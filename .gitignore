@@ -36,6 +36,8 @@ irun.key
 .simvision/
 .symbolnamelist     
 .symbolportinfomap
+dump/
+logs/
 
 # Questa / ModelSim
 work/
