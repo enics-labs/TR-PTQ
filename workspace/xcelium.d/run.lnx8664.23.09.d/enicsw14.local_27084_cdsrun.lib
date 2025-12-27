@@ -1,3 +1,0 @@
-SOFTINCLUDE /tools/cadence/XCELIUM/23.09.001/tools/inca/files/cds.lib
-include ../../../../../../../../../../tech/tsmc/65LP/pdk/cds.lib
-define worklib ../worklib

@@ -1,9 +1,0 @@
- 
--DNCSC
--DXMSC
--D_GLIBCXX_USE_CXX11_ABI=1 -c
--I/tools/cadence/XCELIUM/23.09.001/tools/inca/include
--I/tools/cadence/XCELIUM/23.09.001/tools/include
--fPIC
--pipe
--x c  -Wall
