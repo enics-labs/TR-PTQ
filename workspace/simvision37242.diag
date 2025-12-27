@@ -1,0 +1,91 @@
+*** Message Type: info ***
+When: Fri Dec 26 10:59:35 AM IST 2025
+SimVision started.
+Version: TOOL:  simvision(64)   23.09-s013
+User: levyeli6
+Host: enicsw14
+Platform: Linux/x86_64/3.10.0-1160.62.1.el7.x86_64
+Started: Fri Dec 26 10:59:35 AM IST 2025
+Command: /tools/cadence/XCELIUM/23.09.001/tools.lnx86/simvision/bin/64bit/simvision.exe
+Work Directory: /project/test_project/users/levyeli6/ws/thesis/exp_test/workspace
+ 
+*** Message Type: info ***
+When: Fri Dec 26 10:59:36 AM IST 2025
+Create waveform window: "Waveform 1"
+ 
+*** Message Type: info ***
+When: Fri Dec 26 10:59:45 AM IST 2025
+Create console window: "Console"
+ 
+*** Message Type: info ***
+When: Fri Dec 26 10:59:45 AM IST 2025
+Create utility window: "Properties"
+ 
+*** Message Type: info ***
+When: Fri Dec 26 11:16:50 AM IST 2025
+Create source window: "Source Browser 1"
+ 
+*** Message Type: info ***
+When: Fri Dec 26 11:16:58 AM IST 2025
+Connect to Simulator
+      Design: worklib.tb_pipelined_max:sv
+   Languages: verilog
+   Simulator: Xcelium ppe
+     Version: TOOL:   ippe(64)        23.09-s013
+        User: levyeli6
+        Host: enicsw14
+Time Started: Fri Dec 26 11:16:57 AM IST 2025
+  Process ID: 47600
+   Directory: /project/test_project/users/levyeli6/ws/thesis/exp_test/workspace
+     Command: /tools/cadence/XCELIUM/23.09.001/tools.lnx86/simvision/bin/64bit/ippe.exe -nocopyright -nowarn DLNOCL -cdslib /project/test_project/users/levyeli6/ws/thesis/exp_test/workspace/./xcelium.d/run.lnx8664.23.09.d/cds.lib -snapshot worklib.tb_pipelined_max:sv -64
+
+ 
+*** Message Type: info ***
+When: Fri Dec 26 11:16:58 AM IST 2025
+Exit Simulator: user
+ 
+*** Message Type: info ***
+When: Fri Dec 26 11:24:47 AM IST 2025
+Exit Simulator: user
+ 
+*** Message Type: info ***
+When: Fri Dec 26 11:27:34 AM IST 2025
+Exit Simulator: user
+ 
+*** Message Type: info ***
+When: Fri Dec 26 11:30:18 AM IST 2025
+Exit Simulator: user
+ 
+*** Message Type: info ***
+When: Fri Dec 26 11:31:01 AM IST 2025
+Exit Simulator: user
+ 
+*** Message Type: info ***
+When: Fri Dec 26 11:31:34 AM IST 2025
+Exit Simulator: user
+ 
+*** Message Type: info ***
+When: Fri Dec 26 11:34:13 AM IST 2025
+Exit Simulator: user
+ 
+*** Message Type: error ***
+When: Fri Dec 26 03:37:21 PM IST 2025
+error minor reason {IFV failure}
+    while executing
+"dac::reinvoke $simH"
+    (object "::database" method "::Database::_postReload" body line 31)
+    invoked from within
+"::database _postReload @public@d2"
+    (in namespace inscope "::Database" script line 1)
+    invoked from within
+"namespace inscope ::Database {::database _postReload @public@d2}"
+    ("after" script)
+ 
+*** Message Type: info ***
+When: Fri Dec 26 03:37:22 PM IST 2025
+Delete waveform window: "Waveform 1"
+ 
+*** Message Type: info ***
+When: Fri Dec 26 04:21:16 PM IST 2025
+SimVision Exit.
+ 

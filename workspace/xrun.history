@@ -1,0 +1,12 @@
+s1(21Dec2025:14:29:18):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-exp.sv ../tb/tr_exp_tb.sv -sv -debug 
+s2(21Dec2025:14:30:05):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-exp.sv ../tb/tr_exp_tb.sv -sv -debug 
+s3(21Dec2025:14:30:26):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-exp.sv ../tb/tr_exp_tb.sv -sv -debug 
+s4(21Dec2025:14:31:06):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-exp.sv ../tb/tr_exp_tb.sv -sv -debug 
+s5(21Dec2025:14:32:00):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-exp.sv ../tb/tr_exp_tb.sv -sv -debug 
+s6(21Dec2025:14:32:40):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-exp.sv ../tb/tr_exp_tb.sv -sv -debug 
+s7(21Dec2025:14:33:03):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-exp.sv ../tb/tr_exp_tb.sv -sv -debug 
+s8(21Dec2025:14:33:47):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-exp.sv ../tb/tr_exp_tb.sv -sv -debug 
+s9(21Dec2025:14:39:28):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-exp.sv ../tb/tr_exp_tb.sv -sv -debug 
+s10(21Dec2025:14:39:49):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-exp.sv ../tb/tr_exp_tb.sv -sv -debug 
+s11(21Dec2025:14:40:32):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-exp.sv ../tb/tr_exp_tb.sv -sv -debug 
+s12(21Dec2025:14:43:29):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-exp.sv ../tb/tr_exp_tb.sv -sv -debug -gui 

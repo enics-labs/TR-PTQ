@@ -1,0 +1,162 @@
+s1(21Dec2025:14:29:18):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-exp.sv ../tb/tr_exp_tb.sv -sv -debug 
+s2(21Dec2025:14:30:05):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-exp.sv ../tb/tr_exp_tb.sv -sv -debug 
+s3(21Dec2025:14:30:26):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-exp.sv ../tb/tr_exp_tb.sv -sv -debug 
+s4(21Dec2025:14:31:06):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-exp.sv ../tb/tr_exp_tb.sv -sv -debug 
+s5(21Dec2025:14:32:00):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-exp.sv ../tb/tr_exp_tb.sv -sv -debug 
+s6(21Dec2025:14:32:40):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-exp.sv ../tb/tr_exp_tb.sv -sv -debug 
+s7(21Dec2025:14:33:03):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-exp.sv ../tb/tr_exp_tb.sv -sv -debug 
+s8(21Dec2025:14:33:47):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-exp.sv ../tb/tr_exp_tb.sv -sv -debug 
+s9(21Dec2025:14:39:28):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-exp.sv ../tb/tr_exp_tb.sv -sv -debug 
+s10(21Dec2025:14:39:49):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-exp.sv ../tb/tr_exp_tb.sv -sv -debug 
+s11(21Dec2025:14:40:32):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-exp.sv ../tb/tr_exp_tb.sv -sv -debug 
+s12(21Dec2025:14:43:29):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-exp.sv ../tb/tr_exp_tb.sv -sv -debug -gui 
+s13(21Dec2025:14:48:37):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-exp.sv ../tb/tr_exp_tb.sv -f ../scripts/xrun_config.f 
+s14(21Dec2025:14:49:00):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-exp.sv ../tb/tr_exp_tb.sv -f ../scripts/xrun_config.f 
+s15(21Dec2025:14:53:50):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-exp.sv ../tb/tr_exp_tb.sv -f ../scripts/xrun_config.f 
+s16(21Dec2025:14:59:45):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-exp.sv ../tb/tr_exp_tb.sv -f ../scripts/xrun_config.f 
+s17(21Dec2025:15:00:12):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-exp.sv ../tb/tr_exp_tb.sv -f ../scripts/xrun_config.f 
+s18(21Dec2025:15:00:54):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-exp.sv ../tb/tr_exp_tb.sv -f ../scripts/xrun_config.f 
+s19(21Dec2025:15:01:55):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-exp.sv ../tb/tr_exp_tb.sv -f ../scripts/xrun_config.f 
+s20(21Dec2025:15:02:47):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-exp.sv ../tb/tr_exp_tb.sv -f ../scripts/xrun_config.f 
+s21(21Dec2025:15:05:39):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-exp.sv ../tb/tr_exp_tb.sv -f ../scripts/xrun_config.f 
+s22(21Dec2025:15:06:51):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-exp.sv ../tb/tr_exp_tb.sv -f ../scripts/xrun_config.f 
+s23(21Dec2025:16:34:40):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-exp.sv ../tb/tr_exp_tb.sv -f ../scripts/xrun_config.f 
+s24(21Dec2025:16:38:54):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-exp.sv ../tb/tr_exp_tb.sv -f ../scripts/xrun_config.f 
+s25(21Dec2025:16:42:23):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-exp.sv ../tb/tr_exp_tb.sv -f ../scripts/xrun_config.f 
+s26(21Dec2025:16:46:02):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-exp.sv ../tb/tr_exp_tb.sv -f ../scripts/xrun_config.f 
+s27(21Dec2025:16:46:55):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-exp.sv ../tb/tr_exp_tb.sv -f ../scripts/xrun_config.f 
+s28(21Dec2025:16:49:42):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-exp.sv ../tb/tr_exp_tb.sv -f ../scripts/xrun_config.f 
+s29(21Dec2025:16:49:57):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-exp.sv ../tb/tr_exp_tb.sv -f ../scripts/xrun_config.f 
+s30(24Dec2025:15:25:48):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-exp.sv ../tb/tr_exp_tb.sv -f ../scripts/xrun_config.f 
+s31(24Dec2025:15:26:50):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-exp.sv ../tb/tr_exp_tb.sv -f ../scripts/xrun_config.f 
+s32(24Dec2025:15:32:27):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-exp.sv ../tb/tr_exp_tb.sv -f ../scripts/xrun_config.f 
+s33(24Dec2025:15:32:56):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-exp.sv ../tb/tr_exp_tb.sv -f ../scripts/xrun_config.f 
+s34(24Dec2025:15:33:20):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-exp.sv ../tb/tr_exp_tb.sv -f ../scripts/xrun_config.f 
+s35(24Dec2025:15:50:26):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-ln.sv ../tb/ln_ln_tb.sv -f ../scripts/xrun_config.f 
+s36(24Dec2025:15:51:22):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-ln.sv ../tb/tr_ln_tb.sv -f ../scripts/xrun_config.f 
+s37(24Dec2025:15:52:08):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-ln.sv ../tb/tr_ln_tb.sv -f ../scripts/xrun_config.f 
+s38(24Dec2025:15:52:39):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-ln.sv ../tb/tr_ln_tb.sv -f ../scripts/xrun_config.f 
+s39(24Dec2025:15:56:40):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-ln.sv ../tb/tr_ln_tb.sv -f ../scripts/xrun_config.f 
+s40(24Dec2025:15:59:28):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-ln.sv ../tb/tr_ln_tb.sv -f ../scripts/xrun_config.f 
+s41(24Dec2025:16:03:41):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-ln.sv ../tb/tr_ln_tb.sv -f ../scripts/xrun_config.f 
+s42(24Dec2025:16:04:32):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-ln.sv ../tb/tr_ln_tb.sv -f ../scripts/xrun_config.f 
+s43(24Dec2025:16:05:23):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-ln.sv ../tb/tr_ln_tb.sv -f ../scripts/xrun_config.f 
+s44(24Dec2025:16:06:48):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-ln.sv ../tb/tr_ln_tb.sv -f ../scripts/xrun_config.f 
+s45(24Dec2025:16:08:42):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-ln.sv ../tb/tr_ln_tb.sv -f ../scripts/xrun_config.f 
+s46(24Dec2025:16:09:33):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-ln.sv ../tb/tr_ln_tb.sv -f ../scripts/xrun_config.f 
+s47(24Dec2025:16:19:05):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-ln.sv ../tb/tr_ln_tb.sv -f ../scripts/xrun_config.f 
+s48(24Dec2025:16:23:25):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-ln.sv ../tb/tr_ln_tb.sv -f ../scripts/xrun_config.f 
+s49(24Dec2025:16:24:08):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-ln.sv ../tb/tr_ln_tb.sv -f ../scripts/xrun_config.f 
+s50(24Dec2025:16:26:12):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-ln.sv ../tb/tr_ln_tb.sv -f ../scripts/xrun_config.f 
+s51(24Dec2025:16:28:18):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-ln.sv ../tb/tr_ln_tb.sv -f ../scripts/xrun_config.f 
+s52(24Dec2025:16:34:11):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-ln.sv ../tb/tr_ln_tb.sv -f ../scripts/xrun_config.f -dpi ../tb/dpi/dpi_functions.c 
+s53(24Dec2025:16:47:14):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-ln.sv ../tb/tr_ln_tb.sv -f ../scripts/xrun_config.f -dpi ../tb/dpi/dpi_functions.c 
+s54(24Dec2025:16:47:41):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-ln.sv ../tb/tr_ln_tb.sv -f ../scripts/xrun_config.f -dpi ../tb/dpi/dpi_functions.c 
+s55(24Dec2025:16:48:22):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-ln.sv ../tb/tr_ln_tb.sv -f ../scripts/xrun_config.f -dpi ../tb/dpi/dpi_functions.c 
+s56(24Dec2025:16:48:52):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-ln.sv ../tb/tr_ln_tb.sv -f ../scripts/xrun_config.f -dpi ../tb/dpi/dpi_functions.c 
+s57(24Dec2025:16:56:11):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-ln.sv ../tb/tr_ln_tb.sv -f ../scripts/xrun_config.f -dpi ../tb/dpi/dpi_functions.c 
+s58(24Dec2025:16:57:57):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-ln.sv ../tb/tr_ln_tb.sv -f ../scripts/xrun_config.f -dpi ../tb/dpi/dpi_functions.c 
+s59(24Dec2025:17:00:28):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-ln.sv ../tb/tr_ln_tb.sv -f ../scripts/xrun_config.f -dpi ../tb/dpi/dpi_functions.c 
+s60(24Dec2025:17:02:40):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-ln.sv ../tb/tr_ln_tb.sv -f ../scripts/xrun_config.f -dpi ../tb/dpi/dpi_functions.c 
+s61(24Dec2025:17:03:20):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-ln.sv ../tb/tr_ln_tb.sv -f ../scripts/xrun_config.f -dpi ../tb/dpi/dpi_functions.c 
+s62(24Dec2025:17:03:43):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-ln.sv ../tb/tr_ln_tb.sv -f ../scripts/xrun_config.f -dpi ../tb/dpi/dpi_functions.c 
+s63(24Dec2025:17:29:50):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-div.sv ../tb/tr_div_tb.sv -f ../scripts/xrun_config.f -dpi ../tb/dpi/dpi_functions.c 
+s64(24Dec2025:17:30:22):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-div.sv ../tb/tr_div_tb.sv -f ../scripts/xrun_config.f -dpi ../tb/dpi/dpi_functions.c 
+s65(24Dec2025:17:30:49):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-div.sv ../tb/tr_div_tb.sv -f ../scripts/xrun_config.f -dpi ../tb/dpi/dpi_functions.c 
+s66(25Dec2025:21:21:23):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-div.sv ../tb/tr_div_tb.sv -f ../scripts/xrun_config.f 
+s67(25Dec2025:21:31:14):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-div.sv ../tb/tr_div_tb.sv -f ../scripts/xrun_config.f 
+s68(25Dec2025:21:33:54):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-ln.sv ../tb/tr_ln_tb.sv -f ../scripts/xrun_config.f 
+s69(25Dec2025:21:34:57):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-div.sv ../tb/tr_div_tb.sv -f ../scripts/xrun_config.f 
+s70(25Dec2025:21:45:19):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-div.sv ../tb/tr_div_tb.sv -f ../scripts/xrun_config.f 
+s71(25Dec2025:21:45:44):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-div.sv ../tb/tr_div_tb.sv -f ../scripts/xrun_config.f 
+s72(25Dec2025:21:46:16):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-div.sv ../tb/tr_div_tb.sv -f ../scripts/xrun_config.f 
+s73(25Dec2025:21:48:03):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-div.sv ../tb/tr_div_tb.sv -f ../scripts/xrun_config.f 
+s74(25Dec2025:21:48:11):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-div.sv ../tb/tr_div_tb.sv -f ../scripts/xrun_config.f 
+s75(25Dec2025:21:48:27):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-div.sv ../tb/tr_div_tb.sv -f ../scripts/xrun_config.f 
+s76(25Dec2025:21:49:27):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-div.sv ../tb/tr_div_tb.sv -f ../scripts/xrun_config.f 
+s77(25Dec2025:22:00:36):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-div.sv ../tb/tr_div_tb.sv -f ../scripts/xrun_config.f 
+s78(25Dec2025:22:13:55):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-div.sv ../tb/tr_div_tb.sv -f ../scripts/xrun_config.f 
+s79(25Dec2025:22:14:59):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-div.sv ../tb/tr_div_tb.sv -f ../scripts/xrun_config.f 
+s80(25Dec2025:22:19:41):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-div.sv ../tb/tr_div_tb.sv -f ../scripts/xrun_config.f 
+s81(25Dec2025:22:20:22):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-div.sv ../tb/tr_div_tb.sv -f ../scripts/xrun_config.f 
+s82(25Dec2025:22:21:08):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-div.sv ../tb/tr_div_tb.sv -f ../scripts/xrun_config.f 
+s83(25Dec2025:22:22:11):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-div.sv ../tb/tr_div_tb.sv -f ../scripts/xrun_config.f 
+s84(25Dec2025:22:28:17):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-div.sv ../tb/tr_div_tb.sv -f ../scripts/xrun_config.f 
+s85(25Dec2025:22:28:46):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-div.sv ../tb/tr_div_tb.sv -f ../scripts/xrun_config.f 
+s86(25Dec2025:22:36:28):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-div.sv ../tb/tr_div_tb.sv -f ../scripts/xrun_config.f 
+s87(25Dec2025:22:37:27):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-div.sv ../tb/tr_div_tb.sv -f ../scripts/xrun_config.f 
+s88(25Dec2025:22:38:35):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-div.sv ../tb/tr_div_tb.sv -f ../scripts/xrun_config.f 
+s89(25Dec2025:22:55:23):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-div.sv ../tb/tr_div_tb.sv -f ../scripts/xrun_config.f 
+s90(25Dec2025:22:57:05):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-div.sv ../tb/tr_div_tb.sv -f ../scripts/xrun_config.f 
+s91(25Dec2025:22:58:23):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-div.sv ../tb/tr_div_tb.sv -f ../scripts/xrun_config.f 
+s92(25Dec2025:23:02:20):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-div.sv ../tb/tr_div_tb.sv -f ../scripts/xrun_config.f 
+s93(25Dec2025:23:02:42):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-div.sv ../tb/tr_div_tb.sv -f ../scripts/xrun_config.f 
+s94(25Dec2025:23:04:22):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-div.sv ../tb/tr_div_tb.sv -f ../scripts/xrun_config.f 
+s95(25Dec2025:23:04:40):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-div.sv ../tb/tr_div_tb.sv -f ../scripts/xrun_config.f 
+s96(25Dec2025:23:05:09):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-div.sv ../tb/tr_div_tb.sv -f ../scripts/xrun_config.f 
+s97(25Dec2025:23:05:41):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-div.sv ../tb/tr_div_tb.sv -f ../scripts/xrun_config.f 
+s98(25Dec2025:23:06:03):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-div.sv ../tb/tr_div_tb.sv -f ../scripts/xrun_config.f 
+s99(25Dec2025:23:08:49):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-div.sv ../tb/tr_div_tb.sv -f ../scripts/xrun_config.f 
+s100(25Dec2025:23:09:53):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-div.sv ../tb/tr_div_tb.sv -f ../scripts/xrun_config.f 
+s101(25Dec2025:23:10:46):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-div.sv ../tb/tr_div_tb.sv -f ../scripts/xrun_config.f 
+s102(25Dec2025:23:11:30):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-div.sv ../tb/tr_div_tb.sv -f ../scripts/xrun_config.f 
+s103(25Dec2025:23:12:33):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-div.sv ../tb/tr_div_tb.sv -f ../scripts/xrun_config.f 
+s104(25Dec2025:23:14:31):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-div.sv ../tb/tr_div_tb.sv -f ../scripts/xrun_config.f -g tb.ITER=2 
+s105(25Dec2025:23:14:44):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-div.sv ../tb/tr_div_tb.sv -f ../scripts/xrun_config.f -g ITER=2 
+s106(25Dec2025:23:34:52):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-div.sv ../tb/tr_div_tb.sv -f ../scripts/xrun_config.f -defparam ITER=2 
+s107(25Dec2025:23:35:02):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-div.sv ../tb/tr_div_tb.sv -f ../scripts/xrun_config.f -defparam tb.ITER=2 
+s108(25Dec2025:23:35:16):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-div.sv ../tb/tr_div_tb.sv -f ../scripts/xrun_config.f -defparam tb.ITER=1 
+s109(25Dec2025:23:35:22):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-div.sv ../tb/tr_div_tb.sv -f ../scripts/xrun_config.f -defparam tb.ITER=2 
+s110(26Dec2025:09:30:36):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-div.sv ../tb/tr_div_tb.sv -f ../scripts/xrun_config.f -defparam tb.ITER=1 
+s111(26Dec2025:09:30:46):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-div.sv ../tb/tr_div_tb.sv -f ../scripts/xrun_config.f -defparam tb.ITER=2 
+s112(26Dec2025:10:49:55):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-exp.sv ../tb/tr_exp_tb.sv -f ../scripts/xrun_config.f 
+s113(26Dec2025:10:50:46):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-exp.sv ../tb/tr_exp_tb.sv -f ../scripts/xrun_config.f -defparam ITER=1 
+s114(26Dec2025:10:51:12):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-exp.sv ../tb/tr_exp_tb.sv -f ../scripts/xrun_config.f -defparam tr_exp_tb.ITER=1 
+s115(26Dec2025:10:51:28):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-ln.sv ../tb/tr_ln_tb.sv -f ../scripts/xrun_config.f 
+s116(26Dec2025:10:52:25):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/tr-div.sv ../tb/tr_div_tb.sv -f ../scripts/xrun_config.f -defparam tb.ITER=2 
+s117(26Dec2025:10:53:18):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/online_sum/piped_max.sv ../tb/online_sum/piped_max_tb.sv -f ../scripts/xrun_config.f 
+s118(26Dec2025:10:57:30):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/online_sum/piped_max.sv ../tb/online_sum/piped_max_tb.sv -f ../scripts/xrun_config.f 
+s119(26Dec2025:11:09:40):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/online_sum/piped_max.sv ../tb/online_sum/piped_max_tb.sv -f ../scripts/xrun_config.f 
+s120(26Dec2025:11:11:22):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/online_sum/piped_max.sv ../tb/online_sum/piped_max_tb.sv -f ../scripts/xrun_config.f 
+s121(26Dec2025:11:12:02):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/online_sum/piped_max.sv ../tb/online_sum/piped_max_tb.sv -f ../scripts/xrun_config.f 
+s122(26Dec2025:11:16:17):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/online_sum/piped_max.sv ../tb/online_sum/piped_max_tb.sv -f ../scripts/xrun_config.f 
+s123(26Dec2025:11:23:42):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/online_sum/piped_max.sv ../tb/online_sum/piped_max_tb.sv -f ../scripts/xrun_config.f 
+s124(26Dec2025:11:24:36):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/online_sum/piped_max.sv ../tb/online_sum/piped_max_tb.sv -f ../scripts/xrun_config.f 
+s125(26Dec2025:11:27:02):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/online_sum/piped_max.sv ../tb/online_sum/piped_max_tb.sv -f ../scripts/xrun_config.f 
+s126(26Dec2025:11:30:56):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/online_sum/piped_max.sv ../tb/online_sum/piped_max_tb.sv -f ../scripts/xrun_config.f 
+s127(26Dec2025:11:31:28):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/online_sum/piped_max.sv ../tb/online_sum/piped_max_tb.sv -f ../scripts/xrun_config.f 
+s128(26Dec2025:11:33:55):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/online_sum/piped_max.sv ../tb/online_sum/piped_max_tb.sv -f ../scripts/xrun_config.f 
+s129(26Dec2025:11:40:08):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/online_sum/piped_max.sv ../tb/online_sum/piped_max_tb.sv -f ../scripts/xrun_config.f 
+s130(26Dec2025:11:42:31):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/online_sum/piped_max.sv ../tb/online_sum/piped_max_tb.sv -f ../scripts/xrun_config.f 
+s131(26Dec2025:11:43:32):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/online_sum/piped_max.sv ../tb/online_sum/piped_max_tb.sv -f ../scripts/xrun_config.f 
+s132(26Dec2025:11:47:42):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/online_sum/piped_max.sv ../tb/online_sum/piped_max_tb.sv -f ../scripts/xrun_config.f 
+s133(26Dec2025:11:48:27):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/online_sum/piped_max.sv ../tb/online_sum/piped_max_tb.sv -f ../scripts/xrun_config.f 
+s134(26Dec2025:11:48:38):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/online_sum/piped_max.sv ../tb/online_sum/piped_max_tb.sv -f ../scripts/xrun_config.f 
+s135(26Dec2025:11:49:16):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/online_sum/piped_max.sv ../tb/online_sum/piped_max_tb.sv -f ../scripts/xrun_config.f 
+s136(26Dec2025:11:53:44):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/online_sum/piped_max.sv ../tb/online_sum/piped_max_tb.sv -f ../scripts/xrun_config.f 
+s137(26Dec2025:11:56:23):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/online_sum/piped_max.sv ../tb/online_sum/piped_max_tb.sv -f ../scripts/xrun_config.f -defparam tb_pipelined_max.NUM_OF_TV=3 
+s138(26Dec2025:11:59:25):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/online_sum/piped_max.sv ../tb/online_sum/piped_max_tb.sv -f ../scripts/xrun_config.f -defparam tb_pipelined_max.NUM_OF_TV=3 
+s139(26Dec2025:14:15:46):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/online_sum/piped_max.sv ../rtl/online_sum/online_sum.sv ../rtl/tr-exp.sv -f ../scripts/xrun_config.f 
+s140(26Dec2025:14:17:28):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/online_sum/piped_max.sv ../rtl/online_sum/online_sum.sv ../rtl/tr-exp.sv -f ../scripts/xrun_config.f 
+s141(26Dec2025:14:18:23):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/online_sum/piped_max.sv ../rtl/online_sum/online_sum.sv ../rtl/tr-exp.sv -f ../scripts/xrun_config.f 
+s142(26Dec2025:14:19:02):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/online_sum/piped_max.sv ../rtl/online_sum/online_sum.sv ../rtl/tr-exp.sv ../tb/online_sum/sum_x-max_tb.sv -f ../scripts/xrun_config.f 
+s143(26Dec2025:14:22:17):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/online_sum/piped_max.sv ../rtl/online_sum/online_sum.sv ../rtl/tr-exp.sv ../tb/online_sum/sum_x-max_tb.sv -f ../scripts/xrun_config.f 
+s144(26Dec2025:14:22:56):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/online_sum/piped_max.sv ../rtl/online_sum/online_sum.sv ../rtl/tr-exp.sv ../tb/online_sum/sum_x-max_tb.sv -f ../scripts/xrun_config.f 
+s145(26Dec2025:14:23:24):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/online_sum/piped_max.sv ../rtl/online_sum/online_sum.sv ../rtl/tr-exp.sv ../tb/online_sum/sum_x-max_tb.sv -f ../scripts/xrun_config.f 
+s146(26Dec2025:14:24:56):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/online_sum/piped_max.sv ../rtl/online_sum/online_sum.sv ../rtl/tr-exp.sv ../tb/online_sum/sum_x-max_tb.sv -f ../scripts/xrun_config.f 
+s147(26Dec2025:14:26:54):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/online_sum/piped_max.sv ../rtl/online_sum/online_sum.sv ../rtl/tr-exp.sv ../tb/online_sum/sum_x-max_tb.sv -f ../scripts/xrun_config.f 
+s148(26Dec2025:14:32:40):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/online_sum/piped_max.sv ../rtl/online_sum/online_sum.sv ../rtl/tr-exp.sv ../tb/online_sum/sum_x-max_tb.sv -f ../scripts/xrun_config.f 
+s149(26Dec2025:15:32:41):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/online_sum/piped_max.sv ../rtl/online_sum/online_sum.sv ../rtl/tr-exp.sv ../tb/online_sum/sum_x-max_tb.sv -f ../scripts/xrun_config.f 
+s150(26Dec2025:15:43:11):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/online_sum/piped_max.sv ../rtl/online_sum/online_sum.sv ../rtl/tr-exp.sv ../tb/online_sum/sum_x-max_tb.sv -f ../scripts/xrun_config.f 
+s151(26Dec2025:15:44:28):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/online_sum/piped_max.sv ../rtl/online_sum/online_sum.sv ../rtl/tr-exp.sv ../tb/online_sum/sum_x-max_tb.sv -f ../scripts/xrun_config.f 
+s152(26Dec2025:15:45:01):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/online_sum/piped_max.sv ../rtl/online_sum/online_sum.sv ../rtl/tr-exp.sv ../tb/online_sum/sum_x-max_tb.sv -f ../scripts/xrun_config.f 
+s153(26Dec2025:15:56:12):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/online_sum/piped_max.sv ../rtl/online_sum/online_sum.sv ../rtl/tr-exp.sv ../tb/online_sum/sum_x-max_tb.sv -f ../scripts/xrun_config.f 
+s154(26Dec2025:15:57:20):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/online_sum/piped_max.sv ../rtl/online_sum/online_sum.sv ../rtl/tr-exp.sv ../tb/online_sum/sum_x-max_tb.sv -f ../scripts/xrun_config.f 
+s155(26Dec2025:15:58:13):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/online_sum/piped_max.sv ../rtl/online_sum/online_sum.sv ../rtl/tr-exp.sv ../tb/online_sum/sum_x-max_tb.sv -f ../scripts/xrun_config.f 
+s156(26Dec2025:15:59:25):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/online_sum/piped_max.sv ../rtl/online_sum/online_sum.sv ../rtl/tr-exp.sv ../tb/online_sum/sum_x-max_tb.sv -f ../scripts/xrun_config.f 
+s157(26Dec2025:16:01:42):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/online_sum/piped_max.sv ../rtl/online_sum/online_sum.sv ../rtl/tr-exp.sv ../tb/online_sum/sum_x-max_tb.sv -f ../scripts/xrun_config.f 
+s158(26Dec2025:16:03:01):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/online_sum/piped_max.sv ../rtl/online_sum/online_sum.sv ../rtl/tr-exp.sv ../tb/online_sum/sum_x-max_tb.sv -f ../scripts/xrun_config.f 
+s159(26Dec2025:16:11:16):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/online_sum/piped_max.sv ../rtl/online_sum/online_sum.sv ../rtl/tr-exp.sv ../tb/online_sum/sum_x-max_tb.sv -f ../scripts/xrun_config.f 
+s160(26Dec2025:16:11:55):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/online_sum/piped_max.sv ../rtl/online_sum/online_sum.sv ../rtl/tr-exp.sv ../tb/online_sum/sum_x-max_tb.sv -f ../scripts/xrun_config.f 
+s161(26Dec2025:16:15:35):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/online_sum/piped_max.sv ../rtl/online_sum/online_sum.sv ../rtl/tr-exp.sv ../tb/online_sum/sum_x-max_tb.sv -f ../scripts/xrun_config.f 
+s162(26Dec2025:16:15:57):  /tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun ../rtl/online_sum/piped_max.sv ../rtl/online_sum/online_sum.sv ../rtl/tr-exp.sv ../tb/online_sum/sum_x-max_tb.sv -f ../scripts/xrun_config.f 

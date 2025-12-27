@@ -1,0 +1,6 @@
+xmsc: -nocopyright -COMPILEONLY -cdslib /project/test_project/users/levyeli6/ws/thesis/exp_test/workspace/./xcelium.d/run.lnx8664.23.09.d/cdsrun.lib -hdlvar /project/test_project/users/levyeli6/ws/thesis/exp_test/workspace/./xcelium.d/run.lnx8664.23.09.d/hdlrun.var -work worklib
+xmvlog: -nocopyright -cdslib /project/test_project/users/levyeli6/ws/thesis/exp_test/workspace/./xcelium.d/run.lnx8664.23.09.d/cdsrun.lib -hdlvar /project/test_project/users/levyeli6/ws/thesis/exp_test/workspace/./xcelium.d/run.lnx8664.23.09.d/hdlrun.var -work worklib
+xmvhdl: -nocopyright -cdslib /project/test_project/users/levyeli6/ws/thesis/exp_test/workspace/./xcelium.d/run.lnx8664.23.09.d/cdsrun.lib -hdlvar /project/test_project/users/levyeli6/ws/thesis/exp_test/workspace/./xcelium.d/run.lnx8664.23.09.d/hdlrun.var -work worklib
+xmelab: -nocopyright -cdslib /project/test_project/users/levyeli6/ws/thesis/exp_test/workspace/./xcelium.d/run.lnx8664.23.09.d/cdsrun.lib -hdlvar /project/test_project/users/levyeli6/ws/thesis/exp_test/workspace/./xcelium.d/run.lnx8664.23.09.d/hdlrun.var -work worklib
+simplus: +tb_rc_dir+./xcelium.d/run.lnx8664.23.09.d/xmsc_run +tb_run_dir+/project/test_project/users/levyeli6/ws/thesis/exp_test/workspace +tb_trans_record
+vspsim: -nocopyright

@@ -1,0 +1,173 @@
+xrun(64): 23.09-s013: (c) Copyright 1995-2024 Cadence Design Systems, Inc.
+TOOL:	xrun(64)	23.09-s013: Started on Dec 26, 2025 at 16:15:57 IST
+/tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun
+	../rtl/online_sum/piped_max.sv
+	../rtl/online_sum/online_sum.sv
+	../rtl/tr-exp.sv
+	../tb/online_sum/sum_x-max_tb.sv
+	-f ../scripts/xrun_config.f
+		-sv
+		-log logs/run.log
+		-access +rwc
+		-timescale 1ns/1ps
+		-input ../scripts/simulation.tcl
+		-dpi
+		../tb/dpi/dpi_functions.c
+SOFTINCLUDE ../dig_libs/MUSE/cds.lib
+|
+xrun: *W,DLCPTH (/tech/tsmc/65LP/pdk/cds.lib,3): cds.lib Permission denied on file '/tech/tsmc/65LP/dig_libs/MUSE/cds.lib' (cds.lib command ignored).
+SOFTINCLUDE $XPEDION/aa/cds.lib
+|
+xrun: *W,DLCVAR (/tools/rubyeda/RubySKILL/r20251120.1/cds.site.lib,13): cds.lib Invalid environment variable ''.
+SOFTINCLUDE ../dig_libs/MUSE/cds.lib
+|
+xrun: *W,DLCPTH (/tech/tsmc/65LP/pdk/cds.lib,3): cds.lib Permission denied on file '/tech/tsmc/65LP/dig_libs/MUSE/cds.lib' (cds.lib command ignored).
+SOFTINCLUDE $XPEDION/aa/cds.lib
+|
+xrun: *W,DLCVAR (/tools/rubyeda/RubySKILL/r20251120.1/cds.site.lib,13): cds.lib Invalid environment variable ''.
+SOFTINCLUDE ../dig_libs/MUSE/cds.lib
+|
+xrun: *W,DLCPTH (/tech/tsmc/65LP/pdk/cds.lib,3): cds.lib Permission denied on file '/tech/tsmc/65LP/dig_libs/MUSE/cds.lib' (cds.lib command ignored).
+SOFTINCLUDE $XPEDION/aa/cds.lib
+|
+xrun: *W,DLCVAR (/tools/rubyeda/RubySKILL/r20251120.1/cds.site.lib,13): cds.lib Invalid environment variable ''.
+SOFTINCLUDE ../dig_libs/MUSE/cds.lib
+|
+xrun: *W,DLCPTH (/tech/tsmc/65LP/pdk/cds.lib,3): cds.lib Permission denied on file '/tech/tsmc/65LP/dig_libs/MUSE/cds.lib' (cds.lib command ignored).
+SOFTINCLUDE $XPEDION/aa/cds.lib
+|
+xrun: *W,DLCVAR (/tools/rubyeda/RubySKILL/r20251120.1/cds.site.lib,13): cds.lib Invalid environment variable ''.
+SOFTINCLUDE ../dig_libs/MUSE/cds.lib
+|
+xrun: *W,DLCPTH (/tech/tsmc/65LP/pdk/cds.lib,3): cds.lib Permission denied on file '/tech/tsmc/65LP/dig_libs/MUSE/cds.lib' (cds.lib command ignored).
+SOFTINCLUDE $XPEDION/aa/cds.lib
+|
+xrun: *W,DLCVAR (/tools/rubyeda/RubySKILL/r20251120.1/cds.site.lib,13): cds.lib Invalid environment variable ''.
+Recompiling... reason: file '../rtl/online_sum/online_sum.sv' is newer than expected.
+	expected: Fri Dec 26 16:11:48 2025
+	actual:   Fri Dec 26 16:15:51 2025
+SOFTINCLUDE ../dig_libs/MUSE/cds.lib
+|
+xrun: *W,DLCPTH (/tech/tsmc/65LP/pdk/cds.lib,3): cds.lib Permission denied on file '/tech/tsmc/65LP/dig_libs/MUSE/cds.lib' (cds.lib command ignored).
+SOFTINCLUDE $XPEDION/aa/cds.lib
+|
+xrun: *W,DLCVAR (/tools/rubyeda/RubySKILL/r20251120.1/cds.site.lib,13): cds.lib Invalid environment variable ''.
+SOFTINCLUDE ../dig_libs/MUSE/cds.lib
+|
+xmvlog: *W,DLCPTH (/tech/tsmc/65LP/pdk/cds.lib,3): cds.lib Permission denied on file '/tech/tsmc/65LP/dig_libs/MUSE/cds.lib' (cds.lib command ignored).
+SOFTINCLUDE $XPEDION/aa/cds.lib
+|
+xmvlog: *W,DLCVAR (/tools/rubyeda/RubySKILL/r20251120.1/cds.site.lib,13): cds.lib Invalid environment variable ''.
+file: ../rtl/online_sum/online_sum.sv
+	module worklib.exp_x_minus_xmax:sv
+		errors: 0, warnings: 0
+file: ../tb/online_sum/sum_x-max_tb.sv
+        longint min_val = -(1 << (DATA_WIDTH-1));
+                        |
+xmvlog: *W,VARIST (../tb/online_sum/sum_x-max_tb.sv,149|24): Local static variable with initializer requires 'static' keyword.
+        longint max_val = (1 << (DATA_WIDTH-1)) - 1;
+                        |
+xmvlog: *W,VARIST (../tb/online_sum/sum_x-max_tb.sv,150|24): Local static variable with initializer requires 'static' keyword.
+	Total errors/warnings found outside modules and primitives:
+		errors: 0, warnings: 2
+SOFTINCLUDE ../dig_libs/MUSE/cds.lib
+|
+xrun: *W,DLCPTH (/tech/tsmc/65LP/pdk/cds.lib,3): cds.lib Permission denied on file '/tech/tsmc/65LP/dig_libs/MUSE/cds.lib' (cds.lib command ignored).
+SOFTINCLUDE $XPEDION/aa/cds.lib
+|
+xrun: *W,DLCVAR (/tools/rubyeda/RubySKILL/r20251120.1/cds.site.lib,13): cds.lib Invalid environment variable ''.
+SOFTINCLUDE ../dig_libs/MUSE/cds.lib
+|
+xrun: *W,DLCPTH (/tech/tsmc/65LP/pdk/cds.lib,3): cds.lib Permission denied on file '/tech/tsmc/65LP/dig_libs/MUSE/cds.lib' (cds.lib command ignored).
+SOFTINCLUDE $XPEDION/aa/cds.lib
+|
+xrun: *W,DLCVAR (/tools/rubyeda/RubySKILL/r20251120.1/cds.site.lib,13): cds.lib Invalid environment variable ''.
+SOFTINCLUDE ../dig_libs/MUSE/cds.lib
+|
+xmelab: *W,DLCPTH (/tech/tsmc/65LP/pdk/cds.lib,3): cds.lib Permission denied on file '/tech/tsmc/65LP/dig_libs/MUSE/cds.lib' (cds.lib command ignored).
+SOFTINCLUDE $XPEDION/aa/cds.lib
+|
+xmelab: *W,DLCVAR (/tools/rubyeda/RubySKILL/r20251120.1/cds.site.lib,13): cds.lib Invalid environment variable ''.
+		Caching library 'worklib' ....... Done
+	Elaborating the design hierarchy:
+	Top level design units:
+		sum_x_max_tb
+	Building instance overlay tables: .................... Done
+	Generating native compiled code:
+SOFTINCLUDE ../dig_libs/MUSE/cds.lib
+|
+xmvlog_cg: *W,DLCPTH (/tech/tsmc/65LP/pdk/cds.lib,3): cds.lib Permission denied on file '/tech/tsmc/65LP/dig_libs/MUSE/cds.lib' (cds.lib command ignored).
+SOFTINCLUDE $XPEDION/aa/cds.lib
+|
+xmvlog_cg: *W,DLCVAR (/tools/rubyeda/RubySKILL/r20251120.1/cds.site.lib,13): cds.lib Invalid environment variable ''.
+		worklib.exp_x_minus_xmax:sv <0x450106c9>
+			streams:  16, words: 17034
+	Building instance specific data structures.
+	Loading native compiled code:     .................... Done
+	Design hierarchy summary:
+		                 Instances  Unique
+		Modules:                11       4
+		Registers:             181      59
+		Scalar wires:           64       -
+		Vectored wires:        183       -
+		Always blocks:          19       6
+		Initial blocks:          4       4
+		Cont. assignments:     155      29
+		Pseudo assignments:     25       -
+		Process Clocks:         18       1
+		Simulation timescale:  1ps
+	Writing initial simulation snapshot: worklib.sum_x_max_tb:sv
+SOFTINCLUDE ../dig_libs/MUSE/cds.lib
+|
+xmsim: *W,DLCPTH (/tech/tsmc/65LP/pdk/cds.lib,3): cds.lib Permission denied on file '/tech/tsmc/65LP/dig_libs/MUSE/cds.lib' (cds.lib command ignored).
+SOFTINCLUDE $XPEDION/aa/cds.lib
+|
+xmsim: *W,DLCVAR (/tools/rubyeda/RubySKILL/r20251120.1/cds.site.lib,13): cds.lib Invalid environment variable ''.
+Loading snapshot worklib.sum_x_max_tb:sv .................... Done
+SVSEED default: 1
+xcelium> source /tools/cadence/XCELIUM/23.09.001/tools/xcelium/files/xmsimrc
+xcelium> # create database for post simulation waveform
+xcelium> database -open -shm dump -compress -incsize 100M -into dump -default
+Created default SHM database dump
+xcelium> probe -database dump -create [scop -tops] -functions -tasks -emptyok -depth all -memories -all -dynamic
+xmsim: *W,PRFRTNEV: (-FUNCTIONS) Database must be opened in -EVENT mode to capture calling scope data. Use -wave_glitch_recording with ida_database if ida_probe is being used. Set is_sequence_time option to 1 if $shm_open/$shm_probe is being used.
+xmsim: *W,MTDYNUSE: SHM probe is configured with dynamic object dumping enabled. This is likely to degrade probing performance.
+Created probe 1
+xcelium> run
+  56  -45    4  -56   87   50   63  -49 
+ 108   42  -88  124 -117  -36 -126  -53 
+ -39  -17   71  -18   68  -31   20   -4 
+Success! Time=55000 | Expected=   0 | Got=  x
+  25   31    4  -38 -125  -16  -18   33 
+xmsim: *E,ERRSEV (../tb/online_sum/sum_x-max_tb.sv,126): (time 65 NS).
+sum_x_max_tb.unmblk1
+Mismatch! Time=65000 | Expected=   0 | Got=255
+ 119   78   73  -51  101    4   30  -12 
+xmsim: *E,ERRSEV (../tb/online_sum/sum_x-max_tb.sv,126): (time 75 NS).
+sum_x_max_tb.unmblk1
+Mismatch! Time=75000 | Expected=   0 | Got=  0
+  91  -72 -113 -105  -51   24   29  -91 
+xmsim: *E,ERRSEV (../tb/online_sum/sum_x-max_tb.sv,126): (time 85 NS).
+sum_x_max_tb.unmblk1
+Mismatch! Time=85000 | Expected= -68 | Got=  0
+  14   10 -117  -19    1  115 -128  -81 
+xmsim: *E,ERRSEV (../tb/online_sum/sum_x-max_tb.sv,126): (time 95 NS).
+sum_x_max_tb.unmblk1
+Mismatch! Time=95000 | Expected=   0 | Got=  2
+ -34    0  -65  -27   98  -90  -91   24 
+xmsim: *E,ERRSEV (../tb/online_sum/sum_x-max_tb.sv,126): (time 105 NS).
+sum_x_max_tb.unmblk1
+Mismatch! Time=105000 | Expected=   0 | Got=255
+xmsim: *E,ERRSEV (../tb/online_sum/sum_x-max_tb.sv,126): (time 115 NS).
+sum_x_max_tb.unmblk1
+Mismatch! Time=115000 | Expected=   0 | Got=  0
+xmsim: *E,ERRSEV (../tb/online_sum/sum_x-max_tb.sv,126): (time 125 NS).
+sum_x_max_tb.unmblk1
+Mismatch! Time=125000 | Expected=  82 | Got=  0
+[0;31m[TEST FAILED][0m
+Simulation complete via $finish(1) at time 185 NS + 0
+../tb/online_sum/sum_x-max_tb.sv:81         $finish;
+xcelium> #run 1000
+xcelium> #exit
+xcelium> exit
+TOOL:	xrun(64)	23.09-s013: Exiting on Dec 26, 2025 at 16:15:57 IST  (total: 00:00:00)

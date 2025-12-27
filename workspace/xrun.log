@@ -1,0 +1,60 @@
+xrun(64): 23.09-s013: (c) Copyright 1995-2024 Cadence Design Systems, Inc.
+TOOL:	xrun(64)	23.09-s013: Started on Dec 21, 2025 at 14:43:28 IST
+/tools/cadence/XCELIUM/23.09.001/tools/bin/64bit/xrun
+	../rtl/tr-exp.sv
+	../tb/tr_exp_tb.sv
+	-sv
+	-debug
+	-gui
+SOFTINCLUDE ../dig_libs/MUSE/cds.lib
+|
+xrun: *W,DLCPTH (/tech/tsmc/65LP/pdk/cds.lib,3): cds.lib Permission denied on file '/tech/tsmc/65LP/dig_libs/MUSE/cds.lib' (cds.lib command ignored).
+SOFTINCLUDE $XPEDION/aa/cds.lib
+|
+xrun: *W,DLCVAR (/tools/rubyeda/RubySKILL/r20251120.1/cds.site.lib,13): cds.lib Invalid environment variable ''.
+SOFTINCLUDE ../dig_libs/MUSE/cds.lib
+|
+xrun: *W,DLCPTH (/tech/tsmc/65LP/pdk/cds.lib,3): cds.lib Permission denied on file '/tech/tsmc/65LP/dig_libs/MUSE/cds.lib' (cds.lib command ignored).
+SOFTINCLUDE $XPEDION/aa/cds.lib
+|
+xrun: *W,DLCVAR (/tools/rubyeda/RubySKILL/r20251120.1/cds.site.lib,13): cds.lib Invalid environment variable ''.
+SOFTINCLUDE ../dig_libs/MUSE/cds.lib
+|
+xrun: *W,DLCPTH (/tech/tsmc/65LP/pdk/cds.lib,3): cds.lib Permission denied on file '/tech/tsmc/65LP/dig_libs/MUSE/cds.lib' (cds.lib command ignored).
+SOFTINCLUDE $XPEDION/aa/cds.lib
+|
+xrun: *W,DLCVAR (/tools/rubyeda/RubySKILL/r20251120.1/cds.site.lib,13): cds.lib Invalid environment variable ''.
+SOFTINCLUDE ../dig_libs/MUSE/cds.lib
+|
+xrun: *W,DLCPTH (/tech/tsmc/65LP/pdk/cds.lib,3): cds.lib Permission denied on file '/tech/tsmc/65LP/dig_libs/MUSE/cds.lib' (cds.lib command ignored).
+SOFTINCLUDE $XPEDION/aa/cds.lib
+|
+xrun: *W,DLCVAR (/tools/rubyeda/RubySKILL/r20251120.1/cds.site.lib,13): cds.lib Invalid environment variable ''.
+SOFTINCLUDE ../dig_libs/MUSE/cds.lib
+|
+xrun: *W,DLCPTH (/tech/tsmc/65LP/pdk/cds.lib,3): cds.lib Permission denied on file '/tech/tsmc/65LP/dig_libs/MUSE/cds.lib' (cds.lib command ignored).
+SOFTINCLUDE $XPEDION/aa/cds.lib
+|
+xrun: *W,DLCVAR (/tools/rubyeda/RubySKILL/r20251120.1/cds.site.lib,13): cds.lib Invalid environment variable ''.
+SOFTINCLUDE ../dig_libs/MUSE/cds.lib
+|
+xrun: *W,DLCPTH (/tech/tsmc/65LP/pdk/cds.lib,3): cds.lib Permission denied on file '/tech/tsmc/65LP/dig_libs/MUSE/cds.lib' (cds.lib command ignored).
+SOFTINCLUDE $XPEDION/aa/cds.lib
+|
+xrun: *W,DLCVAR (/tools/rubyeda/RubySKILL/r20251120.1/cds.site.lib,13): cds.lib Invalid environment variable ''.
+SOFTINCLUDE ../dig_libs/MUSE/cds.lib
+|
+xmsim: *W,DLCPTH (/tech/tsmc/65LP/pdk/cds.lib,3): cds.lib Permission denied on file '/tech/tsmc/65LP/dig_libs/MUSE/cds.lib' (cds.lib command ignored).
+SOFTINCLUDE $XPEDION/aa/cds.lib
+|
+xmsim: *W,DLCVAR (/tools/rubyeda/RubySKILL/r20251120.1/cds.site.lib,13): cds.lib Invalid environment variable ''.
+xmsim: *W,NOMTDGUI: Multi-Threaded Dumping is disabled for interactive debug mode.
+
+-------------------------------------
+Relinquished control to SimVision...
+xcelium> 
+xcelium> source /tools/cadence/XCELIUM/23.09.001/tools/xcelium/files/xmsimrc
+xcelium> ^C
+xcelium> exit
+xmsim: *W,NORUNCMD: No 'run' command issued.
+TOOL:	xrun(64)	23.09-s013: Exiting on Dec 21, 2025 at 14:48:23 IST  (total: 00:04:55)

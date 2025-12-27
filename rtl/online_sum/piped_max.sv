@@ -1,0 +1,69 @@
+module pipelined_max_tree #(
+    parameter int NUM_INPUTS = 8,  
+    parameter int DATA_WIDTH = 8  
+)(
+    input  logic                          clk,
+    input  logic                          rst_n,
+    input  logic                          valid_in,
+    input  logic signed [DATA_WIDTH-1:0]  in_data [NUM_INPUTS],
+    output logic signed [DATA_WIDTH-1:0]  max_out, 
+    output logic                          valid_out
+);
+
+    localparam int STAGES = $clog2(NUM_INPUTS);
+
+    // --- 1. Explicit Declaration of the Tree Structure ---
+    // We create an array of logic arrays. 
+    // Each 'row' represents a stage of the pipeline.
+    generate
+        for (genvar s = 0; s <= STAGES; s++) begin : stage_decl
+            localparam int WIDTH = NUM_INPUTS >> s;
+            logic signed [DATA_WIDTH-1:0] data [WIDTH];
+        end
+    endgenerate
+
+    // --- 2. Data Logic ---
+    generate
+        // Connect inputs to the first stage
+        for (genvar i = 0; i < NUM_INPUTS; i++) begin : input_bind
+            assign stage_decl[0].data[i] = in_data[i];
+        end
+
+        // Build the comparison tree
+        for (genvar s = 0; s < STAGES; s++) begin : tree_level
+            localparam int NEXT_WIDTH = NUM_INPUTS >> (s + 1);
+            
+            for (genvar i = 0; i < NEXT_WIDTH; i++) begin : comp_block
+                always_ff @(posedge clk or negedge rst_n) begin
+                    if (!rst_n) begin
+                        stage_decl[s+1].data[i] <= '0;
+                    end else begin
+                        // The actual hardware comparison
+                        if (stage_decl[s].data[2*i] >= stage_decl[s].data[2*i+1])
+                            stage_decl[s+1].data[i] <= stage_decl[s].data[2*i];
+                        else
+                            stage_decl[s+1].data[i] <= stage_decl[s].data[2*i+1];
+                    end
+                end
+            end
+        end
+    endgenerate
+
+    // --- 3. Valid Signal Pipeline (Shift Register) ---
+    logic [STAGES:0] v_pipe; // Size is STAGES+1 to account for input + stages
+
+    always_ff @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            v_pipe <= '0;
+        end else begin
+            // v_pipe[0] is the current input, 
+            // others are delayed versions
+            v_pipe <= {v_pipe[STAGES-1:0], valid_in};
+        end
+    end
+
+    // --- 4. Final Assignments ---
+    assign max_out   = stage_decl[STAGES].data[0];
+    assign valid_out = v_pipe[STAGES-1];
+
+endmodule
