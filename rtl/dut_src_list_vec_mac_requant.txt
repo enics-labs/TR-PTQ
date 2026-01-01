@@ -1,0 +1,3 @@
+vec_mac/vec_mac.sv
+quantization/requant_unit.sv
+qlinear/qlinear.sv

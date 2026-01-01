@@ -1,0 +1,6 @@
+This directory should have the scripts for running your flow, including:
+- Script for running logic simulation (simulation.tcl)
+- Script for running logic synthesis (genus.tcl)
+- Script for running place and route (innovus.tcl)
+- Basic Common UI procedures for use with Cadence tools (procedures.tcl)
+

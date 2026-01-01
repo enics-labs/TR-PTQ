@@ -1,0 +1,20 @@
+-gui
+-sv
+-v93
+-debug
+-timescale 1ns/1ps
+-define GATE_LEVEL
+-define BACKANNOTATION
+-f ../src/dut_src_list_glv.txt
++sdf_verbose 
+-sdfstats ../reports/simulation/sdf_statistics.rpt 
+-input ../scripts/backannotation.tcl
+
+
+# If you have IOs, make sure to add this to your source list
+#-f ../libraries/libraries.TSMC65_IO.f
+
+# If you have memories, add a preload option and behavioral models to your source list:
+# +MEMLOAD="PRELOAD"
+# <my memories>.v
+

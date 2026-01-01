@@ -1,0 +1,145 @@
+# Hierarchy
+set design(FULLCHIP_OR_MACRO) "MACRO"; #FULLCHIP includes IO Ring
+set design(HAS_SCAN) "no"; # Are there scan ports
+
+
+
+
+
+#############################################
+#     Technology Definition
+#############################################
+set TECHNOLOGY "TSMC65LP"
+set SC_TECHNOLOGY "ARM65LP_SC"
+set SRAM_TECHNOLOGY "ARM65LP_SRAM"
+set IO_TECHNOLOGY "TSMC65_IO"
+
+#############################################
+#       Port Definitions (From Verilog)
+#############################################
+###### Clocks
+set design(CLK_NAME) <MY CLOCK NAME> 
+    set design(clock_list) [list $design(CLK_NAME)]
+set design(CLK_PORT) <MY CLOCK PORT NAME>
+    set design(clock_port_list) [list $design(CLK_PORT)]
+set design(CLK_PERIOD) 10.0
+    set design(clock_period_list) [list $design(CLK_PERIOD)]
+# For additional clocks, lappend to clock_list, clock_port_list, clock_period_list
+
+# Reset
+set design(RST_PORT) <MY RESET PORT NAME>
+
+# Scan
+if {$design(HAS_SCAN)=="yes"} {
+    set design(SCAN_MODE_PORT) ""
+}
+
+if {$design(FULLCHIP_OR_MACRO) == "FULLCHIP" } {
+    set design(IO_MODULE) ""
+    set design(IO_VERILOG) ""
+}    
+
+# Hard Macros
+#
+# Add hard macro instance references to the "design" array
+#
+
+#############################################
+#       SDC Settings
+#############################################
+# IO Constraints
+set design(INPUT_DELAY) <MY GENERAL INPUT DELAY>
+set design(OUTPUT_DELAY) <MY GENERAL OUTPUT DELAY>
+set design(INPUT_TRANSITION) [expr $design(CLK_PERIOD)/10.0]
+
+# Clock Constraints 
+set design(CLOCK_UNCERTAINTY)    0.125 ; # In ns for SDC (will appear in ps for get_db)
+set design(CLOCK_MAX_TRANSITION) 0.250 ; # In ns for SDC (will appear in ps for get_db)
+set design(CLOCK_MAX_FANOUT)     20
+set design(CLOCK_MAX_CAPACITANCE) 0.100 ; # In pF for SDC (will appear in fF for get_db) 
+
+# DRV Constraints
+# Note that these will be set automatically based on .lib files if not applied
+set design(MAX_FANOUT)      16
+set design(MAX_TRANSITION)  0.35 ; # In ns for SDC (will appear in ps for get_db)
+#set design(MAX_CAPACITANCE) <MY MAX CAP DRV>; # In pF for SDC (will appear in fF for get_db)
+
+
+#############################################
+#       Files and Paths
+#############################################
+set design(workdir) $env(PWD)
+set design(project_root) "$env(PWD)/.."
+set design(inputs_dir) "$design(project_root)/inputs"
+set design(sourcecode_dir) "$design(project_root)/src/rtl"
+set design(hdl_search_paths) ". $design(sourcecode_dir)"
+set design(read_hdl_list) "$design(sourcecode_dir)/../dut_src_list_avg.txt"
+set design(testbench_dir) "$design(project_root)/src/tb"
+set design(scripts_dir) "$design(project_root)/scripts"
+set design(dbs_dir)     "$design(project_root)/dbs"
+set design(export_dir) "$design(project_root)/export"
+set design(reports_dir) "$design(project_root)/reports"
+set design(synthesis_reports) "$design(reports_dir)/synthesis"
+set design(functional_sdc) "$design(inputs_dir)/$design(TOPLEVEL).sdc"
+set design(postsyn_netlist) "$design(inputs_dir)/$design(TOPLEVEL).postsyn.v"
+set design(postsyn_db_base_name) "$design(dbs_dir)/post_synth/$design(TOPLEVEL)"
+set design(postsyn_db) "$design(postsyn_db_base_name).stylus.enc"
+set design(postsyn_sdf) "$design(inputs_dir)/$design(TOPLEVEL).postsyn.sdf"
+set design(floorplan_def) "$design(inputs_dir)/$design(TOPLEVEL).floorplan.def"
+set design(postroute_netlist) "$design(export_dir)/$design(TOPLEVEL).final.v"
+set design(postroute_sdf) "$design(export_dir)/$design(TOPLEVEL).final.sdf"
+set design(mmmc_view_file) "$design(inputs_dir)/$design(TOPLEVEL).mmmc"
+set design(io_file) "$design(inputs_dir)/$design(TOPLEVEL).io"
+set design(clock_tree_spec) "$design(inputs_dir)/$design(TOPLEVEL).ccopt"
+
+
+#############################################
+#       MMMC
+#############################################
+set design(selected_setup_analysis_views) "wc_analysis_view"
+set design(selected_hold_analysis_views)  "bc_analysis_view"
+
+#############################################
+#       Global Nets
+#############################################
+set design(digital_gnd) "gnd"
+set design(all_ground_nets) $design(digital_gnd)
+set design(digital_vdd) "vdd"
+set design(all_power_nets) $design(digital_vdd)
+
+if {$design(FULLCHIP_OR_MACRO) == "FULLCHIP" } {
+    set design(io_gnd) "gnd"
+    #lappend design(all_ground_nets) $design(io_gnd)
+    set design(io_vdd) "vddio"
+    lappend design(all_power_nets) $design(io_vdd)
+}
+#set design(additional_ground_nets) ""
+#lappend design(all_ground_nets) $design(additional_ground_nets)
+#set design(additional_power_nets) ""
+#lappend design(all_power_nets) $design(additional_power_nets)
+
+#############################################
+#       Power Simulation Stuff
+#############################################
+set design(tb_name)  <MY TEST BENCH NAME>
+set design(dut_name) <MY DUT INSTANCE NAME>
+set design(vcd_file) "$design(export_dir)/pwr/$design(TOPLEVEL).vcd"
+set design(tcf_file) "../export/$design(TOPLEVEL).tcf"
+set design(power_report_start_time) <MY START TIME VCD RECORDING>
+set design(power_report_end_time)   <MY END TIME VCD RECORDING>
+#############################################
+#       Print values to debug file
+#############################################
+set df [open $debug_file w]
+puts $df "\n******************************************"
+puts $df "* Values loaded from $design(TOPLEVEL).defines.tcl *"
+puts $df "******************************************"
+foreach var {TECHNOLOGY SC_TECHNOLOGY SRAM_TECHNOLOGY IO_TECHNOLOGY mmmc_or_simple phys_synth_type runtype} {
+    puts $df "$var = \t[set $var]"
+}
+foreach dic {design} {
+    foreach key [array names $dic] {
+        puts $df "${dic}(${key}) = \t[set ${dic}([set key])]"
+    }
+}
+close $df

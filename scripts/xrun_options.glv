@@ -1,0 +1,17 @@
+-gui
+-sv
+-v93
+-debug
+-nospecify 
+-define GATE_LEVEL
+-f ../src/dut_src_list_glv.txt
+
+#-define BACK_ANNOTATION
+#+sdf_verbose 
+#-sdfstats ../reports/simulation/sdf_statistics.rpt 
+#-input ../scripts/backannotation.tcl
+
+# If you have memories, add a preload option and behavioral models to your source list:
+# +MEMLOAD="PRELOAD"
+# <my memories>.v
+
