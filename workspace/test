@@ -1,0 +1,46 @@
+--- Starting Taylor-Region Test (ITER=2) ---
+xmsim: *E,ERRSEV (../tb/round-exp/round-exp_tb-full.sv,70): (time 36 NS).
+tr_exp_tb.unmblk1
+[ASSERT FAIL] x=-0.266667 | HW=0.749020 | Exp=0.765928 | Err=0.016909
+xmsim: *E,ERRSEV (../tb/round-exp/round-exp_tb-full.sv,70): (time 46 NS).
+tr_exp_tb.unmblk1
+[ASSERT FAIL] x=-0.400000 | HW=0.623529 | Exp=0.670320 | Err=0.046791
+xmsim: *E,ERRSEV (../tb/round-exp/round-exp_tb-full.sv,70): (time 56 NS).
+tr_exp_tb.unmblk1
+[ASSERT FAIL] x=-0.533333 | HW=0.498039 | Exp=0.586646 | Err=0.088607
+xmsim: *E,ERRSEV (../tb/round-exp/round-exp_tb-full.sv,70): (time 86 NS).
+tr_exp_tb.unmblk1
+[ASSERT FAIL] x=-0.933333 | HW=0.411765 | Exp=0.393241 | Err=0.018524
+xmsim: *E,ERRSEV (../tb/round-exp/round-exp_tb-full.sv,70): (time 96 NS).
+tr_exp_tb.unmblk1
+[ASSERT FAIL] x=-1.066667 | HW=0.368627 | Exp=0.344154 | Err=0.024474
+xmsim: *E,ERRSEV (../tb/round-exp/round-exp_tb-full.sv,70): (time 106 NS).
+tr_exp_tb.unmblk1
+[ASSERT FAIL] x=-1.200000 | HW=0.321569 | Exp=0.301194 | Err=0.020374
+xmsim: *E,ERRSEV (../tb/round-exp/round-exp_tb-full.sv,70): (time 116 NS).
+tr_exp_tb.unmblk1
+[ASSERT FAIL] x=-1.333333 | HW=0.274510 | Exp=0.263597 | Err=0.010913
+xmsim: *E,ERRSEV (../tb/round-exp/round-exp_tb-full.sv,70): (time 136 NS).
+tr_exp_tb.unmblk1
+[ASSERT FAIL] x=-1.600000 | HW=0.184314 | Exp=0.201897 | Err=0.017583
+xmsim: *E,ERRSEV (../tb/round-exp/round-exp_tb-full.sv,70): (time 146 NS).
+tr_exp_tb.unmblk1
+[ASSERT FAIL] x=-1.733333 | HW=0.188235 | Exp=0.176694 | Err=0.011541
+xmsim: *E,ERRSEV (../tb/round-exp/round-exp_tb-full.sv,70): (time 156 NS).
+tr_exp_tb.unmblk1
+[ASSERT FAIL] x=-1.866667 | HW=0.168627 | Exp=0.154638 | Err=0.013989
+xmsim: *E,ERRSEV (../tb/round-exp/round-exp_tb-full.sv,70): (time 166 NS).
+tr_exp_tb.unmblk1
+[ASSERT FAIL] x=-2.000000 | HW=0.152941 | Exp=0.135335 | Err=0.017606
+xmsim: *E,ERRSEV (../tb/round-exp/round-exp_tb-full.sv,70): (time 176 NS).
+tr_exp_tb.unmblk1
+[ASSERT FAIL] x=-2.133333 | HW=0.137255 | Exp=0.118442 | Err=0.018813
+xmsim: *E,ERRSEV (../tb/round-exp/round-exp_tb-full.sv,70): (time 186 NS).
+tr_exp_tb.unmblk1
+[ASSERT FAIL] x=-2.266667 | HW=0.117647 | Exp=0.103657 | Err=0.013990
+xmsim: *E,ERRSEV (../tb/round-exp/round-exp_tb-full.sv,70): (time 196 NS).
+tr_exp_tb.unmblk1
+[ASSERT FAIL] x=-2.400000 | HW=0.101961 | Exp=0.090718 | Err=0.011243
+xmsim: *E,ERRSEV (../tb/round-exp/round-exp_tb-full.sv,70): (time 256 NS).
+tr_exp_tb.unmblk1
+[ASSERT FAIL] x=-3.200000 | HW=0.050980 | Exp=0.040762 | Err=0.010218

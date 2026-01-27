@@ -23,6 +23,7 @@ module tr_exp #(
     input  logic               rst_n,
 
     input  logic signed [7:0]  x,      // Q4
+    input  logic signed [7:0]  e_a,      // Q4
     output logic [7:0]         y
 );
 

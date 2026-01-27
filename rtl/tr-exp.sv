@@ -23,13 +23,14 @@ module tr_exp #(
     input  logic               rst_n,
 
     input  logic signed [7:0]  x,      // Q4
+    output logic [7:0]  e_a,      // Q4
     output logic [7:0]         y
 );
 
     // ---------------------------------------------------------
     // Extract integer and fractional parts
     // ---------------------------------------------------------
-    logic signed [3:0] a_int;   // integer part (signed)
+    logic signed [2:0] a_int;   // integer part (signed)
     logic              idx_zero;   // integer part (signed)
     logic [2:0]        a_idx;   // LUT index (0..7)
     logic [3:0]        x_frac;  // fractional part
@@ -56,7 +57,6 @@ module tr_exp #(
     // ---------------------------------------------------------
     // Stage 0 : LUT read
     // ---------------------------------------------------------
-    logic [7:0] e_a;
     assign e_a = (idx_zero) ? 8'd255: exp_lut[a_idx];
 
     // ---------------------------------------------------------
@@ -80,27 +80,27 @@ module tr_exp #(
     assign xa_square[0] = xa_square_0_trm_0 | xa_square_0_trm_1 | xa_square_0_trm_2;
     assign xa_square[1] = x_frac[3]&(~x_frac[2]) | x_frac[3]&x_frac[1];
     assign xa_square[2] = x_frac[3]&x_frac[2];
-    assign second_order = first_order + xa_square;
+    assign second_order = 6'(first_order) + 6'(xa_square);
 
     // ---------------------------------------------------------
     // Stage 3 : final computation
     // ---------------------------------------------------------
 
-    logic [13:0] y1_w1;
+    logic [12:0] y1_w1;
     logic [7:0]  y1_w2;
 
-    logic [13:0] y2_w1;
+    logic [12:0] y2_w1;
     logic [7:0]  y2_w2;
 
-    assign y1_w2 = y1_w1[12:4]; 
-    assign y1_w1 = e_a * first_order;
+    assign y1_w2 = y1_w1[11:4]; 
+    assign y1_w1 = 13'(e_a) * 13'(first_order);
     
-    assign y2_w2 = y2_w1[12:4]; 
+    assign y2_w2 = y2_w1[11:4]; 
     assign y2_w1 = e_a * second_order;
     
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n)
-            y <= 'd0; 
+            y <= 'd0;  
         else begin
             case (ITER)
                 0: begin
