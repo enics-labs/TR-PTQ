@@ -9,7 +9,7 @@ module q4_4_round_neg_tb();
     logic       [7:0]         e_a;
     
     parameter FRAC = 4;
-    parameter ITER = 2;
+    parameter ITER = 1;
 
     tr_exp #(
         .FRAC(FRAC),
@@ -33,7 +33,7 @@ module q4_4_round_neg_tb();
 
     initial begin
         $display("---------------------------------------------------------");
-        $display("  Input (Q4.4) | Dec Value | Rounded Int | LUT Index | mantisa    |    mantisa    | Zero");
+        $display("  Input (Q4.4) | Dec Value | Rounded Int | Ref val | Actual val | LUT Index | mantisa    |    mantisa    | Zero");
         $display("---------------------------------------------------------");
 
         // 1. Test Zero
@@ -67,10 +67,26 @@ module q4_4_round_neg_tb();
     end
 
     task display_vals;
+        // begin
+        //     $display("      %d      |   %f  |     %2d      |     %f  |   %f   |  %f  |      %d      |       %f      |  %b", 
+        //              x, dpi_qmk_to_real(x, 4), e_a, e_a/256.0, $exp(dpi_qmk_to_real(x, 4)), mantisa*e_a/256.0, mantisa, mantisa/16.0, is_zero);
+        // end
+        // begin
+        //     $display("      %d      |   %f  |     %f      |     %f  ", 
+        //              x, dpi_qmk_to_real(x, 4), $exp(int'(dpi_qmk_to_real(x, 4))), e_a/*/256.0*/);
+        // end
+        // begin
+        //     $display("      %d(%0h)      |   %f  |     %f      |     %f  ", 
+        //              x, x, dpi_qmk_to_real(x, 4), 1 + (dpi_qmk_to_real(x, 4) - int'(dpi_qmk_to_real(x, 4))), mantisa/*/16.0*/);
+        // end
         begin
-            $display("      %d      |   %f  |     %2d      |     %f     |      %d      |       %f      |  %b", 
-                     x, dpi_qmk_to_real(x, 4), e_a, e_a/256.0, mantisa, mantisa/16.0, is_zero);
+            $display("      %d(%0h)      |   %f  |     %f      |     %f  ", 
+                     x, x, dpi_qmk_to_real(x, 4), $exp(int'(dpi_qmk_to_real(x, 4))) * (1 + (dpi_qmk_to_real(x, 4) - int'(dpi_qmk_to_real(x, 4)))), (12'(e_a*mantisa))/16.0/256.0);
         end
+        // begin
+        //     $display("________________________________________________________");
+        // end
+
     endtask
 
 endmodule

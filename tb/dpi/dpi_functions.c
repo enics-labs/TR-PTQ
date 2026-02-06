@@ -52,7 +52,7 @@ int dpi_real_to_qmk(double real_val, int M, int K)
 double dpi_qmk_to_real(int fixed_val, int K)
 {
     // Scale factor
-    double scale = (double)(1LL << K) -1;
+    double scale = (double)(1LL << K);
 
     // Convert back to real
     return ((double)fixed_val) / scale;
