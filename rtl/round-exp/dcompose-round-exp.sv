@@ -73,7 +73,7 @@ module tr_exp #(
     logic [5:0] second_order;
     
     quadratic_divider qd(
-        .x(x),      // 8-bit signed input
+        .x(x_frac),      // 8-bit signed input
         .y(xa_square)       // 2-bit unsigned output: floor(x^2/32)
     );
 
@@ -90,6 +90,7 @@ module tr_exp #(
             end
             1: begin
                 mantisa = {3'b000, first_order}; 
+                $display("mantisa=%0d, e_a=%0d", mantisa, e_a);
             end
             2: begin
                 mantisa = {2'b00, second_order}; 
