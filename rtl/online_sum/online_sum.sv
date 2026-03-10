@@ -12,8 +12,8 @@ module exp_x_minus_xmax #(
     input  logic signed [DATA_WIDTH-1:0]  in_data [NUM_INPUTS],
 
     output logic                          valid_out,
-    output logic        [DATA_WIDTH-1:0]  e_a [NUM_INPUTS],  // widened
-    output logic        [DATA_WIDTH-1:0]  e_frac [NUM_INPUTS]  // widened
+    output logic signed [DATA_WIDTH-1:0]  e_a [NUM_INPUTS],  // widened
+    output logic signed [DATA_WIDTH-1:0]  e_frac [NUM_INPUTS]  // widened
 );
 
 localparam int MAX_LATENCY = $clog2(NUM_INPUTS) - 1;
@@ -82,7 +82,9 @@ logic signed [DATA_WIDTH-1:0] x_shifted_clamped [NUM_INPUTS];
 always_comb begin
     for (int j = 0; j < NUM_INPUTS; j++) begin
         // Sign-extend to 9 bits BEFORE subtracting to prevent 8-bit wrap
-        x_shifted[j] = $signed(aligned_data[j]) - $signed(x_max);
+        // x_shifted[j] = $signed(aligned_data[j]) - $signed(x_max);
+        x_shifted[j] = $signed({aligned_data[j][DATA_WIDTH-1], aligned_data[j]}) - 
+                       $signed({x_max[DATA_WIDTH-1], x_max});
         
         // Clamp logic: since x <= x_max, x_shifted is always <= 0.
         // We only need to clamp the underflow (most negative value).
@@ -102,9 +104,10 @@ generate
         tr_exp #(
             .ITER (ITER)
         ) u_tr_exp (
-            .x     (x_shifted_clamped[g]),   // signed Q4, ≤ 0
-            .e_a     (e_a[g]),              // Q1.7 or Q8
-            .e_frac     (e_frac[g])        // Q1.7 or Q8
+            .x       (x_shifted_clamped[g]), // signed Q4, ≤ 0
+            .e_a     (e_a[g]),               // Q1.7 or Q8
+            .mantisa (e_frac[g]),            // Q1.7 or Q8
+            .is_zero ()
         );
     end
 endgenerate

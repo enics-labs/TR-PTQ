@@ -1,3 +1,33 @@
+// ===================================================================================
+// ARCHITECTURE NOTE: Mixed-Sign Multiplication & The Zero-Padding Bug
+// ===================================================================================
+// This module supports mixed-sign vector dot products via the `op_mode` signal.
+//
+// ORIGINAL BUG:
+// Originally, all operands were prepended with a zero: `$signed({1'b0, a_reg})`.
+// While this is required for unsigned numbers, doing this to a negative signed 
+// number destroys its sign bit. For example, an 8-bit -1 (1111_1111) becomes a 
+// 9-bit +255 (0_1111_1111). This caused massive positive calculation errors.
+//
+// THE FIX:
+// We zero-pad ONLY the unsigned operands to prevent their MSB from being
+// accidentally interpreted as a negative two's complement sign, while 
+// leaving signed operands untouched so they sign-extend naturally.
+//
+//   * Mode 0 (SS) - Signed x Signed: 
+//       Both operands are cast directly to $signed(). SV naturally sign-extends.
+//       Logic: $signed(a) * $signed(b)
+//
+//   * Mode 1 (SU) - Signed x Unsigned: 
+//       Operand 'a' is signed (left alone). Operand 'b' is unsigned, so we 
+//       force a leading zero to ensure it remains a positive magnitude.
+//       Logic: $signed(a) * $signed({1'b0, b})
+//
+//   * Mode 2 (UU) - Unsigned x Unsigned:
+//       Both operands are zero-padded to protect their MSBs, then cast to signed
+//       so the resulting product container behaves correctly in the accumulator.
+//       Logic: $signed({1'b0, a}) * $signed({1'b0, b})
+// ===================================================================================
 module vec_mac_dsp48 #(
     parameter int N     = 8,
     parameter int W     = 18,
@@ -76,14 +106,17 @@ module vec_mac_dsp48 #(
             for (int i = 0; i < N; i++) begin
                 unique case (mode1)
                     2'd0: begin // signed * signed
-                        prod_reg[i] <= (2*W)'($signed({1'b0, a_reg[i]}) * $signed({1'b0, b_reg[i]}));
+                        // prod_reg[i] <= (2*W)'($signed({1'b0, a_reg[i]}) * $signed({1'b0, b_reg[i]}));
+                        prod_reg[i] <= $signed(a_reg[i]) * $signed(b_reg[i]);
                     end
                     2'd1: begin // signed * unsigned
-                        prod_reg[i] <= (2*W)'($signed({1'b0, a_reg[i]}) * $signed({1'b0, $unsigned(b_reg[i])}));
+                        // prod_reg[i] <= (2*W)'($signed({1'b0, a_reg[i]}) * $signed({1'b0, $unsigned(b_reg[i])}));
+                        prod_reg[i] <= $signed(a_reg[i]) * $signed({1'b0, b_reg[i]});
                     end
                     default: begin // 2'd2 (unsigned*unsigned) and 2'd3 fallback
                         // Cast to unsigned magnitude then into signed container (non-negative)
-                        prod_reg[i] <= $signed({1'b0, (2*W)'($unsigned(a_reg[i]) * $unsigned(b_reg[i]))});
+                        // prod_reg[i] <= $signed({1'b0, (2*W)'($unsigned(a_reg[i]) * $unsigned(b_reg[i]))});
+                        prod_reg[i] <= $signed({1'b0, a_reg[i]}) * $signed({1'b0, b_reg[i]});
                     end
                 endcase
             end
