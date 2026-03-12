@@ -54,3 +54,6 @@
 - [ ] `qlinear` folder+file name
 - [ ] `quantization` folder name
 - [ ] `tr_div` file name
+
+### Future Task: Parametrization
+- [] Paramterize all bit precision params
