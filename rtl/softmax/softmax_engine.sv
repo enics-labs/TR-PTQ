@@ -29,7 +29,8 @@ module softmax_engine #(
 
     exp_x_minus_xmax #(
         .NUM_INPUTS(N),
-        .DATA_WIDTH(W)
+        .DATA_WIDTH(W),
+        .ITER(1)
     ) u_decompose (
         .clk       (clk),
         .rst_n     (rst_n),

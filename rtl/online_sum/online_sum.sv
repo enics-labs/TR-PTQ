@@ -3,7 +3,7 @@
 module exp_x_minus_xmax #(
     parameter int NUM_INPUTS = 8,
     parameter int DATA_WIDTH = 8,
-    parameter int ITER = 2
+    parameter int ITER = 1
     // parameter int MAX_LATENCY = 3   // latency of pipelined_max_tree
 )(
     input  logic                          clk,
