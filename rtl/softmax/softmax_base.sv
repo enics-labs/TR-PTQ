@@ -10,9 +10,14 @@ module softmax_engine #(
     input  logic                 valid_in,
     input  logic signed [W-1:0]  in_data [N],
     
-    // Output Stream (SoftMax Probabilities)
-    output logic                 valid_out,
-    output logic signed [W-1:0]  prob_out [N]
+    // Output Stream 1: Raw Exponents (Ready after ~3 cycles)
+    output logic                 out_valid_decomp,
+    output logic [W-1:0]         out_e_a [N],
+    output logic [W-1:0]         out_e_frac [N],
+
+    // Output Stream 2: Reciprocal (Ready after ~8 cycles)
+    output logic                 out_valid_sum,
+    output logic [7:0]           out_inv_S
 );
 
     // ========================================================================
@@ -78,43 +83,7 @@ module softmax_engine #(
     );
 
     // ========================================================================
-    // STAGE 3: The Synchronization Delay Line
-    // ========================================================================
-    // While `exp_sum` spends 6 clock cycles calculating the total denominator S,
-    // we must buffer the individual e_a and e_frac values so they arrive at 
-    // the final multiplier at the exact same moment the reciprocal finishes.
-    
-    localparam int MAC_LATENCY = 4; 
-    logic signed [W-1:0] e_a_delayed    [MAC_LATENCY][N];
-    logic signed [W-1:0] e_frac_delayed [MAC_LATENCY][N];
-
-    always_ff @(posedge clk or negedge rst_n) begin
-        if (!rst_n) begin
-            for (int s = 0; s < MAC_LATENCY; s++) begin
-                for (int i = 0; i < N; i++) begin
-                    e_a_delayed[s][i] <= '0;
-                    e_frac_delayed[s][i] <= '0;
-                end
-            end
-        end else begin
-            // FIX: Unconditional shift. The data must flow continuously 
-            // to stay perfectly parallel with the MAC engine.
-            e_a_delayed[0]    <= e_a;
-            e_frac_delayed[0] <= e_frac;
-            
-            for (int s = 1; s < MAC_LATENCY; s++) begin
-                e_a_delayed[s]    <= e_a_delayed[s-1];
-                e_frac_delayed[s] <= e_frac_delayed[s-1];
-            end
-        end
-    end
-
-    // Create a clean wire alias for the final delayed outputs
-    wire signed [W-1:0] final_e_a    [N] = e_a_delayed[MAC_LATENCY-1];
-    wire signed [W-1:0] final_e_frac [N] = e_frac_delayed[MAC_LATENCY-1];
-
-    // ========================================================================
-    // STAGE 4: Denominator Generator (Reciprocal 1/S)
+    // STAGE 3: Denominator Generator (Reciprocal 1/S)
     // ========================================================================
     // Converts the 32-bit integer sum into the normalization scaling factor.
     // This is purely combinational logic, resolving instantly when sum_S arrives.
@@ -135,32 +104,20 @@ module softmax_engine #(
     assign inv_S = (sum_S[23:8] <= 16) ? 8'hFF : inv_S_raw;
 
     // ========================================================================
-    // STAGE 5: Final Requantization & Scaling (Prob = e^x * 1/S)
+    // OUTPUT ASSIGNMENTS
     // ========================================================================
-    // Reassemble the individual exponentials and multiply by the reciprocal.
     
-    always_ff @(posedge clk or negedge rst_n) begin
-        if (!rst_n) begin
-            valid_out <= 1'b0;
-            for (int i = 0; i < N; i++) prob_out[i] <= '0;
-        end else begin
-            valid_out <= valid_sum; // Probabilities are valid 1 cycle after the sum
-            
-            for (int i = 0; i < N; i++) begin
-                if (valid_sum) begin
-                    // 1. Recombine e^x: (e_a * e_frac)
-                    // 2. Multiply by reciprocal: * inv_S
-                    // 3. Shift >> 12 to normalize back to an 8-bit integer probability
-                    
-                    automatic logic [23:0] e_x = {16'd0, final_e_a[i]} * {16'd0, final_e_frac[i]};
-                    automatic logic [31:0] scaled_prob = e_x * {24'd0, inv_S};
-                    
-                    // Simple truncation scaling (Replaces the complex requant_unit for SoftMax)
-                    // prob_out[i] <= scaled_prob[19:12]; 
-                    prob_out[i] <= scaled_prob[20] ? 8'hFF : scaled_prob[19:12];
-                end
-            end
+    // Stream 1 (From exp_x_minus_xmax)
+    assign out_valid_decomp = valid_decomp;
+    always_comb begin
+        for (int i = 0; i < N; i++) begin
+            out_e_a[i]    = e_a[i];
+            out_e_frac[i] = e_frac[i];
         end
     end
+
+    // Stream 2 (From tr_reciprocal + Overflow Clamp)
+    assign out_valid_sum = valid_sum;
+    assign out_inv_S = inv_S; 
 
 endmodule
