@@ -13,7 +13,7 @@
 // online sum
 ../rtl/online_sum/online_sum.sv
 ../rtl/online_sum/piped_max.sv
-// softmax
-../rtl/softmax/softmax_engine.sv
+// tr_gelu
+../rtl/tr_gelu/tr_gelu.sv
 // tb
-../tb/softmax/softmax_engine_tb.sv
+../tb/tr_gelu/tr_gelu_tb.sv
