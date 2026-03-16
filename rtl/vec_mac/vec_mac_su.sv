@@ -28,10 +28,10 @@
 //       so the resulting product container behaves correctly in the accumulator.
 //       Logic: $signed({1'b0, a}) * $signed({1'b0, b})
 // ===================================================================================
-module vec_mac_su #(
+module vec_mac_dsp48 #(
     parameter int N     = 8,
-    parameter int W     = 8,
-    parameter int ACC_W = 32
+    parameter int W     = 18,
+    parameter int ACC_W = 48
 )(
     input  logic                    clk,
     input  logic                    rst_n,

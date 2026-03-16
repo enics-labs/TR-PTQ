@@ -1,0 +1,5 @@
+../rtl/tr_exp/tr_exp.sv
+../rtl/tr_exp/round.sv
+../rtl/tr_exp/quadratic_divider.sv
+../rtl/tr_ln/tr_ln.sv
+../rtl/tr_gelu/tr_gelu.sv

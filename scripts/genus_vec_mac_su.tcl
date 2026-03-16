@@ -139,6 +139,11 @@ if {$phys_synth_type == "floorplan"} {
     # Synthesize to generics (non physical-aware)
     enics_start_stage "syn_generic"
     syn_generic 
+
+    # Run clock sweep
+    # source "$design(scripts_dir)/fmax_sweep.tcl"
+    # run_clock_sweep 10000 2000 1000 "clk" $design(synthesis_reports)
+
     # Map to technology (non physical-aware)
     enics_start_stage "technology_mapping"
     syn_map 
