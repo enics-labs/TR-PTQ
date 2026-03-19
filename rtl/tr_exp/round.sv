@@ -3,32 +3,58 @@
 //      is_zero is assigned the rounded_mag value, instead of the input x.                           //
 //      The output fliped_rounded_int cleanly gets ~rounded_mag[2:0], removing the is_zero check.    //
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
-module q4_4_round_neg (
-    input  wire signed [7:0] x,           // Q4.4 signed input (range: -8.0 to 0.0)
-    output wire              is_zero,     // zero detector
-    output wire              is_ceil,     // zero detector
-    output wire        [2:0] fliped_rounded_int // Index for LUT (0 to 7)
+//////////////////////////////////////////////////////////////////
+// UPDATE:
+//      Two modes created: 
+//      MODE 1 - The original q4.4 rounding for the 8-bit LUT.
+//      MODE 2 - 12-bit signed LUT for LayerNorm.
+//////////////////////////////////////////////////////////////////
+module round #(
+    parameter int WIDTH = 8,
+    parameter int FRAC_W = 4,
+    parameter int LUT_IDX_W = 3
+)(
+    input  wire signed [WIDTH-1:0] x,           
+    output wire                    is_zero,
+    output wire                    is_ceil,
+    output wire        [LUT_IDX_W-1:0] lut_idx  // Index for LUT
 );
 
+    localparam int INT_W = WIDTH - FRAC_W;
+    
     // 1. Extraction
-    wire signed [3:0] trunc_int; // The integer part
-    wire frac_round_bit;   // The 0.5 fractional bit
-    wire signed [3:0] rounded_mag;
+    wire signed [INT_W-1:0] trunc_int;      // The integer part
+    wire                    frac_round_bit; // The 0.5 fractional bit
+    wire signed [INT_W-1:0] rounded_mag;
 
     // 2. Round-to-Nearest (Toward Zero for negatives)
     // If fractional bit is 1 (e.g., -1.5), we add 1 to the negative number to get -1.0
 
-    assign trunc_int        = x[7:4];
-    assign frac_round_bit   = x[3];
+    assign trunc_int        = x[WIDTH-1:FRAC_W];
+    assign frac_round_bit   = x[FRAC_W-1];
     assign is_ceil          = frac_round_bit;
-    assign rounded_mag      = (frac_round_bit) ? (trunc_int + 4'sd1) : trunc_int;
+    assign rounded_mag      = (frac_round_bit) ? (trunc_int + 'b1) : trunc_int;
 
     // 3. Zero Detection
-    assign is_zero          = (rounded_mag == 4'sd0);
+    assign is_zero          = (rounded_mag == '0);
     
-    // 4. Flipping for LUT Index
-    // We use ~ to turn negative integers into a 0-based magnitude index
-    // Note: We only need the lower 3 bits since max magnitude is 8 (which flips to 7)
-    assign fliped_rounded_int = ~rounded_mag[2:0];
+    // 4. LUT Index Generation
+    generate
+        if (WIDTH == 8 && FRAC_W == 4) begin : gen_idx_8bit
+            // ----------------------------------------------------------------
+            // MODE 1: 8-bit Negative-Only LUT Indexing
+            // ----------------------------------------------------------------
+            // Use bitwise NOT to map negative magnitudes to 0-based index 
+            assign lut_idx = ~rounded_mag[LUT_IDX_W-1:0];
+        end else begin : gen_idx_12bit
+            // ----------------------------------------------------------------
+            // MODE 2: 12-bit Signed LUT Indexing (LayerNorm)
+            // ----------------------------------------------------------------
+            // LayerNorm requires a signed LUT (spanning positive and negative anchors).
+            // We just pass the raw, rounded integer out as the index.
+            // The LUT module will handle the signed indexing.
+            assign lut_idx = rounded_mag[LUT_IDX_W-1:0];
+        end
+    endgenerate
 
 endmodule
