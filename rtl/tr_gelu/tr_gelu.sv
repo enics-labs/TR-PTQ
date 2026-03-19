@@ -203,60 +203,36 @@ module tr_gelu #(
     // ========================================================================
     // STAGE 4: Denominator Generator & Final Multiplier
     // ========================================================================
-    localparam int RECIP_ITER = 1;
+    logic [7:0] inv_S_comb;
+    logic [7:0] inv_S;
 
-    // 1. Calculate natural log of the sum
-    logic [7:0] ln_S;
-    
-    tr_ln #(
-        .WIDTH(9),  // sum_S is 9 bits wide
-        .BITS(8)    // Match the fractional bits (Q4.4 = 4)
-    ) u_ln (
-        .xq(sum_S),
-        .yq(ln_S)
+    // Shift the 9-bit Q1.8 sum down by 4 bits to create a Q5.4 input
+    logic [8:0] sum_S_q4;
+    assign sum_S_q4 = sum_S >> 4;
+
+    tr_reciprocal #(
+        .IN_WIDTH  (9),      // sum_S is 9 bits (Q1.8)
+        .OUT_WIDTH (8),      // Final output is 8 bits (Q0.8)
+        .IN_FRAC   (4),      // Fractional precision of sum_S
+        .OUT_FRAC  (4),      // Internal Log-domain working precision
+        .INV_SQRT  (0),      // 0 = standard reciprocal (1/x)
+        .ITER      (1)       // 1st-order Taylor for GELU division
+    ) u_reciprocal (
+        .clk   (clk),
+        .rst_n (rst_n),
+        .xq    (sum_S_q4),
+        .yq    (inv_S_comb)
     );
-
-    // 2. Negate the log output (-ln S)
-    logic signed [7:0] neg_ln_S;
-    always_comb begin
-        neg_ln_S = -(ln_S >> 4);
-    end
-
-    // 3. Calculate exponential of the negated log to get the reciprocal
-    // Thesis: Uses 1st or 2nd order approximation for stable division
-    logic [7:0] inv_e_a;
-    logic [7:0] inv_mantisa;
-    logic       inv_is_zero;
-
-    tr_exp #(
-        .FRAC(FRAC_W),
-        .ITER(RECIP_ITER)       // 1st-order Taylor for the division reciprocal
-    ) u_exp_reciprocal (
-        .x       (neg_ln_S),
-        .e_a     (inv_e_a),
-        .mantisa (inv_mantisa),
-        .is_zero (inv_is_zero)
-    );
-
-    // --- Combinational Reconstruction of Reciprocal ---
-    logic [15:0] raw_inv;
-    logic [7:0]  inv_S_next;
-    
-    always_comb begin
-        raw_inv = inv_e_a * inv_mantisa;
-        if (RECIP_ITER == 0)
-            inv_S_next = inv_e_a;
-        else
-            inv_S_next = raw_inv[FRAC_W + 7 : FRAC_W]; // Shift 8 to restore Q0.8
-    end
 
     // --- Sequential Capture ---
-    logic [7:0] inv_S;
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             inv_S <= '0;
         end else begin
-            inv_S <= inv_S_next;
+            // inv_S <= inv_S_comb;
+            // Safety Clamp. If the mathematical sum is effectively 1.0 (256), 
+            // force the reciprocal to 1.0 (255) to prevent 8-bit overflow truncation.
+            inv_S <= (sum_S < 256) ? 8'hFF : inv_S_comb;
         end
     end
 
