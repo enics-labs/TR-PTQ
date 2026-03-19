@@ -32,7 +32,7 @@
 //    allocated per call, preventing variable-sharing "ghost bugs" when tasks are 
 //    called rapidly back-to-back during Phase 2.
 // ===================================================================================
-module tb_pipelined_max();
+module piped_max_tb();
 
     // ------------------------------------------------------------
     // Parameters
@@ -66,7 +66,7 @@ module tb_pipelined_max();
     // ------------------------------------------------------------
     // DUT
     // ------------------------------------------------------------
-    pipelined_max_tree #(
+    piped_max #(
         .NUM_INPUTS(NUM_INPUTS),
         .DATA_WIDTH(DATA_WIDTH)
     ) dut (

@@ -1,4 +1,4 @@
-module pipelined_max_tree #(
+module piped_max #(
     parameter int NUM_INPUTS = 8,  
     parameter int DATA_WIDTH = 8  
 )(
