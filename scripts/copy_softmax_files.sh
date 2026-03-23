@@ -3,7 +3,7 @@
 # 1. Check if the user provided the input list file
 if [ "$#" -ne 1 ]; then
     echo "Usage: $0 <path_to_dut_src_list.txt>"
-    echo "Example: $0 ../inputs/dut_src_list_softmax_base.txt"
+    echo "Example: $0 ../inputs/dut_src_list_vec_mac_su.txt"
     exit 1
 fi
 
@@ -17,7 +17,7 @@ fi
 
 
 # 2. Define the source branch and base destination folder
-SOURCE_BRANCH="softmax_temp"
+SOURCE_BRANCH="tr_core"
 DEST_BASE="../rtl"
 
 # Ensure you are on the destination branch
