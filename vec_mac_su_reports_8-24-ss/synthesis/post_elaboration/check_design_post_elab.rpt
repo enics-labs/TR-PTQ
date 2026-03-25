@@ -1,0 +1,169 @@
+
+ 	 Check Design Report (c)
+	 ------------------- 
+No subdesign's name is greater than 1.5k in length.
+
+ Feedthrough Module(s)
+ -------------------------
+No feed through module in 'vec_mac_su'
+
+  Unresolved References & Empty Modules
+  ------------------------------------- 
+No unresolved references in design 'vec_mac_su'
+
+No empty modules in design 'vec_mac_su'
+
+ Unloaded Pin(s), Port(s)
+ -------------------------
+No unloaded sequential element in 'vec_mac_su'
+
+No unloaded port in 'vec_mac_su'
+
+ Unloaded Combinational Pin(s)
+ -------------------------------
+design 'vec_mac_su' has the following unloaded combinational elements
+pin:vec_mac_su/add_140_26_I15/g293/z
+pin:vec_mac_su/add_140_26_I15/g295/z
+pin:vec_mac_su/add_140_26_I15/g298/z
+Total number of unloaded combinational elements in design 'vec_mac_su' : 3
+
+ Assigns
+ ------- 
+Total number of assign statements in design 'vec_mac_su' : 0
+
+ Undriven Port(s)/Pin(s)
+ ------------------------
+No undriven combinational pin in 'vec_mac_su'
+
+No undriven sequential pin in 'vec_mac_su'
+
+No undriven hierarchical pin in 'vec_mac_su'
+
+No undriven port in 'vec_mac_su'
+
+ Multidriven Port(s)/Pin(s)
+--------------------------
+
+No multidriven combinational pin in 'vec_mac_su'
+
+No multidriven sequential pin in 'vec_mac_su'
+
+No multidriven hierarchical pin in 'vec_mac_su'
+
+No multidriven ports in 'vec_mac_su'
+
+No multidriven unloaded nets in 'vec_mac_su'
+
+  Constant Pin(s)
+  ----------------
+No constant combinational pin(s) in design 'vec_mac_su'
+
+No constant sequential pin(s) in design 'vec_mac_su'
+
+design 'vec_mac_su' has the following constant input hierarchical pin(s)
+hpin:vec_mac_su/mul_116_58_I16/B[8] 	 (fanout : 8)
+hpin:vec_mac_su/mul_121_66_I16/A[8] 	 (fanout : 9)
+hpin:vec_mac_su/mul_121_66_I16/B[8] 	 (fanout : 9)
+hpin:vec_mac_su/mul_116_58_I15/B[8] 	 (fanout : 8)
+hpin:vec_mac_su/mul_121_66_I15/A[8] 	 (fanout : 9)
+hpin:vec_mac_su/mul_121_66_I15/B[8] 	 (fanout : 9)
+hpin:vec_mac_su/mul_116_58_I14/B[8] 	 (fanout : 8)
+hpin:vec_mac_su/mul_121_66_I14/A[8] 	 (fanout : 9)
+hpin:vec_mac_su/mul_121_66_I14/B[8] 	 (fanout : 9)
+hpin:vec_mac_su/mul_116_58_I13/B[8] 	 (fanout : 8)
+hpin:vec_mac_su/mul_121_66_I13/A[8] 	 (fanout : 9)
+hpin:vec_mac_su/mul_121_66_I13/B[8] 	 (fanout : 9)
+hpin:vec_mac_su/mul_116_58_I12/B[8] 	 (fanout : 8)
+hpin:vec_mac_su/mul_121_66_I12/A[8] 	 (fanout : 9)
+hpin:vec_mac_su/mul_121_66_I12/B[8] 	 (fanout : 9)
+hpin:vec_mac_su/mul_116_58_I11/B[8] 	 (fanout : 8)
+hpin:vec_mac_su/mul_121_66_I11/A[8] 	 (fanout : 9)
+hpin:vec_mac_su/mul_121_66_I11/B[8] 	 (fanout : 9)
+hpin:vec_mac_su/mul_116_58_I10/B[8] 	 (fanout : 8)
+hpin:vec_mac_su/mul_121_66_I10/A[8] 	 (fanout : 9)
+hpin:vec_mac_su/mul_121_66_I10/B[8] 	 (fanout : 9)
+hpin:vec_mac_su/mul_116_58_I9/B[8] 	 (fanout : 8)
+hpin:vec_mac_su/mul_121_66_I9/A[8] 	 (fanout : 9)
+hpin:vec_mac_su/mul_121_66_I9/B[8] 	 (fanout : 9)
+hpin:vec_mac_su/mul_116_58_I8/B[8] 	 (fanout : 8)
+hpin:vec_mac_su/mul_121_66_I8/A[8] 	 (fanout : 9)
+hpin:vec_mac_su/mul_121_66_I8/B[8] 	 (fanout : 9)
+hpin:vec_mac_su/mul_116_58_I7/B[8] 	 (fanout : 8)
+hpin:vec_mac_su/mul_121_66_I7/A[8] 	 (fanout : 9)
+hpin:vec_mac_su/mul_121_66_I7/B[8] 	 (fanout : 9)
+hpin:vec_mac_su/mul_116_58_I6/B[8] 	 (fanout : 8)
+hpin:vec_mac_su/mul_121_66_I6/A[8] 	 (fanout : 9)
+hpin:vec_mac_su/mul_121_66_I6/B[8] 	 (fanout : 9)
+hpin:vec_mac_su/mul_116_58_I5/B[8] 	 (fanout : 8)
+hpin:vec_mac_su/mul_121_66_I5/A[8] 	 (fanout : 9)
+hpin:vec_mac_su/mul_121_66_I5/B[8] 	 (fanout : 9)
+hpin:vec_mac_su/mul_116_58_I4/B[8] 	 (fanout : 8)
+hpin:vec_mac_su/mul_121_66_I4/A[8] 	 (fanout : 9)
+hpin:vec_mac_su/mul_121_66_I4/B[8] 	 (fanout : 9)
+hpin:vec_mac_su/mul_116_58_I3/B[8] 	 (fanout : 8)
+hpin:vec_mac_su/mul_121_66_I3/A[8] 	 (fanout : 9)
+hpin:vec_mac_su/mul_121_66_I3/B[8] 	 (fanout : 9)
+hpin:vec_mac_su/mul_116_58_I2/B[8] 	 (fanout : 8)
+hpin:vec_mac_su/mul_121_66_I2/A[8] 	 (fanout : 9)
+hpin:vec_mac_su/mul_121_66_I2/B[8] 	 (fanout : 9)
+hpin:vec_mac_su/mul_116_58_I1/B[8] 	 (fanout : 8)
+hpin:vec_mac_su/mul_121_66_I1/A[8] 	 (fanout : 9)
+hpin:vec_mac_su/mul_121_66_I1/B[8] 	 (fanout : 9)
+Total number of constant hierarchical pins in design 'vec_mac_su' : 48
+
+No constant connected ports in design 'vec_mac_su'
+
+  Preserved instances(s)
+  ----------------
+No preserved combinational instance(s) in design 'vec_mac_su'
+No preserved sequential instance(s) in design 'vec_mac_su'
+No preserved hierarchical instance(s) in design 'vec_mac_su'
+
+  Physical only instances(s)
+  ----------------
+No physical only instance(s) in design 'vec_mac_su'
+
+  Logical only instance(s) and linked libcells
+    -----------------------------------------
+No logical only instance(s) in design 'vec_mac_su'
+
+Libcells with no corresponding LEF
+----------------------------------
+No libcell(s) found.
+
+LEF cells with no corresponding libcell
+---------------------------------------
+
+No physical (LEF) cells found.
+
+ Summary
+ ------- 
+
+              Name                       Total
+----------------------------------------------
+Unresolved References                        0
+Empty Modules                                0
+Unloaded Port(s)                             0
+Unloaded Sequential Pin(s)                   0
+Unloaded Combinational Pin(s)                3
+Assigns                                      0
+Undriven Port(s)                             0
+Undriven Leaf Pin(s)                         0
+Undriven hierarchical pin(s)                 0
+Multidriven Port(s)                          0
+Multidriven Leaf Pin(s)                      0
+Multidriven hierarchical Pin(s)              0
+Multidriven unloaded net(s)                  0
+Constant Port(s)                             0
+Constant Leaf Pin(s)                         0
+Constant hierarchical Pin(s)                48
+Preserved leaf instance(s)                   0
+Preserved hierarchical instance(s)           0
+Feedthrough Modules(s)                       0
+Libcells with no LEF cell                    0
+Physical (LEF) cells with no libcell         0
+Subdesigns with long module name             0
+Physical only instance(s)                    0
+Logical only instance(s)                     0
+
+  Done Checking the design.

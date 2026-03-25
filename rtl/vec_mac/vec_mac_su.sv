@@ -28,10 +28,10 @@
 //       so the resulting product container behaves correctly in the accumulator.
 //       Logic: $signed({1'b0, a}) * $signed({1'b0, b})
 // ===================================================================================
-module vec_mac_dsp48 #(
-    parameter int N     = 8,
-    parameter int W     = 18,
-    parameter int ACC_W = 48
+module vec_mac_su #(
+    parameter int N     = 16,
+    parameter int W     = 8, // 12 / 8
+    parameter int ACC_W = 24 // 32 / 24
 )(
     input  logic                    clk,
     input  logic                    rst_n,
@@ -39,7 +39,7 @@ module vec_mac_dsp48 #(
     // Input stream
     input  logic                    in_valid,
     output logic                    in_ready,
-    input  logic [1:0]              op_mode,   // 0:SS, 1:SU, 2:UU
+    // input  logic [1:0]              op_mode,   // 0:SS, 1:SU, 2:UU
     input  logic [W-1:0]            a [N],      // raw bits
     input  logic [W-1:0]            b [N],      // raw bits
     input  logic                    clear_acc,
@@ -49,6 +49,8 @@ module vec_mac_dsp48 #(
     input  logic                    out_ready,
     output logic signed [ACC_W-1:0] out_dot
 );
+    logic [1:0] op_mode;
+    assign op_mode = 2'b0;
 
     // ============================================================
     // Handshake / pipeline control
@@ -93,35 +95,59 @@ module vec_mac_dsp48 #(
     logic                  v2;
     logic                  clr2;
 
-    always_ff @(posedge clk) begin
-        if (!rst_n) begin
-            v2    <= 1'b0;
-            clr2  <= 1'b0;
-            mode2 <= 2'd0;
-        end else if (advance) begin
-            v2    <= v1;
-            clr2  <= clr1;
-            mode2 <= mode1;
+    always_comb begin
+        v2    = v1;
+        clr2  = clr1;
+        mode2 = mode1;
 
-            for (int i = 0; i < N; i++) begin
-                unique case (mode1)
-                    2'd0: begin // signed * signed
-                        // prod_reg[i] <= (2*W)'($signed({1'b0, a_reg[i]}) * $signed({1'b0, b_reg[i]}));
-                        prod_reg[i] <= $signed(a_reg[i]) * $signed(b_reg[i]);
-                    end
-                    2'd1: begin // signed * unsigned
-                        // prod_reg[i] <= (2*W)'($signed({1'b0, a_reg[i]}) * $signed({1'b0, $unsigned(b_reg[i])}));
-                        prod_reg[i] <= $signed(a_reg[i]) * $signed({1'b0, b_reg[i]});
-                    end
-                    default: begin // 2'd2 (unsigned*unsigned) and 2'd3 fallback
-                        // Cast to unsigned magnitude then into signed container (non-negative)
-                        // prod_reg[i] <= $signed({1'b0, (2*W)'($unsigned(a_reg[i]) * $unsigned(b_reg[i]))});
-                        prod_reg[i] <= $signed({1'b0, a_reg[i]}) * $signed({1'b0, b_reg[i]});
-                    end
-                endcase
-            end
+        for (int i = 0; i < N; i++) begin
+            unique case (mode1)
+                2'd0: begin // signed * signed
+                    // prod_reg[i] <= (2*W)'($signed({1'b0, a_reg[i]}) * $signed({1'b0, b_reg[i]}));
+                    prod_reg[i] = $signed(a_reg[i]) ;
+                end
+                2'd1: begin // signed * unsigned
+                    // prod_reg[i] <= (2*W)'($signed({1'b0, a_reg[i]}) * $signed({1'b0, $unsigned(b_reg[i])}));
+                    prod_reg[i] = $signed(a_reg[i]) ;
+                end
+                default: begin // 2'd2 (unsigned*unsigned) and 2'd3 fallback
+                    // Cast to unsigned magnitude then into signed container (non-negative)
+                    // prod_reg[i] <= $signed({1'b0, (2*W)'($unsigned(a_reg[i]) * $unsigned(b_reg[i]))});
+                    prod_reg[i] = $signed({1'b0, a_reg[i]});
+                end
+            endcase
         end
     end
+
+    // always_ff @(posedge clk) begin
+    //     if (!rst_n) begin
+    //         v2    <= 1'b0;
+    //         clr2  <= 1'b0;
+    //         mode2 <= 2'd0;
+    //     end else if (advance) begin
+    //         v2    <= v1;
+    //         clr2  <= clr1;
+    //         mode2 <= mode1;
+
+    //         for (int i = 0; i < N; i++) begin
+    //             unique case (mode1)
+    //                 2'd0: begin // signed * signed
+    //                     // prod_reg[i] <= (2*W)'($signed({1'b0, a_reg[i]}) * $signed({1'b0, b_reg[i]}));
+    //                     prod_reg[i] <= $signed(a_reg[i]) * $signed(b_reg[i]);
+    //                 end
+    //                 2'd1: begin // signed * unsigned
+    //                     // prod_reg[i] <= (2*W)'($signed({1'b0, a_reg[i]}) * $signed({1'b0, $unsigned(b_reg[i])}));
+    //                     prod_reg[i] <= $signed(a_reg[i]) * $signed({1'b0, b_reg[i]});
+    //                 end
+    //                 default: begin // 2'd2 (unsigned*unsigned) and 2'd3 fallback
+    //                     // Cast to unsigned magnitude then into signed container (non-negative)
+    //                     // prod_reg[i] <= $signed({1'b0, (2*W)'($unsigned(a_reg[i]) * $unsigned(b_reg[i]))});
+    //                     prod_reg[i] <= $signed({1'b0, a_reg[i]}) * $signed({1'b0, b_reg[i]});
+    //                 end
+    //             endcase
+    //         end
+    //     end
+    // end
 
     // ============================================================
     // Stage 3: reduction (sign-extend products into ACC_W)
