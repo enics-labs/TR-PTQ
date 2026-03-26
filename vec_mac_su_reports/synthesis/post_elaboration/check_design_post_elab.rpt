@@ -1,0 +1,179 @@
+
+ 	 Check Design Report (c)
+	 ------------------- 
+No subdesign's name is greater than 1.5k in length.
+
+ Feedthrough Module(s)
+ -------------------------
+No feed through module in 'TR_LN'
+
+  Unresolved References & Empty Modules
+  ------------------------------------- 
+No unresolved references in design 'TR_LN'
+
+No empty modules in design 'TR_LN'
+
+ Unloaded Pin(s), Port(s)
+ -------------------------
+No unloaded sequential element in 'TR_LN'
+
+No unloaded port in 'TR_LN'
+
+ Unloaded Combinational Pin(s)
+ -------------------------------
+design 'TR_LN' has the following unloaded combinational elements
+pin:TR_LN/add_53_26/g4/z
+Total number of unloaded combinational elements in design 'TR_LN' : 1
+
+ Assigns
+ ------- 
+Encountered an assign statement at hport 'hport:TR_LN/ctl_xq_35_17/out_0[16]' in module case_box
+Total number of assign statements in design 'TR_LN' : 1
+
+ Undriven Port(s)/Pin(s)
+ ------------------------
+No undriven combinational pin in 'TR_LN'
+
+No undriven sequential pin in 'TR_LN'
+
+No undriven hierarchical pin in 'TR_LN'
+
+No undriven port in 'TR_LN'
+
+ Multidriven Port(s)/Pin(s)
+--------------------------
+
+No multidriven combinational pin in 'TR_LN'
+
+No multidriven sequential pin in 'TR_LN'
+
+No multidriven hierarchical pin in 'TR_LN'
+
+No multidriven ports in 'TR_LN'
+
+No multidriven unloaded nets in 'TR_LN'
+
+  Constant Pin(s)
+  ----------------
+No constant combinational pin(s) in design 'TR_LN'
+
+No constant sequential pin(s) in design 'TR_LN'
+
+design 'TR_LN' has the following constant input hierarchical pin(s)
+hpin:TR_LN/add_53_26/B[3] 	 (fanout : 2)
+hpin:TR_LN/add_53_26/B[2] 	 (fanout : 2)
+hpin:TR_LN/add_53_26/B[1] 	 (fanout : 2)
+hpin:TR_LN/add_53_26/B[0] 	 (fanout : 2)
+hpin:TR_LN/sub_39_40/B[2] 	 (fanout : 2)
+hpin:TR_LN/sub_39_40/B[1] 	 (fanout : 1)
+hpin:TR_LN/sub_39_40/B[0] 	 (fanout : 2)
+hpin:TR_LN/sub_50_45/B 	 (fanout : 2)
+hpin:TR_LN/mux_msb_35_17/in_0[2] 	 (fanout : 1)
+hpin:TR_LN/mux_msb_35_17/in_0[1] 	 (fanout : 1)
+hpin:TR_LN/mux_msb_35_17/in_0[0] 	 (fanout : 1)
+hpin:TR_LN/mux_msb_35_17/in_1[2] 	 (fanout : 1)
+hpin:TR_LN/mux_msb_35_17/in_1[1] 	 (fanout : 1)
+hpin:TR_LN/mux_msb_35_17/in_1[0] 	 (fanout : 1)
+hpin:TR_LN/mux_msb_35_17/in_2[2] 	 (fanout : 1)
+hpin:TR_LN/mux_msb_35_17/in_2[1] 	 (fanout : 1)
+hpin:TR_LN/mux_msb_35_17/in_2[0] 	 (fanout : 1)
+hpin:TR_LN/mux_msb_35_17/in_3[2] 	 (fanout : 1)
+hpin:TR_LN/mux_msb_35_17/in_3[1] 	 (fanout : 1)
+hpin:TR_LN/mux_msb_35_17/in_3[0] 	 (fanout : 1)
+hpin:TR_LN/mux_msb_35_17/in_4[2] 	 (fanout : 1)
+hpin:TR_LN/mux_msb_35_17/in_4[1] 	 (fanout : 1)
+hpin:TR_LN/mux_msb_35_17/in_4[0] 	 (fanout : 1)
+hpin:TR_LN/mux_msb_35_17/in_5[2] 	 (fanout : 1)
+hpin:TR_LN/mux_msb_35_17/in_5[1] 	 (fanout : 1)
+hpin:TR_LN/mux_msb_35_17/in_5[0] 	 (fanout : 1)
+hpin:TR_LN/mux_msb_35_17/in_6[2] 	 (fanout : 1)
+hpin:TR_LN/mux_msb_35_17/in_6[1] 	 (fanout : 1)
+hpin:TR_LN/mux_msb_35_17/in_6[0] 	 (fanout : 1)
+hpin:TR_LN/mux_msb_35_17/in_7[2] 	 (fanout : 1)
+hpin:TR_LN/mux_msb_35_17/in_7[1] 	 (fanout : 1)
+hpin:TR_LN/mux_msb_35_17/in_7[0] 	 (fanout : 1)
+hpin:TR_LN/mux_msb_35_17/in_8[2] 	 (fanout : 1)
+hpin:TR_LN/mux_msb_35_17/in_8[1] 	 (fanout : 1)
+hpin:TR_LN/mux_msb_35_17/in_8[0] 	 (fanout : 1)
+hpin:TR_LN/mux_msb_35_17/in_9[2] 	 (fanout : 1)
+hpin:TR_LN/mux_msb_35_17/in_9[1] 	 (fanout : 1)
+hpin:TR_LN/mux_msb_35_17/in_9[0] 	 (fanout : 1)
+hpin:TR_LN/mux_msb_35_17/in_10[2] 	 (fanout : 1)
+hpin:TR_LN/mux_msb_35_17/in_10[1] 	 (fanout : 1)
+hpin:TR_LN/mux_msb_35_17/in_10[0] 	 (fanout : 1)
+hpin:TR_LN/mux_msb_35_17/in_11[2] 	 (fanout : 1)
+hpin:TR_LN/mux_msb_35_17/in_11[1] 	 (fanout : 1)
+hpin:TR_LN/mux_msb_35_17/in_11[0] 	 (fanout : 1)
+hpin:TR_LN/mux_msb_35_17/in_12[2] 	 (fanout : 1)
+hpin:TR_LN/mux_msb_35_17/in_12[1] 	 (fanout : 1)
+hpin:TR_LN/mux_msb_35_17/in_12[0] 	 (fanout : 1)
+hpin:TR_LN/mux_msb_35_17/in_13[2] 	 (fanout : 1)
+hpin:TR_LN/mux_msb_35_17/in_13[1] 	 (fanout : 1)
+hpin:TR_LN/mux_msb_35_17/in_13[0] 	 (fanout : 1)
+hpin:TR_LN/mux_msb_35_17/in_14[2] 	 (fanout : 1)
+hpin:TR_LN/mux_msb_35_17/in_14[1] 	 (fanout : 1)
+hpin:TR_LN/mux_msb_35_17/in_14[0] 	 (fanout : 1)
+hpin:TR_LN/mux_msb_35_17/in_15[2] 	 (fanout : 1)
+hpin:TR_LN/mux_msb_35_17/in_15[1] 	 (fanout : 1)
+hpin:TR_LN/mux_msb_35_17/in_15[0] 	 (fanout : 1)
+hpin:TR_LN/mux_msb_35_17/in_16[2] 	 (fanout : 1)
+hpin:TR_LN/mux_msb_35_17/in_16[1] 	 (fanout : 1)
+hpin:TR_LN/mux_msb_35_17/in_16[0] 	 (fanout : 1)
+Total number of constant hierarchical pins in design 'TR_LN' : 59
+
+No constant connected ports in design 'TR_LN'
+
+  Preserved instances(s)
+  ----------------
+No preserved combinational instance(s) in design 'TR_LN'
+No preserved sequential instance(s) in design 'TR_LN'
+No preserved hierarchical instance(s) in design 'TR_LN'
+
+  Physical only instances(s)
+  ----------------
+No physical only instance(s) in design 'TR_LN'
+
+  Logical only instance(s) and linked libcells
+    -----------------------------------------
+No logical only instance(s) in design 'TR_LN'
+
+Libcells with no corresponding LEF
+----------------------------------
+No libcell(s) found.
+
+LEF cells with no corresponding libcell
+---------------------------------------
+
+No physical (LEF) cells found.
+
+ Summary
+ ------- 
+
+              Name                       Total
+----------------------------------------------
+Unresolved References                        0
+Empty Modules                                0
+Unloaded Port(s)                             0
+Unloaded Sequential Pin(s)                   0
+Unloaded Combinational Pin(s)                1
+Assigns                                      1
+Undriven Port(s)                             0
+Undriven Leaf Pin(s)                         0
+Undriven hierarchical pin(s)                 0
+Multidriven Port(s)                          0
+Multidriven Leaf Pin(s)                      0
+Multidriven hierarchical Pin(s)              0
+Multidriven unloaded net(s)                  0
+Constant Port(s)                             0
+Constant Leaf Pin(s)                         0
+Constant hierarchical Pin(s)                59
+Preserved leaf instance(s)                   0
+Preserved hierarchical instance(s)           0
+Feedthrough Modules(s)                       0
+Libcells with no LEF cell                    0
+Physical (LEF) cells with no libcell         0
+Subdesigns with long module name             0
+Physical only instance(s)                    0
+Logical only instance(s)                     0
+
+  Done Checking the design.
