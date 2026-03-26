@@ -72,7 +72,7 @@ set design(read_hdl_list) "$design(inputs_dir)/dut_src_list_$design(TOPLEVEL).tx
 set design(scripts_dir) "$design(project_root)/scripts"
 set design(dbs_dir)     "$design(project_root)/dbs"
 set design(export_dir) "$design(project_root)/export"
-set design(reports_dir) "$design(project_root)/softmax_base_reports"
+set design(reports_dir) "$design(project_root)/tr_softmax_reports"
 set design(synthesis_reports) "$design(reports_dir)/synthesis"
 set design(functional_sdc) "$design(inputs_dir)/$design(TOPLEVEL).sdc"
 
