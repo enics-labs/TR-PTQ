@@ -1,6 +1,7 @@
 // global config
 -f ../scripts/xrun_config.f
 // online_sum
+../rtl/online_sum/max_sub.sv 
 ../rtl/online_sum/online_sum.sv 
 ../rtl/online_sum/piped_max.sv
 // exponent decomposition

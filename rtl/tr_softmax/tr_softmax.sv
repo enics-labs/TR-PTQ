@@ -1,7 +1,9 @@
 module tr_softmax #(
     parameter int N = 8,
     parameter int W = 8,
-    parameter int ACC_W = 32
+    parameter int ACC_W = 32,
+    parameter int MODE = 0,         // 0: Int Max+Sub | 1: Ext Max, Int Sub | 2: Ext Max+Sub
+    parameter int RECIP_TYPE = 0    // 0: TR-Reciprocal | 1: Classic Divider | 2: Bypass (MAC Only)
 )(
     input  logic                 clk,
     input  logic                 rst_n,
@@ -9,15 +11,17 @@ module tr_softmax #(
     // Input Stream (Raw Attention Scores)
     input  logic                 valid_in,
     input  logic signed [W-1:0]  in_data [N],
+    input  logic signed [W-1:0]  ext_x_max, // Driven if MODE == 1
     
-    // Output Stream 1: Raw Exponents (Ready after ~3 cycles)
+    // Output Stream 1: Raw Exponents
     output logic                 out_valid_decomp,
     output logic [W-1:0]         out_e_a [N],
     output logic [W-1:0]         out_e_frac [N],
 
-    // Output Stream 2: Reciprocal (Ready after ~8 cycles)
-    output logic                 out_valid_sum,
-    output logic [7:0]           out_inv_S
+    // Output Stream 2: Accumulation & Reciprocal
+    output logic                    out_valid_sum,
+    output logic signed [ACC_W-1:0] out_sum_S, // Exposed for MAC-Only bypass mode
+    output logic [7:0]              out_inv_S
 );
 
     // ========================================================================
@@ -35,12 +39,14 @@ module tr_softmax #(
         .DATA_WIDTH(W),
         .FRAC_W(4),
         .LUT_IDX_W(3),
-        .ITER(1)
+        .ITER(1),
+        .MODE(MODE)
     ) u_decompose (
         .clk       (clk),
         .rst_n     (rst_n),
         .valid_in  (valid_in),
         .in_data   (in_data),
+        .ext_x_max (ext_x_max),
         .valid_out (valid_decomp),
         .e_a       (e_a),
         .e_frac    (e_frac)
@@ -91,39 +97,79 @@ module tr_softmax #(
     // This is purely combinational logic, resolving instantly when sum_S arrives.
     
     logic [7:0] inv_S_raw;
-    logic [7:0] inv_S;
+    logic       final_valid_sum;
 
-    tr_reciprocal #(
-        .WIDTH(16),
-        .OUT_WIDTH(8),
-        .IN_FRAC(4),
-        .OUT_FRAC(4),
-        .INV_SQRT(0),      // 0 = standard reciprocal 1/x
-        .ITER(2)
-    ) u_reciprocal (
-        .clk   (clk),
-        .rst_n (rst_n),
-        .xq    (sum_S[23:8]),
-        .yq    (inv_S_raw)
-    );
+    wire [15:0] safe_denominator = (sum_S[23:8] == 0) ? 16'd1 : sum_S[23:8];
 
-    assign inv_S = (sum_S[23:8] <= 16) ? 8'hFF : inv_S_raw;
+    generate
+        if (RECIP_TYPE == 0) begin : gen_tr_recip
+            // ---------------------------------------------------
+            // Option 0: TR-Reciprocal (Combinational Log-Domain)
+            // ---------------------------------------------------
+            tr_reciprocal #(
+                .IN_WIDTH(16),
+                .OUT_WIDTH(8),
+                .IN_FRAC(4),
+                .OUT_FRAC(4),
+                .INV_SQRT(0),      // 0 = standard reciprocal 1/x
+                .ITER(2)
+            ) u_reciprocal (
+                .clk   (clk),
+                .rst_n (rst_n),
+                .xq    (safe_denominator),
+                .yq    (inv_S_raw)
+            );
+
+        end else if (RECIP_TYPE == 1) begin : gen_classic_recip
+            // ---------------------------------------------------
+            // Option 1: Classic Divider (Multi-Cycle)
+            // ---------------------------------------------------
+            logic raw_div_valid;
+            logic div_valid_d;
+
+            classic_reciprocal #(
+                .IN_WIDTH(16),
+                .OUT_WIDTH(8),
+                .IN_FRAC(4),
+                .OUT_FRAC(4)
+            ) u_reciprocal (
+                .clk   (clk),
+                .rst_n (rst_n),
+                .start(valid_sum),
+                .xq    (safe_denominator),
+                .valid_out(raw_div_valid),
+                .yq    (inv_S_raw)
+            );
+
+            always_ff @(posedge clk or negedge rst_n) begin
+                if (!rst_n) div_valid_d <= 1'b0;
+                else        div_valid_d <= raw_div_valid;
+            end
+            
+            assign final_valid_sum = raw_div_valid & ~div_valid_d;
+
+        end else begin: gen_bypass_recip
+            // ---------------------------------------------------
+            // Option 2: Bypass Reciprocal (MAC Sum Only)
+            // ---------------------------------------------------
+            assign inv_S_raw = 8'd0;
+            assign final_valid_sum = valid_sum;
+        end
+    endgenerate
 
     // ========================================================================
     // OUTPUT ASSIGNMENTS
     // ========================================================================
-    
-    // Stream 1 (From exp_x_minus_xmax)
     assign out_valid_decomp = valid_decomp;
+    assign out_valid_sum    = final_valid_sum;
+    assign out_sum_S        = sum_S;
+    assign out_inv_S = inv_S_raw;
+
     always_comb begin
         for (int i = 0; i < N; i++) begin
             out_e_a[i]    = e_a[i];
             out_e_frac[i] = e_frac[i];
         end
     end
-
-    // Stream 2 (From tr_reciprocal + Overflow Clamp)
-    assign out_valid_sum = valid_sum;
-    assign out_inv_S = inv_S; 
 
 endmodule
