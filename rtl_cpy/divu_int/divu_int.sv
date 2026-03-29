@@ -1,18 +1,18 @@
 
-/* DO NOT TOUCH!!! */
-
-module divu_int #(parameter WIDTH=16) ( // width of numbers in bits
-    input wire clk,              // clock
-    input wire rst_n,              // reset
-    input wire start,            // start calculation
+module divu_int #(
+    parameter WIDTH=16              // width of numbers in bits
+)( 
+    input wire clk,                 // clock
+    input wire rst_n,               // reset
+    input wire start,               // start calculation
     output reg    busy,             // calculation in progress
     output reg    done,             // calculation is complete (high for one tick)
     output reg    valid,            // result is valid
     output reg    dbz,              // divide by zero
-    input wire [WIDTH-1:0] a,    // dividend (numerator)
-    input wire [WIDTH-1:0] b,    // divisor (denominator)
-    output     reg [WIDTH-1:0] val,  // result value: quotient
-    output     reg [WIDTH-1:0] rem   // result: remainder
+    input wire [WIDTH-1:0] a,       // dividend (numerator)
+    input wire [WIDTH-1:0] b,       // divisor (denominator)
+    output     reg [WIDTH-1:0] val, // result value: quotient
+    output     reg [WIDTH-1:0] rem  // result: remainder
     );
 
     reg [WIDTH-1:0] b1;             // copy of divisor

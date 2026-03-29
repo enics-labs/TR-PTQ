@@ -115,12 +115,10 @@ module soft_dsp_eng_post_wrapper #(
         .N(N),
         .FRAC(FRAC),
         .ITER(ITER)
-    ) u_tr_exp_wrapper (
-        .dsp_mode (1'b1),     // Hardwired to 1 (we do the muxing at the top level)
-        .a        (a_sub),    // Feed the shifted values
-        .b        (a_sub),    // Unused by TR-exp
-        .a_mux    (exp_a_mux),// Outputs e_a
-        .b_mux    (exp_b_mux) // Outputs e_frac
+    ) u_tr_exp_array (
+        .x       (a_sub),       // Feed the shifted and subtracted values
+        .e_a     (exp_a_mux),   // Extracts e_a
+        .mantisa (exp_b_mux)    // Extracts e_frac
     );
 
     // ========================================================================

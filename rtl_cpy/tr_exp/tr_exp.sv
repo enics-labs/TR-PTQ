@@ -15,23 +15,6 @@
 //
 // Fraction bits: 4
 // =============================================================
-// UPDATE
-// ===================================================================================
-// ORIGINAL BUG (Index Collision):
-// Originally, the LUT index was calculated using a 3-bit bitwise inversion of the 
-// rounded anchor magnitude: `~rounded_mag[2:0]`. This created an aliasing collision:
-//   * Anchor  0 (0000) -> lower 3 bits 000 -> inverted to 111 (Index 7)
-//   * Anchor -8 (1000) -> lower 3 bits 000 -> inverted to 111 (Index 7)
-// Because index 7 was hardcoded to hold e^0 (255), inputs near -8 (e.g., -7.625) 
-// erroneously fetched e^0 instead of e^-8, causing massive approximation errors.
-// 
-// FIX:
-//   1. The `round.sv` module now outputs `is_zero` when the rounded_mag is zero.
-//   2. The LUT was shifted to strictly contain negative anchors (-1 to -8).
-//      Index 7 now holds the quantized value for e^-8 (8'd0).
-//   3. A bypass multiplexer at Stage 0 catches the zero-anchor case and injects 
-//      255 (e^0) directly, bypassing the LUT entirely.
-// ===================================================================================
 module tr_exp #(
     parameter int FRAC = 4,
     parameter int ITER = 2
@@ -90,7 +73,7 @@ module tr_exp #(
     logic [1:0] xa_square;
     logic [5:0] second_order;
     
-    quadratic_divider qd(
+    q4_4_quadratic_divider qd(
         .x(x_frac),      // 8-bit signed input
         .y(xa_square)       // 2-bit unsigned output: floor(x^2/32)
     );

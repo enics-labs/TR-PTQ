@@ -1,4 +1,4 @@
-module quadratic_divider (
+module q4_4_quadratic_divider (
     input  wire [3:0] x,      // 8-bit signed input
     output wire [1:0] y       // 2-bit unsigned output: floor(x^2/32)
 );

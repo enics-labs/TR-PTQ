@@ -10,7 +10,7 @@
 ../rtl_cpy/tr_exp/tr_exp_wrapper.sv
 ../rtl_cpy/tr_exp/tr_exp.sv
 ../rtl_cpy/tr_exp/q4_4_round_neg.sv
-../rtl_cpy/tr_exp/quadratic_divider.sv
+../rtl_cpy/tr_exp/q4_4_quadratic_divider.sv
 
 ../rtl_cpy/online_sum/piped_max.sv
 ../rtl_cpy/online_sum/max_sub.sv

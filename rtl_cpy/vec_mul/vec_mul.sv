@@ -1,18 +1,7 @@
 // ===================================================================================
-// ARCHITECTURE NOTE: Mixed-Sign Multiplication & The Zero-Padding Bug
+// ARCHITECTURE NOTE: Mixed-Sign Multiplication
 // ===================================================================================
 // This module supports mixed-sign vector dot products via the `op_mode` signal.
-//
-// ORIGINAL BUG:
-// Originally, all operands were prepended with a zero: `$signed({1'b0, a_reg})`.
-// While this is required for unsigned numbers, doing this to a negative signed
-// number destroys its sign bit. For example, an 8-bit -1 (1111_1111) becomes a
-// 9-bit +255 (0_1111_1111). This caused massive positive calculation errors.
-//
-// THE FIX:
-// We zero-pad ONLY the unsigned operands to prevent their MSB from being
-// accidentally interpreted as a negative two's complement sign, while
-// leaving signed operands untouched so they sign-extend naturally.
 //
 //   * Mode 0 (SS) - Signed x Signed:
 //       Both operands are cast directly to $signed(). SV naturally sign-extends.
