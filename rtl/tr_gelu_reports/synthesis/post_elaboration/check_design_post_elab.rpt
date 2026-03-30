@@ -1,0 +1,502 @@
+
+ 	 Check Design Report (c)
+	 ------------------- 
+No subdesign's name is greater than 1.5k in length.
+
+ Feedthrough Module(s)
+ -------------------------
+No feed through module in 'tr_gelu'
+
+  Unresolved References & Empty Modules
+  ------------------------------------- 
+No unresolved references in design 'tr_gelu'
+
+No empty modules in design 'tr_gelu'
+
+ Unloaded Pin(s), Port(s)
+ -------------------------
+No unloaded sequential element in 'tr_gelu'
+
+No unloaded port in 'tr_gelu'
+
+ Unloaded Combinational Pin(s)
+ -------------------------------
+design 'tr_gelu' has the following unloaded combinational elements
+pin:tr_gelu/u_exp_term1/qd/g6/z
+pin:tr_gelu/u_exp_term1/qd/g13/z
+pin:tr_gelu/u_ln/add_38_39/g4/z
+pin:tr_gelu/u_ln/add_38_39/g28/z
+pin:tr_gelu/u_ln/add_38_39/g30/z
+pin:tr_gelu/u_ln/add_38_39/g33/z
+pin:tr_gelu/u_ln/add_33_36/g1/z
+pin:tr_gelu/u_ln/add_33_36/g84/z
+pin:tr_gelu/u_exp_reciprocal/qd/g6/z
+pin:tr_gelu/u_exp_reciprocal/qd/g13/z
+pin:tr_gelu/u_exp_term2/qd/g6/z
+pin:tr_gelu/u_exp_term2/qd/g13/z
+pin:tr_gelu/mul_59_25/g1/z
+pin:tr_gelu/mul_59_25/g481/z
+pin:tr_gelu/mul_59_25/g484/z
+pin:tr_gelu/mul_59_25/g192/z
+pin:tr_gelu/mul_246_27/g1/z
+pin:tr_gelu/mul_246_27/g419/z
+pin:tr_gelu/mul_246_27/g422/z
+pin:tr_gelu/mul_246_27/g425/z
+pin:tr_gelu/mul_246_27/g448/z
+pin:tr_gelu/mul_246_27/g451/z
+pin:tr_gelu/mul_246_27/g453/z
+pin:tr_gelu/mul_246_27/g455/z
+pin:tr_gelu/mul_297_97/g12/z
+pin:tr_gelu/mul_297_97/g1056/z
+pin:tr_gelu/mul_297_97/g1059/z
+pin:tr_gelu/mul_297_97/g1061/z
+pin:tr_gelu/mul_297_97/g1064/z
+pin:tr_gelu/mul_297_97/g1066/z
+pin:tr_gelu/mul_297_97/g1069/z
+pin:tr_gelu/mul_297_97/g1071/z
+pin:tr_gelu/mul_297_97/g1074/z
+pin:tr_gelu/mul_297_97/g1076/z
+pin:tr_gelu/mul_297_97/g1079/z
+pin:tr_gelu/mul_297_97/g1082/z
+pin:tr_gelu/mul_297_97/g1085/z
+pin:tr_gelu/mul_297_97/g1087/z
+pin:tr_gelu/mul_297_97/g1090/z
+pin:tr_gelu/mul_297_97/g1113/z
+pin:tr_gelu/mul_297_97/g1115/z
+pin:tr_gelu/mul_297_97/g1116/z
+pin:tr_gelu/minus_32_31/g71/z
+pin:tr_gelu/minus_32_31/g73/z
+pin:tr_gelu/minus_32_31/g76/z
+pin:tr_gelu/minus_32_31/g86/z
+pin:tr_gelu/minus_32_31/g88/z
+Total number of unloaded combinational elements in design 'tr_gelu' : 47
+
+ Assigns
+ ------- 
+Encountered an assign statement at hport 'hport:tr_gelu/u_exp_term1/uut/is_ceil' in module q4_4_round_neg
+Encountered an assign statement at hport 'hport:tr_gelu/u_exp_term1/mantisa[7]' in module tr_exp_FRAC4_ITER0
+Encountered an assign statement at hport 'hport:tr_gelu/u_exp_term1/mantisa[6]' in module tr_exp_FRAC4_ITER0
+Encountered an assign statement at hport 'hport:tr_gelu/u_exp_term1/mantisa[5]' in module tr_exp_FRAC4_ITER0
+Encountered an assign statement at hport 'hport:tr_gelu/u_exp_term1/mantisa[4]' in module tr_exp_FRAC4_ITER0
+Encountered an assign statement at hport 'hport:tr_gelu/u_exp_term1/mantisa[3]' in module tr_exp_FRAC4_ITER0
+Encountered an assign statement at hport 'hport:tr_gelu/u_exp_term1/mantisa[2]' in module tr_exp_FRAC4_ITER0
+Encountered an assign statement at hport 'hport:tr_gelu/u_exp_term1/mantisa[1]' in module tr_exp_FRAC4_ITER0
+Encountered an assign statement at hport 'hport:tr_gelu/u_exp_term1/mantisa[0]' in module tr_exp_FRAC4_ITER0
+Encountered an assign statement at hport 'hport:tr_gelu/u_ln/sub_23_32/Z[7]' in module sub_unsigned
+Encountered an assign statement at hport 'hport:tr_gelu/u_ln/sub_23_32/Z[6]' in module sub_unsigned
+Encountered an assign statement at hport 'hport:tr_gelu/u_ln/ctl_xq_17_17/out_0[9]' in module case_box
+Encountered an assign statement at hport 'hport:tr_gelu/u_exp_reciprocal/mantisa[7]' in module tr_exp_FRAC4_ITER1
+Encountered an assign statement at hport 'hport:tr_gelu/u_exp_reciprocal/mantisa[6]' in module tr_exp_FRAC4_ITER1
+Encountered an assign statement at hport 'hport:tr_gelu/u_exp_reciprocal/mantisa[5]' in module tr_exp_FRAC4_ITER1
+Encountered an assign statement at hport 'hport:tr_gelu/u_exp_reciprocal/mantisa[3]' in module tr_exp_FRAC4_ITER1
+Encountered an assign statement at hport 'hport:tr_gelu/u_exp_reciprocal/mantisa[2]' in module tr_exp_FRAC4_ITER1
+Encountered an assign statement at hport 'hport:tr_gelu/u_exp_reciprocal/mantisa[1]' in module tr_exp_FRAC4_ITER1
+Encountered an assign statement at hport 'hport:tr_gelu/u_exp_reciprocal/mantisa[0]' in module tr_exp_FRAC4_ITER1
+Total number of assign statements in design 'tr_gelu' : 19
+
+ Undriven Port(s)/Pin(s)
+ ------------------------
+No undriven combinational pin in 'tr_gelu'
+
+No undriven sequential pin in 'tr_gelu'
+
+The following hierarchical pin(s) in design 'tr_gelu' are undriven
+hpin:tr_gelu/minus_222_20/B[3] 	 (fanout : 2)
+hpin:tr_gelu/minus_222_20/B[2] 	 (fanout : 3)
+hpin:tr_gelu/minus_222_20/B[1] 	 (fanout : 2)
+hpin:tr_gelu/minus_222_20/B[0] 	 (fanout : 2)
+Total number of hierarchical undriven pins in design 'tr_gelu' : 4
+
+No undriven port in 'tr_gelu'
+
+ Multidriven Port(s)/Pin(s)
+--------------------------
+
+No multidriven combinational pin in 'tr_gelu'
+
+No multidriven sequential pin in 'tr_gelu'
+
+No multidriven hierarchical pin in 'tr_gelu'
+
+No multidriven ports in 'tr_gelu'
+
+No multidriven unloaded nets in 'tr_gelu'
+
+  Constant Pin(s)
+  ----------------
+No constant combinational pin(s) in design 'tr_gelu'
+
+No constant sequential pin(s) in design 'tr_gelu'
+
+design 'tr_gelu' has the following constant input hierarchical pin(s)
+hpin:tr_gelu/gt_63_25/B[7] 	 (fanout : 17)
+hpin:tr_gelu/gt_63_25/B[6] 	 (fanout : 2)
+hpin:tr_gelu/gt_63_25/B[5] 	 (fanout : 2)
+hpin:tr_gelu/gt_63_25/B[4] 	 (fanout : 2)
+hpin:tr_gelu/gt_63_25/B[3] 	 (fanout : 2)
+hpin:tr_gelu/gt_63_25/B[2] 	 (fanout : 2)
+hpin:tr_gelu/gt_63_25/B[1] 	 (fanout : 2)
+hpin:tr_gelu/gt_63_25/B[0] 	 (fanout : 1)
+hpin:tr_gelu/lt_64_30/B[7] 	 (fanout : 3)
+hpin:tr_gelu/lt_64_30/B[6] 	 (fanout : 1)
+hpin:tr_gelu/lt_64_30/B[5] 	 (fanout : 1)
+hpin:tr_gelu/lt_64_30/B[4] 	 (fanout : 1)
+hpin:tr_gelu/lt_64_30/B[3] 	 (fanout : 1)
+hpin:tr_gelu/lt_64_30/B[2] 	 (fanout : 1)
+hpin:tr_gelu/lt_64_30/B[1] 	 (fanout : 1)
+hpin:tr_gelu/lt_64_30/B[0] 	 (fanout : 1)
+hpin:tr_gelu/mul_59_25/B[8] 	 (fanout : 8)
+hpin:tr_gelu/mul_59_25/B[7] 	 (fanout : 8)
+hpin:tr_gelu/mul_59_25/B[6] 	 (fanout : 8)
+hpin:tr_gelu/mul_59_25/B[5] 	 (fanout : 8)
+hpin:tr_gelu/mul_59_25/B[4] 	 (fanout : 8)
+hpin:tr_gelu/mul_59_25/B[3] 	 (fanout : 8)
+hpin:tr_gelu/mul_59_25/B[2] 	 (fanout : 8)
+hpin:tr_gelu/minus_104_20/A 	 (fanout : 14)
+hpin:tr_gelu/mul_297_45/B[8] 	 (fanout : 8)
+hpin:tr_gelu/mul_297_97/B[8] 	 (fanout : 20)
+hpin:tr_gelu/neq_36_24/B 	 (fanout : 1)
+hpin:tr_gelu/minus_32_31/A 	 (fanout : 14)
+hpin:tr_gelu/gt_101_27/B 	 (fanout : 13)
+hpin:tr_gelu/minus_222_20/A 	 (fanout : 2)
+hpin:tr_gelu/minus_222_20/B[7] 	 (fanout : 1)
+hpin:tr_gelu/minus_222_20/B[6] 	 (fanout : 2)
+hpin:tr_gelu/minus_222_20/B[5] 	 (fanout : 2)
+hpin:tr_gelu/minus_222_20/B[4] 	 (fanout : 3)
+hpin:tr_gelu/mux_region_idx_36_24/in_1[1] 	 (fanout : 1)
+hpin:tr_gelu/mux_region_idx_36_24/in_1[0] 	 (fanout : 1)
+hpin:tr_gelu/mux_alpha_g_45_15/in_0[1] 	 (fanout : 1)
+hpin:tr_gelu/mux_alpha_g_45_15/in_0[0] 	 (fanout : 1)
+hpin:tr_gelu/mux_alpha_g_45_15/in_1[1] 	 (fanout : 1)
+hpin:tr_gelu/mux_alpha_g_45_15/in_1[0] 	 (fanout : 1)
+hpin:tr_gelu/mux_alpha_g_45_15/in_2[1] 	 (fanout : 1)
+hpin:tr_gelu/mux_alpha_g_45_15/in_2[0] 	 (fanout : 1)
+hpin:tr_gelu/mux_alpha_g_45_15/in_3[1] 	 (fanout : 1)
+hpin:tr_gelu/mux_alpha_g_45_15/in_3[0] 	 (fanout : 1)
+hpin:tr_gelu/mux_101_27/in_0[7] 	 (fanout : 1)
+hpin:tr_gelu/mux_101_27/in_0[6] 	 (fanout : 1)
+hpin:tr_gelu/mux_101_27/in_0[5] 	 (fanout : 1)
+hpin:tr_gelu/mux_101_27/in_0[4] 	 (fanout : 1)
+hpin:tr_gelu/mux_101_27/in_0[3] 	 (fanout : 1)
+hpin:tr_gelu/mux_101_27/in_0[2] 	 (fanout : 1)
+hpin:tr_gelu/mux_101_27/in_0[1] 	 (fanout : 1)
+hpin:tr_gelu/mux_101_27/in_0[0] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term1/uut/eq_27_44/B 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term1/uut/add_24_61/B[1] 	 (fanout : 5)
+hpin:tr_gelu/u_exp_term1/uut/add_24_61/B[0] 	 (fanout : 2)
+hpin:tr_gelu/u_exp_term1/mux_exp_lut[a_idx]_79_37/in_0[6] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term1/mux_exp_lut[a_idx]_79_37/in_0[5] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term1/mux_exp_lut[a_idx]_79_37/in_0[4] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term1/mux_exp_lut[a_idx]_79_37/in_0[3] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term1/mux_exp_lut[a_idx]_79_37/in_0[2] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term1/mux_exp_lut[a_idx]_79_37/in_0[1] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term1/mux_exp_lut[a_idx]_79_37/in_0[0] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term1/mux_exp_lut[a_idx]_79_37/in_1[6] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term1/mux_exp_lut[a_idx]_79_37/in_1[5] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term1/mux_exp_lut[a_idx]_79_37/in_1[4] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term1/mux_exp_lut[a_idx]_79_37/in_1[3] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term1/mux_exp_lut[a_idx]_79_37/in_1[2] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term1/mux_exp_lut[a_idx]_79_37/in_1[1] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term1/mux_exp_lut[a_idx]_79_37/in_1[0] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term1/mux_exp_lut[a_idx]_79_37/in_2[6] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term1/mux_exp_lut[a_idx]_79_37/in_2[5] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term1/mux_exp_lut[a_idx]_79_37/in_2[4] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term1/mux_exp_lut[a_idx]_79_37/in_2[3] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term1/mux_exp_lut[a_idx]_79_37/in_2[2] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term1/mux_exp_lut[a_idx]_79_37/in_2[1] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term1/mux_exp_lut[a_idx]_79_37/in_2[0] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term1/mux_exp_lut[a_idx]_79_37/in_3[6] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term1/mux_exp_lut[a_idx]_79_37/in_3[5] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term1/mux_exp_lut[a_idx]_79_37/in_3[4] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term1/mux_exp_lut[a_idx]_79_37/in_3[3] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term1/mux_exp_lut[a_idx]_79_37/in_3[2] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term1/mux_exp_lut[a_idx]_79_37/in_3[1] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term1/mux_exp_lut[a_idx]_79_37/in_3[0] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term1/mux_exp_lut[a_idx]_79_37/in_4[6] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term1/mux_exp_lut[a_idx]_79_37/in_4[5] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term1/mux_exp_lut[a_idx]_79_37/in_4[4] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term1/mux_exp_lut[a_idx]_79_37/in_4[3] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term1/mux_exp_lut[a_idx]_79_37/in_4[2] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term1/mux_exp_lut[a_idx]_79_37/in_4[1] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term1/mux_exp_lut[a_idx]_79_37/in_4[0] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term1/mux_exp_lut[a_idx]_79_37/in_5[6] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term1/mux_exp_lut[a_idx]_79_37/in_5[5] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term1/mux_exp_lut[a_idx]_79_37/in_5[4] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term1/mux_exp_lut[a_idx]_79_37/in_5[3] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term1/mux_exp_lut[a_idx]_79_37/in_5[2] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term1/mux_exp_lut[a_idx]_79_37/in_5[1] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term1/mux_exp_lut[a_idx]_79_37/in_5[0] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term1/mux_exp_lut[a_idx]_79_37/in_6[6] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term1/mux_exp_lut[a_idx]_79_37/in_6[5] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term1/mux_exp_lut[a_idx]_79_37/in_6[4] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term1/mux_exp_lut[a_idx]_79_37/in_6[3] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term1/mux_exp_lut[a_idx]_79_37/in_6[2] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term1/mux_exp_lut[a_idx]_79_37/in_6[1] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term1/mux_exp_lut[a_idx]_79_37/in_6[0] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term1/mux_exp_lut[a_idx]_79_37/in_7[6] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term1/mux_exp_lut[a_idx]_79_37/in_7[5] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term1/mux_exp_lut[a_idx]_79_37/in_7[4] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term1/mux_exp_lut[a_idx]_79_37/in_7[3] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term1/mux_exp_lut[a_idx]_79_37/in_7[2] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term1/mux_exp_lut[a_idx]_79_37/in_7[1] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term1/mux_exp_lut[a_idx]_79_37/in_7[0] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term1/mux_79_18/in_0[7] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term1/mux_79_18/in_1[7] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term1/mux_79_18/in_1[6] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term1/mux_79_18/in_1[5] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term1/mux_79_18/in_1[4] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term1/mux_79_18/in_1[3] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term1/mux_79_18/in_1[2] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term1/mux_79_18/in_1[1] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term1/mux_79_18/in_1[0] 	 (fanout : 1)
+hpin:tr_gelu/u_ln/add_33_36/B[7] 	 (fanout : 2)
+hpin:tr_gelu/u_ln/add_33_36/B[6] 	 (fanout : 2)
+hpin:tr_gelu/u_ln/add_33_36/B[5] 	 (fanout : 2)
+hpin:tr_gelu/u_ln/add_33_36/B[4] 	 (fanout : 2)
+hpin:tr_gelu/u_ln/add_33_36/B[3] 	 (fanout : 2)
+hpin:tr_gelu/u_ln/add_33_36/B[2] 	 (fanout : 2)
+hpin:tr_gelu/u_ln/add_33_36/B[1] 	 (fanout : 2)
+hpin:tr_gelu/u_ln/add_33_36/B[0] 	 (fanout : 2)
+hpin:tr_gelu/u_ln/sub_23_32/A[5] 	 (fanout : 2)
+hpin:tr_gelu/u_ln/sub_23_32/A[4] 	 (fanout : 3)
+hpin:tr_gelu/u_ln/sub_23_32/B[3] 	 (fanout : 1)
+hpin:tr_gelu/u_ln/sub_23_32/B[2] 	 (fanout : 1)
+hpin:tr_gelu/u_ln/sub_23_32/B[1] 	 (fanout : 1)
+hpin:tr_gelu/u_ln/sub_23_32/B[0] 	 (fanout : 2)
+hpin:tr_gelu/u_ln/gt_27_21/B 	 (fanout : 11)
+hpin:tr_gelu/u_ln/sub_30_38/B 	 (fanout : 1)
+hpin:tr_gelu/u_ln/minus_27_49/A 	 (fanout : 14)
+hpin:tr_gelu/u_ln/mux_msb_17_17/in_0[3] 	 (fanout : 1)
+hpin:tr_gelu/u_ln/mux_msb_17_17/in_0[2] 	 (fanout : 1)
+hpin:tr_gelu/u_ln/mux_msb_17_17/in_0[1] 	 (fanout : 1)
+hpin:tr_gelu/u_ln/mux_msb_17_17/in_0[0] 	 (fanout : 1)
+hpin:tr_gelu/u_ln/mux_msb_17_17/in_1[3] 	 (fanout : 1)
+hpin:tr_gelu/u_ln/mux_msb_17_17/in_1[2] 	 (fanout : 1)
+hpin:tr_gelu/u_ln/mux_msb_17_17/in_1[1] 	 (fanout : 1)
+hpin:tr_gelu/u_ln/mux_msb_17_17/in_1[0] 	 (fanout : 1)
+hpin:tr_gelu/u_ln/mux_msb_17_17/in_2[3] 	 (fanout : 1)
+hpin:tr_gelu/u_ln/mux_msb_17_17/in_2[2] 	 (fanout : 1)
+hpin:tr_gelu/u_ln/mux_msb_17_17/in_2[1] 	 (fanout : 1)
+hpin:tr_gelu/u_ln/mux_msb_17_17/in_2[0] 	 (fanout : 1)
+hpin:tr_gelu/u_ln/mux_msb_17_17/in_3[3] 	 (fanout : 1)
+hpin:tr_gelu/u_ln/mux_msb_17_17/in_3[2] 	 (fanout : 1)
+hpin:tr_gelu/u_ln/mux_msb_17_17/in_3[1] 	 (fanout : 1)
+hpin:tr_gelu/u_ln/mux_msb_17_17/in_3[0] 	 (fanout : 1)
+hpin:tr_gelu/u_ln/mux_msb_17_17/in_4[3] 	 (fanout : 1)
+hpin:tr_gelu/u_ln/mux_msb_17_17/in_4[2] 	 (fanout : 1)
+hpin:tr_gelu/u_ln/mux_msb_17_17/in_4[1] 	 (fanout : 1)
+hpin:tr_gelu/u_ln/mux_msb_17_17/in_4[0] 	 (fanout : 1)
+hpin:tr_gelu/u_ln/mux_msb_17_17/in_5[3] 	 (fanout : 1)
+hpin:tr_gelu/u_ln/mux_msb_17_17/in_5[2] 	 (fanout : 1)
+hpin:tr_gelu/u_ln/mux_msb_17_17/in_5[1] 	 (fanout : 1)
+hpin:tr_gelu/u_ln/mux_msb_17_17/in_5[0] 	 (fanout : 1)
+hpin:tr_gelu/u_ln/mux_msb_17_17/in_6[3] 	 (fanout : 1)
+hpin:tr_gelu/u_ln/mux_msb_17_17/in_6[2] 	 (fanout : 1)
+hpin:tr_gelu/u_ln/mux_msb_17_17/in_6[1] 	 (fanout : 1)
+hpin:tr_gelu/u_ln/mux_msb_17_17/in_6[0] 	 (fanout : 1)
+hpin:tr_gelu/u_ln/mux_msb_17_17/in_7[3] 	 (fanout : 1)
+hpin:tr_gelu/u_ln/mux_msb_17_17/in_7[2] 	 (fanout : 1)
+hpin:tr_gelu/u_ln/mux_msb_17_17/in_7[1] 	 (fanout : 1)
+hpin:tr_gelu/u_ln/mux_msb_17_17/in_7[0] 	 (fanout : 1)
+hpin:tr_gelu/u_ln/mux_msb_17_17/in_8[3] 	 (fanout : 1)
+hpin:tr_gelu/u_ln/mux_msb_17_17/in_8[2] 	 (fanout : 1)
+hpin:tr_gelu/u_ln/mux_msb_17_17/in_8[1] 	 (fanout : 1)
+hpin:tr_gelu/u_ln/mux_msb_17_17/in_8[0] 	 (fanout : 1)
+hpin:tr_gelu/u_ln/mux_msb_17_17/in_9[3] 	 (fanout : 1)
+hpin:tr_gelu/u_ln/mux_msb_17_17/in_9[2] 	 (fanout : 1)
+hpin:tr_gelu/u_ln/mux_msb_17_17/in_9[1] 	 (fanout : 1)
+hpin:tr_gelu/u_ln/mux_msb_17_17/in_9[0] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_reciprocal/mux_exp_lut[a_idx]_79_37/in_0[6] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_reciprocal/mux_exp_lut[a_idx]_79_37/in_0[5] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_reciprocal/mux_exp_lut[a_idx]_79_37/in_0[4] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_reciprocal/mux_exp_lut[a_idx]_79_37/in_0[3] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_reciprocal/mux_exp_lut[a_idx]_79_37/in_0[2] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_reciprocal/mux_exp_lut[a_idx]_79_37/in_0[1] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_reciprocal/mux_exp_lut[a_idx]_79_37/in_0[0] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_reciprocal/mux_exp_lut[a_idx]_79_37/in_1[6] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_reciprocal/mux_exp_lut[a_idx]_79_37/in_1[5] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_reciprocal/mux_exp_lut[a_idx]_79_37/in_1[4] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_reciprocal/mux_exp_lut[a_idx]_79_37/in_1[3] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_reciprocal/mux_exp_lut[a_idx]_79_37/in_1[2] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_reciprocal/mux_exp_lut[a_idx]_79_37/in_1[1] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_reciprocal/mux_exp_lut[a_idx]_79_37/in_1[0] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_reciprocal/mux_exp_lut[a_idx]_79_37/in_2[6] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_reciprocal/mux_exp_lut[a_idx]_79_37/in_2[5] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_reciprocal/mux_exp_lut[a_idx]_79_37/in_2[4] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_reciprocal/mux_exp_lut[a_idx]_79_37/in_2[3] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_reciprocal/mux_exp_lut[a_idx]_79_37/in_2[2] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_reciprocal/mux_exp_lut[a_idx]_79_37/in_2[1] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_reciprocal/mux_exp_lut[a_idx]_79_37/in_2[0] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_reciprocal/mux_exp_lut[a_idx]_79_37/in_3[6] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_reciprocal/mux_exp_lut[a_idx]_79_37/in_3[5] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_reciprocal/mux_exp_lut[a_idx]_79_37/in_3[4] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_reciprocal/mux_exp_lut[a_idx]_79_37/in_3[3] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_reciprocal/mux_exp_lut[a_idx]_79_37/in_3[2] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_reciprocal/mux_exp_lut[a_idx]_79_37/in_3[1] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_reciprocal/mux_exp_lut[a_idx]_79_37/in_3[0] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_reciprocal/mux_exp_lut[a_idx]_79_37/in_4[6] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_reciprocal/mux_exp_lut[a_idx]_79_37/in_4[5] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_reciprocal/mux_exp_lut[a_idx]_79_37/in_4[4] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_reciprocal/mux_exp_lut[a_idx]_79_37/in_4[3] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_reciprocal/mux_exp_lut[a_idx]_79_37/in_4[2] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_reciprocal/mux_exp_lut[a_idx]_79_37/in_4[1] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_reciprocal/mux_exp_lut[a_idx]_79_37/in_4[0] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_reciprocal/mux_exp_lut[a_idx]_79_37/in_5[6] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_reciprocal/mux_exp_lut[a_idx]_79_37/in_5[5] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_reciprocal/mux_exp_lut[a_idx]_79_37/in_5[4] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_reciprocal/mux_exp_lut[a_idx]_79_37/in_5[3] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_reciprocal/mux_exp_lut[a_idx]_79_37/in_5[2] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_reciprocal/mux_exp_lut[a_idx]_79_37/in_5[1] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_reciprocal/mux_exp_lut[a_idx]_79_37/in_5[0] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_reciprocal/mux_exp_lut[a_idx]_79_37/in_6[6] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_reciprocal/mux_exp_lut[a_idx]_79_37/in_6[5] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_reciprocal/mux_exp_lut[a_idx]_79_37/in_6[4] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_reciprocal/mux_exp_lut[a_idx]_79_37/in_6[3] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_reciprocal/mux_exp_lut[a_idx]_79_37/in_6[2] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_reciprocal/mux_exp_lut[a_idx]_79_37/in_6[1] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_reciprocal/mux_exp_lut[a_idx]_79_37/in_6[0] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_reciprocal/mux_exp_lut[a_idx]_79_37/in_7[6] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_reciprocal/mux_exp_lut[a_idx]_79_37/in_7[5] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_reciprocal/mux_exp_lut[a_idx]_79_37/in_7[4] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_reciprocal/mux_exp_lut[a_idx]_79_37/in_7[3] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_reciprocal/mux_exp_lut[a_idx]_79_37/in_7[2] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_reciprocal/mux_exp_lut[a_idx]_79_37/in_7[1] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_reciprocal/mux_exp_lut[a_idx]_79_37/in_7[0] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_reciprocal/mux_79_18/in_0[7] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_reciprocal/mux_79_18/in_1[7] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_reciprocal/mux_79_18/in_1[6] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_reciprocal/mux_79_18/in_1[5] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_reciprocal/mux_79_18/in_1[4] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_reciprocal/mux_79_18/in_1[3] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_reciprocal/mux_79_18/in_1[2] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_reciprocal/mux_79_18/in_1[1] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_reciprocal/mux_79_18/in_1[0] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_reciprocal/uut/eq_27_44/B 	 (fanout : 1)
+hpin:tr_gelu/u_exp_reciprocal/uut/add_24_61/B[1] 	 (fanout : 5)
+hpin:tr_gelu/u_exp_reciprocal/uut/add_24_61/B[0] 	 (fanout : 2)
+hpin:tr_gelu/u_exp_term2/mux_exp_lut[a_idx]_79_37/in_0[6] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term2/mux_exp_lut[a_idx]_79_37/in_0[5] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term2/mux_exp_lut[a_idx]_79_37/in_0[4] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term2/mux_exp_lut[a_idx]_79_37/in_0[3] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term2/mux_exp_lut[a_idx]_79_37/in_0[2] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term2/mux_exp_lut[a_idx]_79_37/in_0[1] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term2/mux_exp_lut[a_idx]_79_37/in_0[0] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term2/mux_exp_lut[a_idx]_79_37/in_1[6] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term2/mux_exp_lut[a_idx]_79_37/in_1[5] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term2/mux_exp_lut[a_idx]_79_37/in_1[4] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term2/mux_exp_lut[a_idx]_79_37/in_1[3] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term2/mux_exp_lut[a_idx]_79_37/in_1[2] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term2/mux_exp_lut[a_idx]_79_37/in_1[1] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term2/mux_exp_lut[a_idx]_79_37/in_1[0] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term2/mux_exp_lut[a_idx]_79_37/in_2[6] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term2/mux_exp_lut[a_idx]_79_37/in_2[5] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term2/mux_exp_lut[a_idx]_79_37/in_2[4] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term2/mux_exp_lut[a_idx]_79_37/in_2[3] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term2/mux_exp_lut[a_idx]_79_37/in_2[2] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term2/mux_exp_lut[a_idx]_79_37/in_2[1] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term2/mux_exp_lut[a_idx]_79_37/in_2[0] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term2/mux_exp_lut[a_idx]_79_37/in_3[6] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term2/mux_exp_lut[a_idx]_79_37/in_3[5] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term2/mux_exp_lut[a_idx]_79_37/in_3[4] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term2/mux_exp_lut[a_idx]_79_37/in_3[3] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term2/mux_exp_lut[a_idx]_79_37/in_3[2] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term2/mux_exp_lut[a_idx]_79_37/in_3[1] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term2/mux_exp_lut[a_idx]_79_37/in_3[0] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term2/mux_exp_lut[a_idx]_79_37/in_4[6] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term2/mux_exp_lut[a_idx]_79_37/in_4[5] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term2/mux_exp_lut[a_idx]_79_37/in_4[4] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term2/mux_exp_lut[a_idx]_79_37/in_4[3] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term2/mux_exp_lut[a_idx]_79_37/in_4[2] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term2/mux_exp_lut[a_idx]_79_37/in_4[1] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term2/mux_exp_lut[a_idx]_79_37/in_4[0] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term2/mux_exp_lut[a_idx]_79_37/in_5[6] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term2/mux_exp_lut[a_idx]_79_37/in_5[5] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term2/mux_exp_lut[a_idx]_79_37/in_5[4] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term2/mux_exp_lut[a_idx]_79_37/in_5[3] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term2/mux_exp_lut[a_idx]_79_37/in_5[2] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term2/mux_exp_lut[a_idx]_79_37/in_5[1] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term2/mux_exp_lut[a_idx]_79_37/in_5[0] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term2/mux_exp_lut[a_idx]_79_37/in_6[6] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term2/mux_exp_lut[a_idx]_79_37/in_6[5] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term2/mux_exp_lut[a_idx]_79_37/in_6[4] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term2/mux_exp_lut[a_idx]_79_37/in_6[3] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term2/mux_exp_lut[a_idx]_79_37/in_6[2] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term2/mux_exp_lut[a_idx]_79_37/in_6[1] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term2/mux_exp_lut[a_idx]_79_37/in_6[0] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term2/mux_exp_lut[a_idx]_79_37/in_7[6] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term2/mux_exp_lut[a_idx]_79_37/in_7[5] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term2/mux_exp_lut[a_idx]_79_37/in_7[4] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term2/mux_exp_lut[a_idx]_79_37/in_7[3] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term2/mux_exp_lut[a_idx]_79_37/in_7[2] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term2/mux_exp_lut[a_idx]_79_37/in_7[1] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term2/mux_exp_lut[a_idx]_79_37/in_7[0] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term2/mux_79_18/in_0[7] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term2/mux_79_18/in_1[7] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term2/mux_79_18/in_1[6] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term2/mux_79_18/in_1[5] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term2/mux_79_18/in_1[4] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term2/mux_79_18/in_1[3] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term2/mux_79_18/in_1[2] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term2/mux_79_18/in_1[1] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term2/mux_79_18/in_1[0] 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term2/uut/eq_27_44/B 	 (fanout : 1)
+hpin:tr_gelu/u_exp_term2/uut/add_24_61/B[1] 	 (fanout : 5)
+hpin:tr_gelu/u_exp_term2/uut/add_24_61/B[0] 	 (fanout : 2)
+Total number of constant hierarchical pins in design 'tr_gelu' : 313
+
+No constant connected ports in design 'tr_gelu'
+
+  Preserved instances(s)
+  ----------------
+No preserved combinational instance(s) in design 'tr_gelu'
+No preserved sequential instance(s) in design 'tr_gelu'
+No preserved hierarchical instance(s) in design 'tr_gelu'
+
+  Physical only instances(s)
+  ----------------
+No physical only instance(s) in design 'tr_gelu'
+
+  Logical only instance(s) and linked libcells
+    -----------------------------------------
+No logical only instance(s) in design 'tr_gelu'
+
+Libcells with no corresponding LEF
+----------------------------------
+No libcell(s) found.
+
+LEF cells with no corresponding libcell
+---------------------------------------
+
+No physical (LEF) cells found.
+
+ Summary
+ ------- 
+
+              Name                       Total
+----------------------------------------------
+Unresolved References                        0
+Empty Modules                                0
+Unloaded Port(s)                             0
+Unloaded Sequential Pin(s)                   0
+Unloaded Combinational Pin(s)               47
+Assigns                                     19
+Undriven Port(s)                             0
+Undriven Leaf Pin(s)                         0
+Undriven hierarchical pin(s)                 4
+Multidriven Port(s)                          0
+Multidriven Leaf Pin(s)                      0
+Multidriven hierarchical Pin(s)              0
+Multidriven unloaded net(s)                  0
+Constant Port(s)                             0
+Constant Leaf Pin(s)                         0
+Constant hierarchical Pin(s)               313
+Preserved leaf instance(s)                   0
+Preserved hierarchical instance(s)           0
+Feedthrough Modules(s)                       0
+Libcells with no LEF cell                    0
+Physical (LEF) cells with no libcell         0
+Subdesigns with long module name             0
+Physical only instance(s)                    0
+Logical only instance(s)                     0
+
+  Done Checking the design.

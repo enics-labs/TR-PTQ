@@ -1,0 +1,12 @@
+../rtl/tr_exp/tr_exp.sv 
+../rtl/tr_exp/round.sv 
+../rtl/tr_exp/quadratic_divider.sv
+../rtl/tr_reciprocal/tr_reciprocal.sv 
+../rtl/tr_reciprocal/classic_reciprocal.sv 
+../rtl/tr_reciprocal/divu_int.sv 
+../rtl/tr_ln/tr_ln.sv 
+../rtl/vec_mac/vec_mac_su.sv
+../rtl/online_sum/online_sum.sv
+../rtl/online_sum/piped_max.sv
+../rtl/online_sum/max_sub.sv
+../rtl/tr_softmax/tr_softmax.sv

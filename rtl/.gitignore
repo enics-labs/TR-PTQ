@@ -1,0 +1,149 @@
+xcelium.d
+
+.tstamp
+# ==================================================
+# drawio
+# ==================================================
+.*.bkp
+# ==================================================
+# Verilog / SystemVerilog
+# ==================================================
+*.vcd
+*.vpd
+*.wlf
+*.fsdb
+*.fst
+*.trn
+*.trn.db
+*.dmp
+
+# Compiled simulation outputs
+*.o
+*.a
+*.so
+*.dll
+*.exe
+*.out
+
+# ==================================================
+# Genus
+# ==================================================
+workspace/
+export/
+rtl/
+
+# ==================================================
+# Simulators
+# ==================================================
+
+# Cadence Xcelium / xrun
+xcelium.d/
+xrun.history
+xrun.log
+*.err
+*.diag
+*.key
+INCA_libs/
+irun.key
+.simvision/
+.symbolnamelist     
+.symbolportinfomap
+dump/
+logs/
+
+# Questa / ModelSim
+work/
+modelsim.ini
+transcript
+vsim.wlf
+questa.log
+
+# Verilator
+obj_dir/
+verilator.log
+verilator.tmp
+
+# VCS
+csrc/
+simv
+simv.daidir/
+ucli.key
+vcs.log
+
+# Icarus
+*.vvp
+
+# ==================================================
+# FPGA tools
+# ==================================================
+
+# Vivado
+.vivado/
+vivado.jou
+vivado.log
+vivado_pid*.str
+*.xpr
+*.runs/
+*.cache/
+*.hw/
+*.sim/
+
+# Quartus
+db/
+incremental_db/
+*.qws
+*.qpf~
+*.qsf~
+
+# Libero / Synplify
+*.prj
+*.srp
+*.srr
+*.log
+
+# ==================================================
+# Wave / Coverage
+# ==================================================
+cov/
+coverage/
+*.ucdb
+*.cov
+*.html
+
+# ==================================================
+# Generated files
+# ==================================================
+generated/
+build/
+dist/
+out/
+tmp/
+.cache/
+
+# ==================================================
+# DPI / C++ build artifacts
+# ==================================================
+*.obj
+*.d
+*.gcda
+*.gcno
+
+# ==================================================
+# Editor / OS
+# ==================================================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# ==================================================
+# Python (often used for TB / DPI)
+# ==================================================
+__pycache__/
+*.pyc
+.venv/
+.env
+

@@ -1,0 +1,524 @@
+
+ 	 Check Design Report (c)
+	 ------------------- 
+No subdesign's name is greater than 1.5k in length.
+
+ Feedthrough Module(s)
+ -------------------------
+No feed through module in 'vec_mac_su'
+
+  Unresolved References & Empty Modules
+  ------------------------------------- 
+No unresolved references in design 'vec_mac_su'
+
+No empty modules in design 'vec_mac_su'
+
+ Unloaded Pin(s), Port(s)
+ -------------------------
+design 'vec_mac_su' has the following unloaded sequential elements
+inst:vec_mac_su/mode1_reg[0]
+Total number of unloaded sequential elements in design 'vec_mac_su' : 1
+
+design 'vec_mac_su' has the following unloaded port(s)
+port:vec_mac_su/b[15][11]
+port:vec_mac_su/b[15][10]
+port:vec_mac_su/b[15][9]
+port:vec_mac_su/b[15][8]
+port:vec_mac_su/b[15][7]
+port:vec_mac_su/b[15][6]
+port:vec_mac_su/b[15][5]
+port:vec_mac_su/b[15][4]
+port:vec_mac_su/b[15][3]
+port:vec_mac_su/b[15][2]
+port:vec_mac_su/b[15][1]
+port:vec_mac_su/b[15][0]
+port:vec_mac_su/b[14][11]
+port:vec_mac_su/b[14][10]
+port:vec_mac_su/b[14][9]
+port:vec_mac_su/b[14][8]
+port:vec_mac_su/b[14][7]
+port:vec_mac_su/b[14][6]
+port:vec_mac_su/b[14][5]
+port:vec_mac_su/b[14][4]
+port:vec_mac_su/b[14][3]
+port:vec_mac_su/b[14][2]
+port:vec_mac_su/b[14][1]
+port:vec_mac_su/b[14][0]
+port:vec_mac_su/b[13][11]
+port:vec_mac_su/b[13][10]
+port:vec_mac_su/b[13][9]
+port:vec_mac_su/b[13][8]
+port:vec_mac_su/b[13][7]
+port:vec_mac_su/b[13][6]
+port:vec_mac_su/b[13][5]
+port:vec_mac_su/b[13][4]
+port:vec_mac_su/b[13][3]
+port:vec_mac_su/b[13][2]
+port:vec_mac_su/b[13][1]
+port:vec_mac_su/b[13][0]
+port:vec_mac_su/b[12][11]
+port:vec_mac_su/b[12][10]
+port:vec_mac_su/b[12][9]
+port:vec_mac_su/b[12][8]
+port:vec_mac_su/b[12][7]
+port:vec_mac_su/b[12][6]
+port:vec_mac_su/b[12][5]
+port:vec_mac_su/b[12][4]
+port:vec_mac_su/b[12][3]
+port:vec_mac_su/b[12][2]
+port:vec_mac_su/b[12][1]
+port:vec_mac_su/b[12][0]
+port:vec_mac_su/b[11][11]
+port:vec_mac_su/b[11][10]
+port:vec_mac_su/b[11][9]
+port:vec_mac_su/b[11][8]
+port:vec_mac_su/b[11][7]
+port:vec_mac_su/b[11][6]
+port:vec_mac_su/b[11][5]
+port:vec_mac_su/b[11][4]
+port:vec_mac_su/b[11][3]
+port:vec_mac_su/b[11][2]
+port:vec_mac_su/b[11][1]
+port:vec_mac_su/b[11][0]
+port:vec_mac_su/b[10][11]
+port:vec_mac_su/b[10][10]
+port:vec_mac_su/b[10][9]
+port:vec_mac_su/b[10][8]
+port:vec_mac_su/b[10][7]
+port:vec_mac_su/b[10][6]
+port:vec_mac_su/b[10][5]
+port:vec_mac_su/b[10][4]
+port:vec_mac_su/b[10][3]
+port:vec_mac_su/b[10][2]
+port:vec_mac_su/b[10][1]
+port:vec_mac_su/b[10][0]
+port:vec_mac_su/b[9][11]
+port:vec_mac_su/b[9][10]
+port:vec_mac_su/b[9][9]
+port:vec_mac_su/b[9][8]
+port:vec_mac_su/b[9][7]
+port:vec_mac_su/b[9][6]
+port:vec_mac_su/b[9][5]
+port:vec_mac_su/b[9][4]
+port:vec_mac_su/b[9][3]
+port:vec_mac_su/b[9][2]
+port:vec_mac_su/b[9][1]
+port:vec_mac_su/b[9][0]
+port:vec_mac_su/b[8][11]
+port:vec_mac_su/b[8][10]
+port:vec_mac_su/b[8][9]
+port:vec_mac_su/b[8][8]
+port:vec_mac_su/b[8][7]
+port:vec_mac_su/b[8][6]
+port:vec_mac_su/b[8][5]
+port:vec_mac_su/b[8][4]
+port:vec_mac_su/b[8][3]
+port:vec_mac_su/b[8][2]
+port:vec_mac_su/b[8][1]
+port:vec_mac_su/b[8][0]
+port:vec_mac_su/b[7][11]
+port:vec_mac_su/b[7][10]
+port:vec_mac_su/b[7][9]
+port:vec_mac_su/b[7][8]
+port:vec_mac_su/b[7][7]
+port:vec_mac_su/b[7][6]
+port:vec_mac_su/b[7][5]
+port:vec_mac_su/b[7][4]
+port:vec_mac_su/b[7][3]
+port:vec_mac_su/b[7][2]
+port:vec_mac_su/b[7][1]
+port:vec_mac_su/b[7][0]
+port:vec_mac_su/b[6][11]
+port:vec_mac_su/b[6][10]
+port:vec_mac_su/b[6][9]
+port:vec_mac_su/b[6][8]
+port:vec_mac_su/b[6][7]
+port:vec_mac_su/b[6][6]
+port:vec_mac_su/b[6][5]
+port:vec_mac_su/b[6][4]
+port:vec_mac_su/b[6][3]
+port:vec_mac_su/b[6][2]
+port:vec_mac_su/b[6][1]
+port:vec_mac_su/b[6][0]
+port:vec_mac_su/b[5][11]
+port:vec_mac_su/b[5][10]
+port:vec_mac_su/b[5][9]
+port:vec_mac_su/b[5][8]
+port:vec_mac_su/b[5][7]
+port:vec_mac_su/b[5][6]
+port:vec_mac_su/b[5][5]
+port:vec_mac_su/b[5][4]
+port:vec_mac_su/b[5][3]
+port:vec_mac_su/b[5][2]
+port:vec_mac_su/b[5][1]
+port:vec_mac_su/b[5][0]
+port:vec_mac_su/b[4][11]
+port:vec_mac_su/b[4][10]
+port:vec_mac_su/b[4][9]
+port:vec_mac_su/b[4][8]
+port:vec_mac_su/b[4][7]
+port:vec_mac_su/b[4][6]
+port:vec_mac_su/b[4][5]
+port:vec_mac_su/b[4][4]
+port:vec_mac_su/b[4][3]
+port:vec_mac_su/b[4][2]
+port:vec_mac_su/b[4][1]
+port:vec_mac_su/b[4][0]
+port:vec_mac_su/b[3][11]
+port:vec_mac_su/b[3][10]
+port:vec_mac_su/b[3][9]
+port:vec_mac_su/b[3][8]
+port:vec_mac_su/b[3][7]
+port:vec_mac_su/b[3][6]
+port:vec_mac_su/b[3][5]
+port:vec_mac_su/b[3][4]
+port:vec_mac_su/b[3][3]
+port:vec_mac_su/b[3][2]
+port:vec_mac_su/b[3][1]
+port:vec_mac_su/b[3][0]
+port:vec_mac_su/b[2][11]
+port:vec_mac_su/b[2][10]
+port:vec_mac_su/b[2][9]
+port:vec_mac_su/b[2][8]
+port:vec_mac_su/b[2][7]
+port:vec_mac_su/b[2][6]
+port:vec_mac_su/b[2][5]
+port:vec_mac_su/b[2][4]
+port:vec_mac_su/b[2][3]
+port:vec_mac_su/b[2][2]
+port:vec_mac_su/b[2][1]
+port:vec_mac_su/b[2][0]
+port:vec_mac_su/b[1][11]
+port:vec_mac_su/b[1][10]
+port:vec_mac_su/b[1][9]
+port:vec_mac_su/b[1][8]
+port:vec_mac_su/b[1][7]
+port:vec_mac_su/b[1][6]
+port:vec_mac_su/b[1][5]
+port:vec_mac_su/b[1][4]
+port:vec_mac_su/b[1][3]
+port:vec_mac_su/b[1][2]
+port:vec_mac_su/b[1][1]
+port:vec_mac_su/b[1][0]
+port:vec_mac_su/b[0][11]
+port:vec_mac_su/b[0][10]
+port:vec_mac_su/b[0][9]
+port:vec_mac_su/b[0][8]
+port:vec_mac_su/b[0][7]
+port:vec_mac_su/b[0][6]
+port:vec_mac_su/b[0][5]
+port:vec_mac_su/b[0][4]
+port:vec_mac_su/b[0][3]
+port:vec_mac_su/b[0][2]
+port:vec_mac_su/b[0][1]
+port:vec_mac_su/b[0][0]
+Total number of unloaded ports in design 'vec_mac_su' : 192
+
+ Unloaded Combinational Pin(s)
+ -------------------------------
+design 'vec_mac_su' has the following unloaded combinational elements
+pin:vec_mac_su/add_164_26_I15/g447/z
+pin:vec_mac_su/add_164_26_I15/g449/z
+pin:vec_mac_su/add_164_26_I15/g452/z
+Total number of unloaded combinational elements in design 'vec_mac_su' : 3
+
+ Assigns
+ ------- 
+Total number of assign statements in design 'vec_mac_su' : 0
+
+ Undriven Port(s)/Pin(s)
+ ------------------------
+No undriven combinational pin in 'vec_mac_su'
+
+No undriven sequential pin in 'vec_mac_su'
+
+No undriven hierarchical pin in 'vec_mac_su'
+
+No undriven port in 'vec_mac_su'
+
+ Multidriven Port(s)/Pin(s)
+--------------------------
+
+No multidriven combinational pin in 'vec_mac_su'
+
+No multidriven sequential pin in 'vec_mac_su'
+
+No multidriven hierarchical pin in 'vec_mac_su'
+
+No multidriven ports in 'vec_mac_su'
+
+No multidriven unloaded nets in 'vec_mac_su'
+
+  Constant Pin(s)
+  ----------------
+No constant combinational pin(s) in design 'vec_mac_su'
+
+No constant sequential pin(s) in design 'vec_mac_su'
+
+design 'vec_mac_su' has the following constant input hierarchical pin(s)
+hpin:vec_mac_su/mux_prod_reg[0]_104_26/in_1[12] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[0]_104_26/in_1[11] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[0]_104_26/in_1[10] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[0]_104_26/in_1[9] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[0]_104_26/in_1[8] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[0]_104_26/in_1[7] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[0]_104_26/in_1[6] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[0]_104_26/in_1[5] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[0]_104_26/in_1[4] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[0]_104_26/in_1[3] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[0]_104_26/in_1[2] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[0]_104_26/in_1[1] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[0]_104_26/in_1[0] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[1]_104_26/in_1[12] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[1]_104_26/in_1[11] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[1]_104_26/in_1[10] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[1]_104_26/in_1[9] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[1]_104_26/in_1[8] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[1]_104_26/in_1[7] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[1]_104_26/in_1[6] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[1]_104_26/in_1[5] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[1]_104_26/in_1[4] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[1]_104_26/in_1[3] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[1]_104_26/in_1[2] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[1]_104_26/in_1[1] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[1]_104_26/in_1[0] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[2]_104_26/in_1[12] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[2]_104_26/in_1[11] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[2]_104_26/in_1[10] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[2]_104_26/in_1[9] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[2]_104_26/in_1[8] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[2]_104_26/in_1[7] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[2]_104_26/in_1[6] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[2]_104_26/in_1[5] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[2]_104_26/in_1[4] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[2]_104_26/in_1[3] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[2]_104_26/in_1[2] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[2]_104_26/in_1[1] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[2]_104_26/in_1[0] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[3]_104_26/in_1[12] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[3]_104_26/in_1[11] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[3]_104_26/in_1[10] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[3]_104_26/in_1[9] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[3]_104_26/in_1[8] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[3]_104_26/in_1[7] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[3]_104_26/in_1[6] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[3]_104_26/in_1[5] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[3]_104_26/in_1[4] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[3]_104_26/in_1[3] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[3]_104_26/in_1[2] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[3]_104_26/in_1[1] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[3]_104_26/in_1[0] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[4]_104_26/in_1[12] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[4]_104_26/in_1[11] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[4]_104_26/in_1[10] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[4]_104_26/in_1[9] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[4]_104_26/in_1[8] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[4]_104_26/in_1[7] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[4]_104_26/in_1[6] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[4]_104_26/in_1[5] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[4]_104_26/in_1[4] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[4]_104_26/in_1[3] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[4]_104_26/in_1[2] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[4]_104_26/in_1[1] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[4]_104_26/in_1[0] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[5]_104_26/in_1[12] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[5]_104_26/in_1[11] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[5]_104_26/in_1[10] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[5]_104_26/in_1[9] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[5]_104_26/in_1[8] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[5]_104_26/in_1[7] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[5]_104_26/in_1[6] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[5]_104_26/in_1[5] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[5]_104_26/in_1[4] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[5]_104_26/in_1[3] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[5]_104_26/in_1[2] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[5]_104_26/in_1[1] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[5]_104_26/in_1[0] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[6]_104_26/in_1[12] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[6]_104_26/in_1[11] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[6]_104_26/in_1[10] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[6]_104_26/in_1[9] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[6]_104_26/in_1[8] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[6]_104_26/in_1[7] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[6]_104_26/in_1[6] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[6]_104_26/in_1[5] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[6]_104_26/in_1[4] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[6]_104_26/in_1[3] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[6]_104_26/in_1[2] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[6]_104_26/in_1[1] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[6]_104_26/in_1[0] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[7]_104_26/in_1[12] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[7]_104_26/in_1[11] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[7]_104_26/in_1[10] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[7]_104_26/in_1[9] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[7]_104_26/in_1[8] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[7]_104_26/in_1[7] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[7]_104_26/in_1[6] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[7]_104_26/in_1[5] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[7]_104_26/in_1[4] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[7]_104_26/in_1[3] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[7]_104_26/in_1[2] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[7]_104_26/in_1[1] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[7]_104_26/in_1[0] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[8]_104_26/in_1[12] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[8]_104_26/in_1[11] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[8]_104_26/in_1[10] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[8]_104_26/in_1[9] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[8]_104_26/in_1[8] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[8]_104_26/in_1[7] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[8]_104_26/in_1[6] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[8]_104_26/in_1[5] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[8]_104_26/in_1[4] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[8]_104_26/in_1[3] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[8]_104_26/in_1[2] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[8]_104_26/in_1[1] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[8]_104_26/in_1[0] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[9]_104_26/in_1[12] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[9]_104_26/in_1[11] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[9]_104_26/in_1[10] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[9]_104_26/in_1[9] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[9]_104_26/in_1[8] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[9]_104_26/in_1[7] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[9]_104_26/in_1[6] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[9]_104_26/in_1[5] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[9]_104_26/in_1[4] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[9]_104_26/in_1[3] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[9]_104_26/in_1[2] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[9]_104_26/in_1[1] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[9]_104_26/in_1[0] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[10]_104_26/in_1[12] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[10]_104_26/in_1[11] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[10]_104_26/in_1[10] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[10]_104_26/in_1[9] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[10]_104_26/in_1[8] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[10]_104_26/in_1[7] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[10]_104_26/in_1[6] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[10]_104_26/in_1[5] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[10]_104_26/in_1[4] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[10]_104_26/in_1[3] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[10]_104_26/in_1[2] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[10]_104_26/in_1[1] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[10]_104_26/in_1[0] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[11]_104_26/in_1[12] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[11]_104_26/in_1[11] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[11]_104_26/in_1[10] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[11]_104_26/in_1[9] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[11]_104_26/in_1[8] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[11]_104_26/in_1[7] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[11]_104_26/in_1[6] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[11]_104_26/in_1[5] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[11]_104_26/in_1[4] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[11]_104_26/in_1[3] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[11]_104_26/in_1[2] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[11]_104_26/in_1[1] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[11]_104_26/in_1[0] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[12]_104_26/in_1[12] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[12]_104_26/in_1[11] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[12]_104_26/in_1[10] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[12]_104_26/in_1[9] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[12]_104_26/in_1[8] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[12]_104_26/in_1[7] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[12]_104_26/in_1[6] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[12]_104_26/in_1[5] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[12]_104_26/in_1[4] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[12]_104_26/in_1[3] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[12]_104_26/in_1[2] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[12]_104_26/in_1[1] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[12]_104_26/in_1[0] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[13]_104_26/in_1[12] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[13]_104_26/in_1[11] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[13]_104_26/in_1[10] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[13]_104_26/in_1[9] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[13]_104_26/in_1[8] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[13]_104_26/in_1[7] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[13]_104_26/in_1[6] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[13]_104_26/in_1[5] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[13]_104_26/in_1[4] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[13]_104_26/in_1[3] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[13]_104_26/in_1[2] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[13]_104_26/in_1[1] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[13]_104_26/in_1[0] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[14]_104_26/in_1[12] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[14]_104_26/in_1[11] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[14]_104_26/in_1[10] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[14]_104_26/in_1[9] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[14]_104_26/in_1[8] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[14]_104_26/in_1[7] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[14]_104_26/in_1[6] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[14]_104_26/in_1[5] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[14]_104_26/in_1[4] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[14]_104_26/in_1[3] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[14]_104_26/in_1[2] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[14]_104_26/in_1[1] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[14]_104_26/in_1[0] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[15]_104_26/in_1[12] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[15]_104_26/in_1[11] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[15]_104_26/in_1[10] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[15]_104_26/in_1[9] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[15]_104_26/in_1[8] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[15]_104_26/in_1[7] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[15]_104_26/in_1[6] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[15]_104_26/in_1[5] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[15]_104_26/in_1[4] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[15]_104_26/in_1[3] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[15]_104_26/in_1[2] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[15]_104_26/in_1[1] 	 (fanout : 1)
+hpin:vec_mac_su/mux_prod_reg[15]_104_26/in_1[0] 	 (fanout : 1)
+Total number of constant hierarchical pins in design 'vec_mac_su' : 208
+
+No constant connected ports in design 'vec_mac_su'
+
+  Preserved instances(s)
+  ----------------
+No preserved combinational instance(s) in design 'vec_mac_su'
+No preserved sequential instance(s) in design 'vec_mac_su'
+No preserved hierarchical instance(s) in design 'vec_mac_su'
+
+  Physical only instances(s)
+  ----------------
+No physical only instance(s) in design 'vec_mac_su'
+
+  Logical only instance(s) and linked libcells
+    -----------------------------------------
+No logical only instance(s) in design 'vec_mac_su'
+
+Libcells with no corresponding LEF
+----------------------------------
+No libcell(s) found.
+
+LEF cells with no corresponding libcell
+---------------------------------------
+
+No physical (LEF) cells found.
+
+ Summary
+ ------- 
+
+              Name                       Total
+----------------------------------------------
+Unresolved References                        0
+Empty Modules                                0
+Unloaded Port(s)                           192
+Unloaded Sequential Pin(s)                   1
+Unloaded Combinational Pin(s)                3
+Assigns                                      0
+Undriven Port(s)                             0
+Undriven Leaf Pin(s)                         0
+Undriven hierarchical pin(s)                 0
+Multidriven Port(s)                          0
+Multidriven Leaf Pin(s)                      0
+Multidriven hierarchical Pin(s)              0
+Multidriven unloaded net(s)                  0
+Constant Port(s)                             0
+Constant Leaf Pin(s)                         0
+Constant hierarchical Pin(s)               208
+Preserved leaf instance(s)                   0
+Preserved hierarchical instance(s)           0
+Feedthrough Modules(s)                       0
+Libcells with no LEF cell                    0
+Physical (LEF) cells with no libcell         0
+Subdesigns with long module name             0
+Physical only instance(s)                    0
+Logical only instance(s)                     0
+
+  Done Checking the design.
