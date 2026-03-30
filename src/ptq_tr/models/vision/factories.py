@@ -7,7 +7,7 @@ from ptq_tr.models.vision.vit.swin.model import SwinTransformer
 from ptq_tr.quantization.modules.q_layernorm import QLayerNorm
 
 
-def deit_base_patch16_224(pretrained=False, quant=False, q_module_list=[], **kwargs):
+def deit_base_patch16_224(pretrained=False, quant=None, quant_config=None, q_module_list=None, **kwargs):
     model = DistilledVisionTransformer(
         img_size=224,
         patch_size=16,
@@ -17,6 +17,7 @@ def deit_base_patch16_224(pretrained=False, quant=False, q_module_list=[], **kwa
         mlp_ratio=4,
         qkv_bias=True,
         quant=quant,
+        quant_config=quant_config,
         q_module_list=q_module_list,
         distilled=False,
         **kwargs,
@@ -29,7 +30,7 @@ def deit_base_patch16_224(pretrained=False, quant=False, q_module_list=[], **kwa
     return model
 
 
-def deit_small_patch16_224(pretrained=False, quant=False, q_module_list=[], **kwargs):
+def deit_small_patch16_224(pretrained=False, quant=None, quant_config=None, q_module_list=None, **kwargs):
     model = DistilledVisionTransformer(
         img_size=224,
         patch_size=16,
@@ -40,6 +41,7 @@ def deit_small_patch16_224(pretrained=False, quant=False, q_module_list=[], **kw
         qkv_bias=True,
         q_module_list=q_module_list,
         quant=quant,
+        quant_config=quant_config,
         distilled=False,
         **kwargs,
     )
@@ -52,7 +54,7 @@ def deit_small_patch16_224(pretrained=False, quant=False, q_module_list=[], **kw
     return model
 
 
-def deit_tiny_patch16_224(pretrained=False, quant=False, q_module_list=[], **kwargs):
+def deit_tiny_patch16_224(pretrained=False, quant=None, quant_config=None, q_module_list=None, **kwargs):
     model = DistilledVisionTransformer(
         img_size=224,
         patch_size=16,
@@ -63,6 +65,7 @@ def deit_tiny_patch16_224(pretrained=False, quant=False, q_module_list=[], **kwa
         qkv_bias=True,
         q_module_list=q_module_list,
         quant=quant,
+        quant_config=quant_config,
         distilled=False,
         **kwargs,
     )
@@ -74,12 +77,13 @@ def deit_tiny_patch16_224(pretrained=False, quant=False, q_module_list=[], **kwa
     return model
 
 
-def swin_tiny_patch4_window7_224(pretrained=False, quant=False, q_module_list=[], **kwargs):
+def swin_tiny_patch4_window7_224(pretrained=False, quant=None, quant_config=None, q_module_list=None, **kwargs):
     model = SwinTransformer(
         img_size=224,
         patch_size=4,
         num_classes=1000,
         quant=quant,
+        quant_config=quant_config,
         norm_layer=QLayerNorm,
         embed_dim=96,
         depths=(2, 2, 6, 2),
@@ -98,7 +102,7 @@ def swin_tiny_patch4_window7_224(pretrained=False, quant=False, q_module_list=[]
     return model
 
 
-def swin_small_patch4_window7_224(pretrained=False, quant=False, q_module_list=[], **kwargs):
+def swin_small_patch4_window7_224(pretrained=False, quant=None, quant_config=None, q_module_list=None, **kwargs):
     model = SwinTransformer(
         img_size=224,
         patch_size=4,
@@ -106,6 +110,7 @@ def swin_small_patch4_window7_224(pretrained=False, quant=False, q_module_list=[
         norm_layer=QLayerNorm,
         embed_dim=96,
         quant=quant,
+        quant_config=quant_config,
         depths=(2, 2, 18, 2),
         num_heads=(3, 6, 12, 24),
         window_size=7,
@@ -122,13 +127,14 @@ def swin_small_patch4_window7_224(pretrained=False, quant=False, q_module_list=[
     return model
 
 
-def swin_base_patch4_window7_224(pretrained=False, quant=False, q_module_list=[], **kwargs):
+def swin_base_patch4_window7_224(pretrained=False, quant=None, quant_config=None, q_module_list=None, **kwargs):
     model = SwinTransformer(
         img_size=224,
         patch_size=4,
         num_classes=1000,
         norm_layer=QLayerNorm,
         quant=quant,
+        quant_config=quant_config,
         embed_dim=128,
         depths=[2, 2, 18, 2],
         num_heads=[4, 8, 16, 32],

@@ -18,9 +18,12 @@ class Attention(QauntParams):
         qkv_bias=False,
         attn_drop=0.0,
         proj_drop=0.0,
-        quant=False,
+        quant=None,
+        quant_config=None,
     ):
-        super().__init__()
+        super().__init__(quant_config=quant_config)
+        quant = self.quant if quant is None else quant
+        self.quant = quant
         self.num_heads = num_heads
         head_dim = dim // num_heads
         self.scale = head_dim ** -0.5
@@ -29,17 +32,18 @@ class Attention(QauntParams):
             dim,
             dim * 3,
             bias=qkv_bias,
-            nof_bits1=8,
-            nof_bits2=8,
+            nof_bits1=self.nof_bits_linear1,
+            nof_bits2=self.nof_bits_linear2,
             quant=quant,
         )
         self.mat_mul_qk = QuantizedMatmul(
-            in1_bits=8,
-            in2_bits=8,
+            in1_bits=self.nof_bits_matmul1,
+            in2_bits=self.nof_bits_matmul2,
             quant=quant,
         )
         self.sf = IntSoftmaxTS(
             nof_bits=self.nof_bits_softmax,
+            int_bits=self.int_bits_softmax,
             LUT_SIZE=self.lut_size_softmax,
             dim=-1,
             quant=self.quant,
@@ -47,15 +51,15 @@ class Attention(QauntParams):
 
         self.attn_drop = nn.Dropout(attn_drop)
         self.mat_mul_pv = QuantizedMatmul(
-            in1_bits=8,
-            in2_bits=8,
+            in1_bits=self.nof_bits_matmul1,
+            in2_bits=self.nof_bits_matmul2,
             quant=quant,
         )
         self.proj = QuantizedLinear(
             dim,
             dim,
-            nof_bits1=8,
-            nof_bits2=8,
+            nof_bits1=self.nof_bits_linear1,
+            nof_bits2=self.nof_bits_linear2,
             quant=quant,
         )
         self.proj_drop = nn.Dropout(proj_drop)

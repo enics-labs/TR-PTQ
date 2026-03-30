@@ -14,14 +14,23 @@ class PatchMerging(QauntParams):
         self,
         input_resolution,
         dim,
-        quant=False,
+        quant=None,
+        quant_config=None,
         norm_layer=QLayerNorm,
     ):
-        super().__init__()
+        super().__init__(quant_config=quant_config)
+        quant = self.quant if quant is None else quant
         self.quant = quant
         self.input_resolution = input_resolution
         self.dim = dim
-        self.reduction = QuantizedLinear(4 * dim, 2 * dim, bias=False)
+        self.reduction = QuantizedLinear(
+            4 * dim,
+            2 * dim,
+            bias=False,
+            nof_bits1=self.nof_bits_linear1,
+            nof_bits2=self.nof_bits_linear2,
+            quant=quant,
+        )
 
         self.norm = norm_layer(
             4 * dim,

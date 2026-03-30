@@ -25,10 +25,12 @@ class WindowAttention(QauntParams):
         qkv_bias=True,
         qk_scale=None,
         attn_drop=0.0,
-        quant=False,
+        quant=None,
         proj_drop=0.0,
+        quant_config=None,
     ):
-        super().__init__()
+        super().__init__(quant_config=quant_config)
+        quant = self.quant if quant is None else quant
         self.quant = quant
         self.dim = dim
         self.window_size = window_size
@@ -56,20 +58,40 @@ class WindowAttention(QauntParams):
             dim,
             dim * 3,
             bias=qkv_bias,
-            nof_bits1=8,
-            nof_bits2=8,
+            nof_bits1=self.nof_bits_linear1,
+            nof_bits2=self.nof_bits_linear2,
             quant=quant,
         )
 
-        self.mat_mul_qk = QuantizedMatmul(in1_bits=8, in2_bits=8, quant=quant)
+        self.mat_mul_qk = QuantizedMatmul(
+            in1_bits=self.nof_bits_matmul1,
+            in2_bits=self.nof_bits_matmul2,
+            quant=quant,
+        )
         self.attn_drop = nn.Dropout(attn_drop)
-        self.mat_mul_pv = QuantizedMatmul(in1_bits=8, in2_bits=8, quant=quant)
-        self.proj = QuantizedLinear(dim, dim, nof_bits1=8, nof_bits2=8, quant=quant)
+        self.mat_mul_pv = QuantizedMatmul(
+            in1_bits=self.nof_bits_matmul1,
+            in2_bits=self.nof_bits_matmul2,
+            quant=quant,
+        )
+        self.proj = QuantizedLinear(
+            dim,
+            dim,
+            nof_bits1=self.nof_bits_linear1,
+            nof_bits2=self.nof_bits_linear2,
+            quant=quant,
+        )
         self.proj_drop = nn.Dropout(proj_drop)
 
         trunc_normal_(self.relative_position_bias_table, std=0.02)
 
-        self.softmax = IntSoftmaxTS(nof_bits=8, LUT_SIZE=16, dim=-1, quant=quant)
+        self.softmax = IntSoftmaxTS(
+            nof_bits=self.nof_bits_softmax,
+            int_bits=self.int_bits_softmax,
+            LUT_SIZE=self.lut_size_softmax,
+            dim=-1,
+            quant=quant,
+        )
 
     def forward(self, x, mask=None):
         B_, N, C = x.shape

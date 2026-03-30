@@ -36,13 +36,15 @@ class DropPath(nn.Module):
 class QuantTransformer(QauntParams):
     def __init__(
         self,
-        quant=False,
+        quant=None,
         is_calibrate=False,
-        q_module_list=[QuantizedLinear, QuantizedMatmul, qHadamardProd, QLayerNorm],
+        quant_config=None,
+        q_module_list=None,
     ):
-        super().__init__()
-        self.q_module_list = q_module_list
-        self.quant = quant
+        super().__init__(quant_config=quant_config)
+        if q_module_list is None:
+            q_module_list = [QuantizedLinear, QuantizedMatmul, qHadamardProd, QLayerNorm]
+        self.quant = self.quant if quant is None else quant
         self.is_calibrate = is_calibrate
         self.q_module_list = q_module_list
 

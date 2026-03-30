@@ -27,10 +27,12 @@ class BasicLayer(QauntParams):
         norm_layer=QLayerNorm,
         downsample=None,
         use_checkpoint=False,
-        quant=False,
+        quant=None,
         fused_window_process=False,
+        quant_config=None,
     ):
-        super().__init__()
+        super().__init__(quant_config=quant_config)
+        quant = self.quant if quant is None else quant
         self.quant = quant
         self.dim = dim
         self.input_resolution = input_resolution
@@ -54,13 +56,20 @@ class BasicLayer(QauntParams):
                     norm_layer=norm_layer,
                     quant=quant,
                     fused_window_process=fused_window_process,
+                    quant_config=self,
                 )
                 for i in range(depth)
             ]
         )
 
         if downsample is not None:
-            self.downsample = downsample(input_resolution, dim=dim, norm_layer=norm_layer)
+            self.downsample = downsample(
+                input_resolution,
+                dim=dim,
+                quant=quant,
+                quant_config=self,
+                norm_layer=norm_layer,
+            )
         else:
             self.downsample = None
 

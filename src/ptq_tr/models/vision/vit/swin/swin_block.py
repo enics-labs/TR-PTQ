@@ -73,10 +73,12 @@ class SwinTransformerBlock(QauntParams):
         drop_path=0.0,
         act_layer=IntGeluTS,
         norm_layer=QLayerNorm,
-        quant=False,
+        quant=None,
         fused_window_process=False,
+        quant_config=None,
     ):
-        super().__init__()
+        super().__init__(quant_config=quant_config)
+        quant = self.quant if quant is None else quant
         self.quant = quant
         self.dim = dim
         self.input_resolution = input_resolution
@@ -105,6 +107,7 @@ class SwinTransformerBlock(QauntParams):
             attn_drop=attn_drop,
             quant=quant,
             proj_drop=drop,
+            quant_config=self,
         )
 
         self.drop_path = DropPath(drop_path) if drop_path > 0.0 else nn.Identity()
@@ -123,6 +126,7 @@ class SwinTransformerBlock(QauntParams):
             act_layer=act_layer,
             drop=drop,
             quant=quant,
+            quant_config=self,
         )
 
         if self.shift_size > 0:

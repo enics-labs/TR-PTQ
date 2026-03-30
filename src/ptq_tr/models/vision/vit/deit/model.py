@@ -43,16 +43,19 @@ class DistilledVisionTransformer(QuantTransformer):
         mlp_ratio=4.0,
         qkv_bias=True,
         distilled=True,
-        quant=False,
+        quant=None,
         is_calibrate=False,
-        q_module_list=[QuantizedLinear, QuantizedMatmul, qHadamardProd, QLayerNorm],
+        quant_config=None,
+        q_module_list=None,
         **kwargs,
     ):
         super().__init__(
             quant=quant,
             is_calibrate=is_calibrate,
+            quant_config=quant_config,
             q_module_list=q_module_list,
         )
+        quant = self.quant
         self.num_classes = num_classes
         self.num_features = self.embed_dim = embed_dim
         self.num_tokens = 2 if distilled else 1
@@ -81,6 +84,7 @@ class DistilledVisionTransformer(QuantTransformer):
                     act_layer=IntGeluTS,
                     norm_layer=QLayerNorm,
                     quant=self.quant,
+                    quant_config=self,
                     **kwargs,
                 )
                 for _ in range(depth)
@@ -97,8 +101,8 @@ class DistilledVisionTransformer(QuantTransformer):
             QuantizedLinear(
                 embed_dim,
                 num_classes,
-                nof_bits1=8,
-                nof_bits2=8,
+                nof_bits1=self.nof_bits_linear1,
+                nof_bits2=self.nof_bits_linear2,
                 quant=self.quant,
             )
             if num_classes > 0
@@ -108,8 +112,8 @@ class DistilledVisionTransformer(QuantTransformer):
             QuantizedLinear(
                 embed_dim,
                 num_classes,
-                nof_bits1=8,
-                nof_bits2=8,
+                nof_bits1=self.nof_bits_linear1,
+                nof_bits2=self.nof_bits_linear2,
                 quant=self.quant,
             )
             if distilled

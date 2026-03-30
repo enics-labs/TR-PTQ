@@ -15,37 +15,14 @@ from transformers.pytorch_utils import apply_chunking_to_forward, find_pruneable
 
 from ptq_tr.quantization.modules import IntGeluTS, IntSoftmaxTS, QLayerNorm, QuantizedLinear, QuantizedMatmul
 from ptq_tr.quantization.observers.base import ObserverBase
-from ptq_tr.quantization.qparams import QauntParams
-
-
-_QUANT_ATTRS = (
-    "quant",
-    "nof_bits_linear1",
-    "nof_bits_linear2",
-    "nof_bits_gelu",
-    "nof_bits_softmax",
-    "lut_size_softmax",
-    "nof_bits_lnorm1",
-    "nof_bits_lnorm2",
-    "nof_bits_matmul1",
-    "nof_bits_matmul2",
-)
-
-
-def _load_quant_attrs(module, config):
-    if config is None:
-        return
-    for attr_name in _QUANT_ATTRS:
-        if hasattr(config, attr_name):
-            setattr(module, attr_name, getattr(config, attr_name))
+from ptq_tr.quantization.qparams import QuantConfig, QauntParams, apply_quant_config
 
 
 class QuantizedBertModule(QauntParams):
     """Small helper base class that pulls quantization settings from the config."""
 
     def __init__(self, config=None):
-        super().__init__()
-        _load_quant_attrs(self, config)
+        super().__init__(quant_config=config)
 
 
 class QBertPreTrainedModel(BertPreTrainedModel):
@@ -54,17 +31,8 @@ class QBertPreTrainedModel(BertPreTrainedModel):
     def __init__(self, config):
         super().__init__(config)
         self.q_module_list = list(getattr(config, "q_module_list", []))
-        self.quant = False
-        self.nof_bits_linear1 = 8
-        self.nof_bits_linear2 = 8
-        self.nof_bits_gelu = 8
-        self.nof_bits_softmax = 8
-        self.lut_size_softmax = 7
-        self.nof_bits_lnorm1 = 12
-        self.nof_bits_lnorm2 = 4
-        self.nof_bits_matmul1 = 8
-        self.nof_bits_matmul2 = 8
-        _load_quant_attrs(self, config)
+        apply_quant_config(self, QuantConfig())
+        apply_quant_config(self, config)
 
     def set_q_module_list(self, q_module_list):
         self.q_module_list = list(q_module_list)
@@ -190,6 +158,7 @@ class CustomBertSelfAttention(QuantizedBertModule):
         )
         self.sf = IntSoftmaxTS(
             nof_bits=self.nof_bits_softmax,
+            int_bits=self.int_bits_softmax,
             LUT_SIZE=self.lut_size_softmax,
             dim=-1,
             quant=self.quant,
@@ -309,7 +278,7 @@ class CustomBertIntermediate(QuantizedBertModule):
         if isinstance(config.hidden_act, str):
             self.intermediate_act_fn = IntGeluTS(
                 quant=self.quant,
-                LUT_SIZE=16,
+                LUT_SIZE=self.lut_size_gelu,
                 nof_bits=self.nof_bits_gelu,
             )
         else:

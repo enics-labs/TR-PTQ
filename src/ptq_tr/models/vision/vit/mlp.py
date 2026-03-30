@@ -4,9 +4,10 @@ import torch.nn as nn
 
 from ptq_tr.quantization.modules.int_gelu import IntGeluTS
 from ptq_tr.quantization.modules.quant_linear import QuantizedLinear
+from ptq_tr.quantization.qparams import QauntParams
 
 
-class Mlp(nn.Module):
+class Mlp(QauntParams):
     """Feed-forward network (MLP) block used in Transformer blocks."""
 
     def __init__(
@@ -16,32 +17,37 @@ class Mlp(nn.Module):
         out_features=None,
         act_layer=IntGeluTS,
         is_calibrate=False,
-        quant=False,
+        quant=None,
         drop=0.0,
+        quant_config=None,
     ):
-        super().__init__()
+        super().__init__(quant_config=quant_config)
+        quant = self.quant if quant is None else quant
         self.quant = quant
         out_features = out_features or in_features
         hidden_features = hidden_features or in_features
         self.fc1 = QuantizedLinear(
             in_features,
             hidden_features,
-            nof_bits1=8,
-            nof_bits2=8,
+            nof_bits1=self.nof_bits_linear1,
+            nof_bits2=self.nof_bits_linear2,
             quant=quant,
         )
 
-        self.act = act_layer(
-            quant=quant,
-            LUT_SIZE=16,
-            nof_bits=8,
-        )
+        if act_layer is IntGeluTS:
+            self.act = act_layer(
+                quant=quant,
+                LUT_SIZE=self.lut_size_gelu,
+                nof_bits=self.nof_bits_gelu,
+            )
+        else:
+            self.act = act_layer()
 
         self.fc2 = QuantizedLinear(
             hidden_features,
             out_features,
-            nof_bits1=8,
-            nof_bits2=8,
+            nof_bits1=self.nof_bits_linear1,
+            nof_bits2=self.nof_bits_linear2,
             quant=quant,
         )
 

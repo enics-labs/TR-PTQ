@@ -25,9 +25,12 @@ class Block(QauntParams):
         is_calibrate=False,
         act_layer=IntGeluTS,
         norm_layer=QLayerNorm,
-        quant=False,
+        quant=None,
+        quant_config=None,
     ):
-        super().__init__()
+        super().__init__(quant_config=quant_config)
+        quant = self.quant if quant is None else quant
+        self.quant = quant
         self.norm1 = norm_layer(
             embed_dim,
             in1_bits=self.nof_bits_lnorm1,
@@ -41,6 +44,7 @@ class Block(QauntParams):
             attn_drop=attn_drop,
             proj_drop=drop,
             quant=quant,
+            quant_config=self,
         )
 
         self.drop_path = DropPath(drop_path) if drop_path > 0.0 else nn.Identity()
@@ -58,6 +62,7 @@ class Block(QauntParams):
             act_layer=act_layer,
             drop=drop,
             quant=quant,
+            quant_config=self,
         )
 
     def forward(self, x):

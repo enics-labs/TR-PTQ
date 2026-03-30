@@ -41,17 +41,20 @@ class SwinTransformer(QuantTransformer):
         ape=False,
         patch_norm=True,
         is_calibrate=False,
-        quant=False,
+        quant=None,
         use_checkpoint=False,
         fused_window_process=False,
-        q_module_list=[QuantizedLinear, QuantizedMatmul, qHadamardProd, QLayerNorm],
+        quant_config=None,
+        q_module_list=None,
         **kwargs,
     ):
         super().__init__(
             quant=quant,
             is_calibrate=is_calibrate,
+            quant_config=quant_config,
             q_module_list=q_module_list,
         )
+        quant = self.quant
         self.quant = quant
         self.num_classes = num_classes
         self.num_layers = len(depths)
@@ -60,7 +63,6 @@ class SwinTransformer(QuantTransformer):
         self.patch_norm = patch_norm
         self.num_features = int(embed_dim * 2 ** (self.num_layers - 1))
         self.mlp_ratio = mlp_ratio
-        self.q_module_list = q_module_list
 
         self.patch_embed = PatchEmbed(
             img_size=img_size,
@@ -68,6 +70,7 @@ class SwinTransformer(QuantTransformer):
             in_chans=in_chans,
             embed_dim=embed_dim,
             quant=quant,
+            quant_config=self,
             norm_layer=norm_layer if self.patch_norm else None,
         )
 
@@ -102,6 +105,7 @@ class SwinTransformer(QuantTransformer):
                 use_checkpoint=use_checkpoint,
                 quant=quant,
                 fused_window_process=fused_window_process,
+                quant_config=self,
             )
             self.layers.append(layer)
 

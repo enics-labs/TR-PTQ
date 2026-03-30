@@ -26,6 +26,7 @@ class IntSoftmaxTS(nn.Module):
         eps=1e-5,
         dim=-1,
         iterations=1,
+        int_bits=4,
         ts_ln=TylorNLog,
         int_exp_scaled=TaylorExponent,
     ):
@@ -35,10 +36,14 @@ class IntSoftmaxTS(nn.Module):
         self.nof_bits = nof_bits
         self.iterations = iterations
         self.dim = dim
+        self.int_bits = int_bits
         self.quant = quant
         self.is_calibrate = is_calibrate
         self.is_opt_scale = is_opt_scale
         self.eps = eps
+
+        if not (1 <= self.int_bits <= self.nof_bits):
+            raise ValueError(f"int_bits must be in [1, {self.nof_bits}], got {self.int_bits}")
 
         scale = 1 << (self.nof_bits - 1)
         self.div3 = int(round(scale / 3))
@@ -46,7 +51,8 @@ class IntSoftmaxTS(nn.Module):
         self.ts_ln = ts_ln
         self.int_exp_scaled = int_exp_scaled
 
-        self.input_bits = self.nof_bits - 4
+        # Split total precision into integer and fractional fixed-point bits.
+        self.frac_bits = self.nof_bits - self.int_bits
         self.output_bits = self.nof_bits + 1
         self.stats = dict()
         self.stats["softmax"] = []
@@ -73,23 +79,22 @@ class IntSoftmaxTS(nn.Module):
 
         x_int = self.in_obs.dequantizer(x_q - x_q.max(dim=self.dim, keepdim=True).values).round()
 
-        spacial_scale = 1 << (self.input_bits - 1)
+        spacial_scale = 1 << (self.frac_bits - 1)
         x_scale = (x_int * spacial_scale).floor().to(dtype)
 
         try:
             exp_int = self.int_exp_scaled(
                 x_scale,
                 spacial_scale,
-                input_bits=self.input_bits,
+                input_bits=self.frac_bits,
                 output_bits=self.output_bits,
                 LUT_SIZE=self.LUT_SIZE,
                 exp_lut=self.exp_lut,
                 iterations=0,
             )
         except RuntimeError as err:
-            print("[EXP 1] : TEST")
-            print(x_int)
             raise err
+
         exp_int_sum = exp_int.sum(dim=-1, keepdim=True)
 
         ln_sum = new_ln(exp_int_sum, self.output_bits - 1)
@@ -107,8 +112,6 @@ class IntSoftmaxTS(nn.Module):
                 iterations=1,
             )
         except RuntimeError as err:
-            print("[EXP 2] : TEST")
-            print(x_int)
             raise err
 
         sf_values = ln_mul * exp_int
@@ -120,7 +123,7 @@ class IntSoftmaxTS(nn.Module):
         return deq_softmax
 
     def float_forward_pass(self, x):
-        return x.softmax(dim=-1)
+        return x.softmax(dim=self.dim)
 
     def forward(self, x):
         if self.is_calibrate:

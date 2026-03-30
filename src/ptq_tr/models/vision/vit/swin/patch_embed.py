@@ -20,10 +20,12 @@ class PatchEmbed(QauntParams):
         patch_size=4,
         in_chans=3,
         embed_dim=96,
-        quant=False,
+        quant=None,
+        quant_config=None,
         norm_layer=None,
     ):
-        super().__init__()
+        super().__init__(quant_config=quant_config)
+        quant = self.quant if quant is None else quant
         self.quant = quant
         img_size = to_2tuple(img_size)
         patch_size = to_2tuple(patch_size)
