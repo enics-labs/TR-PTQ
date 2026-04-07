@@ -65,9 +65,9 @@ int clamp_exp_to_output(int e);
 
 template <>
 __device__ __forceinline__
-int clamp_exp_to_output<int8_t>(int e) {
+int clamp_exp_to_output<uint8_t>(int e) {
     if (e < 0) e = 0;
-    if (e > 127) e = 127;
+    if (e > 255) e = 255;
     return e;
 }
 
@@ -222,7 +222,7 @@ void exp_arith_dp4a_cuda(
     dim3 grid((total + THREADS - 1) / THREADS);
 
     if (out.dtype() == torch::kUInt8) {
-        exp_kernel<int8_t><<<grid, block>>>(
+        exp_kernel<uint8_t><<<grid, block>>>(
             x.data_ptr<int8_t>(),
             out.data_ptr<uint8_t>(),
             total

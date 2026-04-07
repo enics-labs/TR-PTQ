@@ -54,8 +54,8 @@ void exp_arith_dp4a(
 
     TORCH_CHECK(x.dtype() == torch::kInt8, "x must be int8 Q4.4");
     TORCH_CHECK(exp_lut.dtype() == torch::kUInt8, "exp_lut must be uint8");
-    TORCH_CHECK(out.dtype() == torch::kInt8 || out.dtype() == torch::kInt16,
-                "out must be int8 or int16");
+    TORCH_CHECK(out.dtype() == torch::kUInt8 || out.dtype() == torch::kInt16,
+                "out must be uint8 or int16");
     TORCH_CHECK(out.numel() == x.numel(), "out must have the same number of elements as x");
     TORCH_CHECK(exp_lut.numel() == 9, "exp_lut must contain exactly 9 values");
 
