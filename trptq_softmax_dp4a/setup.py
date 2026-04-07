@@ -12,9 +12,10 @@ if os.name != 'nt':
 
 setup(
     name='trptq_softmax_dp4a',
+    py_modules=['trptq_softmax_dp4a'],
     ext_modules=[
         CUDAExtension(
-            name='trptq_softmax_dp4a',
+            name='_trptq_softmax_dp4a',
             sources=[
                 'softmax_cuda.cpp',
                 'softmax_cuda_kernel.cu',
