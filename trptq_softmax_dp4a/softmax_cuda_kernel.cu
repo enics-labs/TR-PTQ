@@ -59,6 +59,26 @@ int dot_u8x4(int packed_a, int packed_b) {
 #endif
 }
 
+template <typename OutT>
+__device__ __forceinline__
+int clamp_exp_to_output(int e);
+
+template <>
+__device__ __forceinline__
+int clamp_exp_to_output<int8_t>(int e) {
+    if (e < 0) e = 0;
+    if (e > 127) e = 127;
+    return e;
+}
+
+template <>
+__device__ __forceinline__
+int clamp_exp_to_output<int16_t>(int e) {
+    if (e < 0) e = 0;
+    if (e > 32767) e = 32767;
+    return e;
+}
+
 __global__
 void softmax_dp4a_kernel(
     const int16_t* __restrict__ x,
@@ -171,10 +191,11 @@ void softmax_arith_dp4a_cuda(
     );
 }
 
+template <typename OutT>
 __global__
 void exp_kernel(
-    const int16_t* __restrict__ x,
-    int16_t* __restrict__ out,
+    const int8_t* __restrict__ x,
+    OutT* __restrict__ out,
     int total
 ) {
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
@@ -183,11 +204,9 @@ void exp_kernel(
 
     int xq = static_cast<int>(x[idx]);
     int e = approx_exp_scalar(xq);
+    e = clamp_exp_to_output<OutT>(e);
 
-    if (e < 0) e = 0;
-    if (e > 32767) e = 32767;
-
-    out[idx] = static_cast<int16_t>(e);
+    out[idx] = static_cast<OutT>(e);
 }
 
 void exp_arith_dp4a_cuda(
@@ -202,9 +221,17 @@ void exp_arith_dp4a_cuda(
     dim3 block(THREADS);
     dim3 grid((total + THREADS - 1) / THREADS);
 
-    exp_kernel<<<grid, block>>>(
-        x.data_ptr<int16_t>(),
-        out.data_ptr<int16_t>(),
-        total
-    );
+    if (out.dtype() == torch::kInt8) {
+        exp_kernel<int8_t><<<grid, block>>>(
+            x.data_ptr<int8_t>(),
+            out.data_ptr<int8_t>(),
+            total
+        );
+    } else {
+        exp_kernel<int16_t><<<grid, block>>>(
+            x.data_ptr<int8_t>(),
+            out.data_ptr<int16_t>(),
+            total
+        );
+    }
 }

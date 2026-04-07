@@ -1,5 +1,11 @@
 import torch
-import trptq_softmax_dp4a
+try:
+    import trptq_softmax_dp4a
+except Exception as err:
+    import sys
+    sys.path.append("/content/TR-PTQ/trptq_softmax_dp4a")
+    import trptq_softmax_dp4a
+    print("OK")
 
 A_MIN = -8
 A_MAX = 0
@@ -32,6 +38,7 @@ def softmax_ref_arith(x_q44: torch.Tensor, lut_u8: torch.Tensor):
     y = (e << 8) // denom
     return y.to(torch.int16)
 
+
 def main():
     device = "cuda"
 
@@ -40,21 +47,18 @@ def main():
     x = torch.randn(B, N, device=device)
     x = x - x.max()
 
-    print("x:", x)
     # Convert to Q4.4, clamp into a practical range
     x_q44 = torch.round(x * 16.0).clamp(-128, 0).to(torch.int16)
-    print("x_q44", x_q44)
 
     lut = build_lut_u8(device=device)
-    print("lut", lut)
     y = torch.zeros_like(x_q44)
 
-    trptq_softmax_dp4a.exp_arith_dp4a(x_q44, lut, out)
-    ref = ref_exp(x_q44, lut)
-    
-    #print("max abs diff:", (y.to(torch.int32) - y_ref.to(torch.int32)).abs().max().item())
-    print("sample y[0, :8]:", y[0, :8])
-    print("sample ref[0, :8]:", y_ref[0, :8])
+    trptq_softmax_dp4a.exp_arith_dp4a(x_q44, lut, y)
+    z = y/255.0
+
+    print("x:", x)
+    print("sample y[0, :8]:", z)
+    print("sample ref[0, :8]:", x.exp())
 
 if __name__ == "__main__":
     main()

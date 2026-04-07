@@ -52,9 +52,10 @@ void exp_arith_dp4a(
     CHECK_CONTIGUOUS(exp_lut);
     CHECK_CONTIGUOUS(out);
 
-    TORCH_CHECK(x.dtype() == torch::kInt16, "x must be int16 Q4.4");
+    TORCH_CHECK(x.dtype() == torch::kInt8, "x must be int8 Q4.4");
     TORCH_CHECK(exp_lut.dtype() == torch::kUInt8, "exp_lut must be uint8");
-    TORCH_CHECK(out.dtype() == torch::kInt16, "out must be int16");
+    TORCH_CHECK(out.dtype() == torch::kInt8 || out.dtype() == torch::kInt16,
+                "out must be int8 or int16");
     TORCH_CHECK(out.numel() == x.numel(), "out must have the same number of elements as x");
     TORCH_CHECK(exp_lut.numel() == 9, "exp_lut must contain exactly 9 values");
 
