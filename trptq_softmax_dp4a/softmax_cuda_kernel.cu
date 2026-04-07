@@ -221,10 +221,10 @@ void exp_arith_dp4a_cuda(
     dim3 block(THREADS);
     dim3 grid((total + THREADS - 1) / THREADS);
 
-    if (out.dtype() == torch::kInt8) {
+    if (out.dtype() == torch::kUInt8) {
         exp_kernel<int8_t><<<grid, block>>>(
             x.data_ptr<int8_t>(),
-            out.data_ptr<int8_t>(),
+            out.data_ptr<uint8_t>(),
             total
         );
     } else {
