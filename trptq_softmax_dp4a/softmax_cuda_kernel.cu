@@ -172,19 +172,19 @@ void softmax_sum_kernel(
         int a2 = clamp_anchor(round_q44_to_int(z2));
         int a3 = clamp_anchor(round_q44_to_int(z3));
 
-        uint8_t E0 = EXP_LUT_CONST[a0 - A_MIN];
-        uint8_t E1 = EXP_LUT_CONST[a1 - A_MIN];
-        uint8_t E2 = EXP_LUT_CONST[a2 - A_MIN];
-        uint8_t E3 = EXP_LUT_CONST[a3 - A_MIN];
+        int packedE = pack_u8x4(
+            EXP_LUT_CONST[a0 - A_MIN],
+            EXP_LUT_CONST[a1 - A_MIN],
+            EXP_LUT_CONST[a2 - A_MIN],
+            EXP_LUT_CONST[a3 - A_MIN]
+        );
 
-        uint8_t M0 = approx_m_u8(z0, a0);
-        uint8_t M1 = approx_m_u8(z1, a1);
-        uint8_t M2 = approx_m_u8(z2, a2);
-        uint8_t M3 = approx_m_u8(z3, a3);
-
-        int packedE = pack_u8x4(E0, E1, E2, E3);
-        int packedM = pack_u8x4(M0, M1, M2, M3);
-
+        int packedM = pack_u8x4(
+            approx_m_u8(z0, a0),
+            approx_m_u8(z1, a1),
+            approx_m_u8(z2, a2),
+            approx_m_u8(z3, a3)
+        );
         local_sum += dot_u8x4(packedE, packedM);
     }
 
