@@ -35,3 +35,24 @@ void softmax_arith_dp4a(
 PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
     m.def("softmax_arith_dp4a", &softmax_arith_dp4a, "TR-PTQ Softmax DP4A (CUDA)");
 }
+
+#include <torch/extension.h>
+
+void exp_arith_dp4a_cuda(
+    torch::Tensor x,
+    torch::Tensor exp_lut,
+    torch::Tensor out
+);
+
+void exp_arith_dp4a(
+    torch::Tensor x,
+    torch::Tensor exp_lut,
+    torch::Tensor out
+) {
+    exp_arith_dp4a_cuda(x, exp_lut, out);
+}
+
+PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
+    m.def("exp_arith_dp4a", &exp_arith_dp4a,
+          "TR-PTQ exponent approximation (CUDA, DP4A)");
+}

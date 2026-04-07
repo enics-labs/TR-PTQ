@@ -218,3 +218,88 @@ void softmax_arith_dp4a_cuda(
         cols
     );
 }
+
+
+#include <cuda.h>
+#include <cuda_runtime.h>
+#include <torch/types.h>
+#include <cstdint>
+
+#define THREADS 256
+#define A_MIN -8
+#define A_MAX 0
+
+__constant__ uint8_t EXP_LUT_CONST[9];
+
+// --------------------------------
+// helpers
+// --------------------------------
+__device__ __forceinline__
+int round_q44_to_int(int x_q44) {
+    return (x_q44 + 8) >> 4;
+}
+
+__device__ __forceinline__
+int clamp_anchor(int a) {
+    return (a < A_MIN) ? A_MIN : (a > A_MAX ? A_MAX : a);
+}
+
+__device__ __forceinline__
+int approx_exp_scalar(int x_q44) {
+    int a = clamp_anchor(round_q44_to_int(x_q44));
+    int r = x_q44 - (a << 4);
+    int m = 16 + r;
+    int E = EXP_LUT_CONST[a - A_MIN];
+
+    return (E * m) >> 4;
+}
+
+// --------------------------------
+// kernel
+// --------------------------------
+__global__
+void exp_kernel(
+    const int16_t* __restrict__ x,
+    int16_t* __restrict__ out,
+    int total
+) {
+    int idx = blockIdx.x * blockDim.x + threadIdx.x;
+
+    if (idx >= total) return;
+
+    int xq = (int)x[idx];
+
+    int e = approx_exp_scalar(xq);
+
+    // clamp to int16
+    if (e < 0) e = 0;
+    if (e > 32767) e = 32767;
+
+    out[idx] = (int16_t)e;
+}
+
+// --------------------------------
+// launcher
+// --------------------------------
+void exp_arith_dp4a_cuda(
+    torch::Tensor x,
+    torch::Tensor exp_lut,
+    torch::Tensor out
+) {
+    int total = x.numel();
+
+    cudaMemcpyToSymbol(
+        EXP_LUT_CONST,
+        exp_lut.data_ptr<uint8_t>(),
+        9
+    );
+
+    dim3 block(THREADS);
+    dim3 grid((total + THREADS - 1) / THREADS);
+
+    exp_kernel<<<grid, block>>>(
+        x.data_ptr<int16_t>(),
+        out.data_ptr<int16_t>(),
+        total
+    );
+}

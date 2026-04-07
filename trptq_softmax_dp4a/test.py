@@ -35,19 +35,24 @@ def softmax_ref_arith(x_q44: torch.Tensor, lut_u8: torch.Tensor):
 def main():
     device = "cuda"
 
-    B, N = 4, 128
+    #B, N = 4, 128
+    B, N = 1, 8
     x = torch.randn(B, N, device=device)
+    x = x - x.max()
 
+    print("x:", x)
     # Convert to Q4.4, clamp into a practical range
     x_q44 = torch.round(x * 16.0).clamp(-128, 0).to(torch.int16)
+    print("x_q44", x_q44)
 
     lut = build_lut_u8(device=device)
+    print("lut", lut)
     y = torch.zeros_like(x_q44)
 
-    trptq_softmax_dp4a.softmax_arith_dp4a(x_q44, lut, y)
-    y_ref = softmax_ref_arith(x_q44, lut)
-
-    print("max abs diff:", (y.to(torch.int32) - y_ref.to(torch.int32)).abs().max().item())
+    trptq_softmax_dp4a.exp_arith_dp4a(x_q44, lut, out)
+    ref = ref_exp(x_q44, lut)
+    
+    #print("max abs diff:", (y.to(torch.int32) - y_ref.to(torch.int32)).abs().max().item())
     print("sample y[0, :8]:", y[0, :8])
     print("sample ref[0, :8]:", y_ref[0, :8])
 
