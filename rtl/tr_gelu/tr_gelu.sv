@@ -140,7 +140,7 @@ module tr_gelu #(
     
     // Evaluate e^(-x_max)
     tr_exp #(
-        .FRAC(FRAC_W),
+        .FRAC_W(FRAC_W),
         .ITER(STAGE3_ITER)      // Zero-order approximation for TR-GELU
     ) u_exp_term1 (
         .x       (term1_reg), 

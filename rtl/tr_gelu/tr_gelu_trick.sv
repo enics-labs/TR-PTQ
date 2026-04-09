@@ -72,7 +72,7 @@ module tr_gelu #(
     // ========================================================================
     // STAGE 3: Single Exponential (E = e^-|x|)
     // ========================================================================
-    tr_exp #(.FRAC(FRAC_W), .ITER(0)) u_exp (
+    tr_exp #(.FRAC_W(FRAC_W), .ITER(0)) u_exp (
         .x(u_neg_abs), .e_a(e_a), .mantisa(e_man), .is_zero(is_zero)
     );
 

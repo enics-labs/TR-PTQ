@@ -9,7 +9,7 @@ module tr_hetero_array #(
     
     // Control Inputs
     input  logic               lane_0_mode, // 0: Vector (GELU), 1: Scalar (LN/SoftMax)
-    input  logic [1:0]         shift_mode,  // 00: Bypass, 01: -x, 10: -(x>>>1)
+    input  logic [1:0]         shift_mode,  // 00: Bypass, 01: -x (1/x), 10: -(x>>>1) (1/sqrt(x))
     input  logic               exp_in_sel,  // 0: tr_exp takes x_vec_in, 1: tr_exp takes tr_ln output
     
     // Data Outputs
@@ -36,7 +36,7 @@ module tr_hetero_array #(
     // --------------------------------------------------------
     // PATH A: The High-Precision 20-Bit Processor
     // --------------------------------------------------------
-    logic signed [19:0] l0_ln_out_20b, l0_shift_out, l0_exp_in_20b, l0_man_20b;
+    logic signed [19:0] l0_ln_out_20b, l0_shift_out_20b, l0_exp_in_20b, l0_man_20b;
     logic [3:0]         idx_20b;
     logic [19:0]        ea_20b_raw;
     logic               z_20b;
@@ -54,14 +54,14 @@ module tr_hetero_array #(
     // 2. The Intercept Shifter (Math Reflector)
     always_comb begin
         case (shift_mode)
-            2'b01:   l0_shift_out = -l0_ln_out_20b;         // SoftMax: 1/x
-            2'b10:   l0_shift_out = -(l0_ln_out_20b >>> 1); // LayerNorm: 1/sqrt(x)
-            default: l0_shift_out = l0_ln_out_20b;          // Bypass
+            2'b01:   l0_shift_out_20b = -l0_ln_out_20b;         // SoftMax: 1/x
+            2'b10:   l0_shift_out_20b = -(l0_ln_out_20b >>> 1); // LayerNorm: 1/sqrt(x)
+            default: l0_shift_out_20b = l0_ln_out_20b;          // Bypass
         endcase
     end
 
     // Mux to choose between external data or the shifter output
-    assign l0_exp_in_20b = exp_in_sel ? l0_shift_out : x_scalar_in;
+    assign l0_exp_in_20b = exp_in_sel ? l0_shift_out_20b : x_scalar_in;
 
     // 3. The 20-Bit Exponential & LUT
     q12_8_lut u_lut_20b (
@@ -83,9 +83,10 @@ module tr_hetero_array #(
     // --------------------------------------------------------
     // PATH B: The 8-Bit Shadow ALU (For Vector Integrity)
     // --------------------------------------------------------
-    logic signed [7:0] l0_ln_out_8b, l0_exp_in_8b, l0_man_8b;
+    logic signed [7:0] l0_ln_out_8b, l0_shift_out_8b, l0_exp_in_8b, l0_man_8b;
     logic              z_8b;
 
+    // 1. Logarithm
     tr_ln #(
         .WIDTH(8), 
         .BITS(4),
@@ -95,8 +96,19 @@ module tr_hetero_array #(
         .yq(l0_ln_out_8b)
     );
 
-    assign l0_exp_in_8b = exp_in_sel ? l0_ln_out_8b : x_vec_in[0];
+    // 2. The Intercept Shifter (Math Reflector)
+    always_comb begin
+        case (shift_mode)
+            2'b01:   l0_shift_out_8b = -l0_ln_out_8b;
+            2'b10:   l0_shift_out_8b = -(l0_ln_out_8b >>> 1);
+            default: l0_shift_out_8b = l0_ln_out_8b;
+        endcase
+    end
 
+    // Mux to choose between external data or the shifter output
+    assign l0_exp_in_8b = exp_in_sel ? l0_shift_out_8b : x_vec_in[0];
+
+    // 3. The 8-Bit Exponential
     tr_exp_alu #(
         .WIDTH(8), 
         .FRAC_W(4), 
@@ -126,8 +138,7 @@ module tr_hetero_array #(
     // ========================================================================
     generate
         for (genvar i = 1; i < N; i++) begin : GEN_LANES
-            logic signed [7:0] ln_out;
-            logic signed [7:0] exp_in;
+            logic signed [7:0] ln_out_i, shift_out_i, exp_in_i;
             logic              z_i;
             
             // 1. Logarithm
@@ -137,19 +148,28 @@ module tr_hetero_array #(
                 .OUT_WIDTH(8)
             ) u_ln_i (
                 .xq(x_vec_in[i]), 
-                .yq(ln_out)
+                .yq(ln_out_i)
             );
 
-            // 2. Intra-lane Routing MUX
-            assign exp_in = exp_in_sel ? ln_out : x_vec_in[i];
+            // 2. Intra-lane Shifter (Math Reflector)
+            always_comb begin
+                case (shift_mode)
+                    2'b01:   shift_out_i = -ln_out_i;
+                    2'b10:   shift_out_i = -(ln_out_i >>> 1);
+                    default: shift_out_i = ln_out_i;
+                endcase
+            end
 
-            // 3. Exponential 
+            // 3. Intra-lane Routing MUX
+            assign exp_in_i = exp_in_sel ? shift_out_i : x_vec_in[i];
+
+            // 4. Exponential 
             tr_exp_alu #(
                 .WIDTH(8), 
                 .FRAC_W(4), 
                 .LUT_IDX_W(3)
             ) u_exp_i (
-                .x(exp_in), 
+                .x(exp_in_i), 
                 .a_idx(shared_idx[i]),  // Hooked to Shared ROM[i]
                 .mantisa(y_man_vec_out[i]),
                 .is_zero(z_i)
