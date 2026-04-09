@@ -18,7 +18,7 @@ fi
 
 # 2. Define the source branch and base destination folder
 SOURCE_BRANCH="tr_core"
-DEST_BASE="../rtl_cpy"
+DEST_BASE="../rtl"
 
 # Ensure you are on the destination branch
 git checkout softmax_synthesis
