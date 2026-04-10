@@ -20,7 +20,7 @@ module shared_lut_rom #(
 
     // Combinational routing to all lanes
     always_comb begin
-        for (int i = 1; i < N; i++) begin
+        for (int i = 0; i < N; i++) begin
             e_a[i] = exp_lut[a_idx[i]];
         end
     end

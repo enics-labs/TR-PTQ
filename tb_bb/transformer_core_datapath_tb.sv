@@ -29,7 +29,7 @@ module transformer_core_datapath_tb();
     logic                    ctrl_tr_lane0_mode;
     logic [1:0]              ctrl_tr_shift_mode;
     logic                    ctrl_tr_exp_sel;
-    logic                    ctrl_mux_tr_vec_sel;
+    logic [1:0]              ctrl_mux_tr_vec_sel;
     logic [1:0]              ctrl_mux_a_sel;
     logic [1:0]              ctrl_mux_b_sel;
     logic [1:0]              ctrl_mac_op_mode;
@@ -37,6 +37,7 @@ module transformer_core_datapath_tb();
     logic                    ctrl_mac_clear_acc;
     logic                    ctrl_mac_in_valid;
     logic                    ctrl_save_sum;
+    logic                    ctrl_gelu_mode;
 
     // ========================================================================
     // DUT INSTANTIATION
@@ -60,7 +61,8 @@ module transformer_core_datapath_tb();
         .ctrl_mac_elemwise(ctrl_mac_elemwise),
         .ctrl_mac_clear_acc(ctrl_mac_clear_acc),
         .ctrl_mac_in_valid(ctrl_mac_in_valid),
-        .ctrl_save_sum(ctrl_save_sum)
+        .ctrl_save_sum(ctrl_save_sum),
+        .ctrl_gelu_mode(ctrl_gelu_mode)
     );
 
     // ========================================================================
@@ -79,6 +81,7 @@ module transformer_core_datapath_tb();
         ctrl_mac_clear_acc  = 0;
         ctrl_mac_in_valid   = 0; // Keep MAC gated by default
         ctrl_save_sum       = 0;
+        ctrl_gelu_mode      = 0;
     endtask
 
     // ---------------------------------------------------------
@@ -97,7 +100,7 @@ module transformer_core_datapath_tb();
     // INSTRUCTION: SoftMax Phase 1 (Calculates denominator)
     // ---------------------------------------------------------
     task issue_softmax_phase1();
-        ctrl_mux_tr_vec_sel = 1'b0;  // Route Max_Sub into TR Array
+        ctrl_mux_tr_vec_sel = 2'b00;  // Route Max_Sub into TR Array
         ctrl_tr_exp_sel     = 1'b0;  // Bypass TR_LN (pure exp mode)
         ctrl_tr_lane0_mode  = 1'b0;  // All lanes in Vector Mode
         
@@ -142,31 +145,49 @@ module transformer_core_datapath_tb();
     endtask
 
     // ---------------------------------------------------------
-    // INSTRUCTION: GELU Phase 1 (Compute CDF)
+    // GELU PASS 1: Compute Stable Exponential E = exp(-|alpha*z|)
     // ---------------------------------------------------------
-    task issue_gelu_phase1();
-        ctrl_mux_tr_vec_sel = 1'b1;  // Route RAW Delayed A (Bypass Max_Sub)
-        ctrl_tr_exp_sel     = 1'b0;  
-        ctrl_tr_lane0_mode  = 1'b0;  // All lanes independent
+    task issue_gelu_pass1_exp();
+        ctrl_mux_tr_vec_sel = 2'b01;  // Route Alpha-Stabilizer into TR Array
+        ctrl_tr_exp_sel     = 1'b0;  // Bypass TR_LN (stabilizer feeds u = -|x|)
+        ctrl_tr_lane0_mode  = 1'b0;  // Vector mode (all 8 lanes)
+        ctrl_tr_shift_mode  = 2'b00; // Bypass shifter (pure exponential)
         
-        ctrl_mux_a_sel      = 2'b01; // TR Anchor
-        ctrl_mux_b_sel      = 2'b01; // TR Mantissa
-        
-        ctrl_mac_elemwise   = 1'b1;  // Element-wise multiply
+        ctrl_mux_a_sel      = 2'b01; // Route TR Anchor (e_a)
+        ctrl_mux_b_sel      = 2'b01; // Route TR Mantissa
+        ctrl_mac_elemwise   = 1'b1;  // Element-wise multiply (e_a * man)
         ctrl_mac_clear_acc  = 1'b1;  
-        ctrl_mac_op_mode    = 2'b10; // UU Mode (CDF is strictly positive)
+        ctrl_mac_op_mode    = 2'b10; // UU Mode
     endtask
 
     // ---------------------------------------------------------
-    // INSTRUCTION: GELU Phase 2 (Multiply x * CDF)
+    // GELU PASS 2: Compute Reciprocal 1/S = 1/(1+E)
     // ---------------------------------------------------------
-    task issue_gelu_phase2();
-        ctrl_mux_a_sel      = 2'b10; // Buffered CDF from out_vec
-        ctrl_mux_b_sel      = 2'b00; // Raw Memory B (We will feed X here!)
+    task issue_gelu_pass2_recip();
+        ctrl_mux_tr_vec_sel = 2'b10;  // Route MAC Feedback into TR Array
+        ctrl_tr_exp_sel     = 1'b1;  // Route through Logarithm (Reciprocal mode)
+        ctrl_tr_shift_mode  = 2'b01; // Reciprocal shift (-ln)
+        ctrl_tr_lane0_mode  = 1'b0;  // Use 8-bit vector lanes
         
-        ctrl_mac_elemwise   = 1'b1;  // Element-wise multiply
-        ctrl_mac_clear_acc  = 1'b1;  
-        ctrl_mac_op_mode    = 2'b00; // SS Mode (Raw X can be negative)
+        ctrl_mux_a_sel      = 2'b01; // Anchor
+        ctrl_mux_b_sel      = 2'b01; // Mantissa
+        ctrl_mac_elemwise   = 1'b1;
+        ctrl_mac_clear_acc  = 1'b1;
+        ctrl_mac_op_mode    = 2'b10; // UU Mode
+    endtask
+
+    // ---------------------------------------------------------
+    // GELU PASS 3: Final Multiplication y = z * Sigmoid
+    // ---------------------------------------------------------
+    task issue_gelu_pass3_mult();
+        // Here we multiply the original Z (Memory A) by the Reciprocal (Feedback)
+        ctrl_mux_a_sel      = 2'b00; // Raw Memory Z
+        ctrl_mux_b_sel      = 2'b11; // Use Vector Feedback + Sigmoid Selection
+        ctrl_gelu_mode      = 1'b1;  // Enable 1-Sigmoid Symmetry trick
+
+        ctrl_mac_elemwise   = 1'b1;
+        ctrl_mac_clear_acc  = 1'b1;
+        ctrl_mac_op_mode    = 2'b01; // SU Mode (Z can be negative)
     endtask
 
     // ========================================================================
@@ -274,53 +295,46 @@ module transformer_core_datapath_tb();
         $display("      Lane 2 Prob: %f", real'(out_vec[2]) / 256.0);
 
         // ====================================================================
-        // TEST 3: GELU 2-CYCLE RECOMPUTE
+        // TEST 3: GELU 3-PASS FLOW
         // ====================================================================
-        $display("\n>>> TEST 3: GELU 2-Cycle Recompute Architecture");
-        
-        // Setup inputs (in Q4.4 format)
-        a[0] =  8'd0;    //  0.0
-        a[1] =  8'd16;   //  1.0
-        a[2] = -8'd16;   // -1.0
-        for (int i=3; i<N; i++) a[i] = -8'd128; // Flush to ~0
+        $display("\n>>> TEST 3: Optimized GELU 3-Pass Datapath Flow");
+        a[0] =  8'd16;  // 1.0
+        a[1] = -8'd16;  // -1.0
+        for (int i=2; i<N; i++) a[i] = 8'd0;
 
-        // --- CYCLE 1: COMPUTE CDF (Phi(x)) ---
-        issue_gelu_phase1();
+        // --- CYCLE 1: Calculate E = e^-|alpha*z| ---
+        issue_gelu_pass1_exp();
         in_valid = 1;
-        #30; // Wait 3 clocks for the delay lines
-        
+        #30; // Wait for Max-Tree/Pipeline latency
         ctrl_mac_in_valid = 1;
-        #10; // Pulse MAC Valid
-        
-        in_valid = 0;
-        ctrl_mac_in_valid = 0;
-        ctrl_mac_clear_acc = 0;
-        #30; // Wait for MAC pipeline to settle
-        
-        $display("   [Cycle 1] CDFs (Phi(x)) buffered securely in out_vec!");
+        #10;
+        in_valid = 0; ctrl_mac_in_valid = 0; ctrl_mac_clear_acc = 0;
+        #30; // Settle in out_vec
+        $display("\n   [Pass 1] Exponential E buffered in out_vec.");
 
-        // --- CYCLE 2: MULTIPLY x * CDF ---
-        issue_gelu_phase2();
-        
-        // RECOMPUTE: Feed the exact same vector, but map it to MUX B!
-        for (int i=0; i<N; i++) b[i] = a[i]; 
-        in_valid = 1; 
-        #30; // Wait 3 clocks for the delay lines
-        
+        // --- CYCLE 2: Calculate 1/(1+E) ---
+        // Note: For simplicity, the RECIP pass treats S as E because (1+E) 
+        // logic is handled inside the TR-Array sum_S wire.
+        issue_gelu_pass2_recip();
+        #10;
         ctrl_mac_in_valid = 1;
-        #10; // Pulse MAC Valid
-        
-        in_valid = 0;
-        ctrl_mac_in_valid = 0;
-        ctrl_mac_clear_acc = 0;
-        #30; // Wait for MAC pipeline to settle
-        
-        $display("\n   [Cycle 2] Final GELU Activations:");
-        // Format is Q4.4 (CDF) * Q4.4 (X) = Q8.8
-        $display("      Lane 0 (x= 0.0): %f", real'(out_vec[0]) / 256.0); 
-        $display("      Lane 1 (x= 1.0): %f", real'(out_vec[1]) / 256.0);
-        $display("      Lane 2 (x=-1.0): %f", real'(out_vec[2]) / 256.0);
-        
+        #10;
+        ctrl_mac_in_valid = 0; ctrl_mac_clear_acc = 0;
+        #30;
+        $display("\n   [Pass 2] Reciprocal 1/S buffered in out_vec.");
+
+        // --- CYCLE 3: Final Activation z * sigmoid ---
+        issue_gelu_pass3_mult();
+        in_valid = 1; // Re-fetch original Z from Memory
+        #30;
+        ctrl_mac_in_valid = 1;
+        #10;
+        in_valid = 0; ctrl_mac_in_valid = 0; ctrl_mac_clear_acc = 0;
+        #30;
+
+        $display("\n   [Pass 3] Final GELU Results:");
+        $display("      Lane 0 (x= 1.0): %f", real'(out_vec[0]) / 4096.0);
+        $display("      Lane 1 (x=-1.0): %f", real'(out_vec[1]) / 4096.0);
         $display("=======================================================================\n");
         $finish;
     end

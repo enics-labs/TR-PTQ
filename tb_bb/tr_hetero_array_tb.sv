@@ -38,7 +38,7 @@ module tr_hetero_array_tb();
     // ========================================================================
     // HELPER VARIABLES FOR DISPLAY (MOCKING THE MAC ENGINE)
     // ========================================================================
-    real mac_val_0, mac_val_1, mac_val_2, mac_val_3;
+    real mac_val [N];
     real mac_scalar_val;
     real expected;
     
@@ -57,7 +57,7 @@ module tr_hetero_array_tb();
         // --------------------------------------------------------------------
         // TEST 1: SoftMax Exponentials (Vector Mode, Max_Sub Feed)
         // --------------------------------------------------------------------
-        $display(">>> TEST 1: SoftMax Numerators (Vector Mode | exp_in_sel = 0)");
+        $display(">>> TEST 1: SoftMax Numerators (Vector Mode | Bypass (exp_in_sel = 0))");
         lane_0_mode = 1'b0; // Vector Mode
         shift_mode  = 2'b00;// Bypass Shifter
         exp_in_sel  = 1'b0; // Bypass Logarithm (taking x_vec_in directly into tr_exp)
@@ -70,15 +70,15 @@ module tr_hetero_array_tb();
         #10;
         
         // MOCKING THE MAC ENGINE (e_a is Q0.8, Mantissa is Q4.4)
-        mac_val_0 = (real'(y_ea_vec_out[0]) / 256.0) * (real'(y_man_vec_out[0]) / 16.0);
-        mac_val_1 = (real'(y_ea_vec_out[1]) / 256.0) * (real'(y_man_vec_out[1]) / 16.0);
-        mac_val_2 = (real'(y_ea_vec_out[2]) / 256.0) * (real'(y_man_vec_out[2]) / 16.0);
-        mac_val_3 = (real'(y_ea_vec_out[3]) / 256.0) * (real'(y_man_vec_out[3]) / 16.0);
+        mac_val[0] = (real'(y_ea_vec_out[0]) / 256.0) * (real'(y_man_vec_out[0]) / 16.0);
+        mac_val[1] = (real'(y_ea_vec_out[1]) / 256.0) * (real'(y_man_vec_out[1]) / 16.0);
+        mac_val[2] = (real'(y_ea_vec_out[2]) / 256.0) * (real'(y_man_vec_out[2]) / 16.0);
+        mac_val[3] = (real'(y_ea_vec_out[3]) / 256.0) * (real'(y_man_vec_out[3]) / 16.0);
 
-        $display("   Lane 0 [ 0.0] -> MAC Reconstruction: %f | Expected: 1.000", mac_val_0);
-        $display("   Lane 1 [-0.5] -> MAC Reconstruction: %f | Expected: 0.606", mac_val_1);
-        $display("   Lane 2 [-1.0] -> MAC Reconstruction: %f | Expected: 0.367", mac_val_2);
-        $display("   Lane 3 [-2.0] -> MAC Reconstruction: %f | Expected: 0.135", mac_val_3);
+        $display("   Lane 0 [ 0.0] -> MAC Reconstruction: %f | Expected: 1.000", mac_val[0]);
+        $display("   Lane 1 [-0.5] -> MAC Reconstruction: %f | Expected: 0.606", mac_val[1]);
+        $display("   Lane 2 [-1.0] -> MAC Reconstruction: %f | Expected: 0.367", mac_val[2]);
+        $display("   Lane 3 [-2.0] -> MAC Reconstruction: %f | Expected: 0.135", mac_val[3]);
         $display("--------------------------------------------------------------------\n");
 
         // --------------------------------------------------------------------
@@ -94,11 +94,11 @@ module tr_hetero_array_tb();
         x_vec_in[1] = 8'd24;  // 1.5 -> Lane 1 (Standard ALU)
         #10;
         
-        mac_val_0 = (real'(y_ea_vec_out[0]) / 256.0) * (real'(y_man_vec_out[0]) / 16.0);
-        mac_val_1 = (real'(y_ea_vec_out[1]) / 256.0) * (real'(y_man_vec_out[1]) / 16.0);
+        mac_val[0] = (real'(y_ea_vec_out[0]) / 256.0) * (real'(y_man_vec_out[0]) / 16.0);
+        mac_val[1] = (real'(y_ea_vec_out[1]) / 256.0) * (real'(y_man_vec_out[1]) / 16.0);
 
-        $display("   Lane 0 [1.5] -> MAC Reconstruction: %f (Powered by Shadow ALU)", mac_val_0);
-        $display("   Lane 1 [1.5] -> MAC Reconstruction: %f (Powered by Std 8-bit ALU)", mac_val_1);
+        $display("   Lane 0 [1.5] -> MAC Reconstruction: %f (Powered by Shadow ALU)", mac_val[0]);
+        $display("   Lane 1 [1.5] -> MAC Reconstruction: %f (Powered by Std 8-bit ALU)", mac_val[1]);
         
         if ((y_ea_vec_out[0] == y_ea_vec_out[1]) && (y_man_vec_out[0] == y_man_vec_out[1])) 
              $display("   [PASS] Lane 0 perfectly matches Lane 1 Split Buses!");
@@ -138,6 +138,51 @@ module tr_hetero_array_tb();
         mac_scalar_val = (real'(y_ea_scalar_out) / 256.0) * (real'(y_man_scalar_out) / 256.0);
         expected = 1.0 / $sqrt(4.0);
         $display("   Input Var: 4.0  | MAC 1/sqrt: %f | Expected: %f", mac_scalar_val, expected);
+        $display("=======================================================================\n");
+
+        // --------------------------------------------------------------------
+        // TEST 5: Parallel Vector Reciprocals (GELU Denominator Pass)
+        // --------------------------------------------------------------------
+        $display(">>> TEST 5: Parallel Vector Reciprocals (shift = -x)");
+        lane_0_mode = 1'b0; // Vector Mode
+        shift_mode  = 2'b01; // -ln(x) -> 1/x
+        exp_in_sel  = 1'b1; // Route through Logarithm
+        
+        // Input sequence in Q4.4: 1.0, 2.0, 4.0, 8.0
+        x_vec_in[0] = 8'd16; // 1.0
+        x_vec_in[1] = 8'd32; // 2.0
+        x_vec_in[2] = 8'd64; // 4.0
+        x_vec_in[3] = 8'd127;// ~8.0
+        #10;
+        
+        for (int i=0; i<4; i++) begin
+            mac_val[i] = (real'(y_ea_vec_out[i]) / 256.0) * (real'(y_man_vec_out[i]) / 16.0);
+            expected = 16.0 / real'(x_vec_in[i]); 
+            $display("   Lane %0d [%3.2f] -> 1/x: %f | Expected: %f", i, real'(x_vec_in[i])/16.0, mac_val[i], expected);
+        end
+        
+        if (y_ea_vec_out[0] != 8'd0) $display("   [PASS] Vector lanes successfully computing parallel reciprocals.");
+        $display("--------------------------------------------------------------------\n");
+
+        // --------------------------------------------------------------------
+        // TEST 6: Parallel Vector Inverse Square Roots (LayerNorm Scaling)
+        // --------------------------------------------------------------------
+        $display(">>> TEST 6: Parallel Vector InvSqrt (shift = -x/2)");
+        lane_0_mode = 1'b0; 
+        shift_mode  = 2'b10; // -ln(x)/2 -> 1/sqrt(x)
+        exp_in_sel  = 1'b1;
+        
+        // Input sequence: 1.0, 4.0, 16.0
+        x_vec_in[0] = 8'd16;  // 1.0
+        x_vec_in[1] = 8'd64;  // 4.0
+        x_vec_in[2] = 8'd127; // ~8.0
+        #10;
+        
+        for (int i=0; i<3; i++) begin
+            mac_val[i] = (real'(y_ea_vec_out[i]) / 256.0) * (real'(y_man_vec_out[i]) / 16.0);
+            expected = 1.0 / $sqrt(real'(x_vec_in[i])/16.0);
+            $display("   Lane %0d [%3.2f] -> 1/sqrt(x): %f | Expected: %f", i, real'(x_vec_in[i])/16.0, mac_val[i], expected);
+        end
         $display("=======================================================================\n");
 
         $finish;

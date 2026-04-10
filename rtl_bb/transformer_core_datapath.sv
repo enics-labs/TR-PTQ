@@ -28,16 +28,31 @@ module transformer_core_datapath #(
     input  logic [1:0]              ctrl_tr_shift_mode,
     input  logic                    ctrl_tr_exp_sel,
     // Routing MUX Controls
-    input  logic                    ctrl_mux_tr_vec_sel, // 0: Max_Sub, 1: Delayed A
+    input  logic                    ctrl_mux_sub_val_sel,// 0: Max, 1: Mean
+    input  logic [1:0]              ctrl_mux_tr_vec_sel, // 0: Max_Sub, 1: Delayed A
     input  logic [1:0]              ctrl_mux_a_sel,      // 00: Mem A, 01: TR_EA, 10: Buffered Out
-    input  logic [1:0]              ctrl_mux_b_sel,      // 00: Mem B, 01: TR_MAN, 10: Broadcast Scalar
+    input  logic [2:0]              ctrl_mux_b_sel,      // 00: Mem B, 01: TR_MAN, 10: Broadcast Scalar
     // MAC Engine Controls
     input  logic [1:0]              ctrl_mac_op_mode,
     input  logic                    ctrl_mac_elemwise,
     input  logic                    ctrl_mac_clear_acc,
     input  logic                    ctrl_mac_in_valid,
-    input  logic                    ctrl_save_sum
+    input  logic                    ctrl_save_sum,
+    input  logic                    ctrl_save_mean,
+    input  logic                    ctrl_gelu_mode
 );
+
+    // ========================================================================
+    // DERIVED MATH CONSTANTS (Fully scalable based on W and FRAC)
+    // ========================================================================
+    localparam int ONE_Q_FRAC = 1 << FRAC;       // 1.0 in Q(W.FRAC)
+    localparam int ONE_Q_MAX  = 1 << W;          // 1.0 in Q(0.W)
+    localparam int HALF_FRAC  = 1 << (FRAC - 1); // 0.5 in Q(W.FRAC)
+    localparam int ROUND_W    = 1 << (W - 1);    // 0.5 in Q(W.W)
+    
+    // Saturation limits
+    localparam logic [W-1:0] MAX_POS = {1'b0, {(W-1){1'b1}}}; // 8'h7F (127)
+    localparam logic [W-1:0] MAX_UNS = {W{1'b1}};             // 8'hFF (255)
 
     // ========================================================================
     // STAGE 1: Pipelined Max Tree & Data Delay Lines
@@ -94,35 +109,80 @@ module transformer_core_datapath #(
     // STAGE 2: Max Subtraction & TR Input Routing
     // ========================================================================
     logic signed [W-1:0] a_sub [N];
+    logic signed [W-1:0] a_alpha [N];
+    logic signed [W-1:0] a_feedback [N]; // Feed from MAC feedback
     logic signed [W-1:0] tr_vec_in [N];
 
-    max_sub #(
+    logic signed [W-1:0] saved_mean; 
+    logic signed [W-1:0] sub_val;
+
+    // The Subtractor MUX
+    assign sub_val = ctrl_mux_sub_val_sel ? saved_mean : x_max;
+
+    // SoftMax path
+    scalar_sub #(
         .NUM_INPUTS(N), 
         .DATA_WIDTH(W)
-    ) u_max_sub (
+    ) u_scalar_sub (
         .in_data(a_delayed), 
-        .x_max(x_max), 
+        .sub_val(sub_val), 
         .out_data(a_sub)
     );
+
+    // GELU Scaling path
+    alpha_stabilizer #(
+        .N(N), 
+        .W(W)
+    ) u_alpha_stab (
+        .in_vec(a_delayed), 
+        .out_vec(a_alpha)
+    );
+
+    // Feedback Conversion: Convert 32-bit MAC output to 8-bit Q4.4 for TR Array
+    always_comb begin
+        for (int i = 0; i < N; i++) begin
+            // Shift Q4.12 back to Q4.4 with floor truncation
+            // Add 1.0 (ONE_Q_FRAC) and scale by 2 (shift left 1)
+            // We use (>> W) to safely extract the upper Q4.4 bits from the Q4.12 product
+            a_feedback[i] = ((out_vec[i] >> W) + ONE_Q_FRAC) << 1;
+        end
+    end
 
     // MUX: Feed TR Array with either Max_Sub (SoftMax) or Raw Data (GELU)
     always_comb begin
         for (int i = 0; i < N; i++) begin
-            tr_vec_in[i] = ctrl_mux_tr_vec_sel ? a_delayed[i] : a_sub[i];
+            case (ctrl_mux_tr_vec_sel) // Now a 2-bit control signal
+                2'b00: tr_vec_in[i] = a_sub[i];      // SoftMax / LN Max-Sub
+                2'b01: tr_vec_in[i] = a_alpha[i];    // GELU Pass 1 (EXP)
+                2'b10: tr_vec_in[i] = a_feedback[i]; // GELU Pass 2 (Reciprocal)
+                default: tr_vec_in[i] = a_alpha[i];
+            endcase
         end
     end
 
     // ========================================================================
     // STAGE 3: The Non-Linear Engine (TR Heterogeneous Array)
     // ========================================================================
-    // Scalar capture register
+    // Scalar capture registers
     logic [19:0] saved_sum;
+
+    // The total right-shift to convert a Q8.8 sum back to a Q4.4 mean
+    localparam int MEAN_SHIFT = $clog2(N) + FRAC;
+    localparam int MEAN_ROUND = 1 << (MEAN_SHIFT - 1);
+
     always_ff @(posedge clk or negedge rst_n) begin
-        if (!rst_n) saved_sum <= '0;
-        else if (ctrl_save_sum) saved_sum <= out_dot[19:0];
+        if (!rst_n) begin
+            saved_sum  <= '0;
+            saved_mean <= '0;
+        end else begin
+            if (ctrl_save_sum)  saved_sum  <= out_dot[19:0];
+            if (ctrl_save_mean) saved_mean <= $signed(out_dot + MEAN_ROUND) >>> MEAN_SHIFT;
+        end
     end
 
-    wire [19:0] aligned_sum = saved_sum >> 4;
+    // If the FSM is calculating ISD (LayerNorm), shift by an extra log2(N) to divide by N!
+    wire is_isd_mode = (ctrl_tr_shift_mode == 2'b10);
+    wire [19:0] aligned_sum = is_isd_mode ? (saved_sum >> $clog2(N)) : (saved_sum >> FRAC);
 
     logic [7:0]  y_ea_vec  [N];
     logic [7:0]  y_man_vec [N];
@@ -151,9 +211,11 @@ module transformer_core_datapath #(
     logic [19:0] scalar_recip_20b;
     logic [7:0]  scalar_recip_8b;
 
+    localparam logic [39:0] SCALAR_ROUND = 40'd1 << 11;
+
     assign scalar_mult_raw  = y_ea_scalar * y_man_scalar;
     assign scalar_recip_20b = scalar_mult_raw[27:8]; // Restore Q12.8 after mult
-    assign scalar_recip_8b  = (scalar_mult_raw + 40'd2048) >> 12; // Cast Q4.12 -> Q4.4
+    assign scalar_recip_8b  = (scalar_mult_raw + SCALAR_ROUND) >> 12; // Cast Q4.12 -> Q4.4
 
     // ========================================================================
     // STAGE 5: MAC Engine Datapath Multiplexers
@@ -167,16 +229,35 @@ module transformer_core_datapath #(
             case (ctrl_mux_a_sel)
                 2'b00: mac_a_in[i] = a_delayed[i];                // Raw Memory X
                 2'b01: mac_a_in[i] = y_ea_vec[i];                 // TR Array Anchor
-                2'b10: mac_a_in[i] = (out_vec[i] + 32'd128) >> 8; // Feedback Buffered MAC Output
-                default: mac_a_in[i] = a_delayed[i];
+                2'b10: mac_a_in[i] = (out_vec[i] + ROUND_W) >> W; // Feedback Buffered MAC Output
+                2'b11: mac_a_in[i] = a_sub[i];                    // LN Direct Subtractor Routing
             endcase
 
             // MUX B
             case (ctrl_mux_b_sel)
-                2'b00: mac_b_in[i] = b_delayed[i];                // Raw Memory W
-                2'b01: mac_b_in[i] = y_man_vec[i];                // TR Array Mantissa
-                2'b10: mac_b_in[i] = scalar_recip_8b;             // Broadcast Scalar (e.g. 1/Sum)
-                2'b11: mac_b_in[i] = b_delayed[i];                // 1.0 Constant in Q4.4
+                3'b000: mac_b_in[i] = b_delayed[i];                // Raw Memory W
+                3'b001: mac_b_in[i] = y_man_vec[i];                // TR Array Mantissa
+                3'b010: mac_b_in[i] = scalar_recip_8b;             // Broadcast Scalar (e.g. 1/Sum)
+                3'b011: begin
+                    // Shift out the fractional bits to get Q0.W precision, adding half-bit for rounding
+                    logic [W+1:0] inv_S;
+                    inv_S = ((out_vec[i] << 1) + HALF_FRAC) >> FRAC;
+                    
+                    if (ctrl_gelu_mode) begin
+                        logic [W+1:0] sigmoid;
+
+                        // Symmetry Trick: 1.0 - sigma(-x)
+                        sigmoid = (a_delayed[i][W-1]) ? (ONE_Q_MAX - inv_S) : inv_S;
+                        
+                        // Saturate and pass full unsigned precision to the SU MAC
+                        mac_b_in[i] = (sigmoid >= MAX_UNS) ? MAX_UNS : sigmoid[W-1:0];
+                    end else begin
+                        mac_b_in[i] = (inv_S >= MAX_UNS) ? MAX_UNS : inv_S[W-1:0];
+                    end
+                end
+                3'b100: mac_b_in[i] = a_sub[i];    // Direct Subtractor Routing
+                3'b101: mac_b_in[i] = ONE_Q_FRAC;  // Hardware 1.0 Constant
+                default: mac_b_in[i] = b_delayed[i];
             endcase
         end
     end

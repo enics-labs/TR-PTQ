@@ -1,6 +1,10 @@
 // global config
 -f ../scripts/xrun_config.f
 
+// Control package
+../rtl_bb/transformer_ctrl_pkg.sv
+
+// RTL
 ../rtl_bb/tr_hetero_array/q12_8_lut.sv
 ../rtl_bb/tr_hetero_array/shared_lut_rom.sv
 ../rtl_bb/tr_hetero_array/round.sv
@@ -17,4 +21,8 @@
 ../rtl_bb/alpha_stabilizer/alpha_stabilizer.sv
 
 ../rtl_bb/transformer_core_datapath.sv
-../tb_bb/transformer_core_datapath_tb.sv
+../rtl_bb/transformer_core_ctrl.sv
+../rtl_bb/transformer_core_top.sv
+
+// Testbench
+../tb_bb/transformer_core_top_tb.sv
