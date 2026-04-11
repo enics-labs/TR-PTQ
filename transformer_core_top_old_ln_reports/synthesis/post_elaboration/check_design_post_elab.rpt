@@ -77,18 +77,7 @@ pin:transformer_core_top/u_datapath/u_alpha_stab/minus_20_44_I1/g73/z
 pin:transformer_core_top/u_datapath/u_alpha_stab/minus_20_44_I1/g76/z
 pin:transformer_core_top/u_datapath/u_alpha_stab/minus_20_44_I1/g86/z
 pin:transformer_core_top/u_datapath/u_alpha_stab/minus_20_44_I1/g88/z
-pin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/add_52_26/g4/z
-pin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/sll_38_27/g225/z
-pin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/sll_38_27/g226/z
-pin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/sll_38_27/g227/z
-pin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/sll_38_27/g228/z
-pin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/sll_38_27/g229/z
-pin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/sll_38_27/g230/z
-pin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/sll_38_27/g231/z
-pin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/sll_38_27/g232/z
-pin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/sll_38_27/g233/z
-pin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/sll_38_27/g234/z
-pin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/sll_38_27/g235/z
+pin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/add_44_26/g4/z
 pin:transformer_core_top/u_datapath/u_tr_array/u_exp_0_20b/u_quad/mul_42_37/g1/z
 pin:transformer_core_top/u_datapath/u_tr_array/u_exp_0_20b/u_quad/mul_42_37/g430/z
 pin:transformer_core_top/u_datapath/u_tr_array/u_exp_0_20b/u_quad/mul_42_37/g433/z
@@ -98,46 +87,22 @@ pin:transformer_core_top/u_datapath/u_tr_array/u_exp_0_20b/u_quad/mul_42_37/g440
 pin:transformer_core_top/u_datapath/u_tr_array/u_exp_0_20b/u_quad/mul_42_37/g443/z
 pin:transformer_core_top/u_datapath/u_tr_array/u_exp_0_20b/u_quad/mul_42_37/g445/z
 pin:transformer_core_top/u_datapath/u_tr_array/u_exp_0_20b/u_quad/mul_42_37/g463/z
-pin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/add_52_26/g4/z
-pin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/sll_38_27/g55/z
-pin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/sll_38_27/g56/z
-pin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/sll_38_27/g57/z
-pin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/add0013051/g37/z
-pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/add_52_26/g4/z
-pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/sll_38_27/g55/z
-pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/sll_38_27/g56/z
-pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/sll_38_27/g57/z
-pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/add0013051/g37/z
-pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/add_52_26/g4/z
-pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/sll_38_27/g55/z
-pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/sll_38_27/g56/z
-pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/sll_38_27/g57/z
-pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/add0013051/g37/z
-pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/add_52_26/g4/z
-pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/sll_38_27/g55/z
-pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/sll_38_27/g56/z
-pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/sll_38_27/g57/z
-pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/add0013051/g37/z
-pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/add_52_26/g4/z
-pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/sll_38_27/g55/z
-pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/sll_38_27/g56/z
-pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/sll_38_27/g57/z
-pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/add0013051/g37/z
-pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/add_52_26/g4/z
-pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/sll_38_27/g55/z
-pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/sll_38_27/g56/z
-pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/sll_38_27/g57/z
-pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/add0013051/g37/z
-pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/add_52_26/g4/z
-pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/sll_38_27/g55/z
-pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/sll_38_27/g56/z
-pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/sll_38_27/g57/z
-pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/add0013051/g37/z
-pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/add_52_26/g4/z
-pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/sll_38_27/g55/z
-pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/sll_38_27/g56/z
-pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/sll_38_27/g57/z
-pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/add0013051/g37/z
+pin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/add_47_51/g87/z
+pin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/add_44_26/g4/z
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/add_47_51/g87/z
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/add_44_26/g4/z
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/add_47_51/g87/z
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/add_44_26/g4/z
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/add_47_51/g87/z
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/add_44_26/g4/z
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/add_47_51/g87/z
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/add_44_26/g4/z
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/add_47_51/g87/z
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/add_44_26/g4/z
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/add_47_51/g87/z
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/add_44_26/g4/z
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/add_47_51/g87/z
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/add_44_26/g4/z
 pin:transformer_core_top/u_datapath/u_mac_engine/add_141_26_I7/g3/z
 pin:transformer_core_top/u_datapath/u_mac_engine/add_141_26_I7/g276/z
 pin:transformer_core_top/u_datapath/u_mac_engine/add_141_26_I7/g278/z
@@ -565,7 +530,7 @@ pin:transformer_core_top/u_datapath/add_244_48_I1/g444/z
 pin:transformer_core_top/u_datapath/add_244_48_I1/g447/z
 pin:transformer_core_top/u_datapath/add_244_48_I1/g449/z
 pin:transformer_core_top/u_datapath/add_244_48_I1/g452/z
-Total number of unloaded combinational elements in design 'transformer_core_top' : 533
+Total number of unloaded combinational elements in design 'transformer_core_top' : 498
 
  Assigns
  ------- 
@@ -584,35 +549,7 @@ Encountered an assign statement at hport 'hport:transformer_core_top/u_datapath/
 Encountered an assign statement at hport 'hport:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/yq[16]' in module tr_ln_WIDTH20_BITS8_OUT_WIDTH20
 Encountered an assign statement at hport 'hport:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/yq[15]' in module tr_ln_WIDTH20_BITS8_OUT_WIDTH20
 Encountered an assign statement at hport 'hport:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/yq[14]' in module tr_ln_WIDTH20_BITS8_OUT_WIDTH20
-Encountered an assign statement at hport 'hport:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/yq[13]' in module tr_ln_WIDTH20_BITS8_OUT_WIDTH20
-Encountered an assign statement at hport 'hport:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/sub_38_41/Z[31]' in module sub_unsigned_773
-Encountered an assign statement at hport 'hport:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/sub_38_41/Z[30]' in module sub_unsigned_773
-Encountered an assign statement at hport 'hport:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/sub_38_41/Z[29]' in module sub_unsigned_773
-Encountered an assign statement at hport 'hport:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/sub_38_41/Z[28]' in module sub_unsigned_773
-Encountered an assign statement at hport 'hport:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/sub_38_41/Z[27]' in module sub_unsigned_773
-Encountered an assign statement at hport 'hport:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/sub_38_41/Z[26]' in module sub_unsigned_773
-Encountered an assign statement at hport 'hport:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/sub_38_41/Z[25]' in module sub_unsigned_773
-Encountered an assign statement at hport 'hport:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/sub_38_41/Z[24]' in module sub_unsigned_773
-Encountered an assign statement at hport 'hport:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/sub_38_41/Z[23]' in module sub_unsigned_773
-Encountered an assign statement at hport 'hport:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/sub_38_41/Z[22]' in module sub_unsigned_773
-Encountered an assign statement at hport 'hport:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/sub_38_41/Z[21]' in module sub_unsigned_773
-Encountered an assign statement at hport 'hport:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/sub_38_41/Z[20]' in module sub_unsigned_773
-Encountered an assign statement at hport 'hport:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/sub_38_41/Z[19]' in module sub_unsigned_773
-Encountered an assign statement at hport 'hport:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/sub_38_41/Z[18]' in module sub_unsigned_773
-Encountered an assign statement at hport 'hport:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/sub_38_41/Z[17]' in module sub_unsigned_773
-Encountered an assign statement at hport 'hport:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/sub_38_41/Z[16]' in module sub_unsigned_773
-Encountered an assign statement at hport 'hport:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/sub_38_41/Z[15]' in module sub_unsigned_773
-Encountered an assign statement at hport 'hport:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/sub_38_41/Z[14]' in module sub_unsigned_773
-Encountered an assign statement at hport 'hport:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/sub_38_41/Z[13]' in module sub_unsigned_773
-Encountered an assign statement at hport 'hport:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/sub_38_41/Z[12]' in module sub_unsigned_773
-Encountered an assign statement at hport 'hport:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/sub_38_41/Z[11]' in module sub_unsigned_773
-Encountered an assign statement at hport 'hport:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/sub_38_41/Z[10]' in module sub_unsigned_773
-Encountered an assign statement at hport 'hport:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/sub_38_41/Z[9]' in module sub_unsigned_773
-Encountered an assign statement at hport 'hport:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/sub_38_41/Z[8]' in module sub_unsigned_773
-Encountered an assign statement at hport 'hport:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/sub_38_41/Z[7]' in module sub_unsigned_773
-Encountered an assign statement at hport 'hport:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/sub_38_41/Z[6]' in module sub_unsigned_773
-Encountered an assign statement at hport 'hport:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/sub_38_41/Z[5]' in module sub_unsigned_773
-Encountered an assign statement at hport 'hport:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/ctl_xq_32_17/out_0[20]' in module case_box_46
+Encountered an assign statement at hport 'hport:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/ctl_xq_27_17/out_0[20]' in module case_box_46
 Encountered an assign statement at hport 'hport:transformer_core_top/u_datapath/u_tr_array/u_lut_20b/e_a[19]' in module q12_8_lut
 Encountered an assign statement at hport 'hport:transformer_core_top/u_datapath/u_tr_array/u_lut_20b/e_a[17]' in module q12_8_lut
 Encountered an assign statement at hport 'hport:transformer_core_top/u_datapath/u_tr_array/u_exp_0_20b/u_round/is_ceil' in module round_WIDTH20_FRAC_W8_LUT_IDX_W4
@@ -627,36 +564,7 @@ Encountered an assign statement at hport 'hport:transformer_core_top/u_datapath/
 Encountered an assign statement at hport 'hport:transformer_core_top/u_datapath/u_tr_array/u_exp_0_20b/mantisa[12]' in module tr_exp_alu_WIDTH20_FRAC_W8_LUT_IDX_W4
 Encountered an assign statement at hport 'hport:transformer_core_top/u_datapath/u_tr_array/u_exp_0_20b/mantisa[11]' in module tr_exp_alu_WIDTH20_FRAC_W8_LUT_IDX_W4
 Encountered an assign statement at hport 'hport:transformer_core_top/u_datapath/u_tr_array/u_exp_0_20b/mantisa[10]' in module tr_exp_alu_WIDTH20_FRAC_W8_LUT_IDX_W4
-Encountered an assign statement at hport 'hport:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/sub_38_41/Z[31]' in module sub_unsigned_859
-Encountered an assign statement at hport 'hport:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/sub_38_41/Z[30]' in module sub_unsigned_859
-Encountered an assign statement at hport 'hport:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/sub_38_41/Z[29]' in module sub_unsigned_859
-Encountered an assign statement at hport 'hport:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/sub_38_41/Z[28]' in module sub_unsigned_859
-Encountered an assign statement at hport 'hport:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/sub_38_41/Z[27]' in module sub_unsigned_859
-Encountered an assign statement at hport 'hport:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/sub_38_41/Z[26]' in module sub_unsigned_859
-Encountered an assign statement at hport 'hport:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/sub_38_41/Z[25]' in module sub_unsigned_859
-Encountered an assign statement at hport 'hport:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/sub_38_41/Z[24]' in module sub_unsigned_859
-Encountered an assign statement at hport 'hport:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/sub_38_41/Z[23]' in module sub_unsigned_859
-Encountered an assign statement at hport 'hport:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/sub_38_41/Z[22]' in module sub_unsigned_859
-Encountered an assign statement at hport 'hport:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/sub_38_41/Z[21]' in module sub_unsigned_859
-Encountered an assign statement at hport 'hport:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/sub_38_41/Z[20]' in module sub_unsigned_859
-Encountered an assign statement at hport 'hport:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/sub_38_41/Z[19]' in module sub_unsigned_859
-Encountered an assign statement at hport 'hport:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/sub_38_41/Z[18]' in module sub_unsigned_859
-Encountered an assign statement at hport 'hport:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/sub_38_41/Z[17]' in module sub_unsigned_859
-Encountered an assign statement at hport 'hport:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/sub_38_41/Z[16]' in module sub_unsigned_859
-Encountered an assign statement at hport 'hport:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/sub_38_41/Z[15]' in module sub_unsigned_859
-Encountered an assign statement at hport 'hport:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/sub_38_41/Z[14]' in module sub_unsigned_859
-Encountered an assign statement at hport 'hport:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/sub_38_41/Z[13]' in module sub_unsigned_859
-Encountered an assign statement at hport 'hport:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/sub_38_41/Z[12]' in module sub_unsigned_859
-Encountered an assign statement at hport 'hport:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/sub_38_41/Z[11]' in module sub_unsigned_859
-Encountered an assign statement at hport 'hport:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/sub_38_41/Z[10]' in module sub_unsigned_859
-Encountered an assign statement at hport 'hport:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/sub_38_41/Z[9]' in module sub_unsigned_859
-Encountered an assign statement at hport 'hport:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/sub_38_41/Z[8]' in module sub_unsigned_859
-Encountered an assign statement at hport 'hport:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/sub_38_41/Z[7]' in module sub_unsigned_859
-Encountered an assign statement at hport 'hport:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/sub_38_41/Z[6]' in module sub_unsigned_859
-Encountered an assign statement at hport 'hport:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/sub_38_41/Z[5]' in module sub_unsigned_859
-Encountered an assign statement at hport 'hport:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/sub_38_41/Z[4]' in module sub_unsigned_859
-Encountered an assign statement at hport 'hport:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/sub_38_41/Z[3]' in module sub_unsigned_859
-Encountered an assign statement at hport 'hport:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/ctl_xq_32_17/out_0[8]' in module case_box_51
+Encountered an assign statement at hport 'hport:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/ctl_xq_27_17/out_0[8]' in module case_box_50
 Encountered an assign statement at hport 'hport:transformer_core_top/u_datapath/u_tr_array/u_exp_0_8b/u_round/is_ceil' in module round_WIDTH8_FRAC_W4_LUT_IDX_W3
 Encountered an assign statement at hport 'hport:transformer_core_top/u_datapath/u_tr_array/u_exp_0_8b/u_quad/quad_out[3]' in module quadratic_divider_WIDTH8_FRAC_W4
 Encountered an assign statement at hport 'hport:transformer_core_top/u_datapath/u_tr_array/u_exp_0_8b/u_quad/quad_out[2]' in module quadratic_divider_WIDTH8_FRAC_W4
@@ -726,7 +634,7 @@ Encountered an assign statement at hport 'hport:transformer_core_top/u_datapath/
 Encountered an assign statement at hport 'hport:transformer_core_top/u_datapath/out_dot[2]' in module transformer_core_datapath_N8_W8_ACC_W32_FRAC4
 Encountered an assign statement at hport 'hport:transformer_core_top/u_datapath/out_dot[1]' in module transformer_core_datapath_N8_W8_ACC_W32_FRAC4
 Encountered an assign statement at hport 'hport:transformer_core_top/u_datapath/out_dot[0]' in module transformer_core_datapath_N8_W8_ACC_W32_FRAC4
-Total number of assign statements in design 'transformer_core_top' : 157
+Total number of assign statements in design 'transformer_core_top' : 100
 
  Undriven Port(s)/Pin(s)
  ------------------------
@@ -755,7 +663,219 @@ No multidriven unloaded nets in 'transformer_core_top'
   ----------------
 design 'transformer_core_top' has the following constant input combinational pin(s)
 pin:transformer_core_top/u_datapath/u_mac_engine/g96/in_1
-Total number of constant combinational pins in design 'transformer_core_top' : 1
+pin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/srl_35_42/g132/data1
+pin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/srl_35_42/g152/data1
+pin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/srl_35_42/g153/data1
+pin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/srl_35_42/g171/data1
+pin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/srl_35_42/g172/data1
+pin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/srl_35_42/g173/data1
+pin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/srl_35_42/g174/data1
+pin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/srl_35_42/g188/data1
+pin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/srl_35_42/g191/data1
+pin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/srl_35_42/g192/data1
+pin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/srl_35_42/g193/data1
+pin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/srl_35_42/g194/data1
+pin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/srl_35_42/g195/data1
+pin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/srl_35_42/g201/data1
+pin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/srl_35_42/g202/data1
+pin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/srl_35_42/g203/data1
+pin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/srl_35_42/g204/data1
+pin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/srl_35_42/g205/data1
+pin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/srl_35_42/g206/data1
+pin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/srl_35_42/g207/data1
+pin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/srl_35_42/g208/data1
+pin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/srl_35_42/g209/data1
+pin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/srl_35_42/g217/data1
+pin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/srl_35_42/g2/data1
+pin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/srl_35_42/g3/data1
+pin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/srl_35_42/g4/data1
+pin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/srl_35_42/g5/data1
+pin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/srl_35_42/g6/data1
+pin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/srl_35_42/g7/data1
+pin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/srl_35_42/g8/data1
+pin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/srl_35_42/g9/data1
+pin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/srl_35_42/g10/data1
+pin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/srl_35_42/g11/data1
+pin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/srl_35_42/g12/data1
+pin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/srl_35_42/g13/data1
+pin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/srl_35_42/g14/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/srl_35_42/g50/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/srl_35_42/g58/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/srl_35_42/g59/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/srl_35_42/g65/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/srl_35_42/g66/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/srl_35_42/g67/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/srl_35_42/g68/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/srl_35_42/g70/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/srl_35_42/g71/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/srl_35_42/g72/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/srl_35_42/g73/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/srl_35_42/g74/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/srl_35_42/g75/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/srl_35_42/g76/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/srl_35_42/g78/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/srl_35_42/g2/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/srl_35_42/g3/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/srl_35_42/g4/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/srl_35_42/g5/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/srl_35_42/g6/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/srl_35_42/g7/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/srl_35_42/g8/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/srl_35_42/g50/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/srl_35_42/g58/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/srl_35_42/g59/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/srl_35_42/g65/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/srl_35_42/g66/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/srl_35_42/g67/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/srl_35_42/g68/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/srl_35_42/g70/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/srl_35_42/g71/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/srl_35_42/g72/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/srl_35_42/g73/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/srl_35_42/g74/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/srl_35_42/g75/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/srl_35_42/g76/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/srl_35_42/g78/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/srl_35_42/g2/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/srl_35_42/g3/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/srl_35_42/g4/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/srl_35_42/g5/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/srl_35_42/g6/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/srl_35_42/g7/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/srl_35_42/g8/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/srl_35_42/g50/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/srl_35_42/g58/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/srl_35_42/g59/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/srl_35_42/g65/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/srl_35_42/g66/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/srl_35_42/g67/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/srl_35_42/g68/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/srl_35_42/g70/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/srl_35_42/g71/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/srl_35_42/g72/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/srl_35_42/g73/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/srl_35_42/g74/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/srl_35_42/g75/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/srl_35_42/g76/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/srl_35_42/g78/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/srl_35_42/g2/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/srl_35_42/g3/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/srl_35_42/g4/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/srl_35_42/g5/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/srl_35_42/g6/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/srl_35_42/g7/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/srl_35_42/g8/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/srl_35_42/g50/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/srl_35_42/g58/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/srl_35_42/g59/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/srl_35_42/g65/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/srl_35_42/g66/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/srl_35_42/g67/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/srl_35_42/g68/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/srl_35_42/g70/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/srl_35_42/g71/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/srl_35_42/g72/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/srl_35_42/g73/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/srl_35_42/g74/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/srl_35_42/g75/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/srl_35_42/g76/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/srl_35_42/g78/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/srl_35_42/g2/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/srl_35_42/g3/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/srl_35_42/g4/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/srl_35_42/g5/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/srl_35_42/g6/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/srl_35_42/g7/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/srl_35_42/g8/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/srl_35_42/g50/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/srl_35_42/g58/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/srl_35_42/g59/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/srl_35_42/g65/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/srl_35_42/g66/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/srl_35_42/g67/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/srl_35_42/g68/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/srl_35_42/g70/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/srl_35_42/g71/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/srl_35_42/g72/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/srl_35_42/g73/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/srl_35_42/g74/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/srl_35_42/g75/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/srl_35_42/g76/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/srl_35_42/g78/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/srl_35_42/g2/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/srl_35_42/g3/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/srl_35_42/g4/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/srl_35_42/g5/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/srl_35_42/g6/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/srl_35_42/g7/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/srl_35_42/g8/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/srl_35_42/g50/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/srl_35_42/g58/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/srl_35_42/g59/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/srl_35_42/g65/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/srl_35_42/g66/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/srl_35_42/g67/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/srl_35_42/g68/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/srl_35_42/g70/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/srl_35_42/g71/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/srl_35_42/g72/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/srl_35_42/g73/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/srl_35_42/g74/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/srl_35_42/g75/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/srl_35_42/g76/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/srl_35_42/g78/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/srl_35_42/g2/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/srl_35_42/g3/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/srl_35_42/g4/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/srl_35_42/g5/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/srl_35_42/g6/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/srl_35_42/g7/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/srl_35_42/g8/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/srl_35_42/g50/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/srl_35_42/g58/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/srl_35_42/g59/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/srl_35_42/g65/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/srl_35_42/g66/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/srl_35_42/g67/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/srl_35_42/g68/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/srl_35_42/g70/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/srl_35_42/g71/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/srl_35_42/g72/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/srl_35_42/g73/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/srl_35_42/g74/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/srl_35_42/g75/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/srl_35_42/g76/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/srl_35_42/g78/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/srl_35_42/g2/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/srl_35_42/g3/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/srl_35_42/g4/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/srl_35_42/g5/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/srl_35_42/g6/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/srl_35_42/g7/data1
+pin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/srl_35_42/g8/data1
+pin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/srl_35_42/g50/data1
+pin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/srl_35_42/g58/data1
+pin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/srl_35_42/g59/data1
+pin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/srl_35_42/g65/data1
+pin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/srl_35_42/g66/data1
+pin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/srl_35_42/g67/data1
+pin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/srl_35_42/g68/data1
+pin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/srl_35_42/g70/data1
+pin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/srl_35_42/g71/data1
+pin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/srl_35_42/g72/data1
+pin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/srl_35_42/g73/data1
+pin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/srl_35_42/g74/data1
+pin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/srl_35_42/g75/data1
+pin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/srl_35_42/g76/data1
+pin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/srl_35_42/g78/data1
+pin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/srl_35_42/g2/data1
+pin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/srl_35_42/g3/data1
+pin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/srl_35_42/g4/data1
+pin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/srl_35_42/g5/data1
+pin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/srl_35_42/g6/data1
+pin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/srl_35_42/g7/data1
+pin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/srl_35_42/g8/data1
+Total number of constant combinational pins in design 'transformer_core_top' : 213
 
 No constant sequential pin(s) in design 'transformer_core_top'
 
@@ -2256,140 +2376,129 @@ hpin:transformer_core_top/u_datapath/u_tr_array/u_shared_rom/mux_exp_lut[a_idx[7
 hpin:transformer_core_top/u_datapath/u_tr_array/u_shared_rom/mux_exp_lut[a_idx[7]]_24_22/in_7[2] 	 (fanout : 1)
 hpin:transformer_core_top/u_datapath/u_tr_array/u_shared_rom/mux_exp_lut[a_idx[7]]_24_22/in_7[1] 	 (fanout : 1)
 hpin:transformer_core_top/u_datapath/u_tr_array/u_shared_rom/mux_exp_lut[a_idx[7]]_24_22/in_7[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/add_52_26/A[9] 	 (fanout : 9)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/add_52_26/B[7] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/add_52_26/B[6] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/add_52_26/B[5] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/add_52_26/B[4] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/add_52_26/B[3] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/add_52_26/B[2] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/add_52_26/B[1] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/add_52_26/B[0] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/sub_38_41/A[4] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/sub_38_41/A[3] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/sub_38_41/A[2] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/sub_38_41/A[1] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/sub_38_41/A[0] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/add0011768/B[5] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/add0011768/B[4] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/add0011768/B[3] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/add0011768/B[2] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/add0011768/B[1] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/add0011768/B[0] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_0[4] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_0[3] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_0[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_0[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_0[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_1[4] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_1[3] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_1[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_1[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_1[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_2[4] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_2[3] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_2[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_2[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_2[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_3[4] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_3[3] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_3[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_3[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_3[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_4[4] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_4[3] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_4[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_4[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_4[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_5[4] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_5[3] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_5[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_5[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_5[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_6[4] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_6[3] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_6[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_6[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_6[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_7[4] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_7[3] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_7[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_7[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_7[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_8[4] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_8[3] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_8[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_8[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_8[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_9[4] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_9[3] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_9[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_9[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_9[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_10[4] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_10[3] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_10[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_10[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_10[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_11[4] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_11[3] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_11[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_11[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_11[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_12[4] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_12[3] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_12[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_12[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_12[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_13[4] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_13[3] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_13[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_13[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_13[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_14[4] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_14[3] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_14[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_14[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_14[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_15[4] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_15[3] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_15[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_15[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_15[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_16[4] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_16[3] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_16[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_16[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_16[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_17[4] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_17[3] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_17[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_17[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_17[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_18[4] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_18[3] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_18[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_18[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_18[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_19[4] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_19[3] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_19[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_19[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_19[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_20[4] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_20[3] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_20[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_20[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_32_17/in_20[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_38_27/in_1[8] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_38_27/in_1[7] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_38_27/in_1[6] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_38_27/in_1[5] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_38_27/in_1[4] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_38_27/in_1[3] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_38_27/in_1[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_38_27/in_1[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_38_27/in_1[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/add_44_26/B[7] 	 (fanout : 2)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/add_44_26/B[6] 	 (fanout : 2)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/add_44_26/B[5] 	 (fanout : 2)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/add_44_26/B[4] 	 (fanout : 2)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/add_44_26/B[3] 	 (fanout : 2)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/add_44_26/B[2] 	 (fanout : 2)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/add_44_26/B[1] 	 (fanout : 2)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/add_44_26/B[0] 	 (fanout : 2)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/sub_31_40/A[5] 	 (fanout : 2)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/sub_31_40/B[3] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/sub_31_40/B[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/sub_31_40/B[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/sub_31_40/B[0] 	 (fanout : 2)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/gte_34_21/B 	 (fanout : 4)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/sub_41_28/B[1] 	 (fanout : 3)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/sub_41_28/B[0] 	 (fanout : 2)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/minus_37_46/A 	 (fanout : 26)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_0[4] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_0[3] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_0[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_0[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_0[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_1[4] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_1[3] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_1[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_1[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_1[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_2[4] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_2[3] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_2[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_2[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_2[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_3[4] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_3[3] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_3[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_3[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_3[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_4[4] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_4[3] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_4[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_4[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_4[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_5[4] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_5[3] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_5[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_5[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_5[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_6[4] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_6[3] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_6[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_6[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_6[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_7[4] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_7[3] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_7[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_7[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_7[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_8[4] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_8[3] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_8[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_8[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_8[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_9[4] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_9[3] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_9[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_9[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_9[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_10[4] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_10[3] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_10[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_10[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_10[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_11[4] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_11[3] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_11[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_11[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_11[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_12[4] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_12[3] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_12[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_12[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_12[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_13[4] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_13[3] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_13[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_13[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_13[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_14[4] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_14[3] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_14[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_14[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_14[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_15[4] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_15[3] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_15[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_15[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_15[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_16[4] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_16[3] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_16[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_16[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_16[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_17[4] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_17[3] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_17[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_17[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_17[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_18[4] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_18[3] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_18[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_18[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_18[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_19[4] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_19[3] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_19[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_19[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_19[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_20[4] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_20[3] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_20[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_20[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/mux_msb_27_17/in_20[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_20b/srl_35_42/A[20] 	 (fanout : 2)
 hpin:transformer_core_top/u_datapath/u_tr_array/u_lut_20b/mux_e_a_9_15/in_0[17] 	 (fanout : 1)
 hpin:transformer_core_top/u_datapath/u_tr_array/u_lut_20b/mux_e_a_9_15/in_0[16] 	 (fanout : 1)
 hpin:transformer_core_top/u_datapath/u_tr_array/u_lut_20b/mux_e_a_9_15/in_0[15] 	 (fanout : 1)
@@ -2662,51 +2771,46 @@ hpin:transformer_core_top/u_datapath/u_tr_array/u_lut_20b/mux_e_a_9_15/in_14[1] 
 hpin:transformer_core_top/u_datapath/u_tr_array/u_lut_20b/mux_e_a_9_15/in_14[0] 	 (fanout : 1)
 hpin:transformer_core_top/u_datapath/u_tr_array/u_exp_0_20b/u_round/eq_39_44/B 	 (fanout : 1)
 hpin:transformer_core_top/u_datapath/u_tr_array/u_exp_0_20b/u_round/add_36_61/B 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/add_52_26/A[5] 	 (fanout : 5)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/add_52_26/B[3] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/add_52_26/B[2] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/add_52_26/B[1] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/add_52_26/B[0] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/sub_38_41/A[2] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/sub_38_41/A[1] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/sub_38_41/A[0] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/add0013051/B[4] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/add0013051/B[3] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/add0013051/B[2] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/add0013051/B[1] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/add0013051/B[0] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/mux_msb_32_17/in_0[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/mux_msb_32_17/in_0[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/mux_msb_32_17/in_0[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/mux_msb_32_17/in_1[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/mux_msb_32_17/in_1[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/mux_msb_32_17/in_1[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/mux_msb_32_17/in_2[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/mux_msb_32_17/in_2[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/mux_msb_32_17/in_2[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/mux_msb_32_17/in_3[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/mux_msb_32_17/in_3[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/mux_msb_32_17/in_3[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/mux_msb_32_17/in_4[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/mux_msb_32_17/in_4[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/mux_msb_32_17/in_4[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/mux_msb_32_17/in_5[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/mux_msb_32_17/in_5[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/mux_msb_32_17/in_5[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/mux_msb_32_17/in_6[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/mux_msb_32_17/in_6[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/mux_msb_32_17/in_6[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/mux_msb_32_17/in_7[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/mux_msb_32_17/in_7[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/mux_msb_32_17/in_7[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/mux_msb_32_17/in_8[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/mux_msb_32_17/in_8[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/mux_msb_32_17/in_8[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/mux_38_27/in_1[4] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/mux_38_27/in_1[3] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/mux_38_27/in_1[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/mux_38_27/in_1[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/mux_38_27/in_1[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/add_44_26/B[3] 	 (fanout : 2)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/add_44_26/B[2] 	 (fanout : 2)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/add_44_26/B[1] 	 (fanout : 2)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/add_44_26/B[0] 	 (fanout : 2)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/sub_31_40/A[3] 	 (fanout : 2)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/sub_31_40/B[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/sub_31_40/B[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/sub_31_40/B[0] 	 (fanout : 2)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/gte_34_21/B 	 (fanout : 4)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/sub_41_28/B[1] 	 (fanout : 3)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/sub_41_28/B[0] 	 (fanout : 2)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/minus_37_46/A 	 (fanout : 14)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/mux_msb_27_17/in_0[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/mux_msb_27_17/in_0[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/mux_msb_27_17/in_0[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/mux_msb_27_17/in_1[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/mux_msb_27_17/in_1[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/mux_msb_27_17/in_1[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/mux_msb_27_17/in_2[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/mux_msb_27_17/in_2[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/mux_msb_27_17/in_2[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/mux_msb_27_17/in_3[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/mux_msb_27_17/in_3[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/mux_msb_27_17/in_3[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/mux_msb_27_17/in_4[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/mux_msb_27_17/in_4[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/mux_msb_27_17/in_4[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/mux_msb_27_17/in_5[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/mux_msb_27_17/in_5[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/mux_msb_27_17/in_5[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/mux_msb_27_17/in_6[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/mux_msb_27_17/in_6[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/mux_msb_27_17/in_6[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/mux_msb_27_17/in_7[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/mux_msb_27_17/in_7[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/mux_msb_27_17/in_7[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/mux_msb_27_17/in_8[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/mux_msb_27_17/in_8[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/mux_msb_27_17/in_8[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/u_ln_0_8b/srl_35_42/A[8] 	 (fanout : 2)
 hpin:transformer_core_top/u_datapath/u_tr_array/u_exp_0_8b/u_round/eq_39_44/B 	 (fanout : 1)
 hpin:transformer_core_top/u_datapath/u_tr_array/u_exp_0_8b/u_round/add_36_61/B 	 (fanout : 2)
 hpin:transformer_core_top/u_datapath/u_tr_array/minus_157_44_I7/A 	 (fanout : 14)
@@ -2811,333 +2915,298 @@ hpin:transformer_core_top/u_datapath/u_tr_array/mux_179_23/in_1[3] 	 (fanout : 1
 hpin:transformer_core_top/u_datapath/u_tr_array/mux_179_23/in_1[2] 	 (fanout : 1)
 hpin:transformer_core_top/u_datapath/u_tr_array/mux_179_23/in_1[1] 	 (fanout : 1)
 hpin:transformer_core_top/u_datapath/u_tr_array/mux_179_23/in_1[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/add_52_26/A[5] 	 (fanout : 5)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/add_52_26/B[3] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/add_52_26/B[2] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/add_52_26/B[1] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/add_52_26/B[0] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/sub_38_41/A[2] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/sub_38_41/A[1] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/sub_38_41/A[0] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/add0013051/B[4] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/add0013051/B[3] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/add0013051/B[2] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/add0013051/B[1] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/add0013051/B[0] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/mux_msb_32_17/in_0[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/mux_msb_32_17/in_0[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/mux_msb_32_17/in_0[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/mux_msb_32_17/in_1[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/mux_msb_32_17/in_1[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/mux_msb_32_17/in_1[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/mux_msb_32_17/in_2[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/mux_msb_32_17/in_2[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/mux_msb_32_17/in_2[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/mux_msb_32_17/in_3[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/mux_msb_32_17/in_3[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/mux_msb_32_17/in_3[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/mux_msb_32_17/in_4[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/mux_msb_32_17/in_4[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/mux_msb_32_17/in_4[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/mux_msb_32_17/in_5[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/mux_msb_32_17/in_5[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/mux_msb_32_17/in_5[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/mux_msb_32_17/in_6[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/mux_msb_32_17/in_6[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/mux_msb_32_17/in_6[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/mux_msb_32_17/in_7[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/mux_msb_32_17/in_7[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/mux_msb_32_17/in_7[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/mux_msb_32_17/in_8[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/mux_msb_32_17/in_8[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/mux_msb_32_17/in_8[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/mux_38_27/in_1[4] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/mux_38_27/in_1[3] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/mux_38_27/in_1[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/mux_38_27/in_1[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/mux_38_27/in_1[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/add_44_26/B[3] 	 (fanout : 2)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/add_44_26/B[2] 	 (fanout : 2)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/add_44_26/B[1] 	 (fanout : 2)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/add_44_26/B[0] 	 (fanout : 2)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/sub_31_40/A[3] 	 (fanout : 2)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/sub_31_40/B[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/sub_31_40/B[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/sub_31_40/B[0] 	 (fanout : 2)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/gte_34_21/B 	 (fanout : 4)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/sub_41_28/B[1] 	 (fanout : 3)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/sub_41_28/B[0] 	 (fanout : 2)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/minus_37_46/A 	 (fanout : 14)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/mux_msb_27_17/in_0[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/mux_msb_27_17/in_0[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/mux_msb_27_17/in_0[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/mux_msb_27_17/in_1[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/mux_msb_27_17/in_1[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/mux_msb_27_17/in_1[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/mux_msb_27_17/in_2[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/mux_msb_27_17/in_2[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/mux_msb_27_17/in_2[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/mux_msb_27_17/in_3[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/mux_msb_27_17/in_3[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/mux_msb_27_17/in_3[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/mux_msb_27_17/in_4[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/mux_msb_27_17/in_4[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/mux_msb_27_17/in_4[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/mux_msb_27_17/in_5[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/mux_msb_27_17/in_5[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/mux_msb_27_17/in_5[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/mux_msb_27_17/in_6[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/mux_msb_27_17/in_6[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/mux_msb_27_17/in_6[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/mux_msb_27_17/in_7[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/mux_msb_27_17/in_7[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/mux_msb_27_17/in_7[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/mux_msb_27_17/in_8[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/mux_msb_27_17/in_8[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/mux_msb_27_17/in_8[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_ln_i/srl_35_42/A[8] 	 (fanout : 2)
 hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_exp_i/u_round/eq_39_44/B 	 (fanout : 1)
 hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[1].u_exp_i/u_round/add_36_61/B 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/add_52_26/A[5] 	 (fanout : 5)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/add_52_26/B[3] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/add_52_26/B[2] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/add_52_26/B[1] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/add_52_26/B[0] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/sub_38_41/A[2] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/sub_38_41/A[1] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/sub_38_41/A[0] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/add0013051/B[4] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/add0013051/B[3] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/add0013051/B[2] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/add0013051/B[1] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/add0013051/B[0] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/mux_msb_32_17/in_0[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/mux_msb_32_17/in_0[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/mux_msb_32_17/in_0[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/mux_msb_32_17/in_1[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/mux_msb_32_17/in_1[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/mux_msb_32_17/in_1[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/mux_msb_32_17/in_2[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/mux_msb_32_17/in_2[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/mux_msb_32_17/in_2[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/mux_msb_32_17/in_3[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/mux_msb_32_17/in_3[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/mux_msb_32_17/in_3[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/mux_msb_32_17/in_4[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/mux_msb_32_17/in_4[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/mux_msb_32_17/in_4[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/mux_msb_32_17/in_5[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/mux_msb_32_17/in_5[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/mux_msb_32_17/in_5[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/mux_msb_32_17/in_6[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/mux_msb_32_17/in_6[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/mux_msb_32_17/in_6[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/mux_msb_32_17/in_7[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/mux_msb_32_17/in_7[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/mux_msb_32_17/in_7[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/mux_msb_32_17/in_8[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/mux_msb_32_17/in_8[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/mux_msb_32_17/in_8[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/mux_38_27/in_1[4] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/mux_38_27/in_1[3] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/mux_38_27/in_1[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/mux_38_27/in_1[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/mux_38_27/in_1[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/add_44_26/B[3] 	 (fanout : 2)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/add_44_26/B[2] 	 (fanout : 2)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/add_44_26/B[1] 	 (fanout : 2)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/add_44_26/B[0] 	 (fanout : 2)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/sub_31_40/A[3] 	 (fanout : 2)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/sub_31_40/B[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/sub_31_40/B[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/sub_31_40/B[0] 	 (fanout : 2)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/gte_34_21/B 	 (fanout : 4)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/sub_41_28/B[1] 	 (fanout : 3)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/sub_41_28/B[0] 	 (fanout : 2)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/minus_37_46/A 	 (fanout : 14)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/mux_msb_27_17/in_0[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/mux_msb_27_17/in_0[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/mux_msb_27_17/in_0[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/mux_msb_27_17/in_1[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/mux_msb_27_17/in_1[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/mux_msb_27_17/in_1[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/mux_msb_27_17/in_2[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/mux_msb_27_17/in_2[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/mux_msb_27_17/in_2[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/mux_msb_27_17/in_3[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/mux_msb_27_17/in_3[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/mux_msb_27_17/in_3[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/mux_msb_27_17/in_4[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/mux_msb_27_17/in_4[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/mux_msb_27_17/in_4[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/mux_msb_27_17/in_5[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/mux_msb_27_17/in_5[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/mux_msb_27_17/in_5[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/mux_msb_27_17/in_6[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/mux_msb_27_17/in_6[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/mux_msb_27_17/in_6[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/mux_msb_27_17/in_7[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/mux_msb_27_17/in_7[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/mux_msb_27_17/in_7[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/mux_msb_27_17/in_8[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/mux_msb_27_17/in_8[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/mux_msb_27_17/in_8[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_ln_i/srl_35_42/A[8] 	 (fanout : 2)
 hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_exp_i/u_round/eq_39_44/B 	 (fanout : 1)
 hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[2].u_exp_i/u_round/add_36_61/B 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/add_52_26/A[5] 	 (fanout : 5)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/add_52_26/B[3] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/add_52_26/B[2] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/add_52_26/B[1] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/add_52_26/B[0] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/sub_38_41/A[2] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/sub_38_41/A[1] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/sub_38_41/A[0] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/add0013051/B[4] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/add0013051/B[3] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/add0013051/B[2] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/add0013051/B[1] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/add0013051/B[0] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/mux_msb_32_17/in_0[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/mux_msb_32_17/in_0[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/mux_msb_32_17/in_0[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/mux_msb_32_17/in_1[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/mux_msb_32_17/in_1[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/mux_msb_32_17/in_1[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/mux_msb_32_17/in_2[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/mux_msb_32_17/in_2[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/mux_msb_32_17/in_2[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/mux_msb_32_17/in_3[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/mux_msb_32_17/in_3[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/mux_msb_32_17/in_3[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/mux_msb_32_17/in_4[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/mux_msb_32_17/in_4[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/mux_msb_32_17/in_4[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/mux_msb_32_17/in_5[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/mux_msb_32_17/in_5[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/mux_msb_32_17/in_5[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/mux_msb_32_17/in_6[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/mux_msb_32_17/in_6[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/mux_msb_32_17/in_6[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/mux_msb_32_17/in_7[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/mux_msb_32_17/in_7[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/mux_msb_32_17/in_7[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/mux_msb_32_17/in_8[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/mux_msb_32_17/in_8[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/mux_msb_32_17/in_8[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/mux_38_27/in_1[4] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/mux_38_27/in_1[3] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/mux_38_27/in_1[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/mux_38_27/in_1[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/mux_38_27/in_1[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/add_44_26/B[3] 	 (fanout : 2)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/add_44_26/B[2] 	 (fanout : 2)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/add_44_26/B[1] 	 (fanout : 2)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/add_44_26/B[0] 	 (fanout : 2)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/sub_31_40/A[3] 	 (fanout : 2)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/sub_31_40/B[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/sub_31_40/B[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/sub_31_40/B[0] 	 (fanout : 2)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/gte_34_21/B 	 (fanout : 4)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/sub_41_28/B[1] 	 (fanout : 3)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/sub_41_28/B[0] 	 (fanout : 2)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/minus_37_46/A 	 (fanout : 14)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/mux_msb_27_17/in_0[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/mux_msb_27_17/in_0[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/mux_msb_27_17/in_0[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/mux_msb_27_17/in_1[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/mux_msb_27_17/in_1[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/mux_msb_27_17/in_1[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/mux_msb_27_17/in_2[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/mux_msb_27_17/in_2[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/mux_msb_27_17/in_2[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/mux_msb_27_17/in_3[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/mux_msb_27_17/in_3[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/mux_msb_27_17/in_3[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/mux_msb_27_17/in_4[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/mux_msb_27_17/in_4[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/mux_msb_27_17/in_4[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/mux_msb_27_17/in_5[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/mux_msb_27_17/in_5[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/mux_msb_27_17/in_5[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/mux_msb_27_17/in_6[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/mux_msb_27_17/in_6[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/mux_msb_27_17/in_6[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/mux_msb_27_17/in_7[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/mux_msb_27_17/in_7[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/mux_msb_27_17/in_7[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/mux_msb_27_17/in_8[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/mux_msb_27_17/in_8[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/mux_msb_27_17/in_8[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_ln_i/srl_35_42/A[8] 	 (fanout : 2)
 hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_exp_i/u_round/eq_39_44/B 	 (fanout : 1)
 hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[3].u_exp_i/u_round/add_36_61/B 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/add_52_26/A[5] 	 (fanout : 5)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/add_52_26/B[3] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/add_52_26/B[2] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/add_52_26/B[1] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/add_52_26/B[0] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/sub_38_41/A[2] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/sub_38_41/A[1] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/sub_38_41/A[0] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/add0013051/B[4] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/add0013051/B[3] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/add0013051/B[2] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/add0013051/B[1] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/add0013051/B[0] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/mux_msb_32_17/in_0[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/mux_msb_32_17/in_0[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/mux_msb_32_17/in_0[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/mux_msb_32_17/in_1[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/mux_msb_32_17/in_1[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/mux_msb_32_17/in_1[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/mux_msb_32_17/in_2[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/mux_msb_32_17/in_2[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/mux_msb_32_17/in_2[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/mux_msb_32_17/in_3[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/mux_msb_32_17/in_3[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/mux_msb_32_17/in_3[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/mux_msb_32_17/in_4[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/mux_msb_32_17/in_4[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/mux_msb_32_17/in_4[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/mux_msb_32_17/in_5[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/mux_msb_32_17/in_5[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/mux_msb_32_17/in_5[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/mux_msb_32_17/in_6[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/mux_msb_32_17/in_6[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/mux_msb_32_17/in_6[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/mux_msb_32_17/in_7[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/mux_msb_32_17/in_7[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/mux_msb_32_17/in_7[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/mux_msb_32_17/in_8[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/mux_msb_32_17/in_8[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/mux_msb_32_17/in_8[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/mux_38_27/in_1[4] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/mux_38_27/in_1[3] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/mux_38_27/in_1[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/mux_38_27/in_1[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/mux_38_27/in_1[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/add_44_26/B[3] 	 (fanout : 2)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/add_44_26/B[2] 	 (fanout : 2)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/add_44_26/B[1] 	 (fanout : 2)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/add_44_26/B[0] 	 (fanout : 2)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/sub_31_40/A[3] 	 (fanout : 2)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/sub_31_40/B[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/sub_31_40/B[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/sub_31_40/B[0] 	 (fanout : 2)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/gte_34_21/B 	 (fanout : 4)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/sub_41_28/B[1] 	 (fanout : 3)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/sub_41_28/B[0] 	 (fanout : 2)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/minus_37_46/A 	 (fanout : 14)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/mux_msb_27_17/in_0[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/mux_msb_27_17/in_0[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/mux_msb_27_17/in_0[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/mux_msb_27_17/in_1[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/mux_msb_27_17/in_1[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/mux_msb_27_17/in_1[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/mux_msb_27_17/in_2[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/mux_msb_27_17/in_2[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/mux_msb_27_17/in_2[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/mux_msb_27_17/in_3[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/mux_msb_27_17/in_3[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/mux_msb_27_17/in_3[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/mux_msb_27_17/in_4[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/mux_msb_27_17/in_4[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/mux_msb_27_17/in_4[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/mux_msb_27_17/in_5[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/mux_msb_27_17/in_5[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/mux_msb_27_17/in_5[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/mux_msb_27_17/in_6[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/mux_msb_27_17/in_6[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/mux_msb_27_17/in_6[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/mux_msb_27_17/in_7[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/mux_msb_27_17/in_7[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/mux_msb_27_17/in_7[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/mux_msb_27_17/in_8[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/mux_msb_27_17/in_8[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/mux_msb_27_17/in_8[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_ln_i/srl_35_42/A[8] 	 (fanout : 2)
 hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_exp_i/u_round/eq_39_44/B 	 (fanout : 1)
 hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[4].u_exp_i/u_round/add_36_61/B 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/add_52_26/A[5] 	 (fanout : 5)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/add_52_26/B[3] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/add_52_26/B[2] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/add_52_26/B[1] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/add_52_26/B[0] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/sub_38_41/A[2] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/sub_38_41/A[1] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/sub_38_41/A[0] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/add0013051/B[4] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/add0013051/B[3] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/add0013051/B[2] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/add0013051/B[1] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/add0013051/B[0] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/mux_msb_32_17/in_0[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/mux_msb_32_17/in_0[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/mux_msb_32_17/in_0[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/mux_msb_32_17/in_1[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/mux_msb_32_17/in_1[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/mux_msb_32_17/in_1[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/mux_msb_32_17/in_2[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/mux_msb_32_17/in_2[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/mux_msb_32_17/in_2[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/mux_msb_32_17/in_3[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/mux_msb_32_17/in_3[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/mux_msb_32_17/in_3[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/mux_msb_32_17/in_4[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/mux_msb_32_17/in_4[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/mux_msb_32_17/in_4[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/mux_msb_32_17/in_5[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/mux_msb_32_17/in_5[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/mux_msb_32_17/in_5[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/mux_msb_32_17/in_6[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/mux_msb_32_17/in_6[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/mux_msb_32_17/in_6[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/mux_msb_32_17/in_7[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/mux_msb_32_17/in_7[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/mux_msb_32_17/in_7[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/mux_msb_32_17/in_8[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/mux_msb_32_17/in_8[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/mux_msb_32_17/in_8[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/mux_38_27/in_1[4] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/mux_38_27/in_1[3] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/mux_38_27/in_1[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/mux_38_27/in_1[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/mux_38_27/in_1[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/add_44_26/B[3] 	 (fanout : 2)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/add_44_26/B[2] 	 (fanout : 2)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/add_44_26/B[1] 	 (fanout : 2)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/add_44_26/B[0] 	 (fanout : 2)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/sub_31_40/A[3] 	 (fanout : 2)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/sub_31_40/B[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/sub_31_40/B[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/sub_31_40/B[0] 	 (fanout : 2)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/gte_34_21/B 	 (fanout : 4)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/sub_41_28/B[1] 	 (fanout : 3)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/sub_41_28/B[0] 	 (fanout : 2)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/minus_37_46/A 	 (fanout : 14)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/mux_msb_27_17/in_0[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/mux_msb_27_17/in_0[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/mux_msb_27_17/in_0[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/mux_msb_27_17/in_1[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/mux_msb_27_17/in_1[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/mux_msb_27_17/in_1[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/mux_msb_27_17/in_2[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/mux_msb_27_17/in_2[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/mux_msb_27_17/in_2[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/mux_msb_27_17/in_3[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/mux_msb_27_17/in_3[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/mux_msb_27_17/in_3[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/mux_msb_27_17/in_4[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/mux_msb_27_17/in_4[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/mux_msb_27_17/in_4[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/mux_msb_27_17/in_5[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/mux_msb_27_17/in_5[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/mux_msb_27_17/in_5[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/mux_msb_27_17/in_6[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/mux_msb_27_17/in_6[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/mux_msb_27_17/in_6[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/mux_msb_27_17/in_7[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/mux_msb_27_17/in_7[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/mux_msb_27_17/in_7[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/mux_msb_27_17/in_8[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/mux_msb_27_17/in_8[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/mux_msb_27_17/in_8[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_ln_i/srl_35_42/A[8] 	 (fanout : 2)
 hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_exp_i/u_round/eq_39_44/B 	 (fanout : 1)
 hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[5].u_exp_i/u_round/add_36_61/B 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/add_52_26/A[5] 	 (fanout : 5)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/add_52_26/B[3] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/add_52_26/B[2] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/add_52_26/B[1] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/add_52_26/B[0] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/sub_38_41/A[2] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/sub_38_41/A[1] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/sub_38_41/A[0] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/add0013051/B[4] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/add0013051/B[3] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/add0013051/B[2] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/add0013051/B[1] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/add0013051/B[0] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/mux_msb_32_17/in_0[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/mux_msb_32_17/in_0[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/mux_msb_32_17/in_0[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/mux_msb_32_17/in_1[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/mux_msb_32_17/in_1[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/mux_msb_32_17/in_1[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/mux_msb_32_17/in_2[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/mux_msb_32_17/in_2[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/mux_msb_32_17/in_2[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/mux_msb_32_17/in_3[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/mux_msb_32_17/in_3[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/mux_msb_32_17/in_3[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/mux_msb_32_17/in_4[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/mux_msb_32_17/in_4[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/mux_msb_32_17/in_4[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/mux_msb_32_17/in_5[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/mux_msb_32_17/in_5[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/mux_msb_32_17/in_5[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/mux_msb_32_17/in_6[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/mux_msb_32_17/in_6[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/mux_msb_32_17/in_6[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/mux_msb_32_17/in_7[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/mux_msb_32_17/in_7[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/mux_msb_32_17/in_7[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/mux_msb_32_17/in_8[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/mux_msb_32_17/in_8[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/mux_msb_32_17/in_8[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/mux_38_27/in_1[4] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/mux_38_27/in_1[3] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/mux_38_27/in_1[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/mux_38_27/in_1[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/mux_38_27/in_1[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/add_44_26/B[3] 	 (fanout : 2)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/add_44_26/B[2] 	 (fanout : 2)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/add_44_26/B[1] 	 (fanout : 2)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/add_44_26/B[0] 	 (fanout : 2)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/sub_31_40/A[3] 	 (fanout : 2)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/sub_31_40/B[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/sub_31_40/B[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/sub_31_40/B[0] 	 (fanout : 2)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/gte_34_21/B 	 (fanout : 4)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/sub_41_28/B[1] 	 (fanout : 3)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/sub_41_28/B[0] 	 (fanout : 2)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/minus_37_46/A 	 (fanout : 14)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/mux_msb_27_17/in_0[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/mux_msb_27_17/in_0[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/mux_msb_27_17/in_0[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/mux_msb_27_17/in_1[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/mux_msb_27_17/in_1[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/mux_msb_27_17/in_1[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/mux_msb_27_17/in_2[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/mux_msb_27_17/in_2[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/mux_msb_27_17/in_2[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/mux_msb_27_17/in_3[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/mux_msb_27_17/in_3[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/mux_msb_27_17/in_3[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/mux_msb_27_17/in_4[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/mux_msb_27_17/in_4[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/mux_msb_27_17/in_4[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/mux_msb_27_17/in_5[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/mux_msb_27_17/in_5[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/mux_msb_27_17/in_5[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/mux_msb_27_17/in_6[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/mux_msb_27_17/in_6[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/mux_msb_27_17/in_6[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/mux_msb_27_17/in_7[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/mux_msb_27_17/in_7[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/mux_msb_27_17/in_7[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/mux_msb_27_17/in_8[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/mux_msb_27_17/in_8[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/mux_msb_27_17/in_8[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_ln_i/srl_35_42/A[8] 	 (fanout : 2)
 hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_exp_i/u_round/eq_39_44/B 	 (fanout : 1)
 hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[6].u_exp_i/u_round/add_36_61/B 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/add_52_26/A[5] 	 (fanout : 5)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/add_52_26/B[3] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/add_52_26/B[2] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/add_52_26/B[1] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/add_52_26/B[0] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/sub_38_41/A[2] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/sub_38_41/A[1] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/sub_38_41/A[0] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/add0013051/B[4] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/add0013051/B[3] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/add0013051/B[2] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/add0013051/B[1] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/add0013051/B[0] 	 (fanout : 2)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/mux_msb_32_17/in_0[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/mux_msb_32_17/in_0[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/mux_msb_32_17/in_0[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/mux_msb_32_17/in_1[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/mux_msb_32_17/in_1[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/mux_msb_32_17/in_1[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/mux_msb_32_17/in_2[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/mux_msb_32_17/in_2[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/mux_msb_32_17/in_2[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/mux_msb_32_17/in_3[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/mux_msb_32_17/in_3[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/mux_msb_32_17/in_3[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/mux_msb_32_17/in_4[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/mux_msb_32_17/in_4[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/mux_msb_32_17/in_4[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/mux_msb_32_17/in_5[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/mux_msb_32_17/in_5[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/mux_msb_32_17/in_5[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/mux_msb_32_17/in_6[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/mux_msb_32_17/in_6[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/mux_msb_32_17/in_6[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/mux_msb_32_17/in_7[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/mux_msb_32_17/in_7[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/mux_msb_32_17/in_7[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/mux_msb_32_17/in_8[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/mux_msb_32_17/in_8[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/mux_msb_32_17/in_8[0] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/mux_38_27/in_1[4] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/mux_38_27/in_1[3] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/mux_38_27/in_1[2] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/mux_38_27/in_1[1] 	 (fanout : 1)
-hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/mux_38_27/in_1[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/add_44_26/B[3] 	 (fanout : 2)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/add_44_26/B[2] 	 (fanout : 2)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/add_44_26/B[1] 	 (fanout : 2)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/add_44_26/B[0] 	 (fanout : 2)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/sub_31_40/A[3] 	 (fanout : 2)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/sub_31_40/B[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/sub_31_40/B[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/sub_31_40/B[0] 	 (fanout : 2)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/gte_34_21/B 	 (fanout : 4)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/sub_41_28/B[1] 	 (fanout : 3)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/sub_41_28/B[0] 	 (fanout : 2)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/minus_37_46/A 	 (fanout : 14)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/mux_msb_27_17/in_0[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/mux_msb_27_17/in_0[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/mux_msb_27_17/in_0[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/mux_msb_27_17/in_1[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/mux_msb_27_17/in_1[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/mux_msb_27_17/in_1[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/mux_msb_27_17/in_2[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/mux_msb_27_17/in_2[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/mux_msb_27_17/in_2[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/mux_msb_27_17/in_3[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/mux_msb_27_17/in_3[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/mux_msb_27_17/in_3[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/mux_msb_27_17/in_4[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/mux_msb_27_17/in_4[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/mux_msb_27_17/in_4[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/mux_msb_27_17/in_5[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/mux_msb_27_17/in_5[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/mux_msb_27_17/in_5[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/mux_msb_27_17/in_6[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/mux_msb_27_17/in_6[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/mux_msb_27_17/in_6[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/mux_msb_27_17/in_7[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/mux_msb_27_17/in_7[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/mux_msb_27_17/in_7[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/mux_msb_27_17/in_8[2] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/mux_msb_27_17/in_8[1] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/mux_msb_27_17/in_8[0] 	 (fanout : 1)
+hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_ln_i/srl_35_42/A[8] 	 (fanout : 2)
 hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_exp_i/u_round/eq_39_44/B 	 (fanout : 1)
 hpin:transformer_core_top/u_datapath/u_tr_array/GEN_LANES[7].u_exp_i/u_round/add_36_61/B 	 (fanout : 2)
 hpin:transformer_core_top/u_datapath/u_mac_engine/mul_118_58_I8/B[8] 	 (fanout : 8)
@@ -3997,7 +4066,7 @@ hpin:transformer_core_top/u_datapath/mux_mac_b_in[0]_237_19/in_5[3] 	 (fanout : 
 hpin:transformer_core_top/u_datapath/mux_mac_b_in[0]_237_19/in_5[2] 	 (fanout : 1)
 hpin:transformer_core_top/u_datapath/mux_mac_b_in[0]_237_19/in_5[1] 	 (fanout : 1)
 hpin:transformer_core_top/u_datapath/mux_mac_b_in[0]_237_19/in_5[0] 	 (fanout : 1)
-Total number of constant hierarchical pins in design 'transformer_core_top' : 3237
+Total number of constant hierarchical pins in design 'transformer_core_top' : 3186
 
 No constant connected ports in design 'transformer_core_top'
 
@@ -4033,8 +4102,8 @@ Unresolved References                        0
 Empty Modules                                0
 Unloaded Port(s)                             0
 Unloaded Sequential Pin(s)                   9
-Unloaded Combinational Pin(s)              533
-Assigns                                    157
+Unloaded Combinational Pin(s)              498
+Assigns                                    100
 Undriven Port(s)                             0
 Undriven Leaf Pin(s)                         0
 Undriven hierarchical pin(s)                 0
@@ -4043,8 +4112,8 @@ Multidriven Leaf Pin(s)                      0
 Multidriven hierarchical Pin(s)              0
 Multidriven unloaded net(s)                  0
 Constant Port(s)                             0
-Constant Leaf Pin(s)                         1
-Constant hierarchical Pin(s)              3237
+Constant Leaf Pin(s)                       213
+Constant hierarchical Pin(s)              3186
 Preserved leaf instance(s)                   0
 Preserved hierarchical instance(s)           0
 Feedthrough Modules(s)                       0
