@@ -190,6 +190,8 @@ module transformer_core_datapath #(
     logic [19:0] y_man_scalar;
 
     tr_hetero_array #(.N(N)) u_tr_array (
+        .clk              (clk),
+        .rst_n            (rst_n),
         .x_vec_in         (tr_vec_in),
         .x_scalar_in      (aligned_sum), // Fed back from the MAC accumulator (ALIGNMENT FIX: Q4.12 -> Qx.8)
         .lane_0_mode      (ctrl_tr_lane0_mode),
@@ -218,6 +220,29 @@ module transformer_core_datapath #(
     assign scalar_recip_8b  = (scalar_mult_raw + SCALAR_ROUND) >> 12; // Cast Q4.12 -> Q4.4
 
     // ========================================================================
+    // STAGE 4.5: MAC Bypass Synchronization Pipeline
+    // ========================================================================
+    // Because the TR array has a 1-cycle pipeline, the raw data bypassing 
+    // the TR array must also be delayed by 1 cycle to arrive at the MAC simultaneously.
+    logic signed [W-1:0] a_mac_pipe [N];
+    logic signed [W-1:0] b_mac_pipe [N];
+    logic signed [W-1:0] a_sub_pipe [N];
+
+    always_ff @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            for (int i = 0; i < N; i++) begin
+                a_mac_pipe[i] <= '0;
+                b_mac_pipe[i] <= '0;
+                a_sub_pipe[i] <= '0;
+            end
+        end else begin
+            a_mac_pipe <= a_delayed;
+            b_mac_pipe <= b_delayed;
+            a_sub_pipe <= a_sub;
+        end
+    end
+
+    // ========================================================================
     // STAGE 5: MAC Engine Datapath Multiplexers
     // ========================================================================
     logic [W-1:0] mac_a_in [N];
@@ -227,15 +252,15 @@ module transformer_core_datapath #(
         for (int i = 0; i < N; i++) begin
             // MUX A
             case (ctrl_mux_a_sel)
-                2'b00: mac_a_in[i] = a_delayed[i];                // Raw Memory X
+                2'b00: mac_a_in[i] = a_mac_pipe[i];                // Raw Memory X
                 2'b01: mac_a_in[i] = y_ea_vec[i];                 // TR Array Anchor
                 2'b10: mac_a_in[i] = (out_vec[i] + ROUND_W) >> W; // Feedback Buffered MAC Output
-                2'b11: mac_a_in[i] = a_sub[i];                    // LN Direct Subtractor Routing
+                2'b11: mac_a_in[i] = a_sub_pipe[i];                    // LN Direct Subtractor Routing
             endcase
 
             // MUX B
             case (ctrl_mux_b_sel)
-                3'b000: mac_b_in[i] = b_delayed[i];                // Raw Memory W
+                3'b000: mac_b_in[i] = b_mac_pipe[i];                // Raw Memory W
                 3'b001: mac_b_in[i] = y_man_vec[i];                // TR Array Mantissa
                 3'b010: mac_b_in[i] = scalar_recip_8b;             // Broadcast Scalar (e.g. 1/Sum)
                 3'b011: begin
@@ -255,9 +280,9 @@ module transformer_core_datapath #(
                         mac_b_in[i] = (inv_S >= MAX_UNS) ? MAX_UNS : inv_S[W-1:0];
                     end
                 end
-                3'b100: mac_b_in[i] = a_sub[i];    // Direct Subtractor Routing
+                3'b100: mac_b_in[i] = a_sub_pipe[i];    // Direct Subtractor Routing
                 3'b101: mac_b_in[i] = ONE_Q_FRAC;  // Hardware 1.0 Constant
-                default: mac_b_in[i] = b_delayed[i];
+                default: mac_b_in[i] = b_mac_pipe[i];
             endcase
         end
     end
