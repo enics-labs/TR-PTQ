@@ -56,6 +56,6 @@ module tr_ln #(
     end
     
     // Assign back out to the parameterized width
-    assign yq = yq_full[OUT_WIDTH-1:0];
+    assign yq = OUT_WIDTH'(yq_full);
 
 endmodule
