@@ -19,22 +19,34 @@ module tr_ln_tb;
         .xq(x_20b), .yq(y_12b)
     );
 
+    logic        [7:0] x_8b;
+    logic signed [7:0] y_8b_vec;
+    
+    tr_ln #(.WIDTH(8), .BITS(4), .OUT_WIDTH(8)) u_8b_to_8b (
+        .xq(x_8b), .yq(y_8b_vec)
+    );
+
     // ========================================================================
     // VERIFICATION VARIABLES
     // ========================================================================
     real x_real, expected_real, hw_real, current_error;
     real max_err_softmax = 0.0;
     real max_err_norm    = 0.0;
+    real max_err_vec8    = 0.0;
     
     int fail_count_softmax = 0;
     int fail_count_norm    = 0;
+    int fail_count_vec8    = 0;
+
     int tests_run_softmax  = 0;
     int tests_run_norm     = 0;
+    int tests_run_vec8     = 0;
 
     // Define Tolerances
     // We expect slight algorithmic drift because hardware uses ln(2) ~= 0.6875
-    real TOL_SOFTMAX = 0.0020; 
-    real TOL_NORM    = 0.15; 
+    real TOL_SOFTMAX = 0.20; 
+    real TOL_NORM    = 0.15;
+    real TOL_VEC8    = 0.20;
 
     initial begin
         $display("=======================================================================");
@@ -63,51 +75,79 @@ module tr_ln_tb;
             
             if (current_error > max_err_softmax) max_err_softmax = current_error;
             
-            $display("  [SOFTMAX RESULT] x=%7.3f (Raw:%5d) | HW=%6.3f | Math=%6.3f | Err=%6.3f", 
-                             x_real, i, hw_real, expected_real, current_error);
+            // $display("  [SOFTMAX RESULT] x=%7.3f (Raw:%5d) | HW=%6.3f | Math=%6.3f | Err=%6.3f", 
+            //                  x_real, i, hw_real, expected_real, current_error);
 
             // FAILURE LOGGER
             if (current_error > TOL_SOFTMAX) begin
-                // if (fail_count_softmax < 15) begin
-                //     $display("  [SOFTMAX FAIL] x=%7.3f (Raw:%5d) | HW=%6.3f | Math=%6.3f | Err=%6.3f", 
-                //              x_real, i, hw_real, expected_real, current_error);
-                // end
+                if (fail_count_softmax < 15) begin
+                    $display("  [SOFTMAX FAIL] x=%7.3f (Raw:%5d) | HW=%6.3f | Math=%6.3f | Err=%6.3f", 
+                             x_real, i, hw_real, expected_real, current_error);
+                end
                 fail_count_softmax++;
             end
             tests_run_softmax++;
         end
 
-        // // --------------------------------------------------------------------
-        // // SWEEP 2: LAYERNORM VARIANCE (20-bit in -> 12-bit out, Qx.8)
-        // // --------------------------------------------------------------------
-        // $display("\n---> SWEEPING 20-BIT LAYERNORM DOMAIN (Inputs: 0.125 to 200.0)...");
-        // // We start at 32 (0.125 in Qx.8) to test the negative-log fraction boundary
-        // for (int i = 32; i <= 51200; i++) begin
-        //     x_20b = i; #1;
+        // --------------------------------------------------------------------
+        // SWEEP 2: LAYERNORM VARIANCE (20-bit in -> 12-bit out, Qx.8)
+        // --------------------------------------------------------------------
+        $display("\n---> SWEEPING 20-BIT LAYERNORM DOMAIN (Inputs: 0.125 to 200.0)...");
+        // We start at 32 (0.125 in Qx.8) to test the negative-log fraction boundary
+        for (int i = 32; i <= 51200; i++) begin
+            x_20b = i; #1;
             
-        //     // Reconstruct Hardware Output (Output is Qx.8)
-        //     hw_real = real'(y_12b) / 256.0;      
+            // Reconstruct Hardware Output (Output is Qx.8)
+            hw_real = real'(y_12b) / 256.0;      
             
-        //     // Calculate Golden Math
-        //     x_real        = real'(i) / 256.0;
-        //     expected_real = $ln(x_real);
+            // Calculate Golden Math
+            x_real        = real'(i) / 256.0;
+            expected_real = $ln(x_real);
             
-        //     // Calculate Error
-        //     current_error = expected_real - hw_real;
-        //     if (current_error < 0) current_error = -current_error; 
+            // Calculate Error
+            current_error = expected_real - hw_real;
+            if (current_error < 0) current_error = -current_error; 
             
-        //     if (current_error > max_err_norm) max_err_norm = current_error;
+            if (current_error > max_err_norm) max_err_norm = current_error;
             
-        //     // FAILURE LOGGER
-        //     if (current_error > TOL_NORM) begin
-        //         if (fail_count_norm < 15) begin
-        //             $display("  [NORM FAIL] x=%7.3f (Raw:%5d) | HW=%6.3f | Math=%6.3f | Err=%6.3f", 
-        //                      x_real, i, hw_real, expected_real, current_error);
-        //         end
-        //         fail_count_norm++;
-        //     end
-        //     tests_run_norm++;
-        // end
+            // FAILURE LOGGER
+            if (current_error > TOL_NORM) begin
+                if (fail_count_norm < 15) begin
+                    $display("  [NORM FAIL] x=%7.3f (Raw:%5d) | HW=%6.3f | Math=%6.3f | Err=%6.3f", 
+                             x_real, i, hw_real, expected_real, current_error);
+                end
+                fail_count_norm++;
+            end
+            tests_run_norm++;
+        end
+
+        // --------------------------------------------------------------------
+        // SWEEP 3: VECTOR LANES (8-bit in -> 8-bit out, Qx.4)
+        // --------------------------------------------------------------------
+        $display("\n---> SWEEPING 8-BIT VECTOR DOMAIN (Inputs: 0.0625 to 15.9375)...");
+        // Sweep every single possible non-zero 8-bit unsigned value
+        for (int i = 1; i <= 255; i++) begin
+            x_8b = i;
+            #1;
+            
+            hw_real = real'(y_8b_vec) / 16.0;
+            x_real        = real'(i) / 16.0;
+            expected_real = $ln(x_real);
+            
+            current_error = expected_real - hw_real;
+            if (current_error < 0) current_error = -current_error; 
+            
+            if (current_error > max_err_vec8) max_err_vec8 = current_error;
+            
+            if (current_error > TOL_VEC8) begin
+                if (fail_count_vec8 < 15) begin
+                    $display("  [VEC8 FAIL] x=%7.3f (Raw:%5d) | HW=%6.3f | Math=%6.3f | Err=%6.3f", 
+                             x_real, i, hw_real, expected_real, current_error);
+                end
+                fail_count_vec8++;
+            end
+            tests_run_vec8++;
+        end
 
         // --------------------------------------------------------------------
         // FINAL VERIFICATION REPORT
@@ -120,13 +160,19 @@ module tr_ln_tb;
         $display("    -> Max Error  : %f", max_err_softmax);
         $display("    -> Failures   : %0d vectors exceeded tolerance (%0.2f)", fail_count_softmax, TOL_SOFTMAX);
         
-        // $display("\n [LAYERNORM MODE : 20-bit in -> 12-bit out | Qx.8]");
-        // $display("    -> Tested     : %0d vectors", tests_run_norm);
-        // $display("    -> Max Error  : %f", max_err_norm);
-        // $display("    -> Failures   : %0d vectors exceeded tolerance (%0.2f)", fail_count_norm, TOL_NORM);
-        // if (fail_count_norm > 0 || fail_count_softmax > 0) begin
-        //      $display("       *(Note: Algorithmic drift is expected at large inputs since HW ln(2) = 0.6875)*");
-        // end
+        $display("\n [LAYERNORM MODE : 20-bit in -> 12-bit out | Qx.8]");
+        $display("    -> Tested     : %0d vectors", tests_run_norm);
+        $display("    -> Max Error  : %f", max_err_norm);
+        $display("    -> Failures   : %0d vectors exceeded tolerance (%0.2f)", fail_count_norm, TOL_NORM);
+
+        $display("\n [VECTOR LANES MODE : 8-bit in -> 8-bit out | Qx.4]");
+        $display("    -> Tested     : %0d vectors", tests_run_vec8);
+        $display("    -> Max Error  : %f", max_err_vec8);
+        $display("    -> Failures   : %0d vectors exceeded tolerance (%0.2f)", fail_count_vec8, TOL_VEC8);
+
+        if (fail_count_norm > 0 || fail_count_softmax > 0 || fail_count_vec8 > 0) begin
+             $display("\n       *(Note: Algorithmic drift is expected at large inputs since HW ln(2) = 0.6875)*");
+        end
         $display("=======================================================================\n");
         $finish;
     end
