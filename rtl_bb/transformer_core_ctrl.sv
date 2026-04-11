@@ -28,118 +28,130 @@ module transformer_core_ctrl import transformer_ctrl_pkg::*; #(
     // ---------------------------------------------------------
     // 1. THE MICROCODE ROM (Combinational Lookup)
     // ---------------------------------------------------------
+    micro_op_t next_uop;
     micro_op_t current_uop;
 
     always_comb begin
-        current_uop = MICRO_OP_IDLE; // Default safe state
+        next_uop = MICRO_OP_IDLE; // Default safe state
 
         case (host_opcode)
             OP_LINEAR_MVM: begin
-                current_uop.mac_clear_acc = 1'b1;
-                current_uop.mac_op_mode   = 2'b00; // SS
+                next_uop.mac_clear_acc = 1'b1;
+                next_uop.mac_op_mode   = 2'b00; // SS
             end
             
             OP_GELU_P1: begin
-                current_uop.mux_tr_vec_sel = 2'b01; 
-                current_uop.mux_a_sel      = 2'b01; 
-                current_uop.mux_b_sel      = 3'b001; 
-                current_uop.mac_elemwise   = 1'b1;
-                current_uop.mac_clear_acc  = 1'b1;
-                current_uop.mac_op_mode    = 2'b10; // UU
+                next_uop.mux_tr_vec_sel = 2'b01; 
+                next_uop.mux_a_sel      = 2'b01; 
+                next_uop.mux_b_sel      = 3'b001; 
+                next_uop.mac_elemwise   = 1'b1;
+                next_uop.mac_clear_acc  = 1'b1;
+                next_uop.mac_op_mode    = 2'b10; // UU
             end
 
             OP_GELU_P2: begin
-                current_uop.mux_tr_vec_sel = 2'b10; // Feedback
-                current_uop.tr_exp_sel     = 1'b1;  // Log mode
-                current_uop.tr_shift_mode  = 2'b01; // Reciprocal
-                current_uop.mux_a_sel      = 2'b01; 
-                current_uop.mux_b_sel      = 3'b001; 
-                current_uop.mac_elemwise   = 1'b1;
-                current_uop.mac_clear_acc  = 1'b1;
-                current_uop.mac_op_mode    = 2'b10; // UU
+                next_uop.mux_tr_vec_sel = 2'b10; // Feedback
+                next_uop.tr_exp_sel     = 1'b1;  // Log mode
+                next_uop.tr_shift_mode  = 2'b01; // Reciprocal
+                next_uop.mux_a_sel      = 2'b01; 
+                next_uop.mux_b_sel      = 3'b001; 
+                next_uop.mac_elemwise   = 1'b1;
+                next_uop.mac_clear_acc  = 1'b1;
+                next_uop.mac_op_mode    = 2'b10; // UU
             end
 
             OP_GELU_P3: begin
-                current_uop.mux_b_sel      = 3'b011; // Sigmoid Trick
-                current_uop.gelu_mode      = 1'b1;  
-                current_uop.mac_elemwise   = 1'b1;
-                current_uop.mac_clear_acc  = 1'b1;
-                current_uop.mac_op_mode    = 2'b01; // SU Mode
+                next_uop.mux_b_sel      = 3'b011; // Sigmoid Trick
+                next_uop.gelu_mode      = 1'b1;  
+                next_uop.mac_elemwise   = 1'b1;
+                next_uop.mac_clear_acc  = 1'b1;
+                next_uop.mac_op_mode    = 2'b01; // SU Mode
             end
             
             OP_SMAX_P1: begin // Summation: e^(x - max) -> out_dot
-                current_uop.mux_tr_vec_sel = 2'b00; // Max-Sub Mode
-                current_uop.tr_exp_sel     = 1'b0;  // Pure Exponential
-                current_uop.tr_lane0_mode  = 1'b0;  // Vector Mode
-                current_uop.tr_shift_mode  = 2'b00; // Bypass
-                current_uop.mux_a_sel      = 2'b01; // TR Anchor
-                current_uop.mux_b_sel      = 3'b001; // TR Mantissa
-                current_uop.mac_elemwise   = 1'b0;  // Dot-Product / Summation Mode!
-                current_uop.mac_clear_acc  = 1'b1;  // Clear sum
-                current_uop.mac_op_mode    = 2'b10; // UU Mode (Exponentials are positive)
-                current_uop.save_sum       = 1'b1;  // Latch the denominator sum
+                next_uop.mux_tr_vec_sel = 2'b00; // Max-Sub Mode
+                next_uop.tr_exp_sel     = 1'b0;  // Pure Exponential
+                next_uop.tr_lane0_mode  = 1'b0;  // Vector Mode
+                next_uop.tr_shift_mode  = 2'b00; // Bypass
+                next_uop.mux_a_sel      = 2'b01; // TR Anchor
+                next_uop.mux_b_sel      = 3'b001; // TR Mantissa
+                next_uop.mac_elemwise   = 1'b0;  // Dot-Product / Summation Mode!
+                next_uop.mac_clear_acc  = 1'b1;  // Clear sum
+                next_uop.mac_op_mode    = 2'b10; // UU Mode (Exponentials are positive)
+                next_uop.save_sum       = 1'b1;  // Latch the denominator sum
             end
 
             OP_SMAX_P2: begin // Buffer: e^(x - max) -> out_vec
-                current_uop.mux_tr_vec_sel = 2'b00; // Max-Sub Mode
-                current_uop.tr_exp_sel     = 1'b0;  // Log Mode
-                current_uop.tr_lane0_mode  = 1'b0;  
-                current_uop.tr_shift_mode  = 2'b00;
-                current_uop.mux_a_sel      = 2'b01; 
-                current_uop.mux_b_sel      = 3'b001; 
-                current_uop.mac_elemwise   = 1'b1;  // ELEMENT-WISE (Save to out_vec)
-                current_uop.mac_clear_acc  = 1'b1;
-                current_uop.mac_op_mode    = 2'b10; // UU Mode
+                next_uop.mux_tr_vec_sel = 2'b00; // Max-Sub Mode
+                next_uop.tr_exp_sel     = 1'b0;  // Log Mode
+                next_uop.tr_lane0_mode  = 1'b0;  
+                next_uop.tr_shift_mode  = 2'b00;
+                next_uop.mux_a_sel      = 2'b01; 
+                next_uop.mux_b_sel      = 3'b001; 
+                next_uop.mac_elemwise   = 1'b1;  // ELEMENT-WISE (Save to out_vec)
+                next_uop.mac_clear_acc  = 1'b1;
+                next_uop.mac_op_mode    = 2'b10; // UU Mode
             end
 
             OP_SMAX_P3: begin // Broadcast Divide: out_vec * (1/out_dot)
-                current_uop.tr_lane0_mode  = 1'b1;  // Scalar Mode
-                current_uop.tr_shift_mode  = 2'b01; // Reciprocal (-x)
-                current_uop.tr_exp_sel     = 1'b1;  // Log Mode
-                current_uop.mux_a_sel      = 2'b10; // Buffered Exponentials (out_vec Pass 1)
-                current_uop.mux_b_sel      = 3'b010; // Broadcast Scalar (1/out_dot)
-                current_uop.mac_elemwise   = 1'b1;  // Element-wise multiply
-                current_uop.mac_clear_acc  = 1'b1;
-                current_uop.mac_op_mode    = 2'b10; // UU Mode (Both are positive)
+                next_uop.tr_lane0_mode  = 1'b1;  // Scalar Mode
+                next_uop.tr_shift_mode  = 2'b01; // Reciprocal (-x)
+                next_uop.tr_exp_sel     = 1'b1;  // Log Mode
+                next_uop.mux_a_sel      = 2'b10; // Buffered Exponentials (out_vec Pass 1)
+                next_uop.mux_b_sel      = 3'b010; // Broadcast Scalar (1/out_dot)
+                next_uop.mac_elemwise   = 1'b1;  // Element-wise multiply
+                next_uop.mac_clear_acc  = 1'b1;
+                next_uop.mac_op_mode    = 2'b10; // UU Mode (Both are positive)
             end
 
             OP_LN_P1: begin // Calculate Mean: Sum(X)
-                current_uop.mux_a_sel      = 2'b00;  // Raw X
-                current_uop.mux_b_sel      = 3'b101; // Multiply by 1.0
-                current_uop.mac_elemwise   = 1'b0;   // Dot Product / Summation
-                current_uop.mac_clear_acc  = 1'b1;
-                current_uop.mac_op_mode    = 2'b00;  // SS Mode
-                current_uop.save_mean      = 1'b1;   // Latch into saved_mean
+                next_uop.mux_a_sel      = 2'b00;  // Raw X
+                next_uop.mux_b_sel      = 3'b101; // Multiply by 1.0
+                next_uop.mac_elemwise   = 1'b0;   // Dot Product / Summation
+                next_uop.mac_clear_acc  = 1'b1;
+                next_uop.mac_op_mode    = 2'b00;  // SS Mode
+                next_uop.save_mean      = 1'b1;   // Latch into saved_mean
             end
 
             OP_LN_P2: begin // Calculate Variance: Sum((X - mu)^2)
-                current_uop.mux_sub_val_sel = 1'b1;  // Subtract Mean
-                current_uop.mux_a_sel      = 2'b11;  // a_sub
-                current_uop.mux_b_sel      = 3'b100; // a_sub
-                current_uop.mac_elemwise   = 1'b0;   // Dot Product / Summation
-                current_uop.mac_clear_acc  = 1'b1;
-                current_uop.mac_op_mode    = 2'b00;  // SS Mode
-                current_uop.save_sum       = 1'b1;   // Latch into saved_sum (for TR Array)
+                next_uop.mux_sub_val_sel = 1'b1;  // Subtract Mean
+                next_uop.mux_a_sel      = 2'b11;  // a_sub
+                next_uop.mux_b_sel      = 3'b100; // a_sub
+                next_uop.mac_elemwise   = 1'b0;   // Dot Product / Summation
+                next_uop.mac_clear_acc  = 1'b1;
+                next_uop.mac_op_mode    = 2'b00;  // SS Mode
+                next_uop.save_sum       = 1'b1;   // Latch into saved_sum (for TR Array)
             end
 
             OP_LN_P3: begin // Final Normalization: (X - mu) * ISD
-                current_uop.mux_sub_val_sel = 1'b1; // Keep Mean subtraction active
-                current_uop.tr_lane0_mode  = 1'b1;   
-                current_uop.tr_shift_mode  = 2'b10;  // ISD Mode (Triggers the Var/N shift!)
-                current_uop.tr_exp_sel     = 1'b1;   
+                next_uop.mux_sub_val_sel = 1'b1; // Keep Mean subtraction active
+                next_uop.tr_lane0_mode  = 1'b1;   
+                next_uop.tr_shift_mode  = 2'b10;  // ISD Mode (Triggers the Var/N shift!)
+                next_uop.tr_exp_sel     = 1'b1;   
 
                 // Read a_sub directly! No buffering required.
-                current_uop.mux_a_sel      = 2'b11;  
-                current_uop.mux_b_sel      = 3'b010; // scalar_recip_8b (Holds ISD)
-                current_uop.mac_elemwise   = 1'b1;   
-                current_uop.mac_clear_acc  = 1'b1;
-                current_uop.mac_op_mode    = 2'b01;  // SU Mode
+                next_uop.mux_a_sel      = 2'b11;  
+                next_uop.mux_b_sel      = 3'b010; // scalar_recip_8b (Holds ISD)
+                next_uop.mac_elemwise   = 1'b1;   
+                next_uop.mac_clear_acc  = 1'b1;
+                next_uop.mac_op_mode    = 2'b01;  // SU Mode
             end
         endcase
     end
+    
+    // ---------------------------------------------------------
+    // 2. THE MICRO-OP PIPELINE REGISTER
+    // ---------------------------------------------------------
+    always_ff @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            current_uop <= '0; // Drives NOPs to datapath on reset
+        end else begin
+            current_uop <= next_uop;
+        end
+    end
 
     // ---------------------------------------------------------
-    // 2. THE SEQUENCER STATE MACHINE
+    // 3. THE SEQUENCER STATE MACHINE
     // ---------------------------------------------------------
     typedef enum logic [2:0] {
         ST_IDLE,
@@ -184,7 +196,7 @@ module transformer_core_ctrl import transformer_ctrl_pkg::*; #(
             ST_LOAD: begin
                 ctrl_bus    = current_uop; 
                 dp_in_valid = 1'b1; // Push data into pipeline
-                wait_cnt_d  = MAX_LATENCY;
+                wait_cnt_d  = MAX_LATENCY + 1; // TODO: MAX_LATENCY + 1
                 state_d     = ST_WAIT_PIPE;
             end
 
