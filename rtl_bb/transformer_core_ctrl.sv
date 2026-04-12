@@ -195,8 +195,8 @@ module transformer_core_ctrl import transformer_ctrl_pkg::*; #(
 
             ST_LOAD: begin
                 ctrl_bus    = current_uop; 
-                dp_in_valid = 1'b1; // Push data into pipeline
-                wait_cnt_d  = MAX_LATENCY + 1; // TODO: MAX_LATENCY + 1
+                dp_in_valid = 1'b1;             // Push data into pipeline
+                wait_cnt_d  = MAX_LATENCY + 2;
                 state_d     = ST_WAIT_PIPE;
             end
 

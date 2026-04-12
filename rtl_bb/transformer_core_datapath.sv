@@ -205,25 +205,9 @@ module transformer_core_datapath #(
     );
 
     // ========================================================================
-    // STAGE 4: Scalar Math Reflector (Broadcast Generator)
+    // STAGE 3.5: Bypass Synchronization Pipeline 1
     // ========================================================================
-    // Since Option A uses a split bus, we manually calculate the single 
-    // scalar reciprocal here and cast it to Q4.4 to broadcast to the MAC Engine.
-    logic [39:0] scalar_mult_raw;
-    logic [19:0] scalar_recip_20b;
-    logic [7:0]  scalar_recip_8b;
-
-    localparam logic [39:0] SCALAR_ROUND = 40'd1 << 11;
-
-    assign scalar_mult_raw  = y_ea_scalar * y_man_scalar;
-    assign scalar_recip_20b = scalar_mult_raw[27:8]; // Restore Q12.8 after mult
-    assign scalar_recip_8b  = (scalar_mult_raw + SCALAR_ROUND) >> 12; // Cast Q4.12 -> Q4.4
-
-    // ========================================================================
-    // STAGE 4.5: MAC Bypass Synchronization Pipeline
-    // ========================================================================
-    // Because the TR array has a 1-cycle pipeline, the raw data bypassing 
-    // the TR array must also be delayed by 1 cycle to arrive at the MAC simultaneously.
+    // Delays raw data by 1 cycle to match the TR Array's internal pipeline.
     logic signed [W-1:0] a_mac_pipe [N];
     logic signed [W-1:0] b_mac_pipe [N];
     logic signed [W-1:0] a_sub_pipe [N];
@@ -243,6 +227,59 @@ module transformer_core_datapath #(
     end
 
     // ========================================================================
+    // STAGE 4: Multiplier Isolation & Bypass Synchronization Pipeline 2
+    // ========================================================================
+    // We register the outputs of the TR Array before they hit the massive 20x20 
+    // multiplier. We also delay the bypass signals a SECOND time to keep sync.
+    logic [7:0]  y_ea_vec_pipe [N];
+    logic [7:0]  y_man_vec_pipe [N];
+    logic [19:0] y_ea_scalar_pipe;
+    logic [19:0] y_man_scalar_pipe;
+
+    logic signed [W-1:0] a_mac_pipe_2 [N];
+    logic signed [W-1:0] b_mac_pipe_2 [N];
+    logic signed [W-1:0] a_sub_pipe_2 [N];
+
+    always_ff @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            for (int i = 0; i < N; i++) begin
+                y_ea_vec_pipe[i]  <= '0;
+                y_man_vec_pipe[i] <= '0;
+                a_mac_pipe_2[i]   <= '0;
+                b_mac_pipe_2[i]   <= '0;
+                a_sub_pipe_2[i]   <= '0;
+            end
+            y_ea_scalar_pipe  <= '0;
+            y_man_scalar_pipe <= '0;
+        end else begin
+            y_ea_vec_pipe     <= y_ea_vec;
+            y_man_vec_pipe    <= y_man_vec;
+            y_ea_scalar_pipe  <= y_ea_scalar;
+            y_man_scalar_pipe <= y_man_scalar;
+            
+            a_mac_pipe_2      <= a_mac_pipe;
+            b_mac_pipe_2      <= b_mac_pipe;
+            a_sub_pipe_2      <= a_sub_pipe;
+        end
+    end
+
+    // ========================================================================
+    // STAGE 4.5: Scalar Math Reflector (Broadcast Generator)
+    // ========================================================================
+    // Since Option A uses a split bus, we manually calculate the single 
+    // scalar reciprocal here and cast it to Q4.4 to broadcast to the MAC Engine.
+    logic [39:0] scalar_mult_raw;
+    logic [19:0] scalar_recip_20b;
+    logic [7:0]  scalar_recip_8b;
+
+    localparam logic [39:0] SCALAR_ROUND = 40'd1 << 11;
+
+    assign scalar_mult_raw  = y_ea_scalar_pipe * y_man_scalar_pipe;
+
+    assign scalar_recip_20b = scalar_mult_raw[27:8]; // Restore Q12.8 after mult
+    assign scalar_recip_8b  = (scalar_mult_raw + SCALAR_ROUND) >> 12; // Cast Q4.12 -> Q4.4
+
+    // ========================================================================
     // STAGE 5: MAC Engine Datapath Multiplexers
     // ========================================================================
     logic [W-1:0] mac_a_in [N];
@@ -252,16 +289,16 @@ module transformer_core_datapath #(
         for (int i = 0; i < N; i++) begin
             // MUX A
             case (ctrl_mux_a_sel)
-                2'b00: mac_a_in[i] = a_mac_pipe[i];                // Raw Memory X
-                2'b01: mac_a_in[i] = y_ea_vec[i];                 // TR Array Anchor
+                2'b00: mac_a_in[i] = a_mac_pipe_2[i];                // Raw Memory X
+                2'b01: mac_a_in[i] = y_ea_vec_pipe[i];                 // TR Array Anchor
                 2'b10: mac_a_in[i] = (out_vec[i] + ROUND_W) >> W; // Feedback Buffered MAC Output
-                2'b11: mac_a_in[i] = a_sub_pipe[i];                    // LN Direct Subtractor Routing
+                2'b11: mac_a_in[i] = a_sub_pipe_2[i];                    // LN Direct Subtractor Routing
             endcase
 
             // MUX B
             case (ctrl_mux_b_sel)
-                3'b000: mac_b_in[i] = b_mac_pipe[i];                // Raw Memory W
-                3'b001: mac_b_in[i] = y_man_vec[i];                // TR Array Mantissa
+                3'b000: mac_b_in[i] = b_mac_pipe_2[i];                // Raw Memory W
+                3'b001: mac_b_in[i] = y_man_vec_pipe[i];                // TR Array Mantissa
                 3'b010: mac_b_in[i] = scalar_recip_8b;             // Broadcast Scalar (e.g. 1/Sum)
                 3'b011: begin
                     // Shift out the fractional bits to get Q0.W precision, adding half-bit for rounding
@@ -272,7 +309,7 @@ module transformer_core_datapath #(
                         logic [W+1:0] sigmoid;
 
                         // Symmetry Trick: 1.0 - sigma(-x)
-                        sigmoid = (a_delayed[i][W-1]) ? (ONE_Q_MAX - inv_S) : inv_S;
+                        sigmoid = (a_mac_pipe_2[i][W-1]) ? (ONE_Q_MAX - inv_S) : inv_S;
                         
                         // Saturate and pass full unsigned precision to the SU MAC
                         mac_b_in[i] = (sigmoid >= MAX_UNS) ? MAX_UNS : sigmoid[W-1:0];
@@ -280,9 +317,9 @@ module transformer_core_datapath #(
                         mac_b_in[i] = (inv_S >= MAX_UNS) ? MAX_UNS : inv_S[W-1:0];
                     end
                 end
-                3'b100: mac_b_in[i] = a_sub_pipe[i];    // Direct Subtractor Routing
-                3'b101: mac_b_in[i] = ONE_Q_FRAC;  // Hardware 1.0 Constant
-                default: mac_b_in[i] = b_mac_pipe[i];
+                3'b100: mac_b_in[i] = a_sub_pipe_2[i];  // Direct Subtractor Routing
+                3'b101: mac_b_in[i] = ONE_Q_FRAC;       // Hardware 1.0 Constant
+                default: mac_b_in[i] = b_mac_pipe_2[i];
             endcase
         end
     end
