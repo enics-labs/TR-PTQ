@@ -77,6 +77,15 @@ module transformer_core_datapath #(
     // Delay incoming memory vectors to match the Max Tree latency
     logic signed [W-1:0] a_d [MAX_LATENCY+1][N];
     logic signed [W-1:0] b_d [MAX_LATENCY+1][N];
+    logic signed [W-1:0] a_alpha_d [MAX_LATENCY+1][N];
+
+    logic signed [W-1:0] a_alpha_raw [N];
+    alpha_stabilizer #(
+        .N(N), .W(W)
+    ) u_alpha_stab (
+        .in_vec(a_d[0]), // Compute using the Stage 0 register
+        .out_vec(a_alpha_raw)
+    );
 
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
@@ -84,17 +93,29 @@ module transformer_core_datapath #(
                 for (int i = 0; i < N; i++) begin
                     a_d[s][i] <= '0;
                     b_d[s][i] <= '0;
+                    a_alpha_d[s][i] <= '0;
                 end
             end
         end else begin
+            // Stage 0: Latch inputs from the outside world
             for (int i = 0; i < N; i++) begin
                 a_d[0][i] <= a[i];
                 b_d[0][i] <= b[i];
             end
-            for (int s = 1; s <= MAX_LATENCY; s++) begin
+
+            // Stage 1: Shift memory inputs AND latch the Alpha calculation
+            for (int i = 0; i < N; i++) begin
+                a_d[1][i] <= a_d[0][i];
+                b_d[1][i] <= b_d[0][i];
+                a_alpha_d[1][i] <= a_alpha_raw[i]; 
+            end
+
+            // Stage 2 to MAX: Standard shift register
+            for (int s = 2; s <= MAX_LATENCY; s++) begin
                 for (int i = 0; i < N; i++) begin
                     a_d[s][i] <= a_d[s-1][i];
                     b_d[s][i] <= b_d[s-1][i];
+                    a_alpha_d[s][i] <= a_alpha_d[s-1][i];
                 end
             end
         end
@@ -102,14 +123,16 @@ module transformer_core_datapath #(
 
     wire signed [W-1:0] a_delayed [N];
     wire signed [W-1:0] b_delayed [N];
+    wire signed [W-1:0] a_alpha_delayed [N];
+
     assign a_delayed = a_d[MAX_LATENCY];
     assign b_delayed = b_d[MAX_LATENCY];
+    assign a_alpha_delayed = a_alpha_d[MAX_LATENCY];
 
     // ========================================================================
     // STAGE 2: Max Subtraction & TR Input Routing
     // ========================================================================
     logic signed [W-1:0] a_sub [N];
-    logic signed [W-1:0] a_alpha [N];
     logic signed [W-1:0] a_feedback [N]; // Feed from MAC feedback
     logic signed [W-1:0] tr_vec_in [N];
 
@@ -129,15 +152,6 @@ module transformer_core_datapath #(
         .out_data(a_sub)
     );
 
-    // GELU Scaling path
-    alpha_stabilizer #(
-        .N(N), 
-        .W(W)
-    ) u_alpha_stab (
-        .in_vec(a_delayed), 
-        .out_vec(a_alpha)
-    );
-
     // Feedback Conversion: Convert 32-bit MAC output to 8-bit Q4.4 for TR Array
     always_comb begin
         for (int i = 0; i < N; i++) begin
@@ -153,9 +167,9 @@ module transformer_core_datapath #(
         for (int i = 0; i < N; i++) begin
             case (ctrl_mux_tr_vec_sel) // Now a 2-bit control signal
                 2'b00: tr_vec_in[i] = a_sub[i];      // SoftMax / LN Max-Sub
-                2'b01: tr_vec_in[i] = a_alpha[i];    // GELU Pass 1 (EXP)
+                2'b01: tr_vec_in[i] = a_alpha_delayed[i];    // GELU Pass 1 (EXP)
                 2'b10: tr_vec_in[i] = a_feedback[i]; // GELU Pass 2 (Reciprocal)
-                default: tr_vec_in[i] = a_alpha[i];
+                default: tr_vec_in[i] = a_alpha_delayed[i];
             endcase
         end
     end
