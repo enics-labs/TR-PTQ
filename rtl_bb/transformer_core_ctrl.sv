@@ -183,7 +183,6 @@ module transformer_core_ctrl import transformer_ctrl_pkg::*; #(
         
         dp_in_valid     = 1'b0;
         dp_mac_in_valid = 1'b0;
-        ctrl_bus        = MICRO_OP_IDLE;
 
         case (state_q)
             ST_IDLE: begin
@@ -194,14 +193,12 @@ module transformer_core_ctrl import transformer_ctrl_pkg::*; #(
             end
 
             ST_LOAD: begin
-                ctrl_bus    = current_uop; 
                 dp_in_valid = 1'b1;             // Push data into pipeline
                 wait_cnt_d  = MAX_LATENCY + 2;
                 state_d     = ST_WAIT_PIPE;
             end
 
             ST_WAIT_PIPE: begin
-                ctrl_bus = current_uop; // Hold control signals stable
                 dp_in_valid = 1'b1;
 
                 if (wait_cnt_q == 0) begin
@@ -212,14 +209,12 @@ module transformer_core_ctrl import transformer_ctrl_pkg::*; #(
             end
 
             ST_PULSE_MAC: begin
-                ctrl_bus        = current_uop;
                 dp_mac_in_valid = 1'b1; // Trigger the multiplier
                 wait_cnt_d      = 4'd3; // Wait for MAC to settle + feedback routing
                 state_d         = ST_WAIT_MAC;
             end
 
             ST_WAIT_MAC: begin
-                ctrl_bus = current_uop; 
                 if (wait_cnt_q == 0) begin
                     host_done_pulse = 1'b1; // Tell software we finished this pass!
                     state_d         = ST_IDLE;
@@ -229,5 +224,7 @@ module transformer_core_ctrl import transformer_ctrl_pkg::*; #(
             end
         endcase
     end
+
+    assign ctrl_bus = current_uop;
 
 endmodule
