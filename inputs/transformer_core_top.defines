@@ -18,7 +18,7 @@ set design(CLK_NAME) clk
     set design(clock_list) [list $design(CLK_NAME)]
 set design(CLK_PORT) clk
     set design(clock_port_list) [list $design(CLK_PORT)]
-set design(CLK_PERIOD) 3.0
+set design(CLK_PERIOD) 3.3
     set design(clock_period_list) [list $design(CLK_PERIOD)]
 
 # Reset
