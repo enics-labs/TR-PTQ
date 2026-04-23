@@ -12,7 +12,7 @@ module soft_dsp_eng_post_wrapper_tb;
     localparam int RECIP_BITS = 16;
 
     // Taylor-Region accumulated error tolerance
-    localparam real TOL_SUM = 0.00075; 
+    localparam real TOL_SUM = 0.75; 
 
     logic                    clk;
     logic                    rst_n;

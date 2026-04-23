@@ -1,8 +1,6 @@
-// Generic SystemVerilog file list for simulating soft_dsp_eng_post_wrapper_tb.
-// Usage examples:
-//   iverilog -g2012 -o simv -f tb/soft_dsp_eng_post_wrapper_tb.f
-//   vcs -sverilog -f tb/soft_dsp_eng_post_wrapper_tb.f
-//   verilator --sv --binary -f tb/soft_dsp_eng_post_wrapper_tb.f
+// Usage example:
+// cd tr-vit/workspace
+// xrun -f ../tb_cpy/soft_dsp_eng_post_wrapper_tb.f
 
 // global config
 -f ../scripts/xrun_config.f
@@ -12,8 +10,8 @@
 ../rtl_cpy/tr_exp/q4_4_round_neg.sv
 ../rtl_cpy/tr_exp/q4_4_quadratic_divider.sv
 
-../rtl_cpy/online_sum/piped_max.sv
-../rtl_cpy/online_sum/max_sub.sv
+../rtl_cpy/piped_max/piped_max.sv
+../rtl_cpy/max_sub/max_sub.sv
 
 ../rtl_cpy/vec_mul/vec_mul.sv
 
