@@ -1,3 +1,5 @@
+`timescale 1ns/1ps
+
 module piped_max #(
     parameter int NUM_INPUTS = 8,  
     parameter int DATA_WIDTH = 8  

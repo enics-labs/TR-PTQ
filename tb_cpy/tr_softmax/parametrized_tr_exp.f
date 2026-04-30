@@ -6,4 +6,4 @@
 
 ../rtl_cpy/tr_exp/parametrized_tr_exp.sv 
 
-../tb_cpy/parametrized_tr_exp_tb.sv 
+../tb_cpy/tr_softmax/parametrized_tr_exp_tb.sv 

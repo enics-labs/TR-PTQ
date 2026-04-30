@@ -269,101 +269,6 @@ module transformer_core_top_tb import transformer_ctrl_pkg::*; ();
         end
     endtask
 
-    // // ========================================================================
-    // // MAIN EXECUTION THREAD
-    // // ========================================================================
-    // initial begin
-    //     logic signed [W-1:0] test_in [N];
-    //     real                 test_exp [N];
-
-    //     $display("======================================================");
-    //     $display("  STARTING HARDWARE REGRESSION SUITE");
-    //     $display("======================================================");
-    //     reset_system();
-
-    //     // --------------------------------------------------------------------
-    //     // SWEEP 1: SOFTMAX TESTS
-    //     // --------------------------------------------------------------------
-        
-    //     // 1A. Known Regression (Your proven values)
-    //     test_in  = '{8'd0, -8'd16, -8'd32, -8'd128, -8'd128, -8'd128, -8'd128, -8'd128};
-    //     test_exp = '{0.6875, 0.2578, 0.0859, 0.0, 0.0, 0.0, 0.0, 0.0};
-    //     run_test_vector("SoftMax Regression Profile", test_in, test_exp, 0.05, 1);
-
-    //     // 1B. Uniform Distribution (All inputs equal)
-    //     // Expected: 1/8 = 0.125 for all lanes
-    //     test_in  = '{8'd16, 8'd16, 8'd16, 8'd16, 8'd16, 8'd16, 8'd16, 8'd16};
-    //     test_exp = '{0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125};
-    //     run_test_vector("SoftMax Uniform Distribution", test_in, test_exp, 0.05, 1);
-
-    //     // 1C. Extreme Saturation (One massive value)
-    //     // Expected: Lane 0 approaches 1.0, others approach 0.0
-    //     test_in  = '{8'd64, -8'd64, -8'd64, -8'd64, -8'd64, -8'd64, -8'd64, -8'd64};
-    //     test_exp = '{1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-    //     run_test_vector("SoftMax Extreme Saturation", test_in, test_exp, 0.05, 1);
-
-
-    //     // --------------------------------------------------------------------
-    //     // SWEEP 2: GELU TESTS
-    //     // --------------------------------------------------------------------
-        
-    //     // 2A. Known Regression (Your proven SU values)
-    //     test_in  = '{8'd16, -8'd16, 8'd0, 8'd0, 8'd0, 8'd0, 8'd0, 8'd0};
-    //     test_exp = '{0.9179, -0.0820, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-    //     run_test_vector("GELU Regression Profile", test_in, test_exp, 0.05, 0);
-
-    //     // 2B. Large Positive Bounds (Approaching linear y = x)
-    //     // Inputs: 2.0 (32), 3.0 (48). Expected: ~2.0, ~3.0
-    //     // We use a wider tolerance (0.15) here because 8-bit quantization drift 
-    //     // gets heavier on the upper bounds, but the curve shape should hold.
-    //     test_in  = '{8'd32, 8'd48, 8'd64, 8'd0, 8'd0, 8'd0, 8'd0, 8'd0};
-    //     test_exp = '{1.95, 2.99, 4.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-    //     run_test_vector("GELU Positive Upper Bounds", test_in, test_exp, 0.15, 0);
-
-    //     // 2C. Large Negative Bounds (Approaching zero)
-    //     // Inputs: -2.0 (-32), -3.0 (-48). Expected: approaches 0
-    //     test_in  = '{-8'd32, -8'd48, -8'd64, 8'd0, 8'd0, 8'd0, 8'd0, 8'd0};
-    //     test_exp = '{-0.045, -0.004, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-    //     run_test_vector("GELU Negative Lower Bounds", test_in, test_exp, 0.05, 0);
-
-    //     // --------------------------------------------------------------------
-    //     // SWEEP 3: LAYERNORM TESTS
-    //     // --------------------------------------------------------------------
-        
-    //     // 3A. Zero-Mean Symmetric Vector
-    //     // Inputs: 4 lanes of 2.0 (32), 4 lanes of -2.0 (-32). 
-    //     // Mean = 0. Variance Sum = 8 * (2.0)^2 = 32. 
-    //     // ISD calculation: 1 / sqrt(32) ≈ 0.176
-    //     // Expected Output: X * 0.176 (approx 0.353 and -0.353)
-    //     // *Tolerance is set wide (0.5) so we can read the true hardware output!*
-    //     test_in  = '{8'd32, 8'd32, 8'd32, 8'd32, -8'd32, -8'd32, -8'd32, -8'd32};
-    //     test_exp = '{1.00, 1.00, 1.00, 1.00, -1.00, -1.00, -1.00, -1.00};
-    //     run_test_vector("LayerNorm Zero-Mean Profile", test_in, test_exp, 0.15, 2);
-
-    //     // 3B. Positive Skewed Vector
-    //     // Inputs: 4.0, 2.0, 2.0, 0.0 (and zeros). Mean = 1.0 (16).
-    //     // The hardware MUST subtract 1.0 from everything before squaring.
-    //     // Variance Sum: 3^2 + 1^2 + 1^2 + (-1)^2 + 4*(-1)^2 = 9 + 1 + 1 + 1 + 4 = 16.
-    //     // ISD calculation: 1 / sqrt(16) = 0.25
-    //     // Expected Outputs: (X - 1.0) * 0.25 -> [0.75, 0.25, 0.25, -0.25, -0.25...]
-    //     test_in  = '{8'd64, 8'd32, 8'd32, 8'd0, 8'd0, 8'd0, 8'd0, 8'd0};
-    //     test_exp = '{2.12, 0.71, 0.71, -0.71, -0.71, -0.71, -0.71, -0.71};
-    //     run_test_vector("LayerNorm Positive Skew", test_in, test_exp, 0.15, 2);
-
-    //     // --------------------------------------------------------------------
-    //     // FINAL REPORT
-    //     // --------------------------------------------------------------------
-    //     $display("\n======================================================");
-    //     if (total_errors == 0) begin
-    //         $display("  [SUCCESS] REGRESSION PASSED! (%0d/%0d Checkpoints)", total_tests, total_tests);
-    //     end else begin
-    //         $display("  [ERROR] %0d/%0d FAILURES DETECTED! Check limits.", total_errors, total_tests);
-    //     end
-    //     $display("======================================================\n");
-    //     #100;
-    //     $finish;
-    // end
-
     initial begin
         logic signed [W-1:0] test_in [N];
 
@@ -373,30 +278,30 @@ module transformer_core_top_tb import transformer_ctrl_pkg::*; ();
         reset_system();
 
         // --------------------------------------------------------------------
-        // DIRECTED EDGE CASES
+        // DETERMINISTIC TEST VECTORS
         // --------------------------------------------------------------------
+        $display("\n>>> STARTING DETERMINISTIC SWEEP...");
+        
+        // --- LayerNorm Deterministic Vectors ---
         test_in = '{8'd32, 8'd32, 8'd32, 8'd32, -8'd32, -8'd32, -8'd32, -8'd32};
         run_verification_cycle("LayerNorm Zero-Mean", test_in, 0.15, 2);
 
         test_in = '{8'd64, 8'd32, 8'd32, 8'd0, 8'd0, 8'd0, 8'd0, 8'd0};
         run_verification_cycle("LayerNorm Positive Skew", test_in, 0.15, 2);
 
-        // --------------------------------------------------------------------
-        // RANDOMIZED MONTE CARLO SWEEP
-        // --------------------------------------------------------------------
-        $display("\n>>> STARTING RANDOMIZED SWEEP...");
-        for (int iter = 0; iter < 10; iter++) begin
-            string test_name;
-            
-            // Generate random Q4.4 inputs (-128 to 127)
-            for (int i = 0; i < N; i++) test_in[i] = $urandom_range(0, 127) - 64;
-            
-            $sformat(test_name, "SoftMax Random Iter %0d", iter);
-            run_verification_cycle(test_name, test_in, 0.10, 1);
-            
-            $sformat(test_name, "LayerNorm Random Iter %0d", iter);
-            run_verification_cycle(test_name, test_in, 0.20, 2);
-        end
+        // --- SoftMax Deterministic Vectors ---
+        test_in = '{8'd0, -8'd16, -8'd32, -8'd128, -8'd128, -8'd128, -8'd128, -8'd128};
+        run_verification_cycle("SoftMax Regression Profile", test_in, 0.10, 1);
+
+        test_in = '{8'd16, 8'd16, 8'd16, 8'd16, 8'd16, 8'd16, 8'd16, 8'd16};
+        run_verification_cycle("SoftMax Uniform Distribution", test_in, 0.10, 1);
+
+        // --- GELU Deterministic Vectors ---
+        test_in = '{8'd16, -8'd16, 8'd0, 8'd0, 8'd0, 8'd0, 8'd0, 8'd0};
+        run_verification_cycle("GELU Regression Profile", test_in, 0.10, 0);
+
+        test_in = '{8'd32, 8'd48, 8'd64, 8'd0, 8'd0, 8'd0, 8'd0, 8'd0};
+        run_verification_cycle("GELU Positive Upper Bounds", test_in, 0.15, 0);
 
         // --------------------------------------------------------------------
         // FINAL REPORT

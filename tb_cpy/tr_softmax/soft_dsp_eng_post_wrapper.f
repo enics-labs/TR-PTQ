@@ -21,4 +21,4 @@
 
 ../rtl_cpy/soft_dsp_eng_post_wrapper.sv
 
-../tb_cpy/soft_dsp_eng_post_wrapper_tb.sv
+../tb_cpy/tr_softmax/soft_dsp_eng_post_wrapper_tb.sv
