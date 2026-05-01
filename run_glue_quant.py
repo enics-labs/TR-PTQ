@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Generic GLUE quantized BERT runner for MRPC and CoLA."""
+"""Generic GLUE quantized BERT runner for MRPC, CoLA, RTE, SST-2, QQP, MNLI, and QNLI."""
 
 import os
 import sys
@@ -82,6 +82,18 @@ def _should_calibrate(q_module_list):
         module_class in q_module_list
         for module_class in (QLayerNorm, IntSoftmaxTS, QuantizedLinear, QuantizedMatmul)
     )
+
+
+def q_module_names(q_module_list):
+    return [module_class.__name__ for module_class in q_module_list]
+
+
+def quantized_module_paths(model):
+    return [
+        {"path": name, "type": type(module).__name__}
+        for name, module in model.named_modules()
+        if getattr(module, "quant", False) is True
+    ]
 
 
 def calibrate_model(model, task, tokenizer, q_module_list, config, device):
@@ -184,7 +196,7 @@ def evaluate_model(model, task, tokenizer, config, device):
     max_len = evaluation_config.get("max_len", 128)
     num_val_examples = evaluation_config.get("num_val_examples", task.default_num_val_examples)
 
-    dataset = _load_split(task, "validation", shuffle_seed=400)
+    dataset = _load_split(task, task.validation_split, shuffle_seed=400)
     streamer = dataset.iter(batch_size=batch_size)
     metric = evaluate.load(task.metric_name, task.metric_config)
 
@@ -245,6 +257,7 @@ def main():
     model.to(device)
 
     q_module_list = resolve_q_module_list(config.get("q_module_list", ["QLayerNorm"]))
+    resolved_q_module_names = q_module_names(q_module_list)
     model.set_q_module_list(q_module_list)
     model.set_quant()
 
@@ -256,15 +269,19 @@ def main():
     print(f"Final {task.primary_metric}: {primary_metric_value}")
     print("Final Loss:", average_loss)
 
+    output_config = dict(config)
+    output_config["q_module_list"] = resolved_q_module_names
+
     result_path = save_experiment_result(
         accuracy=primary_metric_value,
         loss=average_loss,
-        configuration=config,
-        quantized=config.get("q_module_list", []),
+        configuration=output_config,
+        quantized=resolved_q_module_names,
         output_dir=PROJECT_DIR / "output",
         extra={
             "task_name": task.name,
             "model_name": model_name,
+            "quantized_module_paths": quantized_module_paths(model),
             "metrics": metrics,
             "primary_metric_name": task.primary_metric,
             "primary_metric_value": primary_metric_value,

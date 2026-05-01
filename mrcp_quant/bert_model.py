@@ -43,10 +43,13 @@ DEFAULT_QUANT_PARAMS = {
     "nof_bits_linear2": 8,
     "nof_bits_gelu": 8,
     "lut_size_gelu": 16,
+    "split_table_gelu": -1,
     "nof_bits_softmax": 8,
     "lut_size_softmax": 7,
+    "split_table_softmax": 0,
     "nof_bits_lnorm1": 12,
     "nof_bits_lnorm2": 12,
+    "split_table_lnorm": -1,
     "nof_bits_matmul1": 8,
     "nof_bits_matmul2": 8,
 }
@@ -199,6 +202,7 @@ class CustomBertSelfOutput(QauntParams):
         self.LayerNorm = QLayerNorm(config.hidden_size,
                                     in1_bits=self.nof_bits_lnorm1,
                                     in2_bits=self.nof_bits_lnorm2,
+                                    split_table=self.split_table_lnorm,
                                     eps=config.layer_norm_eps,
                                     quant=self.quant)
         self.dropout = nn.Dropout(config.hidden_dropout_prob)
@@ -249,6 +253,7 @@ class CustomBertSelfAttention(QauntParams):
 
         self.sf = IntSoftmaxTS(nof_bits=self.nof_bits_softmax,
                                LUT_SIZE=self.lut_size_softmax,
+                               split_table=self.split_table_softmax,
                                dim=-1,
                                quant=self.quant)
 
@@ -389,6 +394,7 @@ class CustomBertIntermediate(QauntParams):
             self.intermediate_act_fn = IntGeluTS(quant=self.quant,
                                                 LUT_SIZE=self.lut_size_gelu,
                                                 nof_bits=self.nof_bits_gelu,
+                                                split_table=self.split_table_gelu,
                                                 hidden_act=config.hidden_act)
         else:
             self.intermediate_act_fn = config.hidden_act
@@ -413,6 +419,7 @@ class CustomBertOutput(QauntParams):
         self.LayerNorm = QLayerNorm(config.hidden_size,
                                     in1_bits=self.nof_bits_lnorm1,
                                     in2_bits=self.nof_bits_lnorm2,
+                                    split_table=self.split_table_lnorm,
                                     eps=config.layer_norm_eps,
                                     quant=self.quant)
 
@@ -570,6 +577,7 @@ class CustomBertEmbeddings(QauntParams):
         self.LayerNorm = QLayerNorm(config.hidden_size,
                                     in1_bits=self.nof_bits_lnorm1,
                                     in2_bits=self.nof_bits_lnorm2,
+                                    split_table=self.split_table_lnorm,
                                     eps=config.layer_norm_eps,
                                     quant=self.quant)
 
@@ -757,6 +765,7 @@ class CustomBertPredictionHeadTransform(QauntParams):
         self.LayerNorm = QLayerNorm(config.hidden_size,
                                     in1_bits=self.nof_bits_lnorm1,
                                     in2_bits=self.nof_bits_lnorm2,
+                                    split_table=self.split_table_lnorm,
                                     eps=config.layer_norm_eps,
                                     quant=self.quant)
 

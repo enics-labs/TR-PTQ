@@ -924,13 +924,23 @@ print("Final F1:", f1_res["f1"])
 average_loss = sum(losses) / len(losses) if losses else None
 print("Final Loss:", average_loss)
 
+resolved_q_module_names = [module_class.__name__ for module_class in q_module_list]
+output_config = dict(experiment_config)
+output_config["q_module_list"] = resolved_q_module_names
+quantized_module_paths = [
+    {"path": name, "type": type(module).__name__}
+    for name, module in model.named_modules()
+    if getattr(module, "quant", False) is True
+]
+
 result_path = save_experiment_result(
     accuracy=acc_res["accuracy"],
     loss=average_loss,
-    configuration=experiment_config,
-    quantized=experiment_config.get("q_module_list", []),
+    configuration=output_config,
+    quantized=resolved_q_module_names,
     output_dir=PROJECT_DIR / "output",
     extra={
+        "quantized_module_paths": quantized_module_paths,
         "metrics": {
             "accuracy": acc_res["accuracy"],
             "f1": f1_res["f1"],

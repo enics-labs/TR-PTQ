@@ -11,10 +11,13 @@
       "nof_bits_linear2": 8,
       "nof_bits_gelu": 8,
       "lut_size_gelu": 16,
+      "split_table_gelu": 0,
       "nof_bits_softmax": 8,
       "lut_size_softmax": 7,
+      "split_table_softmax": 0,
       "nof_bits_lnorm1": 12,
       "nof_bits_lnorm2": 12,
+      "split_table_lnorm": 0,
       "nof_bits_matmul1": 8,
       "nof_bits_matmul2": 8
     },

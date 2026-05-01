@@ -1,8 +1,8 @@
 {
-  "task_name": "cola",
-  "model_name": "geckos/bert-base-uncased-finetuned-glue-cola",
+  "task_name": "mnli",
+  "model_name": "ishan/bert-base-uncased-mnli",
   "q_module_list": [
-    "IntGeluTS"
+    "IntGeluTS", "IntSoftmaxTS", "QLayerNorm", "QuantizedLinear", "QuantizedMatmul", "qHadamardProd"
   ],
   "quantization": {
     "defaults": {
@@ -26,9 +26,12 @@
   "calibration": {
     "num_samples": 32
   },
+  "scale_optimization": {
+    "num_samples": 30
+  },
   "evaluation": {
     "batch_size": 16,
     "max_len": 128,
-    "num_val_examples": 1043
+    "num_val_examples": 9815
   }
 }

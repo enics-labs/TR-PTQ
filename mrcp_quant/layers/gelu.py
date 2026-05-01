@@ -19,6 +19,7 @@ class IntGeluTS(nn.Module):
                  hidden_act='gelu',
                  eps=1e-5,
                  gelu_scale=1.702,
+                 split_table=-1,
                  is_opt_scale=False,
                  is_calibrate=False,
                  ts_ln=new_ln,
@@ -31,6 +32,7 @@ class IntGeluTS(nn.Module):
         self.is_opt_scale = is_opt_scale
         self.is_weights_quantized = True
         self.gelu_scale = gelu_scale
+        self.split_table = split_table
         self.ts_ln = ts_ln
         self.int_exp_scaled = int_exp_scaled
         self.eps = eps
@@ -87,6 +89,7 @@ class IntGeluTS(nn.Module):
                               output_bits=output_bits,
                               LUT_SIZE=LUT_SIZE,
                               exp_lut=[],
+                              split_table=self.split_table,
                               iterations=0)
                               # iterations=iterations)
 
@@ -96,7 +99,8 @@ class IntGeluTS(nn.Module):
                               output_bits=output_bits,
                               LUT_SIZE=LUT_SIZE,
                               exp_lut=[],
-                              iterations=iterations)
+                              split_table=self.split_table,
+                              iterations=0)
 
         exp_int_sum = exp_int + exp_zero
 
@@ -129,6 +133,7 @@ class IntGeluTS(nn.Module):
                                     output_bits=self.output_bits,
                                     LUT_SIZE=self.LUT_SIZE,
                                     exp_lut=[],
+                                    split_table=self.split_table,
                                     iterations=self.iterations)
 
         q_sigmoid = ln_mul * exp_int

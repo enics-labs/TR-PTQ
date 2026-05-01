@@ -113,6 +113,8 @@ def _apply_quant_params_to_module(module, params):
         _set_observer_bits(getattr(module, "w_obs", None), params["nof_bits_lnorm2"])
         if hasattr(module, "in2_bits"):
             module.in2_bits = params["nof_bits_lnorm2"]
+    if is_layernorm and "split_table_lnorm" in params:
+        module.split_table = params["split_table_lnorm"]
 
     if is_gelu and "nof_bits_gelu" in params:
         module.nof_bits = params["nof_bits_gelu"]
@@ -121,11 +123,18 @@ def _apply_quant_params_to_module(module, params):
         _set_observer_bits(getattr(module, "in_obs", None), module.nof_bits)
     if is_gelu and "lut_size_gelu" in params:
         module.LUT_SIZE = params["lut_size_gelu"]
+    if is_gelu and "split_table_gelu" in params:
+        module.split_table = params["split_table_gelu"]
 
     if is_softmax and "nof_bits_softmax" in params:
         module.nof_bits = params["nof_bits_softmax"]
+        module.input_bits = module.nof_bits - 4
+        module.output_bits = module.nof_bits + 1
+        _set_observer_bits(getattr(module, "in_obs", None), module.nof_bits)
     if is_softmax and "lut_size_softmax" in params:
         module.LUT_SIZE = params["lut_size_softmax"]
+    if is_softmax and "split_table_softmax" in params:
+        module.split_table = params["split_table_softmax"]
 
     if is_matmul and "nof_bits_matmul1" in params:
         _set_observer_bits(getattr(module, "in1_obs", None), params["nof_bits_matmul1"])

@@ -18,7 +18,8 @@ class IntSoftmaxTS(nn.Module):
                  is_opt_scale=False,
                  eps=1e-5,
                  dim=-1,
-                 iterations=1,
+                 iterations=2,
+                 split_table=0,
                  ts_ln=new_ln,
                  int_exp_scaled=TaylorExponent):
         super(IntSoftmaxTS, self).__init__()
@@ -26,6 +27,7 @@ class IntSoftmaxTS(nn.Module):
         self.LUT_SIZE = LUT_SIZE
         self.nof_bits = nof_bits
         self.iterations = iterations
+        self.split_table = split_table
         self.dim = dim
         self.quant = quant
         self.is_calibrate = is_calibrate
@@ -103,6 +105,7 @@ class IntSoftmaxTS(nn.Module):
                                           output_bits=self.output_bits,
                                           LUT_SIZE=self.LUT_SIZE,
                                           exp_lut=self.exp_lut,
+                                          split_table=self.split_table,
                                           iterations=1)  # TODO test zero iterations
                                           # iterations=self.iterations)
         except RuntimeError as err:

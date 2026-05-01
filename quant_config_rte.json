@@ -1,8 +1,8 @@
 {
-  "task_name": "cola",
-  "model_name": "geckos/bert-base-uncased-finetuned-glue-cola",
+  "task_name": "rte",
+  "model_name": "textattack/bert-base-uncased-RTE",
   "q_module_list": [
-    "IntGeluTS"
+    "IntGeluTS", "IntSoftmaxTS", "QLayerNorm", "QuantizedLinear", "QuantizedMatmul", "qHadamardProd"
   ],
   "quantization": {
     "defaults": {
@@ -29,6 +29,6 @@
   "evaluation": {
     "batch_size": 16,
     "max_len": 128,
-    "num_val_examples": 1043
+    "num_val_examples": 277
   }
 }

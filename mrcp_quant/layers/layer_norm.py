@@ -26,11 +26,13 @@ class QLayerNorm(nn.LayerNorm):
                  is_calibrate=False,
                  ts_ln=new_ln,
                  int_exp_scaled=TaylorExponent,
+                 split_table=-1,
                  iterations=3):
 
         super(QLayerNorm, self).__init__(normalized_shape, eps, elementwise_affine)
         self.ts_ln = ts_ln
         self.int_exp_scaled = int_exp_scaled
+        self.split_table = split_table
 
         self.in1_bits = in1_bits
         self.in2_bits = in2_bits-1
@@ -134,7 +136,8 @@ class QLayerNorm(nn.LayerNorm):
                              scale_factor,
                              iterations=2,
                              input_bits=self.output_bits1,
-                             output_bits=self.output_bits1)
+                             output_bits=self.output_bits1,
+                             split_table=self.split_table)
 
         return out
 

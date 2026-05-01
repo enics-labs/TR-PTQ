@@ -11,6 +11,10 @@ def _json_default(value):
     return str(value)
 
 
+def _safe_filename_part(value):
+    return "".join(ch if ch.isalnum() or ch in ("-", "_") else "_" for ch in str(value).lower())
+
+
 def save_experiment_result(
     accuracy,
     loss=None,
@@ -39,7 +43,9 @@ def save_experiment_result(
     }
     payload.update(extra)
 
-    result_path = output_path / f"result_{now.strftime('%Y%m%d_%H%M%S')}.json"
+    task_name = extra.get("task_name") or (configuration or {}).get("task_name")
+    filename_prefix = f"{_safe_filename_part(task_name)}_" if task_name else ""
+    result_path = output_path / f"{filename_prefix}result_{now.strftime('%Y%m%d_%H%M%S')}.json"
     with result_path.open("w", encoding="utf-8") as f:
         json.dump(payload, f, indent=2, default=_json_default)
 
