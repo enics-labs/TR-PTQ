@@ -6,7 +6,7 @@
  */
 `timescale 1ns/1ps
 
-module tr_gelu #(
+module tr_gelu_alu #(
     parameter int W = 8  // Q4.4 format (1 sign, 3 int, 4 frac)
 )(
     input  logic                 clk,

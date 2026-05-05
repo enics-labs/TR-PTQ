@@ -19,7 +19,7 @@ module tr_gelu_tb;
     int total_errors = 0;
 
     // DUT
-    tr_gelu #(.W(W)) dut (.*);
+    tr_gelu_alu #(.W(W)) dut (.*);
 
     // Clock
     initial begin
