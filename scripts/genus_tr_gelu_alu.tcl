@@ -116,7 +116,8 @@ set_db [get_db design:$design(TOPLEVEL)] .lp_clock_gating_style latch
 # Prevent specific modules from being ungrouped
 # set_db [get_db modules max_sub] .ungroup_ok false
 # set_db [get_db modules tr_exp*] .ungroup_ok false
-# set_db [get_db modules tr_reciprocal*] .ungroup_ok false
+set_db [get_db modules tr_reciprocal*] .ungroup_ok false
+# set_db [get_db modules *tr_reciprocal*] preserve true
 set_db auto_ungroup none
 
 ##########################
