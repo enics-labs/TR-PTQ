@@ -1,0 +1,397 @@
+
+ 	 Check Design Report (c)
+	 ------------------- 
+No subdesign's name is greater than 1.5k in length.
+
+ Feedthrough Module(s)
+ -------------------------
+No feed through module in 'tr_gelu_alu'
+
+  Unresolved References & Empty Modules
+  ------------------------------------- 
+design 'tr_gelu_alu' has the following unresolved references
+hinst:tr_gelu_alu/u_recip
+Total number of unresolved references in design 'tr_gelu_alu' : 1
+
+No empty modules in design 'tr_gelu_alu'
+
+ Unloaded Pin(s), Port(s)
+ -------------------------
+No unloaded sequential element in 'tr_gelu_alu'
+
+No unloaded port in 'tr_gelu_alu'
+
+ Unloaded Combinational Pin(s)
+ -------------------------------
+design 'tr_gelu_alu' has the following unloaded combinational elements
+pin:tr_gelu_alu/u_exp/u_quad/g6/z
+pin:tr_gelu_alu/u_exp/u_quad/g13/z
+pin:tr_gelu_alu/add_116_31/g1/z
+pin:tr_gelu_alu/add_116_31/g67/z
+pin:tr_gelu_alu/add_116_31/g69/z
+pin:tr_gelu_alu/add_116_31/g72/z
+pin:tr_gelu_alu/add_116_31/g74/z
+pin:tr_gelu_alu/add_116_31/g77/z
+pin:tr_gelu_alu/add_116_31/g79/z
+pin:tr_gelu_alu/add_116_31/g82/z
+pin:tr_gelu_alu/add_116_31/g84/z
+pin:tr_gelu_alu/mul_160_30/g1/z
+pin:tr_gelu_alu/mul_160_30/g481/z
+pin:tr_gelu_alu/mul_160_30/g484/z
+pin:tr_gelu_alu/mul_160_30/g486/z
+pin:tr_gelu_alu/mul_160_30/g489/z
+pin:tr_gelu_alu/mul_160_30/g491/z
+pin:tr_gelu_alu/mul_160_30/g494/z
+pin:tr_gelu_alu/mul_160_30/g192/z
+pin:tr_gelu_alu/minus_45_31/g71/z
+pin:tr_gelu_alu/minus_45_31/g73/z
+pin:tr_gelu_alu/minus_45_31/g76/z
+pin:tr_gelu_alu/minus_45_31/g86/z
+pin:tr_gelu_alu/minus_45_31/g88/z
+pin:tr_gelu_alu/mul_156_38/g1/z
+pin:tr_gelu_alu/mul_156_38/g422/z
+pin:tr_gelu_alu/mul_156_38/g425/z
+pin:tr_gelu_alu/mul_156_38/g427/z
+pin:tr_gelu_alu/mul_156_38/g430/z
+pin:tr_gelu_alu/mul_156_38/g432/z
+pin:tr_gelu_alu/mul_156_38/g435/z
+pin:tr_gelu_alu/mul_156_38/g455/z
+Total number of unloaded combinational elements in design 'tr_gelu_alu' : 32
+
+ Assigns
+ ------- 
+Encountered an assign statement at hport 'hport:tr_gelu_alu/u_exp/u_round/is_ceil' in module round_WIDTH8_FRAC_W4_LUT_IDX_W3
+Encountered an assign statement at hport 'hport:tr_gelu_alu/u_exp/u_quad/quad_out[3]' in module quadratic_divider_WIDTH8_FRAC_W4
+Encountered an assign statement at hport 'hport:tr_gelu_alu/u_exp/u_quad/quad_out[2]' in module quadratic_divider_WIDTH8_FRAC_W4
+Encountered an assign statement at hport 'hport:tr_gelu_alu/u_exp/mantisa[7]' in module tr_exp_FRAC_W4_ITER0
+Encountered an assign statement at hport 'hport:tr_gelu_alu/u_exp/mantisa[6]' in module tr_exp_FRAC_W4_ITER0
+Encountered an assign statement at hport 'hport:tr_gelu_alu/u_exp/mantisa[5]' in module tr_exp_FRAC_W4_ITER0
+Encountered an assign statement at hport 'hport:tr_gelu_alu/u_exp/mantisa[4]' in module tr_exp_FRAC_W4_ITER0
+Encountered an assign statement at hport 'hport:tr_gelu_alu/u_exp/mantisa[3]' in module tr_exp_FRAC_W4_ITER0
+Encountered an assign statement at hport 'hport:tr_gelu_alu/u_exp/mantisa[2]' in module tr_exp_FRAC_W4_ITER0
+Encountered an assign statement at hport 'hport:tr_gelu_alu/u_exp/mantisa[1]' in module tr_exp_FRAC_W4_ITER0
+Encountered an assign statement at hport 'hport:tr_gelu_alu/u_exp/mantisa[0]' in module tr_exp_FRAC_W4_ITER0
+Total number of assign statements in design 'tr_gelu_alu' : 11
+
+ Undriven Port(s)/Pin(s)
+ ------------------------
+No undriven combinational pin in 'tr_gelu_alu'
+
+No undriven sequential pin in 'tr_gelu_alu'
+
+No undriven hierarchical pin in 'tr_gelu_alu'
+
+No undriven port in 'tr_gelu_alu'
+
+ Multidriven Port(s)/Pin(s)
+--------------------------
+
+The following combinational pin(s) in design 'tr_gelu_alu' are multidriven
+pin:tr_gelu_alu/g1/in_0
+Total number of combinational multidriven pin(s) in design 'tr_gelu_alu' : 1
+
+The following sequential pin(s) in design 'tr_gelu_alu' are multidriven
+pin:tr_gelu_alu/x_s1_reg[0]/clk
+pin:tr_gelu_alu/x_s1_reg[1]/clk
+pin:tr_gelu_alu/x_s1_reg[2]/clk
+pin:tr_gelu_alu/x_s1_reg[3]/clk
+pin:tr_gelu_alu/x_s1_reg[4]/clk
+pin:tr_gelu_alu/x_s1_reg[5]/clk
+pin:tr_gelu_alu/x_s1_reg[6]/clk
+pin:tr_gelu_alu/x_s1_reg[7]/clk
+pin:tr_gelu_alu/z_s1_reg[0]/clk
+pin:tr_gelu_alu/z_s1_reg[1]/clk
+pin:tr_gelu_alu/z_s1_reg[2]/clk
+pin:tr_gelu_alu/z_s1_reg[3]/clk
+pin:tr_gelu_alu/z_s1_reg[4]/clk
+pin:tr_gelu_alu/z_s1_reg[5]/clk
+pin:tr_gelu_alu/z_s1_reg[6]/clk
+pin:tr_gelu_alu/z_s1_reg[7]/clk
+pin:tr_gelu_alu/inv_s1_reg[0]/clk
+pin:tr_gelu_alu/inv_s1_reg[1]/clk
+pin:tr_gelu_alu/inv_s1_reg[2]/clk
+pin:tr_gelu_alu/inv_s1_reg[3]/clk
+pin:tr_gelu_alu/inv_s1_reg[4]/clk
+pin:tr_gelu_alu/inv_s1_reg[5]/clk
+pin:tr_gelu_alu/inv_s1_reg[6]/clk
+pin:tr_gelu_alu/inv_s1_reg[7]/clk
+pin:tr_gelu_alu/mode_s1_reg/clk
+pin:tr_gelu_alu/valid_s1_reg/clk
+pin:tr_gelu_alu/u_neg_abs_reg[0]/clk
+pin:tr_gelu_alu/u_neg_abs_reg[1]/clk
+pin:tr_gelu_alu/u_neg_abs_reg[2]/clk
+pin:tr_gelu_alu/u_neg_abs_reg[3]/clk
+pin:tr_gelu_alu/u_neg_abs_reg[4]/clk
+pin:tr_gelu_alu/u_neg_abs_reg[5]/clk
+pin:tr_gelu_alu/u_neg_abs_reg[6]/clk
+pin:tr_gelu_alu/u_neg_abs_reg[7]/clk
+pin:tr_gelu_alu/x_s2_reg[0]/clk
+pin:tr_gelu_alu/x_s2_reg[1]/clk
+pin:tr_gelu_alu/x_s2_reg[2]/clk
+pin:tr_gelu_alu/x_s2_reg[3]/clk
+pin:tr_gelu_alu/x_s2_reg[4]/clk
+pin:tr_gelu_alu/x_s2_reg[5]/clk
+pin:tr_gelu_alu/x_s2_reg[6]/clk
+pin:tr_gelu_alu/x_s2_reg[7]/clk
+pin:tr_gelu_alu/z_s2_reg[0]/clk
+pin:tr_gelu_alu/z_s2_reg[1]/clk
+pin:tr_gelu_alu/z_s2_reg[2]/clk
+pin:tr_gelu_alu/z_s2_reg[3]/clk
+pin:tr_gelu_alu/z_s2_reg[4]/clk
+pin:tr_gelu_alu/z_s2_reg[5]/clk
+pin:tr_gelu_alu/z_s2_reg[6]/clk
+pin:tr_gelu_alu/z_s2_reg[7]/clk
+pin:tr_gelu_alu/inv_s2_reg[0]/clk
+pin:tr_gelu_alu/inv_s2_reg[1]/clk
+pin:tr_gelu_alu/inv_s2_reg[2]/clk
+pin:tr_gelu_alu/inv_s2_reg[3]/clk
+pin:tr_gelu_alu/inv_s2_reg[4]/clk
+pin:tr_gelu_alu/inv_s2_reg[5]/clk
+pin:tr_gelu_alu/inv_s2_reg[6]/clk
+pin:tr_gelu_alu/inv_s2_reg[7]/clk
+pin:tr_gelu_alu/mode_s2_reg/clk
+pin:tr_gelu_alu/valid_s2_reg/clk
+pin:tr_gelu_alu/E_s3_reg[0]/clk
+pin:tr_gelu_alu/E_s3_reg[1]/clk
+pin:tr_gelu_alu/E_s3_reg[2]/clk
+pin:tr_gelu_alu/E_s3_reg[3]/clk
+pin:tr_gelu_alu/E_s3_reg[4]/clk
+pin:tr_gelu_alu/E_s3_reg[5]/clk
+pin:tr_gelu_alu/E_s3_reg[6]/clk
+pin:tr_gelu_alu/E_s3_reg[7]/clk
+pin:tr_gelu_alu/x_s3_reg[0]/clk
+pin:tr_gelu_alu/x_s3_reg[1]/clk
+pin:tr_gelu_alu/x_s3_reg[2]/clk
+pin:tr_gelu_alu/x_s3_reg[3]/clk
+pin:tr_gelu_alu/x_s3_reg[4]/clk
+pin:tr_gelu_alu/x_s3_reg[5]/clk
+pin:tr_gelu_alu/x_s3_reg[6]/clk
+pin:tr_gelu_alu/x_s3_reg[7]/clk
+pin:tr_gelu_alu/z_s3_reg[0]/clk
+pin:tr_gelu_alu/z_s3_reg[1]/clk
+pin:tr_gelu_alu/z_s3_reg[2]/clk
+pin:tr_gelu_alu/z_s3_reg[3]/clk
+pin:tr_gelu_alu/z_s3_reg[4]/clk
+pin:tr_gelu_alu/z_s3_reg[5]/clk
+pin:tr_gelu_alu/z_s3_reg[6]/clk
+pin:tr_gelu_alu/z_s3_reg[7]/clk
+pin:tr_gelu_alu/inv_s3_reg[0]/clk
+pin:tr_gelu_alu/inv_s3_reg[1]/clk
+pin:tr_gelu_alu/inv_s3_reg[2]/clk
+pin:tr_gelu_alu/inv_s3_reg[3]/clk
+pin:tr_gelu_alu/inv_s3_reg[4]/clk
+pin:tr_gelu_alu/inv_s3_reg[5]/clk
+pin:tr_gelu_alu/inv_s3_reg[6]/clk
+pin:tr_gelu_alu/inv_s3_reg[7]/clk
+pin:tr_gelu_alu/mode_s3_reg/clk
+pin:tr_gelu_alu/valid_s3_reg/clk
+pin:tr_gelu_alu/v_pipe_m0_reg[3]/clk
+pin:tr_gelu_alu/v_pipe_m0_reg[2]/clk
+pin:tr_gelu_alu/v_pipe_m0_reg[1]/clk
+pin:tr_gelu_alu/v_pipe_m0_reg[0]/clk
+pin:tr_gelu_alu/gelu_m1_out_reg_reg[0]/clk
+pin:tr_gelu_alu/gelu_m1_out_reg_reg[1]/clk
+pin:tr_gelu_alu/gelu_m1_out_reg_reg[2]/clk
+pin:tr_gelu_alu/gelu_m1_out_reg_reg[3]/clk
+pin:tr_gelu_alu/gelu_m1_out_reg_reg[4]/clk
+pin:tr_gelu_alu/gelu_m1_out_reg_reg[5]/clk
+pin:tr_gelu_alu/gelu_m1_out_reg_reg[6]/clk
+pin:tr_gelu_alu/gelu_m1_out_reg_reg[7]/clk
+pin:tr_gelu_alu/valid_m1_out_reg_reg/clk
+Total number of sequential multidriven pin(s) in design 'tr_gelu_alu' : 107
+
+No multidriven hierarchical pin in 'tr_gelu_alu'
+
+No multidriven ports in 'tr_gelu_alu'
+
+No multidriven unloaded nets in 'tr_gelu_alu'
+
+  Constant Pin(s)
+  ----------------
+No constant combinational pin(s) in design 'tr_gelu_alu'
+
+No constant sequential pin(s) in design 'tr_gelu_alu'
+
+design 'tr_gelu_alu' has the following constant input hierarchical pin(s)
+hpin:tr_gelu_alu/u_recip/xq[8] 	 (fanout : 0)
+hpin:tr_gelu_alu/u_recip/xq[7] 	 (fanout : 0)
+hpin:tr_gelu_alu/u_recip/xq[6] 	 (fanout : 0)
+hpin:tr_gelu_alu/u_recip/xq[5] 	 (fanout : 0)
+hpin:tr_gelu_alu/add_116_31/A[8] 	 (fanout : 1)
+hpin:tr_gelu_alu/add_116_31/A[7] 	 (fanout : 2)
+hpin:tr_gelu_alu/add_116_31/A[6] 	 (fanout : 2)
+hpin:tr_gelu_alu/add_116_31/A[5] 	 (fanout : 2)
+hpin:tr_gelu_alu/add_116_31/A[4] 	 (fanout : 2)
+hpin:tr_gelu_alu/add_116_31/A[3] 	 (fanout : 2)
+hpin:tr_gelu_alu/add_116_31/A[2] 	 (fanout : 2)
+hpin:tr_gelu_alu/add_116_31/A[1] 	 (fanout : 2)
+hpin:tr_gelu_alu/add_116_31/A[0] 	 (fanout : 2)
+hpin:tr_gelu_alu/mul_54_23/B[8] 	 (fanout : 8)
+hpin:tr_gelu_alu/mul_54_23/B[7] 	 (fanout : 8)
+hpin:tr_gelu_alu/mul_54_23/B[6] 	 (fanout : 8)
+hpin:tr_gelu_alu/mul_54_23/B[5] 	 (fanout : 8)
+hpin:tr_gelu_alu/mul_54_23/B[4] 	 (fanout : 8)
+hpin:tr_gelu_alu/mul_54_23/B[3] 	 (fanout : 8)
+hpin:tr_gelu_alu/mul_54_23/B[2] 	 (fanout : 8)
+hpin:tr_gelu_alu/gt_56_29/B[11] 	 (fanout : 9)
+hpin:tr_gelu_alu/gt_56_29/B[10] 	 (fanout : 2)
+hpin:tr_gelu_alu/gt_56_29/B[9] 	 (fanout : 2)
+hpin:tr_gelu_alu/gt_56_29/B[8] 	 (fanout : 2)
+hpin:tr_gelu_alu/gt_56_29/B[7] 	 (fanout : 2)
+hpin:tr_gelu_alu/gt_56_29/B[6] 	 (fanout : 2)
+hpin:tr_gelu_alu/gt_56_29/B[5] 	 (fanout : 2)
+hpin:tr_gelu_alu/gt_56_29/B[4] 	 (fanout : 2)
+hpin:tr_gelu_alu/gt_56_29/B[3] 	 (fanout : 2)
+hpin:tr_gelu_alu/gt_56_29/B[2] 	 (fanout : 2)
+hpin:tr_gelu_alu/gt_56_29/B[1] 	 (fanout : 2)
+hpin:tr_gelu_alu/gt_56_29/B[0] 	 (fanout : 1)
+hpin:tr_gelu_alu/lt_57_34/B[11] 	 (fanout : 3)
+hpin:tr_gelu_alu/lt_57_34/B[10] 	 (fanout : 1)
+hpin:tr_gelu_alu/lt_57_34/B[9] 	 (fanout : 1)
+hpin:tr_gelu_alu/lt_57_34/B[8] 	 (fanout : 1)
+hpin:tr_gelu_alu/lt_57_34/B[7] 	 (fanout : 1)
+hpin:tr_gelu_alu/lt_57_34/B[6] 	 (fanout : 1)
+hpin:tr_gelu_alu/lt_57_34/B[5] 	 (fanout : 1)
+hpin:tr_gelu_alu/lt_57_34/B[4] 	 (fanout : 1)
+hpin:tr_gelu_alu/lt_57_34/B[3] 	 (fanout : 1)
+hpin:tr_gelu_alu/lt_57_34/B[2] 	 (fanout : 1)
+hpin:tr_gelu_alu/lt_57_34/B[1] 	 (fanout : 1)
+hpin:tr_gelu_alu/lt_57_34/B[0] 	 (fanout : 1)
+hpin:tr_gelu_alu/gt_82_32/B 	 (fanout : 13)
+hpin:tr_gelu_alu/minus_82_39/A 	 (fanout : 14)
+hpin:tr_gelu_alu/mul_160_30/B[8] 	 (fanout : 8)
+hpin:tr_gelu_alu/minus_45_31/A 	 (fanout : 14)
+hpin:tr_gelu_alu/gt_153_22/B 	 (fanout : 13)
+hpin:tr_gelu_alu/mux_alpha_g_47_15/in_0[1] 	 (fanout : 1)
+hpin:tr_gelu_alu/mux_alpha_g_47_15/in_0[0] 	 (fanout : 1)
+hpin:tr_gelu_alu/mux_alpha_g_47_15/in_1[1] 	 (fanout : 1)
+hpin:tr_gelu_alu/mux_alpha_g_47_15/in_1[0] 	 (fanout : 1)
+hpin:tr_gelu_alu/mux_alpha_g_47_15/in_2[1] 	 (fanout : 1)
+hpin:tr_gelu_alu/mux_alpha_g_47_15/in_2[0] 	 (fanout : 1)
+hpin:tr_gelu_alu/mux_alpha_g_47_15/in_3[1] 	 (fanout : 1)
+hpin:tr_gelu_alu/mux_alpha_g_47_15/in_3[0] 	 (fanout : 1)
+hpin:tr_gelu_alu/u_exp/u_round/eq_39_44/B 	 (fanout : 1)
+hpin:tr_gelu_alu/u_exp/u_round/add_36_61/B 	 (fanout : 2)
+hpin:tr_gelu_alu/u_exp/mux_gen_opt_8bit.exp_lut[a_idx]_96_45/in_0[6] 	 (fanout : 1)
+hpin:tr_gelu_alu/u_exp/mux_gen_opt_8bit.exp_lut[a_idx]_96_45/in_0[5] 	 (fanout : 1)
+hpin:tr_gelu_alu/u_exp/mux_gen_opt_8bit.exp_lut[a_idx]_96_45/in_0[4] 	 (fanout : 1)
+hpin:tr_gelu_alu/u_exp/mux_gen_opt_8bit.exp_lut[a_idx]_96_45/in_0[3] 	 (fanout : 1)
+hpin:tr_gelu_alu/u_exp/mux_gen_opt_8bit.exp_lut[a_idx]_96_45/in_0[2] 	 (fanout : 1)
+hpin:tr_gelu_alu/u_exp/mux_gen_opt_8bit.exp_lut[a_idx]_96_45/in_0[1] 	 (fanout : 1)
+hpin:tr_gelu_alu/u_exp/mux_gen_opt_8bit.exp_lut[a_idx]_96_45/in_0[0] 	 (fanout : 1)
+hpin:tr_gelu_alu/u_exp/mux_gen_opt_8bit.exp_lut[a_idx]_96_45/in_1[6] 	 (fanout : 1)
+hpin:tr_gelu_alu/u_exp/mux_gen_opt_8bit.exp_lut[a_idx]_96_45/in_1[5] 	 (fanout : 1)
+hpin:tr_gelu_alu/u_exp/mux_gen_opt_8bit.exp_lut[a_idx]_96_45/in_1[4] 	 (fanout : 1)
+hpin:tr_gelu_alu/u_exp/mux_gen_opt_8bit.exp_lut[a_idx]_96_45/in_1[3] 	 (fanout : 1)
+hpin:tr_gelu_alu/u_exp/mux_gen_opt_8bit.exp_lut[a_idx]_96_45/in_1[2] 	 (fanout : 1)
+hpin:tr_gelu_alu/u_exp/mux_gen_opt_8bit.exp_lut[a_idx]_96_45/in_1[1] 	 (fanout : 1)
+hpin:tr_gelu_alu/u_exp/mux_gen_opt_8bit.exp_lut[a_idx]_96_45/in_1[0] 	 (fanout : 1)
+hpin:tr_gelu_alu/u_exp/mux_gen_opt_8bit.exp_lut[a_idx]_96_45/in_2[6] 	 (fanout : 1)
+hpin:tr_gelu_alu/u_exp/mux_gen_opt_8bit.exp_lut[a_idx]_96_45/in_2[5] 	 (fanout : 1)
+hpin:tr_gelu_alu/u_exp/mux_gen_opt_8bit.exp_lut[a_idx]_96_45/in_2[4] 	 (fanout : 1)
+hpin:tr_gelu_alu/u_exp/mux_gen_opt_8bit.exp_lut[a_idx]_96_45/in_2[3] 	 (fanout : 1)
+hpin:tr_gelu_alu/u_exp/mux_gen_opt_8bit.exp_lut[a_idx]_96_45/in_2[2] 	 (fanout : 1)
+hpin:tr_gelu_alu/u_exp/mux_gen_opt_8bit.exp_lut[a_idx]_96_45/in_2[1] 	 (fanout : 1)
+hpin:tr_gelu_alu/u_exp/mux_gen_opt_8bit.exp_lut[a_idx]_96_45/in_2[0] 	 (fanout : 1)
+hpin:tr_gelu_alu/u_exp/mux_gen_opt_8bit.exp_lut[a_idx]_96_45/in_3[6] 	 (fanout : 1)
+hpin:tr_gelu_alu/u_exp/mux_gen_opt_8bit.exp_lut[a_idx]_96_45/in_3[5] 	 (fanout : 1)
+hpin:tr_gelu_alu/u_exp/mux_gen_opt_8bit.exp_lut[a_idx]_96_45/in_3[4] 	 (fanout : 1)
+hpin:tr_gelu_alu/u_exp/mux_gen_opt_8bit.exp_lut[a_idx]_96_45/in_3[3] 	 (fanout : 1)
+hpin:tr_gelu_alu/u_exp/mux_gen_opt_8bit.exp_lut[a_idx]_96_45/in_3[2] 	 (fanout : 1)
+hpin:tr_gelu_alu/u_exp/mux_gen_opt_8bit.exp_lut[a_idx]_96_45/in_3[1] 	 (fanout : 1)
+hpin:tr_gelu_alu/u_exp/mux_gen_opt_8bit.exp_lut[a_idx]_96_45/in_3[0] 	 (fanout : 1)
+hpin:tr_gelu_alu/u_exp/mux_gen_opt_8bit.exp_lut[a_idx]_96_45/in_4[6] 	 (fanout : 1)
+hpin:tr_gelu_alu/u_exp/mux_gen_opt_8bit.exp_lut[a_idx]_96_45/in_4[5] 	 (fanout : 1)
+hpin:tr_gelu_alu/u_exp/mux_gen_opt_8bit.exp_lut[a_idx]_96_45/in_4[4] 	 (fanout : 1)
+hpin:tr_gelu_alu/u_exp/mux_gen_opt_8bit.exp_lut[a_idx]_96_45/in_4[3] 	 (fanout : 1)
+hpin:tr_gelu_alu/u_exp/mux_gen_opt_8bit.exp_lut[a_idx]_96_45/in_4[2] 	 (fanout : 1)
+hpin:tr_gelu_alu/u_exp/mux_gen_opt_8bit.exp_lut[a_idx]_96_45/in_4[1] 	 (fanout : 1)
+hpin:tr_gelu_alu/u_exp/mux_gen_opt_8bit.exp_lut[a_idx]_96_45/in_4[0] 	 (fanout : 1)
+hpin:tr_gelu_alu/u_exp/mux_gen_opt_8bit.exp_lut[a_idx]_96_45/in_5[6] 	 (fanout : 1)
+hpin:tr_gelu_alu/u_exp/mux_gen_opt_8bit.exp_lut[a_idx]_96_45/in_5[5] 	 (fanout : 1)
+hpin:tr_gelu_alu/u_exp/mux_gen_opt_8bit.exp_lut[a_idx]_96_45/in_5[4] 	 (fanout : 1)
+hpin:tr_gelu_alu/u_exp/mux_gen_opt_8bit.exp_lut[a_idx]_96_45/in_5[3] 	 (fanout : 1)
+hpin:tr_gelu_alu/u_exp/mux_gen_opt_8bit.exp_lut[a_idx]_96_45/in_5[2] 	 (fanout : 1)
+hpin:tr_gelu_alu/u_exp/mux_gen_opt_8bit.exp_lut[a_idx]_96_45/in_5[1] 	 (fanout : 1)
+hpin:tr_gelu_alu/u_exp/mux_gen_opt_8bit.exp_lut[a_idx]_96_45/in_5[0] 	 (fanout : 1)
+hpin:tr_gelu_alu/u_exp/mux_gen_opt_8bit.exp_lut[a_idx]_96_45/in_6[6] 	 (fanout : 1)
+hpin:tr_gelu_alu/u_exp/mux_gen_opt_8bit.exp_lut[a_idx]_96_45/in_6[5] 	 (fanout : 1)
+hpin:tr_gelu_alu/u_exp/mux_gen_opt_8bit.exp_lut[a_idx]_96_45/in_6[4] 	 (fanout : 1)
+hpin:tr_gelu_alu/u_exp/mux_gen_opt_8bit.exp_lut[a_idx]_96_45/in_6[3] 	 (fanout : 1)
+hpin:tr_gelu_alu/u_exp/mux_gen_opt_8bit.exp_lut[a_idx]_96_45/in_6[2] 	 (fanout : 1)
+hpin:tr_gelu_alu/u_exp/mux_gen_opt_8bit.exp_lut[a_idx]_96_45/in_6[1] 	 (fanout : 1)
+hpin:tr_gelu_alu/u_exp/mux_gen_opt_8bit.exp_lut[a_idx]_96_45/in_6[0] 	 (fanout : 1)
+hpin:tr_gelu_alu/u_exp/mux_gen_opt_8bit.exp_lut[a_idx]_96_45/in_7[6] 	 (fanout : 1)
+hpin:tr_gelu_alu/u_exp/mux_gen_opt_8bit.exp_lut[a_idx]_96_45/in_7[5] 	 (fanout : 1)
+hpin:tr_gelu_alu/u_exp/mux_gen_opt_8bit.exp_lut[a_idx]_96_45/in_7[4] 	 (fanout : 1)
+hpin:tr_gelu_alu/u_exp/mux_gen_opt_8bit.exp_lut[a_idx]_96_45/in_7[3] 	 (fanout : 1)
+hpin:tr_gelu_alu/u_exp/mux_gen_opt_8bit.exp_lut[a_idx]_96_45/in_7[2] 	 (fanout : 1)
+hpin:tr_gelu_alu/u_exp/mux_gen_opt_8bit.exp_lut[a_idx]_96_45/in_7[1] 	 (fanout : 1)
+hpin:tr_gelu_alu/u_exp/mux_gen_opt_8bit.exp_lut[a_idx]_96_45/in_7[0] 	 (fanout : 1)
+hpin:tr_gelu_alu/u_exp/mux_96_26/in_0[7] 	 (fanout : 1)
+hpin:tr_gelu_alu/u_exp/mux_96_26/in_1[7] 	 (fanout : 1)
+hpin:tr_gelu_alu/u_exp/mux_96_26/in_1[6] 	 (fanout : 1)
+hpin:tr_gelu_alu/u_exp/mux_96_26/in_1[5] 	 (fanout : 1)
+hpin:tr_gelu_alu/u_exp/mux_96_26/in_1[4] 	 (fanout : 1)
+hpin:tr_gelu_alu/u_exp/mux_96_26/in_1[3] 	 (fanout : 1)
+hpin:tr_gelu_alu/u_exp/mux_96_26/in_1[2] 	 (fanout : 1)
+hpin:tr_gelu_alu/u_exp/mux_96_26/in_1[1] 	 (fanout : 1)
+hpin:tr_gelu_alu/u_exp/mux_96_26/in_1[0] 	 (fanout : 1)
+Total number of constant hierarchical pins in design 'tr_gelu_alu' : 124
+
+No constant connected ports in design 'tr_gelu_alu'
+
+  Preserved instances(s)
+  ----------------
+No preserved combinational instance(s) in design 'tr_gelu_alu'
+No preserved sequential instance(s) in design 'tr_gelu_alu'
+No preserved hierarchical instance(s) in design 'tr_gelu_alu'
+
+  Physical only instances(s)
+  ----------------
+No physical only instance(s) in design 'tr_gelu_alu'
+
+  Logical only instance(s) and linked libcells
+    -----------------------------------------
+No logical only instance(s) in design 'tr_gelu_alu'
+
+Libcells with no corresponding LEF
+----------------------------------
+No libcell(s) found.
+
+LEF cells with no corresponding libcell
+---------------------------------------
+
+No physical (LEF) cells found.
+
+ Summary
+ ------- 
+
+              Name                       Total
+----------------------------------------------
+Unresolved References                        1
+Empty Modules                                0
+Unloaded Port(s)                             0
+Unloaded Sequential Pin(s)                   0
+Unloaded Combinational Pin(s)               32
+Assigns                                     11
+Undriven Port(s)                             0
+Undriven Leaf Pin(s)                         0
+Undriven hierarchical pin(s)                 0
+Multidriven Port(s)                          0
+Multidriven Leaf Pin(s)                    108
+Multidriven hierarchical Pin(s)              0
+Multidriven unloaded net(s)                  0
+Constant Port(s)                             0
+Constant Leaf Pin(s)                         0
+Constant hierarchical Pin(s)               124
+Preserved leaf instance(s)                   0
+Preserved hierarchical instance(s)           0
+Feedthrough Modules(s)                       0
+Libcells with no LEF cell                    0
+Physical (LEF) cells with no libcell         0
+Subdesigns with long module name             0
+Physical only instance(s)                    0
+Logical only instance(s)                     0
+
+  Done Checking the design.
