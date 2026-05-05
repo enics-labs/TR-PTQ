@@ -138,6 +138,35 @@ module tr_gelu_alu #(
     // ========================================================================
     // PATH B: MODE 1 (Symmetry Selection & Final Product)
     // ========================================================================
+    
+    // ---------------------------------------------------------
+    // STAGE 4: Sigmoid Multiplier (Breaks the Critical Path)
+    // ---------------------------------------------------------
+    logic [7:0]          sigmoid_s4;
+    logic signed [W-1:0] z_s4;
+    logic                valid_s4_m1;
+
+    always_ff @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            sigmoid_s4  <= '0;
+            z_s4        <= '0;
+            valid_s4_m1 <= 1'b0;
+        end else begin
+            logic [15:0] sig_neg_mult;
+            if (x_s3 > 0) begin
+                sigmoid_s4 = inv_s3; 
+            end else begin
+                sig_neg_mult = (E_s3 * inv_s3);
+                sigmoid_s4   = sig_neg_mult[15:8];
+            end
+            z_s4        <= z_s3;
+            valid_s4_m1 <= valid_s3 && (mode_s3 == 1'b1);
+        end
+    end
+
+    // ---------------------------------------------------------
+    // STAGE 5: Final GELU Multiplier
+    // ---------------------------------------------------------
     logic signed [W-1:0] gelu_m1_out_reg;
     logic                valid_m1_out_reg;
 
@@ -146,22 +175,11 @@ module tr_gelu_alu #(
             gelu_m1_out_reg  <= '0;
             valid_m1_out_reg <= 1'b0;
         end else begin
-            logic [7:0]  sigmoid_q8;
-            logic [15:0] sig_neg_mult;
             logic signed [15:0] gelu_prod;
-
-            if (x_s3 > 0) begin
-                sigmoid_q8 = inv_s3; 
-            end else begin
-                sig_neg_mult = (E_s3 * inv_s3);
-                sigmoid_q8   = sig_neg_mult[15:8];
-            end
-
-            gelu_prod = z_s3 * $signed({1'b0, sigmoid_q8});
+            gelu_prod = z_s4 * $signed({1'b0, sigmoid_s4});
             gelu_m1_out_reg <= gelu_prod[15:8];
             
-            // Output is valid immediately at Stage 4 for Mode 1
-            valid_m1_out_reg <= valid_s3 && (mode_s3 == 1'b1);
+            valid_m1_out_reg <= valid_s4_m1;
         end
     end
 
