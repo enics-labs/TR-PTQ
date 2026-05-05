@@ -35,15 +35,9 @@ module tr_ln #(
         // 2. Calculate aq = msb - BITS
         aq_full = $signed({1'b0, msb}) - $signed(AQ_W'(BITS));
 
+        // 3. Perform the shift
         normalized_x = xq << (WIDTH - 1 - msb);
         k1_full = $signed({1'b0, normalized_x[WIDTH-1 : WIDTH-1-BITS]});
-
-        // 3. Perform the shift
-        // if (aq_full >= 0) begin
-        //     k1_full = $signed({1'b0, xq} >> aq_full);
-        // end else begin
-        //     k1_full = $signed({1'b0, xq} << (-aq_full));
-        // end
 
         // 4. Compute k2 = (aq - 1) * (1 << BITS)
         k2_full = $signed(aq_full - 1) <<< BITS;

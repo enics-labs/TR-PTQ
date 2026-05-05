@@ -7,58 +7,49 @@ module tr_ln #(
     output wire signed [OUT_WIDTH-1:0] yq
 );
 
-    // def new_ln(xq, bits):
-    //     aq = xq.log2().floor().int() - bits
-    //     # compute xq >> aq if aq > 0 else xq << -aq)
-    //     k1 = safe_shift_r(xq, aq)
-    //     # compute 2**(-aq))*xq
-    //     k2 = ((aq-1) << bits)
-    //     # compute (2**(-aq))*xq + ((aq-1)*2**bits)
-    //     k = (k1 + k2)
-    //     # yq = ln2q * ((2**(-aq))*xq + ((aq-1)*2**bits))
-    //     yq = (((k>>1)+(k>>3)+(k>>4)))
-    //     return yq
+    // ========================================================================
+    // Dynamic Bit-Width Calculations
+    // ========================================================================
+    localparam int MSB_W = $clog2(WIDTH);        // e.g., 4 for W=16 | 5 for W=20
+    localparam int AQ_W  = MSB_W + 1;            // e.g., 5 for W=16 | 6 for W=20
+    localparam int K1_W  = BITS + 2;             // e.g., 6 for B=4
+    localparam int K_W   = AQ_W + BITS;          // e.g., 9 for W=16 | 10 for W=20
 
-    // Use 32-bit signed variables for all internal math to prevent simulator truncation bugs
-    logic [5:0]         msb;
-    logic [2:0] aq_full;
-    logic signed [7:0] k1_full;
-    logic signed [7:0] k2_full;
-    logic signed [8:0] k_full;
-    logic signed [7:0] yq_full;
+    logic [MSB_W-1:0]         msb;
+    logic signed [AQ_W-1:0]   aq_full;
 
-always_comb begin
+    logic signed [K1_W-1:0] k1_full;
+    logic signed [K_W-1:0] k2_full;
+    logic signed [K_W-1:0]   k_full;
+    logic signed [K_W-1:0]   yq_full;
+
+    logic [WIDTH-1:0]       normalized_x;
+
+    always_comb begin
         // 1. Find the MSB (log2 floor)
-        //     aq = xq.log2().floor().int() - bits
-        msb = 0;
+        msb = '0;
         for (int i = 0; i < WIDTH; i++) begin
             if (xq[i]) msb = i;
         end
-        // 0 < a < 5.6
+
         // 2. Calculate aq = msb - BITS
-        aq_full = $signed({1'b0, msb}) - $signed(BITS);
-        k1_full = xq >> aq_full;
-        // 3. Perform the safe shift
-        //     k1 = safe_shift_r(xq, aq)
-        // if (aq_full > 0) begin
-        //     k1_full = xq >> aq_full;
-        // end else begin
-        //     k1_full = xq << (-aq_full);
-        // end
+        aq_full = $signed({1'b0, msb}) - $signed(AQ_W'(BITS));
+
+        // 3. Perform the shift
+        normalized_x = xq << (WIDTH - 1 - msb);
+        k1_full = $signed({1'b0, normalized_x[WIDTH-1 : WIDTH-1-BITS]});
 
         // 4. Compute k2 = (aq - 1) * (1 << BITS)
-        k2_full = ($signed({1'b0, aq_full}) - 1) <<< BITS;
+        k2_full = $signed(aq_full - 1) <<< BITS;
 
         // 5. Sum them up (Safe signed addition)
         k_full = k1_full + k2_full;
 
         // 6. Final approximation: yq = (k/2) + (k/8) + (k/16)
-        // yq_full = (k_full * 11) >>> 4;
         yq_full = (k_full >>> 1) + (k_full >>> 3) + (k_full >>> 4);
-
     end
     
     // Assign back out to the parameterized width
-    assign yq = yq_full[OUT_WIDTH-1:0];
+    assign yq = OUT_WIDTH'(yq_full);
 
 endmodule
