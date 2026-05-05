@@ -1,0 +1,793 @@
+
+ 	 Check Design Report (c)
+	 ------------------- 
+No subdesign's name is greater than 1.5k in length.
+
+ Feedthrough Module(s)
+ -------------------------
+No feed through module in 'tr_norm_alu'
+
+  Unresolved References & Empty Modules
+  ------------------------------------- 
+No unresolved references in design 'tr_norm_alu'
+
+No empty modules in design 'tr_norm_alu'
+
+ Unloaded Pin(s), Port(s)
+ -------------------------
+No unloaded sequential element in 'tr_norm_alu'
+
+No unloaded port in 'tr_norm_alu'
+
+ Unloaded Combinational Pin(s)
+ -------------------------------
+design 'tr_norm_alu' has the following unloaded combinational elements
+pin:tr_norm_alu/u_isqrt/u_ln/add_49_51/g4/z
+pin:tr_norm_alu/u_isqrt/u_ln/add_49_51/g151/z
+pin:tr_norm_alu/u_isqrt/u_ln/add_49_51/g154/z
+pin:tr_norm_alu/u_isqrt/u_ln/add_46_26/g4/z
+pin:tr_norm_alu/u_isqrt/u_ln/sll_39_27/g225/z
+pin:tr_norm_alu/u_isqrt/u_ln/sll_39_27/g226/z
+pin:tr_norm_alu/u_isqrt/u_ln/sll_39_27/g227/z
+pin:tr_norm_alu/u_isqrt/u_ln/sll_39_27/g228/z
+pin:tr_norm_alu/u_isqrt/u_ln/sll_39_27/g229/z
+pin:tr_norm_alu/u_isqrt/u_ln/sll_39_27/g230/z
+pin:tr_norm_alu/u_isqrt/u_ln/sll_39_27/g231/z
+pin:tr_norm_alu/u_isqrt/u_ln/sll_39_27/g232/z
+pin:tr_norm_alu/u_isqrt/u_ln/sll_39_27/g233/z
+pin:tr_norm_alu/u_isqrt/u_ln/sll_39_27/g234/z
+pin:tr_norm_alu/u_isqrt/u_ln/sll_39_27/g235/z
+pin:tr_norm_alu/u_isqrt/u_exp/u_round/eq_39_44/g4/z
+pin:tr_norm_alu/u_isqrt/u_exp/u_quad/mul_42_37/g1/z
+pin:tr_norm_alu/u_isqrt/u_exp/u_quad/mul_42_37/g430/z
+pin:tr_norm_alu/u_isqrt/u_exp/u_quad/mul_42_37/g433/z
+pin:tr_norm_alu/u_isqrt/u_exp/u_quad/mul_42_37/g435/z
+pin:tr_norm_alu/u_isqrt/u_exp/u_quad/mul_42_37/g438/z
+pin:tr_norm_alu/u_isqrt/u_exp/u_quad/mul_42_37/g440/z
+pin:tr_norm_alu/u_isqrt/u_exp/u_quad/mul_42_37/g443/z
+pin:tr_norm_alu/u_isqrt/u_exp/u_quad/mul_42_37/g445/z
+pin:tr_norm_alu/u_isqrt/u_exp/u_quad/mul_42_37/g463/z
+pin:tr_norm_alu/u_isqrt/mul_96_30/g12/z
+pin:tr_norm_alu/u_isqrt/mul_96_30/g1142/z
+pin:tr_norm_alu/u_isqrt/mul_96_30/g1145/z
+pin:tr_norm_alu/u_isqrt/mul_96_30/g1147/z
+pin:tr_norm_alu/u_isqrt/mul_96_30/g1150/z
+pin:tr_norm_alu/u_isqrt/mul_96_30/g1152/z
+pin:tr_norm_alu/u_isqrt/mul_96_30/g1155/z
+pin:tr_norm_alu/u_isqrt/mul_96_30/g287/z
+pin:tr_norm_alu/u_isqrt/mul_96_30/g1185/z
+pin:tr_norm_alu/u_isqrt/mul_96_30/g1187/z
+pin:tr_norm_alu/u_isqrt/mul_96_30/g1190/z
+pin:tr_norm_alu/u_isqrt/mul_96_30/g1192/z
+pin:tr_norm_alu/add_119_45/g4/z
+pin:tr_norm_alu/add_119_45/g646/z
+pin:tr_norm_alu/add_119_45/g648/z
+pin:tr_norm_alu/add_119_45/g651/z
+pin:tr_norm_alu/add_119_45/g653/z
+pin:tr_norm_alu/add_119_45/g656/z
+pin:tr_norm_alu/add_119_45/g658/z
+pin:tr_norm_alu/add_119_45/g661/z
+pin:tr_norm_alu/add_119_45/g663/z
+pin:tr_norm_alu/add_119_45/g666/z
+pin:tr_norm_alu/add_119_45/g668/z
+pin:tr_norm_alu/add_119_45/g671/z
+pin:tr_norm_alu/add_119_45/g674/z
+pin:tr_norm_alu/add_119_45/g677/z
+pin:tr_norm_alu/add_119_45/g679/z
+pin:tr_norm_alu/add_119_45/g682/z
+pin:tr_norm_alu/add_119_45/g705/z
+pin:tr_norm_alu/add_119_45/g708/z
+pin:tr_norm_alu/add_119_45/g710/z
+pin:tr_norm_alu/add_119_45/g713/z
+pin:tr_norm_alu/add_119_45/g716/z
+pin:tr_norm_alu/add_119_45/g719/z
+pin:tr_norm_alu/add_119_45/g721/z
+pin:tr_norm_alu/add_119_45/g724/z
+pin:tr_norm_alu/add_119_45/g726/z
+pin:tr_norm_alu/add_119_45/g729/z
+pin:tr_norm_alu/add_119_45/g731/z
+pin:tr_norm_alu/add_119_45/g734/z
+pin:tr_norm_alu/add_119_45/g737/z
+pin:tr_norm_alu/add_119_45/g740/z
+pin:tr_norm_alu/add_119_45/g742/z
+pin:tr_norm_alu/add_119_45/g745/z
+pin:tr_norm_alu/add_119_45/g747/z
+pin:tr_norm_alu/add_119_45/g750/z
+pin:tr_norm_alu/add_119_45/g752/z
+pin:tr_norm_alu/add_119_45/g755/z
+pin:tr_norm_alu/add_119_45/g758/z
+pin:tr_norm_alu/add_119_45/g761/z
+pin:tr_norm_alu/add_119_45/g763/z
+pin:tr_norm_alu/add_119_45/g766/z
+pin:tr_norm_alu/add_119_45/g769/z
+pin:tr_norm_alu/add_119_45/g772/z
+pin:tr_norm_alu/add_119_45/g774/z
+pin:tr_norm_alu/add_119_45/g777/z
+pin:tr_norm_alu/mul_210_65/g1/z
+pin:tr_norm_alu/mul_210_65/g796/z
+pin:tr_norm_alu/mul_210_65/g799/z
+pin:tr_norm_alu/mul_210_65/g801/z
+pin:tr_norm_alu/mul_210_65/g804/z
+pin:tr_norm_alu/mul_210_65/g806/z
+pin:tr_norm_alu/mul_210_65/g809/z
+pin:tr_norm_alu/mul_210_65/g845/z
+pin:tr_norm_alu/add_235_64/g4/z
+pin:tr_norm_alu/add_235_64/g153/z
+pin:tr_norm_alu/add_235_64/g155/z
+pin:tr_norm_alu/add_235_64/g158/z
+pin:tr_norm_alu/add_121_47/g4/z
+pin:tr_norm_alu/add_121_47/g646/z
+pin:tr_norm_alu/add_121_47/g648/z
+pin:tr_norm_alu/add_121_47/g651/z
+pin:tr_norm_alu/add_121_47/g653/z
+pin:tr_norm_alu/add_121_47/g656/z
+pin:tr_norm_alu/add_121_47/g658/z
+pin:tr_norm_alu/add_121_47/g661/z
+pin:tr_norm_alu/add_121_47/g663/z
+pin:tr_norm_alu/add_121_47/g666/z
+pin:tr_norm_alu/add_121_47/g668/z
+pin:tr_norm_alu/add_121_47/g671/z
+pin:tr_norm_alu/add_121_47/g674/z
+pin:tr_norm_alu/add_121_47/g677/z
+pin:tr_norm_alu/add_121_47/g679/z
+pin:tr_norm_alu/add_121_47/g682/z
+pin:tr_norm_alu/add_121_47/g737/z
+pin:tr_norm_alu/add_121_47/g740/z
+pin:tr_norm_alu/add_121_47/g742/z
+pin:tr_norm_alu/add_121_47/g745/z
+pin:tr_norm_alu/add_121_47/g747/z
+pin:tr_norm_alu/add_121_47/g750/z
+pin:tr_norm_alu/add_121_47/g752/z
+pin:tr_norm_alu/add_121_47/g755/z
+pin:tr_norm_alu/add_121_47/g758/z
+pin:tr_norm_alu/add_121_47/g761/z
+pin:tr_norm_alu/add_121_47/g763/z
+pin:tr_norm_alu/add_121_47/g766/z
+pin:tr_norm_alu/add_121_47/g769/z
+pin:tr_norm_alu/add_121_47/g772/z
+pin:tr_norm_alu/add_121_47/g774/z
+pin:tr_norm_alu/add_121_47/g777/z
+pin:tr_norm_alu/add_124_42/g3/z
+pin:tr_norm_alu/add_124_42/g4/z
+pin:tr_norm_alu/add_124_42/g595/z
+pin:tr_norm_alu/add_124_42/g597/z
+pin:tr_norm_alu/add_124_42/g600/z
+pin:tr_norm_alu/add_124_42/g602/z
+pin:tr_norm_alu/add_124_42/g605/z
+pin:tr_norm_alu/add_124_42/g607/z
+pin:tr_norm_alu/add_124_42/g610/z
+pin:tr_norm_alu/add_124_42/g665/z
+pin:tr_norm_alu/add_124_42/g668/z
+pin:tr_norm_alu/add_124_42/g670/z
+pin:tr_norm_alu/add_124_42/g673/z
+pin:tr_norm_alu/add_124_42/g675/z
+pin:tr_norm_alu/add_124_42/g678/z
+pin:tr_norm_alu/add_124_42/g680/z
+pin:tr_norm_alu/add_124_42/g683/z
+pin:tr_norm_alu/add_124_42/g686/z
+pin:tr_norm_alu/add_124_42/g689/z
+pin:tr_norm_alu/add_124_42/g691/z
+pin:tr_norm_alu/add_124_42/g694/z
+pin:tr_norm_alu/add_124_42/g696/z
+pin:tr_norm_alu/add_124_42/g699/z
+pin:tr_norm_alu/add_124_42/g701/z
+pin:tr_norm_alu/add_124_42/g704/z
+pin:tr_norm_alu/add_124_42/g707/z
+pin:tr_norm_alu/add_124_42/g710/z
+pin:tr_norm_alu/add_124_42/g712/z
+pin:tr_norm_alu/add_124_42/g715/z
+pin:tr_norm_alu/add_120_45/g4/z
+pin:tr_norm_alu/add_120_45/g646/z
+pin:tr_norm_alu/add_120_45/g648/z
+pin:tr_norm_alu/add_120_45/g651/z
+pin:tr_norm_alu/add_120_45/g653/z
+pin:tr_norm_alu/add_120_45/g656/z
+pin:tr_norm_alu/add_120_45/g658/z
+pin:tr_norm_alu/add_120_45/g661/z
+pin:tr_norm_alu/add_120_45/g663/z
+pin:tr_norm_alu/add_120_45/g666/z
+pin:tr_norm_alu/add_120_45/g668/z
+pin:tr_norm_alu/add_120_45/g671/z
+pin:tr_norm_alu/add_120_45/g737/z
+pin:tr_norm_alu/add_120_45/g740/z
+pin:tr_norm_alu/add_120_45/g742/z
+pin:tr_norm_alu/add_120_45/g745/z
+pin:tr_norm_alu/add_120_45/g747/z
+pin:tr_norm_alu/add_120_45/g750/z
+pin:tr_norm_alu/add_120_45/g752/z
+pin:tr_norm_alu/add_120_45/g755/z
+pin:tr_norm_alu/add_120_45/g758/z
+pin:tr_norm_alu/add_120_45/g761/z
+pin:tr_norm_alu/add_120_45/g763/z
+pin:tr_norm_alu/add_120_45/g766/z
+pin:tr_norm_alu/add_120_45/g769/z
+pin:tr_norm_alu/add_120_45/g772/z
+pin:tr_norm_alu/add_120_45/g774/z
+pin:tr_norm_alu/add_120_45/g777/z
+Total number of unloaded combinational elements in design 'tr_norm_alu' : 182
+
+ Assigns
+ ------- 
+Encountered an assign statement at hport 'hport:tr_norm_alu/u_isqrt/u_ln/sub_39_41/Z[31]' in module sub_unsigned
+Encountered an assign statement at hport 'hport:tr_norm_alu/u_isqrt/u_ln/sub_39_41/Z[30]' in module sub_unsigned
+Encountered an assign statement at hport 'hport:tr_norm_alu/u_isqrt/u_ln/sub_39_41/Z[29]' in module sub_unsigned
+Encountered an assign statement at hport 'hport:tr_norm_alu/u_isqrt/u_ln/sub_39_41/Z[28]' in module sub_unsigned
+Encountered an assign statement at hport 'hport:tr_norm_alu/u_isqrt/u_ln/sub_39_41/Z[27]' in module sub_unsigned
+Encountered an assign statement at hport 'hport:tr_norm_alu/u_isqrt/u_ln/sub_39_41/Z[26]' in module sub_unsigned
+Encountered an assign statement at hport 'hport:tr_norm_alu/u_isqrt/u_ln/sub_39_41/Z[25]' in module sub_unsigned
+Encountered an assign statement at hport 'hport:tr_norm_alu/u_isqrt/u_ln/sub_39_41/Z[24]' in module sub_unsigned
+Encountered an assign statement at hport 'hport:tr_norm_alu/u_isqrt/u_ln/sub_39_41/Z[23]' in module sub_unsigned
+Encountered an assign statement at hport 'hport:tr_norm_alu/u_isqrt/u_ln/sub_39_41/Z[22]' in module sub_unsigned
+Encountered an assign statement at hport 'hport:tr_norm_alu/u_isqrt/u_ln/sub_39_41/Z[21]' in module sub_unsigned
+Encountered an assign statement at hport 'hport:tr_norm_alu/u_isqrt/u_ln/sub_39_41/Z[20]' in module sub_unsigned
+Encountered an assign statement at hport 'hport:tr_norm_alu/u_isqrt/u_ln/sub_39_41/Z[19]' in module sub_unsigned
+Encountered an assign statement at hport 'hport:tr_norm_alu/u_isqrt/u_ln/sub_39_41/Z[18]' in module sub_unsigned
+Encountered an assign statement at hport 'hport:tr_norm_alu/u_isqrt/u_ln/sub_39_41/Z[17]' in module sub_unsigned
+Encountered an assign statement at hport 'hport:tr_norm_alu/u_isqrt/u_ln/sub_39_41/Z[16]' in module sub_unsigned
+Encountered an assign statement at hport 'hport:tr_norm_alu/u_isqrt/u_ln/sub_39_41/Z[15]' in module sub_unsigned
+Encountered an assign statement at hport 'hport:tr_norm_alu/u_isqrt/u_ln/sub_39_41/Z[14]' in module sub_unsigned
+Encountered an assign statement at hport 'hport:tr_norm_alu/u_isqrt/u_ln/sub_39_41/Z[13]' in module sub_unsigned
+Encountered an assign statement at hport 'hport:tr_norm_alu/u_isqrt/u_ln/sub_39_41/Z[12]' in module sub_unsigned
+Encountered an assign statement at hport 'hport:tr_norm_alu/u_isqrt/u_ln/sub_39_41/Z[11]' in module sub_unsigned
+Encountered an assign statement at hport 'hport:tr_norm_alu/u_isqrt/u_ln/sub_39_41/Z[10]' in module sub_unsigned
+Encountered an assign statement at hport 'hport:tr_norm_alu/u_isqrt/u_ln/sub_39_41/Z[9]' in module sub_unsigned
+Encountered an assign statement at hport 'hport:tr_norm_alu/u_isqrt/u_ln/sub_39_41/Z[8]' in module sub_unsigned
+Encountered an assign statement at hport 'hport:tr_norm_alu/u_isqrt/u_ln/sub_39_41/Z[7]' in module sub_unsigned
+Encountered an assign statement at hport 'hport:tr_norm_alu/u_isqrt/u_ln/sub_39_41/Z[6]' in module sub_unsigned
+Encountered an assign statement at hport 'hport:tr_norm_alu/u_isqrt/u_ln/sub_39_41/Z[5]' in module sub_unsigned
+Encountered an assign statement at hport 'hport:tr_norm_alu/u_isqrt/u_ln/ctl_xq_32_17/out_0[20]' in module case_box
+Encountered an assign statement at hport 'hport:tr_norm_alu/u_isqrt/u_exp/u_round/is_ceil' in module round_WIDTH12_FRAC_W8_LUT_IDX_W4
+Encountered an assign statement at hport 'hport:tr_norm_alu/u_isqrt/u_exp/u_quad/quad_out[7]' in module quadratic_divider_WIDTH12_FRAC_W8
+Encountered an assign statement at hport 'hport:tr_norm_alu/u_isqrt/u_exp/mantisa[11]' in module tr_exp_WIDTH12_FRAC_W8_LUT_IDX_W4_ITER2
+Encountered an assign statement at hport 'hport:tr_norm_alu/u_isqrt/u_exp/mantisa[10]' in module tr_exp_WIDTH12_FRAC_W8_LUT_IDX_W4_ITER2
+Total number of assign statements in design 'tr_norm_alu' : 32
+
+ Undriven Port(s)/Pin(s)
+ ------------------------
+No undriven combinational pin in 'tr_norm_alu'
+
+No undriven sequential pin in 'tr_norm_alu'
+
+No undriven hierarchical pin in 'tr_norm_alu'
+
+No undriven port in 'tr_norm_alu'
+
+ Multidriven Port(s)/Pin(s)
+--------------------------
+
+No multidriven combinational pin in 'tr_norm_alu'
+
+No multidriven sequential pin in 'tr_norm_alu'
+
+No multidriven hierarchical pin in 'tr_norm_alu'
+
+No multidriven ports in 'tr_norm_alu'
+
+No multidriven unloaded nets in 'tr_norm_alu'
+
+  Constant Pin(s)
+  ----------------
+No constant combinational pin(s) in design 'tr_norm_alu'
+
+No constant sequential pin(s) in design 'tr_norm_alu'
+
+design 'tr_norm_alu' has the following constant input hierarchical pin(s)
+hpin:tr_norm_alu/mul_99_41/B[14] 	 (fanout : 23)
+hpin:tr_norm_alu/mul_99_41/B[13] 	 (fanout : 25)
+hpin:tr_norm_alu/mul_99_41/B[12] 	 (fanout : 4)
+hpin:tr_norm_alu/mul_99_41/B[11] 	 (fanout : 25)
+hpin:tr_norm_alu/mul_99_41/B[10] 	 (fanout : 4)
+hpin:tr_norm_alu/mul_99_41/B[9] 	 (fanout : 25)
+hpin:tr_norm_alu/mul_99_41/B[8] 	 (fanout : 4)
+hpin:tr_norm_alu/mul_99_41/B[7] 	 (fanout : 25)
+hpin:tr_norm_alu/mul_99_41/B[6] 	 (fanout : 4)
+hpin:tr_norm_alu/mul_99_41/B[5] 	 (fanout : 25)
+hpin:tr_norm_alu/mul_99_41/B[4] 	 (fanout : 4)
+hpin:tr_norm_alu/mul_99_41/B[3] 	 (fanout : 25)
+hpin:tr_norm_alu/mul_99_41/B[2] 	 (fanout : 4)
+hpin:tr_norm_alu/mul_99_41/B[1] 	 (fanout : 25)
+hpin:tr_norm_alu/mul_99_41/B[0] 	 (fanout : 22)
+hpin:tr_norm_alu/mul_100_44/B[14] 	 (fanout : 23)
+hpin:tr_norm_alu/mul_100_44/B[13] 	 (fanout : 25)
+hpin:tr_norm_alu/mul_100_44/B[12] 	 (fanout : 4)
+hpin:tr_norm_alu/mul_100_44/B[11] 	 (fanout : 25)
+hpin:tr_norm_alu/mul_100_44/B[10] 	 (fanout : 4)
+hpin:tr_norm_alu/mul_100_44/B[9] 	 (fanout : 25)
+hpin:tr_norm_alu/mul_100_44/B[8] 	 (fanout : 4)
+hpin:tr_norm_alu/mul_100_44/B[7] 	 (fanout : 25)
+hpin:tr_norm_alu/mul_100_44/B[6] 	 (fanout : 4)
+hpin:tr_norm_alu/mul_100_44/B[5] 	 (fanout : 25)
+hpin:tr_norm_alu/mul_100_44/B[4] 	 (fanout : 4)
+hpin:tr_norm_alu/mul_100_44/B[3] 	 (fanout : 25)
+hpin:tr_norm_alu/mul_100_44/B[2] 	 (fanout : 4)
+hpin:tr_norm_alu/mul_100_44/B[1] 	 (fanout : 25)
+hpin:tr_norm_alu/mul_100_44/B[0] 	 (fanout : 22)
+hpin:tr_norm_alu/add_119_45/B[16] 	 (fanout : 71)
+hpin:tr_norm_alu/add_119_45/B[15] 	 (fanout : 2)
+hpin:tr_norm_alu/add_119_45/B[14] 	 (fanout : 2)
+hpin:tr_norm_alu/add_119_45/B[13] 	 (fanout : 2)
+hpin:tr_norm_alu/add_119_45/B[12] 	 (fanout : 2)
+hpin:tr_norm_alu/add_119_45/B[11] 	 (fanout : 2)
+hpin:tr_norm_alu/add_119_45/B[10] 	 (fanout : 2)
+hpin:tr_norm_alu/add_119_45/B[9] 	 (fanout : 2)
+hpin:tr_norm_alu/add_119_45/B[8] 	 (fanout : 2)
+hpin:tr_norm_alu/add_119_45/B[7] 	 (fanout : 2)
+hpin:tr_norm_alu/add_119_45/B[6] 	 (fanout : 2)
+hpin:tr_norm_alu/add_119_45/B[5] 	 (fanout : 2)
+hpin:tr_norm_alu/add_119_45/B[4] 	 (fanout : 2)
+hpin:tr_norm_alu/add_119_45/B[3] 	 (fanout : 2)
+hpin:tr_norm_alu/add_119_45/B[2] 	 (fanout : 2)
+hpin:tr_norm_alu/add_119_45/B[1] 	 (fanout : 2)
+hpin:tr_norm_alu/add_119_45/B[0] 	 (fanout : 2)
+hpin:tr_norm_alu/gt_216_33/B[7] 	 (fanout : 31)
+hpin:tr_norm_alu/gt_216_33/B[6] 	 (fanout : 2)
+hpin:tr_norm_alu/gt_216_33/B[5] 	 (fanout : 2)
+hpin:tr_norm_alu/gt_216_33/B[4] 	 (fanout : 2)
+hpin:tr_norm_alu/gt_216_33/B[3] 	 (fanout : 2)
+hpin:tr_norm_alu/gt_216_33/B[2] 	 (fanout : 2)
+hpin:tr_norm_alu/gt_216_33/B[1] 	 (fanout : 2)
+hpin:tr_norm_alu/gt_216_33/B[0] 	 (fanout : 1)
+hpin:tr_norm_alu/lt_217_38/B[7] 	 (fanout : 3)
+hpin:tr_norm_alu/lt_217_38/B[6] 	 (fanout : 1)
+hpin:tr_norm_alu/lt_217_38/B[5] 	 (fanout : 1)
+hpin:tr_norm_alu/lt_217_38/B[4] 	 (fanout : 1)
+hpin:tr_norm_alu/lt_217_38/B[3] 	 (fanout : 1)
+hpin:tr_norm_alu/lt_217_38/B[2] 	 (fanout : 1)
+hpin:tr_norm_alu/lt_217_38/B[1] 	 (fanout : 1)
+hpin:tr_norm_alu/lt_217_38/B[0] 	 (fanout : 1)
+hpin:tr_norm_alu/mul_210_65/B[12] 	 (fanout : 9)
+hpin:tr_norm_alu/gt_238_31/B[7] 	 (fanout : 19)
+hpin:tr_norm_alu/gt_238_31/B[6] 	 (fanout : 2)
+hpin:tr_norm_alu/gt_238_31/B[5] 	 (fanout : 2)
+hpin:tr_norm_alu/gt_238_31/B[4] 	 (fanout : 2)
+hpin:tr_norm_alu/gt_238_31/B[3] 	 (fanout : 2)
+hpin:tr_norm_alu/gt_238_31/B[2] 	 (fanout : 2)
+hpin:tr_norm_alu/gt_238_31/B[1] 	 (fanout : 2)
+hpin:tr_norm_alu/gt_238_31/B[0] 	 (fanout : 1)
+hpin:tr_norm_alu/lt_239_36/B[7] 	 (fanout : 3)
+hpin:tr_norm_alu/lt_239_36/B[6] 	 (fanout : 1)
+hpin:tr_norm_alu/lt_239_36/B[5] 	 (fanout : 1)
+hpin:tr_norm_alu/lt_239_36/B[4] 	 (fanout : 1)
+hpin:tr_norm_alu/lt_239_36/B[3] 	 (fanout : 1)
+hpin:tr_norm_alu/lt_239_36/B[2] 	 (fanout : 1)
+hpin:tr_norm_alu/lt_239_36/B[1] 	 (fanout : 1)
+hpin:tr_norm_alu/lt_239_36/B[0] 	 (fanout : 1)
+hpin:tr_norm_alu/add_235_64/B[3] 	 (fanout : 2)
+hpin:tr_norm_alu/add_235_64/B[2] 	 (fanout : 2)
+hpin:tr_norm_alu/add_235_64/B[1] 	 (fanout : 2)
+hpin:tr_norm_alu/add_235_64/B[0] 	 (fanout : 2)
+hpin:tr_norm_alu/lte_164_44/B 	 (fanout : 37)
+hpin:tr_norm_alu/add_121_47/B[16] 	 (fanout : 71)
+hpin:tr_norm_alu/add_121_47/B[15] 	 (fanout : 2)
+hpin:tr_norm_alu/add_121_47/B[14] 	 (fanout : 2)
+hpin:tr_norm_alu/add_121_47/B[13] 	 (fanout : 2)
+hpin:tr_norm_alu/add_121_47/B[12] 	 (fanout : 2)
+hpin:tr_norm_alu/add_121_47/B[11] 	 (fanout : 2)
+hpin:tr_norm_alu/add_121_47/B[10] 	 (fanout : 2)
+hpin:tr_norm_alu/add_121_47/B[9] 	 (fanout : 2)
+hpin:tr_norm_alu/add_121_47/B[8] 	 (fanout : 2)
+hpin:tr_norm_alu/add_121_47/B[7] 	 (fanout : 2)
+hpin:tr_norm_alu/add_121_47/B[6] 	 (fanout : 2)
+hpin:tr_norm_alu/add_121_47/B[5] 	 (fanout : 2)
+hpin:tr_norm_alu/add_121_47/B[4] 	 (fanout : 2)
+hpin:tr_norm_alu/add_121_47/B[3] 	 (fanout : 2)
+hpin:tr_norm_alu/add_121_47/B[2] 	 (fanout : 2)
+hpin:tr_norm_alu/add_121_47/B[1] 	 (fanout : 2)
+hpin:tr_norm_alu/add_121_47/B[0] 	 (fanout : 2)
+hpin:tr_norm_alu/add_124_42/B[8] 	 (fanout : 79)
+hpin:tr_norm_alu/add_124_42/B[7] 	 (fanout : 2)
+hpin:tr_norm_alu/add_124_42/B[6] 	 (fanout : 2)
+hpin:tr_norm_alu/add_124_42/B[5] 	 (fanout : 2)
+hpin:tr_norm_alu/add_124_42/B[4] 	 (fanout : 2)
+hpin:tr_norm_alu/add_124_42/B[3] 	 (fanout : 2)
+hpin:tr_norm_alu/add_124_42/B[2] 	 (fanout : 2)
+hpin:tr_norm_alu/add_124_42/B[1] 	 (fanout : 2)
+hpin:tr_norm_alu/add_124_42/B[0] 	 (fanout : 2)
+hpin:tr_norm_alu/add_120_45/B[12] 	 (fanout : 79)
+hpin:tr_norm_alu/add_120_45/B[11] 	 (fanout : 2)
+hpin:tr_norm_alu/add_120_45/B[10] 	 (fanout : 2)
+hpin:tr_norm_alu/add_120_45/B[9] 	 (fanout : 2)
+hpin:tr_norm_alu/add_120_45/B[8] 	 (fanout : 2)
+hpin:tr_norm_alu/add_120_45/B[7] 	 (fanout : 2)
+hpin:tr_norm_alu/add_120_45/B[6] 	 (fanout : 2)
+hpin:tr_norm_alu/add_120_45/B[5] 	 (fanout : 2)
+hpin:tr_norm_alu/add_120_45/B[4] 	 (fanout : 2)
+hpin:tr_norm_alu/add_120_45/B[3] 	 (fanout : 2)
+hpin:tr_norm_alu/add_120_45/B[2] 	 (fanout : 2)
+hpin:tr_norm_alu/add_120_45/B[1] 	 (fanout : 2)
+hpin:tr_norm_alu/add_120_45/B[0] 	 (fanout : 2)
+hpin:tr_norm_alu/mux_x_scaled_s2_217_38/in_1[7] 	 (fanout : 1)
+hpin:tr_norm_alu/mux_x_scaled_s2_217_38/in_1[6] 	 (fanout : 1)
+hpin:tr_norm_alu/mux_x_scaled_s2_217_38/in_1[5] 	 (fanout : 1)
+hpin:tr_norm_alu/mux_x_scaled_s2_217_38/in_1[4] 	 (fanout : 1)
+hpin:tr_norm_alu/mux_x_scaled_s2_217_38/in_1[3] 	 (fanout : 1)
+hpin:tr_norm_alu/mux_x_scaled_s2_217_38/in_1[2] 	 (fanout : 1)
+hpin:tr_norm_alu/mux_x_scaled_s2_217_38/in_1[1] 	 (fanout : 1)
+hpin:tr_norm_alu/mux_x_scaled_s2_217_38/in_1[0] 	 (fanout : 1)
+hpin:tr_norm_alu/mux_x_scaled_s2_216_33/in_1[7] 	 (fanout : 1)
+hpin:tr_norm_alu/mux_x_scaled_s2_216_33/in_1[6] 	 (fanout : 1)
+hpin:tr_norm_alu/mux_x_scaled_s2_216_33/in_1[5] 	 (fanout : 1)
+hpin:tr_norm_alu/mux_x_scaled_s2_216_33/in_1[4] 	 (fanout : 1)
+hpin:tr_norm_alu/mux_x_scaled_s2_216_33/in_1[3] 	 (fanout : 1)
+hpin:tr_norm_alu/mux_x_scaled_s2_216_33/in_1[2] 	 (fanout : 1)
+hpin:tr_norm_alu/mux_x_scaled_s2_216_33/in_1[1] 	 (fanout : 1)
+hpin:tr_norm_alu/mux_x_scaled_s2_216_33/in_1[0] 	 (fanout : 1)
+hpin:tr_norm_alu/mux_y_m1_out_239_36/in_1[7] 	 (fanout : 1)
+hpin:tr_norm_alu/mux_y_m1_out_239_36/in_1[6] 	 (fanout : 1)
+hpin:tr_norm_alu/mux_y_m1_out_239_36/in_1[5] 	 (fanout : 1)
+hpin:tr_norm_alu/mux_y_m1_out_239_36/in_1[4] 	 (fanout : 1)
+hpin:tr_norm_alu/mux_y_m1_out_239_36/in_1[3] 	 (fanout : 1)
+hpin:tr_norm_alu/mux_y_m1_out_239_36/in_1[2] 	 (fanout : 1)
+hpin:tr_norm_alu/mux_y_m1_out_239_36/in_1[1] 	 (fanout : 1)
+hpin:tr_norm_alu/mux_y_m1_out_239_36/in_1[0] 	 (fanout : 1)
+hpin:tr_norm_alu/mux_y_m1_out_238_31/in_1[7] 	 (fanout : 1)
+hpin:tr_norm_alu/mux_y_m1_out_238_31/in_1[6] 	 (fanout : 1)
+hpin:tr_norm_alu/mux_y_m1_out_238_31/in_1[5] 	 (fanout : 1)
+hpin:tr_norm_alu/mux_y_m1_out_238_31/in_1[4] 	 (fanout : 1)
+hpin:tr_norm_alu/mux_y_m1_out_238_31/in_1[3] 	 (fanout : 1)
+hpin:tr_norm_alu/mux_y_m1_out_238_31/in_1[2] 	 (fanout : 1)
+hpin:tr_norm_alu/mux_y_m1_out_238_31/in_1[1] 	 (fanout : 1)
+hpin:tr_norm_alu/mux_y_m1_out_238_31/in_1[0] 	 (fanout : 1)
+hpin:tr_norm_alu/mux_inv_std_dev_comb_165_18/in_0[11] 	 (fanout : 1)
+hpin:tr_norm_alu/mux_inv_std_dev_comb_165_18/in_0[10] 	 (fanout : 1)
+hpin:tr_norm_alu/mux_inv_std_dev_comb_165_18/in_0[9] 	 (fanout : 1)
+hpin:tr_norm_alu/mux_inv_std_dev_comb_165_18/in_0[8] 	 (fanout : 1)
+hpin:tr_norm_alu/mux_inv_std_dev_comb_165_18/in_0[7] 	 (fanout : 1)
+hpin:tr_norm_alu/mux_inv_std_dev_comb_165_18/in_0[6] 	 (fanout : 1)
+hpin:tr_norm_alu/mux_inv_std_dev_comb_165_18/in_0[5] 	 (fanout : 1)
+hpin:tr_norm_alu/mux_inv_std_dev_comb_165_18/in_0[4] 	 (fanout : 1)
+hpin:tr_norm_alu/mux_inv_std_dev_comb_165_18/in_0[3] 	 (fanout : 1)
+hpin:tr_norm_alu/mux_inv_std_dev_comb_165_18/in_0[2] 	 (fanout : 1)
+hpin:tr_norm_alu/mux_inv_std_dev_comb_165_18/in_0[1] 	 (fanout : 1)
+hpin:tr_norm_alu/mux_inv_std_dev_comb_165_18/in_0[0] 	 (fanout : 1)
+hpin:tr_norm_alu/mux_inv_std_dev_comb_165_18/in_1[11] 	 (fanout : 1)
+hpin:tr_norm_alu/mux_inv_std_dev_comb_165_18/in_1[10] 	 (fanout : 1)
+hpin:tr_norm_alu/mux_inv_std_dev_comb_165_18/in_1[9] 	 (fanout : 1)
+hpin:tr_norm_alu/mux_inv_std_dev_comb_165_18/in_1[8] 	 (fanout : 1)
+hpin:tr_norm_alu/mux_inv_std_dev_comb_165_18/in_1[7] 	 (fanout : 1)
+hpin:tr_norm_alu/mux_inv_std_dev_comb_165_18/in_1[6] 	 (fanout : 1)
+hpin:tr_norm_alu/mux_inv_std_dev_comb_165_18/in_1[5] 	 (fanout : 1)
+hpin:tr_norm_alu/mux_inv_std_dev_comb_165_18/in_1[4] 	 (fanout : 1)
+hpin:tr_norm_alu/mux_inv_std_dev_comb_165_18/in_1[3] 	 (fanout : 1)
+hpin:tr_norm_alu/mux_inv_std_dev_comb_165_18/in_1[2] 	 (fanout : 1)
+hpin:tr_norm_alu/mux_inv_std_dev_comb_165_18/in_1[1] 	 (fanout : 1)
+hpin:tr_norm_alu/mux_inv_std_dev_comb_165_18/in_1[0] 	 (fanout : 1)
+hpin:tr_norm_alu/mux_inv_std_dev_comb_165_18/in_2[11] 	 (fanout : 1)
+hpin:tr_norm_alu/mux_inv_std_dev_comb_165_18/in_2[10] 	 (fanout : 1)
+hpin:tr_norm_alu/mux_inv_std_dev_comb_165_18/in_2[9] 	 (fanout : 1)
+hpin:tr_norm_alu/mux_inv_std_dev_comb_165_18/in_2[8] 	 (fanout : 1)
+hpin:tr_norm_alu/mux_inv_std_dev_comb_165_18/in_2[7] 	 (fanout : 1)
+hpin:tr_norm_alu/mux_inv_std_dev_comb_165_18/in_2[6] 	 (fanout : 1)
+hpin:tr_norm_alu/mux_inv_std_dev_comb_165_18/in_2[5] 	 (fanout : 1)
+hpin:tr_norm_alu/mux_inv_std_dev_comb_165_18/in_2[4] 	 (fanout : 1)
+hpin:tr_norm_alu/mux_inv_std_dev_comb_165_18/in_2[3] 	 (fanout : 1)
+hpin:tr_norm_alu/mux_inv_std_dev_comb_165_18/in_2[2] 	 (fanout : 1)
+hpin:tr_norm_alu/mux_inv_std_dev_comb_165_18/in_2[1] 	 (fanout : 1)
+hpin:tr_norm_alu/mux_inv_std_dev_comb_165_18/in_2[0] 	 (fanout : 1)
+hpin:tr_norm_alu/mux_inv_std_dev_comb_164_44/in_1[11] 	 (fanout : 1)
+hpin:tr_norm_alu/mux_inv_std_dev_comb_164_44/in_1[10] 	 (fanout : 1)
+hpin:tr_norm_alu/mux_inv_std_dev_comb_164_44/in_1[9] 	 (fanout : 1)
+hpin:tr_norm_alu/mux_inv_std_dev_comb_164_44/in_1[8] 	 (fanout : 1)
+hpin:tr_norm_alu/mux_inv_std_dev_comb_164_44/in_1[7] 	 (fanout : 1)
+hpin:tr_norm_alu/mux_inv_std_dev_comb_164_44/in_1[6] 	 (fanout : 1)
+hpin:tr_norm_alu/mux_inv_std_dev_comb_164_44/in_1[5] 	 (fanout : 1)
+hpin:tr_norm_alu/mux_inv_std_dev_comb_164_44/in_1[4] 	 (fanout : 1)
+hpin:tr_norm_alu/mux_inv_std_dev_comb_164_44/in_1[3] 	 (fanout : 1)
+hpin:tr_norm_alu/mux_inv_std_dev_comb_164_44/in_1[2] 	 (fanout : 1)
+hpin:tr_norm_alu/mux_inv_std_dev_comb_164_44/in_1[1] 	 (fanout : 1)
+hpin:tr_norm_alu/mux_inv_std_dev_comb_164_44/in_1[0] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/add_46_26/A[9] 	 (fanout : 9)
+hpin:tr_norm_alu/u_isqrt/u_ln/add_46_26/B[7] 	 (fanout : 2)
+hpin:tr_norm_alu/u_isqrt/u_ln/add_46_26/B[6] 	 (fanout : 2)
+hpin:tr_norm_alu/u_isqrt/u_ln/add_46_26/B[5] 	 (fanout : 2)
+hpin:tr_norm_alu/u_isqrt/u_ln/add_46_26/B[4] 	 (fanout : 2)
+hpin:tr_norm_alu/u_isqrt/u_ln/add_46_26/B[3] 	 (fanout : 2)
+hpin:tr_norm_alu/u_isqrt/u_ln/add_46_26/B[2] 	 (fanout : 2)
+hpin:tr_norm_alu/u_isqrt/u_ln/add_46_26/B[1] 	 (fanout : 2)
+hpin:tr_norm_alu/u_isqrt/u_ln/add_46_26/B[0] 	 (fanout : 2)
+hpin:tr_norm_alu/u_isqrt/u_ln/sub_39_41/A[4] 	 (fanout : 2)
+hpin:tr_norm_alu/u_isqrt/u_ln/sub_39_41/A[3] 	 (fanout : 2)
+hpin:tr_norm_alu/u_isqrt/u_ln/sub_39_41/A[2] 	 (fanout : 2)
+hpin:tr_norm_alu/u_isqrt/u_ln/sub_39_41/A[1] 	 (fanout : 2)
+hpin:tr_norm_alu/u_isqrt/u_ln/sub_39_41/A[0] 	 (fanout : 2)
+hpin:tr_norm_alu/u_isqrt/u_ln/add002028/B[5] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/add002028/B[4] 	 (fanout : 2)
+hpin:tr_norm_alu/u_isqrt/u_ln/add002028/B[3] 	 (fanout : 2)
+hpin:tr_norm_alu/u_isqrt/u_ln/add002028/B[2] 	 (fanout : 2)
+hpin:tr_norm_alu/u_isqrt/u_ln/add002028/B[1] 	 (fanout : 2)
+hpin:tr_norm_alu/u_isqrt/u_ln/add002028/B[0] 	 (fanout : 2)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_0[4] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_0[3] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_0[2] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_0[1] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_0[0] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_1[4] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_1[3] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_1[2] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_1[1] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_1[0] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_2[4] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_2[3] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_2[2] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_2[1] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_2[0] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_3[4] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_3[3] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_3[2] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_3[1] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_3[0] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_4[4] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_4[3] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_4[2] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_4[1] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_4[0] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_5[4] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_5[3] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_5[2] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_5[1] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_5[0] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_6[4] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_6[3] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_6[2] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_6[1] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_6[0] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_7[4] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_7[3] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_7[2] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_7[1] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_7[0] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_8[4] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_8[3] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_8[2] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_8[1] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_8[0] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_9[4] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_9[3] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_9[2] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_9[1] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_9[0] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_10[4] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_10[3] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_10[2] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_10[1] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_10[0] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_11[4] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_11[3] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_11[2] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_11[1] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_11[0] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_12[4] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_12[3] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_12[2] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_12[1] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_12[0] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_13[4] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_13[3] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_13[2] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_13[1] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_13[0] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_14[4] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_14[3] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_14[2] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_14[1] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_14[0] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_15[4] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_15[3] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_15[2] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_15[1] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_15[0] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_16[4] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_16[3] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_16[2] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_16[1] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_16[0] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_17[4] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_17[3] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_17[2] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_17[1] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_17[0] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_18[4] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_18[3] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_18[2] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_18[1] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_18[0] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_19[4] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_19[3] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_19[2] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_19[1] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_19[0] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_20[4] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_20[3] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_20[2] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_20[1] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_msb_32_17/in_20[0] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_39_27/in_1[8] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_39_27/in_1[7] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_39_27/in_1[6] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_39_27/in_1[5] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_39_27/in_1[4] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_39_27/in_1[3] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_39_27/in_1[2] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_39_27/in_1[1] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_ln/mux_39_27/in_1[0] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/u_round/eq_39_44/B 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/u_round/add_36_61/B 	 (fanout : 2)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_0[11] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_0[10] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_0[9] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_0[8] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_0[7] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_0[6] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_0[5] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_0[4] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_0[3] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_0[2] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_0[1] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_0[0] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_1[11] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_1[10] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_1[9] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_1[8] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_1[7] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_1[6] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_1[5] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_1[4] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_1[3] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_1[2] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_1[1] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_1[0] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_2[11] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_2[10] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_2[9] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_2[8] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_2[7] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_2[6] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_2[5] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_2[4] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_2[3] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_2[2] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_2[1] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_2[0] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_3[11] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_3[10] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_3[9] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_3[8] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_3[7] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_3[6] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_3[5] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_3[4] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_3[3] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_3[2] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_3[1] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_3[0] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_4[11] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_4[10] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_4[9] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_4[8] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_4[7] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_4[6] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_4[5] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_4[4] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_4[3] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_4[2] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_4[1] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_4[0] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_5[11] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_5[10] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_5[9] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_5[8] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_5[7] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_5[6] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_5[5] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_5[4] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_5[3] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_5[2] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_5[1] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_5[0] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_6[11] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_6[10] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_6[9] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_6[8] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_6[7] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_6[6] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_6[5] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_6[4] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_6[3] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_6[2] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_6[1] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_6[0] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_7[11] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_7[10] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_7[9] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_7[8] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_7[7] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_7[6] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_7[5] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_7[4] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_7[3] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_7[2] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_7[1] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_7[0] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_8[11] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_8[10] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_8[9] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_8[8] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_8[7] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_8[6] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_8[5] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_8[4] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_8[3] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_8[2] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_8[1] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_8[0] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_9[11] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_9[10] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_9[9] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_9[8] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_9[7] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_9[6] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_9[5] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_9[4] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_9[3] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_9[2] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_9[1] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/u_exp/mux_gen_generic_12bit.e_a_12b_123_23/in_9[0] 	 (fanout : 1)
+hpin:tr_norm_alu/u_isqrt/minus_60_24/A 	 (fanout : 22)
+Total number of constant hierarchical pins in design 'tr_norm_alu' : 461
+
+No constant connected ports in design 'tr_norm_alu'
+
+  Preserved instances(s)
+  ----------------
+No preserved combinational instance(s) in design 'tr_norm_alu'
+No preserved sequential instance(s) in design 'tr_norm_alu'
+No preserved hierarchical instance(s) in design 'tr_norm_alu'
+
+  Physical only instances(s)
+  ----------------
+No physical only instance(s) in design 'tr_norm_alu'
+
+  Logical only instance(s) and linked libcells
+    -----------------------------------------
+No logical only instance(s) in design 'tr_norm_alu'
+
+Libcells with no corresponding LEF
+----------------------------------
+No libcell(s) found.
+
+LEF cells with no corresponding libcell
+---------------------------------------
+
+No physical (LEF) cells found.
+
+ Summary
+ ------- 
+
+              Name                       Total
+----------------------------------------------
+Unresolved References                        0
+Empty Modules                                0
+Unloaded Port(s)                             0
+Unloaded Sequential Pin(s)                   0
+Unloaded Combinational Pin(s)              182
+Assigns                                     32
+Undriven Port(s)                             0
+Undriven Leaf Pin(s)                         0
+Undriven hierarchical pin(s)                 0
+Multidriven Port(s)                          0
+Multidriven Leaf Pin(s)                      0
+Multidriven hierarchical Pin(s)              0
+Multidriven unloaded net(s)                  0
+Constant Port(s)                             0
+Constant Leaf Pin(s)                         0
+Constant hierarchical Pin(s)               461
+Preserved leaf instance(s)                   0
+Preserved hierarchical instance(s)           0
+Feedthrough Modules(s)                       0
+Libcells with no LEF cell                    0
+Physical (LEF) cells with no libcell         0
+Subdesigns with long module name             0
+Physical only instance(s)                    0
+Logical only instance(s)                     0
+
+  Done Checking the design.

@@ -3,4 +3,4 @@
 ../rtl/tr_exp/quadratic_divider.sv
 ../rtl/tr_ln/tr_ln.sv
 ../rtl/tr_reciprocal/tr_reciprocal.sv
-../rtl/tr_gelu/tr_gelu.sv
+../rtl/tr_norm/tr_norm_alu.sv
