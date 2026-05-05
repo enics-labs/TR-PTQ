@@ -10,6 +10,6 @@
 ../rtl/tr_ln/tr_ln.sv 
 
 // tr_gelu
-../rtl/tr_gelu/tr_gelu_trick.sv
+../rtl/tr_gelu/tr_gelu_alu.sv
 // tb
-../tb/tr_gelu/tr_gelu_tb.sv
+../tb/tr_gelu/tr_gelu_alu_tb.sv
