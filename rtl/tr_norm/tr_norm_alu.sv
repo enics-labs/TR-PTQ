@@ -1,4 +1,4 @@
-/**
+/*
  * @module   tr_norm_alu
  * @brief    Two-Pass Taylor-Region LayerNorm (Fully Pipelined)
  * @details  Mode 0: Computes Mean and Inverse Std Dev (Stats Pass).
@@ -7,10 +7,10 @@
 `timescale 1ns/1ps
 
 module tr_norm_alu #(
-    parameter int N = 8,              // Vector Size
-    parameter int W = 8,              // I/O Width
-    parameter int FRAC_W = 4,         // Fractional bits (e.g., 4 for Q4.4)
-    parameter int ACC_W = 20,         // Accumulator Width
+    parameter int N             = 8,  // Vector Size
+    parameter int W             = 8,  // I/O Width
+    parameter int FRAC_W        = 4,  // Fractional bits (e.g., 4 for Q4.4)
+    parameter int ACC_W         = 20, // Accumulator Width
     parameter int ISQRT_LATENCY = 6   // Internal Pipeline Latency for Pass 1
 )(
     input  logic                 clk,
@@ -24,7 +24,7 @@ module tr_norm_alu #(
     
     // Auxiliary Inputs for Pass 2
     input  logic signed [W-1:0]  mean_in,
-    input  logic [11:0]          inv_std_in,
+    input  logic        [11:0]   inv_std_in,
     input  logic signed [W-1:0]  gamma,
     input  logic signed [W-1:0]  beta,
 
@@ -32,7 +32,7 @@ module tr_norm_alu #(
     output logic                 valid_out,
     output logic                 last_out,
     output logic signed [W-1:0]  mean_out,
-    output logic [11:0]          inv_std_dev_out,
+    output logic        [11:0]   inv_std_dev_out,
     output logic signed [W-1:0]  y_out
 );
 
@@ -61,14 +61,18 @@ module tr_norm_alu #(
 
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
-            x_reg <= '0; x_sq_reg <= '0;
-            valid_s1_m0 <= 1'b0; last_s1_m0 <= 1'b0;
+            x_reg       <= '0; 
+            x_sq_reg    <= '0;
+            valid_s1_m0 <= 1'b0; 
+            last_s1_m0  <= 1'b0;
         end else if (valid_m0) begin
-            x_reg <= x_in;
-            x_sq_reg <= x_in * x_in; 
-            valid_s1_m0 <= 1'b1; last_s1_m0 <= last_in;
+            x_reg       <= x_in;
+            x_sq_reg    <= x_in * x_in; 
+            valid_s1_m0 <= 1'b1; 
+            last_s1_m0  <= last_in;
         end else begin
-            valid_s1_m0 <= 1'b0; last_s1_m0 <= 1'b0;
+            valid_s1_m0 <= 1'b0; 
+            last_s1_m0  <= 1'b0;
         end
     end
 
@@ -78,7 +82,9 @@ module tr_norm_alu #(
 
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
-            sum_x <= '0; sum_x_sq <= '0; trigger_calc <= 1'b0;
+            sum_x        <= '0; 
+            sum_x_sq     <= '0; 
+            trigger_calc <= 1'b0;
         end else begin
             trigger_calc <= last_s1_m0;
             if (valid_s1_m0) begin
@@ -117,7 +123,9 @@ module tr_norm_alu #(
 
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
-            mean_reg_s4 <= '0; var_reg_s4 <= '0; valid_s4_m0 <= 1'b0;
+            mean_reg_s4 <= '0; 
+            var_reg_s4  <= '0; 
+            valid_s4_m0 <= 1'b0;
         end else begin
             logic signed [ACC_W-1:0] mean_val;
             logic signed [ACC_W+3:0] mean_val_q8;
@@ -157,7 +165,10 @@ module tr_norm_alu #(
 
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
-            ln_x_s5 <= '0; mean_s5 <= '0; var_s5 <= '0; valid_s5_m0 <= 1'b0;
+            ln_x_s5     <= '0; 
+            mean_s5     <= '0; 
+            var_s5      <= '0; 
+            valid_s5_m0 <= 1'b0;
         end else begin
             ln_x_s5     <= ln_x_comb;
             mean_s5     <= mean_reg_s4;
@@ -174,7 +185,10 @@ module tr_norm_alu #(
 
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
-            neg_ln_x_s6 <= '0; mean_s6 <= '0; var_s6 <= '0; valid_s6_m0 <= 1'b0;
+            neg_ln_x_s6 <= '0; 
+            mean_s6     <= '0; 
+            var_s6      <= '0; 
+            valid_s6_m0 <= 1'b0;
         end else begin
             neg_ln_x_s6 <= -(ln_x_s5 >>> 1); // LayerNorm mode x^(-0.5)
             mean_s6     <= mean_s5;
@@ -199,8 +213,11 @@ module tr_norm_alu #(
 
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
-            e_a_s7 <= '0; mantisa_s7 <= '0; 
-            mean_s7 <= '0; var_s7 <= '0; valid_s7_m0 <= 1'b0;
+            e_a_s7      <= '0; 
+            mantisa_s7  <= '0; 
+            mean_s7     <= '0; 
+            var_s7      <= '0; 
+            valid_s7_m0 <= 1'b0;
         end else begin
             e_a_s7      <= e_a_comb;
             mantisa_s7  <= mantisa_comb;
@@ -218,7 +235,10 @@ module tr_norm_alu #(
 
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
-            mult_res_s8 <= '0; mean_s8 <= '0; var_s8 <= '0; valid_s8_m0 <= 1'b0;
+            mult_res_s8 <= '0; 
+            mean_s8     <= '0; 
+            var_s8      <= '0; 
+            valid_s8_m0 <= 1'b0;
         end else begin
             mult_res_s8 <= e_a_s7 * mantisa_s7;
             mean_s8     <= mean_s7;
@@ -235,7 +255,10 @@ module tr_norm_alu #(
 
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
-            inv_std_dev_math_s9 <= '0; mean_s9 <= '0; var_s9 <= '0; valid_s9_m0 <= 1'b0;
+            inv_std_dev_math_s9 <= '0; 
+            mean_s9             <= '0; 
+            var_s9              <= '0; 
+            valid_s9_m0         <= 1'b0;
         end else begin
             inv_std_dev_math_s9 <= mult_res_s8[19:8]; // Shift back to Q4.8
             mean_s9             <= mean_s8;
@@ -246,6 +269,7 @@ module tr_norm_alu #(
 
     // --- S10: Noise Gate (Combinational Output for Mode 0) ---
     logic [11:0] inv_std_dev_comb;
+    
     always_comb begin
         if      (var_s9 <= 0) inv_std_dev_comb = 12'd0;    
         else if (var_s9 == 1) inv_std_dev_comb = 12'd4095; 
@@ -260,14 +284,18 @@ module tr_norm_alu #(
 
     // --- M1_S1: Fetch, Center & Input Buffering ---
     logic signed [W:0]   x_centered_s1; 
-    logic [11:0]         inv_std_s1;
+    logic        [11:0]  inv_std_s1;
     logic signed [W-1:0] gamma_s1, beta_s1;
     logic                valid_s1_m1, last_s1_m1;
 
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
-            valid_s1_m1 <= 1'b0; last_s1_m1 <= 1'b0; x_centered_s1 <= '0;
-            inv_std_s1 <= '0; gamma_s1 <= '0; beta_s1 <= '0;
+            valid_s1_m1   <= 1'b0; 
+            last_s1_m1    <= 1'b0; 
+            x_centered_s1 <= '0;
+            inv_std_s1    <= '0; 
+            gamma_s1      <= '0; 
+            beta_s1       <= '0;
         end else begin
             valid_s1_m1 <= valid_m1;
             last_s1_m1  <= last_in & mode;
@@ -287,13 +315,16 @@ module tr_norm_alu #(
 
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
-            valid_s2_m1 <= 1'b0; last_s2_m1 <= 1'b0; x_scaled_s2 <= '0;
-            gamma_s2 <= '0; beta_s2 <= '0;
+            valid_s2_m1 <= 1'b0; 
+            last_s2_m1  <= 1'b0; 
+            x_scaled_s2 <= '0;
+            gamma_s2    <= '0; 
+            beta_s2     <= '0;
         end else begin
             valid_s2_m1 <= valid_s1_m1; 
             last_s2_m1  <= last_s1_m1;
             if (valid_s1_m1) begin
-                logic signed [W+14:0] full_mult = x_centered_s1 * $signed({1'b0, inv_std_s1});
+                logic signed [W+14:0] full_mult   = x_centered_s1 * $signed({1'b0, inv_std_s1});
                 logic signed [W+14:0] shifted_val = full_mult >>> 8; 
                 
                 gamma_s2 <= gamma_s1;
@@ -312,7 +343,9 @@ module tr_norm_alu #(
 
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
-            valid_s3_m1 <= 1'b0; last_s3_m1 <= 1'b0; y_m1_out <= '0;
+            valid_s3_m1 <= 1'b0; 
+            last_s3_m1  <= 1'b0; 
+            y_m1_out    <= '0;
         end else begin
             valid_s3_m1 <= valid_s2_m1; 
             last_s3_m1  <= last_s2_m1;
