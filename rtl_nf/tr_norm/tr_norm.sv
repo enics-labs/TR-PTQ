@@ -6,7 +6,7 @@
  */
 `timescale 1ns/1ps
 
-module tr_norm_alu #(
+module tr_norm #(
     parameter int N             = 8,  // Vector Size
     parameter int W             = 8,  // I/O Width
     parameter int FRAC_W        = 4,  // Fractional bits (e.g., 4 for Q4.4)
