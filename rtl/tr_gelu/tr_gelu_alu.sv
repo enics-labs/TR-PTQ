@@ -154,10 +154,10 @@ module tr_gelu_alu #(
         end else begin
             logic [15:0] sig_neg_mult;
             if (x_s3 > 0) begin
-                sigmoid_s4 = inv_s3; 
+                sigmoid_s4 <= inv_s3; 
             end else begin
-                sig_neg_mult = (E_s3 * inv_s3);
-                sigmoid_s4   = sig_neg_mult[15:8];
+                sig_neg_mult <= (E_s3 * inv_s3);
+                sigmoid_s4   <= sig_neg_mult[15:8];
             end
             z_s4        <= z_s3;
             valid_s4_m1 <= valid_s3 && (mode_s3 == 1'b1);
