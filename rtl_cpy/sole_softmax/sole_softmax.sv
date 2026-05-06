@@ -1,6 +1,6 @@
 `timescale 1ns/1ps
 
-module sole_softmax_top #(
+module sole_softmax #(
     parameter int N = 8,
     parameter int W = 8,
     parameter int FRAC_W = 4
