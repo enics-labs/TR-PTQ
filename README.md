@@ -1,14 +1,14 @@
-# MRPC Quantized BERT Experiment
+# MRCP/TR-PTQ Quantized BERT Experiments
 
-This project contains a split-out version of the original `copy_of_bert_glue_mrcp.py` experiment plus a matching Jupyter notebook. The quantized model classes live in `mrcp_quant/`, and experiment settings are controlled by `quant_config.json`.
+This project contains configurable quantized BERT experiments for GLUE and SQuAD, integer/Taylor approximations for transformer layers, and CUDA prototypes for optimized softmax/GELU arithmetic. The quantized model classes live in `mrcp_quant/`, experiment settings are controlled by `quant_config*.json`, and exploratory notebooks live in `notebooks/`.
 
 ## Files
 
 | Path | Purpose |
 | --- | --- |
 | `copy_of_bert_glue_mrcp.py` | Python entry point for the MRPC quantization experiment. |
-| `copy_of_bert_glue_mrcp.ipynb` | Notebook version of the same entry point. |
 | `run_glue_quant.py` | Generic configurable GLUE runner for MRPC, CoLA, RTE, SST-2, QQP, MNLI, and QNLI. |
+| `run_squad_quant.py` | Configurable SQuAD question-answering runner. |
 | `quant_config.json` | Main experiment config. Edit this to change quantized layers, bit widths, and run sizes. |
 | `quant_config_cola.json` | Example CoLA config for the generic GLUE runner. |
 | `quant_config_rte.json` | Example RTE config for the generic GLUE runner. |
@@ -16,6 +16,7 @@ This project contains a split-out version of the original `copy_of_bert_glue_mrc
 | `quant_config_qqp.json` | Example QQP config for the generic GLUE runner. |
 | `quant_config_mnli.json` | Example MNLI config for the generic GLUE runner. |
 | `quant_config_qnli.json` | Example QNLI config for the generic GLUE runner. |
+| `quant_config_squad.json` | Example SQuAD config for the question-answering runner. |
 | `mrcp_quant/observers.py` | Observer classes. |
 | `mrcp_quant/quant_utils.py` | Integer approximation and lookup-table helpers. |
 | `mrcp_quant/quantized_layers.py` | Compatibility exports for quantized layers. |
@@ -23,6 +24,24 @@ This project contains a split-out version of the original `copy_of_bert_glue_mrc
 | `mrcp_quant/bert_model.py` | Custom BERT body and task-independent heads. |
 | `mrcp_quant/heads.py` | Sequence classification and MRPC heads. |
 | `mrcp_quant/config.py` | Config loading and quantized-module name resolution. |
+| `mrcp_quant/optimized_layers/` | CUDA extension prototypes for optimized softmax, reciprocal, sigmoid, and GELU paths. |
+| `notebooks/` | Jupyter notebooks for model runs, approximation analysis, and CUDA extension benchmarks. |
+
+## Notebooks
+
+Most exploratory notebooks are kept under `notebooks/` so the repository root stays focused on runnable scripts and configs.
+
+| Notebook | Purpose |
+| --- | --- |
+| `notebooks/bert_base_glue.ipynb` | BERT-base GLUE experiment workflow. |
+| `notebooks/bert_large_squad_quant.ipynb` | BERT-large SQuAD quantization workflow. |
+| `notebooks/exp_approx_variants.ipynb` | Compares CUDA exponential approximation variants. |
+| `notebooks/gelu_alpha_table_test.ipynb` | Tests and benchmarks optimized GELU with alpha-table and sigmoid variants. |
+| `notebooks/gelu_debug_pref.ipynb` | GELU approximation debugging and profiling notes. |
+| `notebooks/ln_approx_range_1_127.ipynb` | Evaluates `tr_new_ln` over integer input ranges. |
+| `notebooks/reciprocal_approx_tr_ln_exp.ipynb` | Reciprocal approximation analysis using TR-ln/TR-exp. |
+| `notebooks/reciprocal_u8_u16_int32_test.ipynb` | Focused U8/U16 reciprocal CUDA test over int32 denominators. |
+| `notebooks/sigmoid_recip_q44_test.ipynb` | Sigmoid Q4.4 reciprocal-path experiment and benchmark. |
 
 ## Using A Config
 
@@ -38,7 +57,7 @@ To use another config file from the Python script, set `MRPC_QUANT_CONFIG`:
 MRPC_QUANT_CONFIG=my_config.json python copy_of_bert_glue_mrcp.py
 ```
 
-In the notebook, edit the `CONFIG_PATH` cell or set the environment variable before running the notebook.
+In notebooks under `notebooks/`, edit the `CONFIG_PATH` cell or set the environment variable before running the notebook.
 
 ## Generic GLUE Runner
 
@@ -54,6 +73,16 @@ GLUE_QUANT_CONFIG=quant_config_qnli.json python run_glue_quant.py
 ```
 
 Set `task_name` to `mrpc`, `cola`, `rte`, `sst2`, `qqp`, `mnli`, or `qnli`. The runner chooses the matching custom head, tokenizer fields, GLUE split, metric, calibration flow, and timestamped JSON output.
+
+## SQuAD Runner
+
+Use `run_squad_quant.py` for SQuAD question-answering runs:
+
+```bash
+SQUAD_QUANT_CONFIG=quant_config_squad.json python run_squad_quant.py
+```
+
+The runner uses the custom quantized question-answering head, calibrates on the SQuAD train split, evaluates on the validation split, and saves exact-match/F1 metrics to `output/`.
 
 ## Top-Level Options
 

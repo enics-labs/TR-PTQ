@@ -19,8 +19,6 @@ PROJECT_DIR_CANDIDATES = [
     os.environ.get("MRPC_PROJECT_DIR"),
     Path.cwd(),
     Path("/content/mrcp-tr-ptq"),
-    Path("/content/drive/MyDrive/mrcp-tr-ptq"),
-    Path("/content/drive/MyDrive/Colab Notebooks/mrcp-tr-ptq"),
 ]
 
 for candidate in PROJECT_DIR_CANDIDATES:
@@ -51,7 +49,14 @@ from mrcp_quant import (  # noqa: E402
     tokenize_task_batch,
     update_scale_factor,
 )
-from mrcp_quant.quantized_layers import IntSoftmaxTS, QLayerNorm, QuantizedLinear, QuantizedMatmul  # noqa: E402
+from mrcp_quant.quantized_layers import (  # noqa: E402
+    IntGeluTS,
+    IntSoftmaxTS,
+    QLayerNorm,
+    QuantizedLinear,
+    QuantizedMatmul,
+    qHadamardProd,
+)
 
 
 def _config_path():
@@ -80,7 +85,14 @@ def _load_split(task, split, shuffle_seed=None):
 def _should_calibrate(q_module_list):
     return any(
         module_class in q_module_list
-        for module_class in (QLayerNorm, IntSoftmaxTS, QuantizedLinear, QuantizedMatmul)
+        for module_class in (
+            QLayerNorm,
+            IntSoftmaxTS,
+            QuantizedLinear,
+            QuantizedMatmul,
+            IntGeluTS,
+            qHadamardProd,
+        )
     )
 
 

@@ -10,8 +10,6 @@ PROJECT_DIR_CANDIDATES = [
     os.environ.get("MRPC_PROJECT_DIR"),
     Path.cwd(),
     Path("/content/mrcp-tr-ptq"),
-    Path("/content/drive/MyDrive/mrcp-tr-ptq"),
-    Path("/content/drive/MyDrive/Colab Notebooks/mrcp-tr-ptq"),
 ]
 
 for candidate in PROJECT_DIR_CANDIDATES:
@@ -25,8 +23,7 @@ else:
     raise FileNotFoundError(
         "Could not find the project folder containing mrcp_quant. "
         "In Colab, mount Drive and set MRPC_PROJECT_DIR to your project path, "
-        "for example: os.environ['MRPC_PROJECT_DIR'] = "
-        "'/content/drive/MyDrive/mrcp-tr-ptq'."
+        "for example: os.environ['MRPC_PROJECT_DIR'] = '/content/mrcp-tr-ptq'."
     )
 
 if str(PROJECT_DIR) not in sys.path:

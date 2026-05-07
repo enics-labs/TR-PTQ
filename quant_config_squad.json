@@ -1,7 +1,9 @@
 {
-  "task_name": "mnli",
-  "model_name": "textattack/bert-base-uncased-MNLI",
+  "task_name": "squad",
+  "model_name": "bert-large-uncased-whole-word-masking-finetuned-squad",
+  "dataset_name": "squad",
   "q_module_list": [
+    "IntGeluTS", "qHadamardProd"
   ],
   "quantization": {
     "defaults": {
@@ -26,11 +28,12 @@
     "num_samples": 32
   },
   "scale_optimization": {
-    "num_samples": 30
+    "num_samples": 5
   },
   "evaluation": {
     "batch_size": 16,
-    "max_len": 128,
-    "num_val_examples": 9815
+    "max_len": 384,
+    "stride": 128,
+    "num_val_examples": 10570
   }
 }

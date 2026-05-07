@@ -2,7 +2,7 @@
   "task_name": "mrpc",
   "model_name": "lrs21/bert-base-uncased-finetuned-glue-mrpc",
   "q_module_list": [
-    "IntGeluTS", "IntSoftmaxTS", "QLayerNorm", "QuantizedLinear", "QuantizedMatmul", "qHadamardProd"
+    "QuantizedLinear"
   ],
   "quantization": {
     "defaults": {

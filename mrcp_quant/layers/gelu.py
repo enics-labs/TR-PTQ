@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 from transformers.activations import ACT2FN
 
 from mrcp_quant.observers import MinMaxObserver
@@ -113,17 +114,10 @@ class IntGeluTS(nn.Module):
         return self.k_values[indices]
 
     def forward_pass(self, x):
-        alpha = self.get_k_value(x)
-        # alpha = 1.702  # self.get_k_value(x)
-
+        # alpha = self.get_k_value(x)
+        alpha = 1.702  # self.get_k_value(x)
         exp_int, exp_int_sum = self.int_sigmoid(x, self.nof_bits, self.iterations, alpha, self.LUT_SIZE)
         ln_sum = new_ln(exp_int_sum, self.output_bits-1)
-
-        # ln_sum = self.ts_ln(exp_int_sum,
-        #                     iterations=self.iterations+1,
-        #                     nof_bits=self.output_bits,
-        #                     ln_lut=self.ln_lut,
-        #                     LN2=None)
 
         spacial_scale_out = 1 << (self.output_bits - 1)
 
@@ -139,7 +133,10 @@ class IntGeluTS(nn.Module):
         q_sigmoid = ln_mul * exp_int
         deq_sigmoid = q_sigmoid / (1 << ((self.output_bits - 1) + (self.output_bits - 1)))
 
+        
         return self.had_mul(x, deq_sigmoid)
+        # return F.sigmoid(x * alpha)
+        
 
     def float_forward_pass(self, x):
         normal = torch.distributions.Normal(0.0, 1.0)

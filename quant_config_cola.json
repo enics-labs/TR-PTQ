@@ -2,7 +2,7 @@
   "task_name": "cola",
   "model_name": "geckos/bert-base-uncased-finetuned-glue-cola",
   "q_module_list": [
-    "IntGeluTS"
+    "IntGeluTS", "IntSoftmaxTS", "QLayerNorm", "QuantizedLinear", "QuantizedMatmul", "qHadamardProd"
   ],
   "quantization": {
     "defaults": {
