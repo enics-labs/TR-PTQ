@@ -2,7 +2,7 @@ import json
 from pathlib import Path
 
 from .bert_model import DEFAULT_QUANT_PARAMS, set_default_quant_params
-from .quantized_layers import (
+from .layers import (
     IntGeluTS,
     IntSoftmaxTS,
     QLayerNorm,
@@ -22,12 +22,16 @@ Q_MODULES = {
 }
 
 
-def load_experiment_config(path="quant_config.json"):
+def load_experiment_config(path="notebooks/configs/quant_config.json"):
     config_path = Path(path)
     if not config_path.exists() and not config_path.is_absolute():
-        repo_config_path = Path(__file__).resolve().parents[1] / config_path
+        repo_root = Path(__file__).resolve().parents[1]
+        repo_config_path = repo_root / config_path
+        notebooks_config_path = repo_root / "notebooks" / "configs" / config_path.name
         if repo_config_path.exists():
             config_path = repo_config_path
+        elif notebooks_config_path.exists():
+            config_path = notebooks_config_path
     with config_path.open("r", encoding="utf-8") as f:
         return json.load(f)
 

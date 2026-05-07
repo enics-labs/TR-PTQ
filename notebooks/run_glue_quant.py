@@ -62,7 +62,10 @@ from mrcp_quant.quantized_layers import (  # noqa: E402
 def _config_path():
     return os.environ.get(
         "GLUE_QUANT_CONFIG",
-        os.environ.get("MRPC_QUANT_CONFIG", str(PROJECT_DIR / "quant_config.json")),
+        os.environ.get(
+            "MRPC_QUANT_CONFIG",
+            str(PROJECT_DIR / "notebooks" / "configs" / "quant_config.json"),
+        ),
     )
 
 

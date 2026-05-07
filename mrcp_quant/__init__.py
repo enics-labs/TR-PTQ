@@ -8,6 +8,27 @@ from .calibration import calc_cosine, cosine_similarity, find_optimal_scale_fact
 from .visual import configure_plot_style, mean_scale_lineseach, plot_distributions_icml, run_mean, run_ver, sample_layers, sampled_layers, var_scale_linesearch
 from .output import save_experiment_result
 from .tasks import GlueTaskSpec, get_task_spec, tokenize_task_batch
+from .vision_models import (
+    MODEL_LOADERS,
+    Attention,
+    BasicLayer,
+    Block,
+    DeiTPatchEmbed,
+    DistilledVisionTransformer,
+    Mlp,
+    QuantTransformer,
+    SwinPatchEmbed,
+    SwinTransformer,
+    SwinTransformerBlock,
+    WindowAttention,
+    deit_base_patch16_224,
+    deit_small_patch16_224,
+    deit_tiny_patch16_224,
+    get_vision_model_loader,
+    swin_base_patch4_window7_224,
+    swin_small_patch4_window7_224,
+    swin_tiny_patch4_window7_224,
+)
 
 __all__ = [
     "ObserverBase",
@@ -73,4 +94,23 @@ __all__ = [
     "GlueTaskSpec",
     "get_task_spec",
     "tokenize_task_batch",
+    "MODEL_LOADERS",
+    "Attention",
+    "BasicLayer",
+    "Block",
+    "DeiTPatchEmbed",
+    "DistilledVisionTransformer",
+    "Mlp",
+    "QuantTransformer",
+    "SwinPatchEmbed",
+    "SwinTransformer",
+    "SwinTransformerBlock",
+    "WindowAttention",
+    "deit_base_patch16_224",
+    "deit_small_patch16_224",
+    "deit_tiny_patch16_224",
+    "get_vision_model_loader",
+    "swin_base_patch4_window7_224",
+    "swin_small_patch4_window7_224",
+    "swin_tiny_patch4_window7_224",
 ]

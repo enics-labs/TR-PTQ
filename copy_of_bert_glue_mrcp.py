@@ -31,7 +31,10 @@ if str(PROJECT_DIR) not in sys.path:
 
 from mrcp_quant import *
 
-CONFIG_PATH = os.environ.get("MRPC_QUANT_CONFIG", str(PROJECT_DIR / "quant_config.json"))
+CONFIG_PATH = os.environ.get(
+    "MRPC_QUANT_CONFIG",
+    str(PROJECT_DIR / "notebooks" / "configs" / "quant_config.json"),
+)
 experiment_config = load_experiment_config(CONFIG_PATH)
 apply_experiment_config(experiment_config)
 

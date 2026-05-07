@@ -60,7 +60,10 @@ from mrcp_quant.quantized_layers import (  # noqa: E402
 
 
 def _config_path():
-    return os.environ.get("SQUAD_QUANT_CONFIG", str(PROJECT_DIR / "quant_config_squad.json"))
+    return os.environ.get(
+        "SQUAD_QUANT_CONFIG",
+        str(PROJECT_DIR / "notebooks" / "configs" / "quant_config_squad.json"),
+    )
 
 
 def _move_inputs_to_device(inputs, device):

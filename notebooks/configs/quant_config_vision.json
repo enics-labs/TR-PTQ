@@ -1,0 +1,50 @@
+{
+  "task_name": "imagenet",
+  "model_name": "deit_tiny_patch16_224",
+  "pretrained": true,
+  "q_module_list": [
+    "QLayerNorm"
+  ],
+  "dataset": {
+    "name": "imagenet-1k",
+    "train_split": "train",
+    "validation_split": "validation",
+    "token": true,
+    "trust_remote_code": true
+  },
+  "quantization": {
+    "defaults": {
+      "quant": false,
+      "nof_bits_linear1": 8,
+      "nof_bits_linear2": 8,
+      "nof_bits_gelu": 8,
+      "lut_size_gelu": 16,
+      "split_table_gelu": 0,
+      "nof_bits_softmax": 8,
+      "lut_size_softmax": 7,
+      "split_table_softmax": 0,
+      "nof_bits_lnorm1": 12,
+      "nof_bits_lnorm2": 12,
+      "split_table_lnorm": 0,
+      "nof_bits_matmul1": 8,
+      "nof_bits_matmul2": 8
+    },
+    "layers": {}
+  },
+  "calibration": {
+    "num_samples": 32
+  },
+  "scale_optimization": {
+    "num_samples": 0
+  },
+  "evaluation": {
+    "batch_size": 8,
+    "image_size": 224,
+    "resize_size": 256,
+    "num_val_examples": 50000,
+    "topk": [
+      1,
+      5
+    ]
+  }
+}

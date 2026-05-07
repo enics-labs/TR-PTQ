@@ -1,22 +1,24 @@
 # MRCP/TR-PTQ Quantized BERT Experiments
 
-This project contains configurable quantized BERT experiments for GLUE and SQuAD, integer/Taylor approximations for transformer layers, and CUDA prototypes for optimized softmax/GELU arithmetic. The quantized model classes live in `mrcp_quant/`, experiment settings are controlled by `quant_config*.json`, and exploratory notebooks live in `notebooks/`.
+This project contains configurable quantized BERT experiments for GLUE and SQuAD, integer/Taylor approximations for transformer layers, and CUDA prototypes for optimized softmax/GELU arithmetic. The quantized model classes live in `mrcp_quant/`, experiment settings are controlled by `notebooks/configs/quant_config*.json`, and exploratory notebooks live in `notebooks/`.
 
 ## Files
 
 | Path | Purpose |
 | --- | --- |
 | `copy_of_bert_glue_mrcp.py` | Python entry point for the MRPC quantization experiment. |
-| `run_glue_quant.py` | Generic configurable GLUE runner for MRPC, CoLA, RTE, SST-2, QQP, MNLI, and QNLI. |
-| `run_squad_quant.py` | Configurable SQuAD question-answering runner. |
-| `quant_config.json` | Main experiment config. Edit this to change quantized layers, bit widths, and run sizes. |
-| `quant_config_cola.json` | Example CoLA config for the generic GLUE runner. |
-| `quant_config_rte.json` | Example RTE config for the generic GLUE runner. |
-| `quant_config_sst2.json` | Example SST-2 config for the generic GLUE runner. |
-| `quant_config_qqp.json` | Example QQP config for the generic GLUE runner. |
-| `quant_config_mnli.json` | Example MNLI config for the generic GLUE runner. |
-| `quant_config_qnli.json` | Example QNLI config for the generic GLUE runner. |
-| `quant_config_squad.json` | Example SQuAD config for the question-answering runner. |
+| `notebooks/run_glue_quant.py` | Generic configurable GLUE runner for MRPC, CoLA, RTE, SST-2, QQP, MNLI, and QNLI. |
+| `notebooks/run_squad_quant.py` | Configurable SQuAD question-answering runner. |
+| `notebooks/run_vision_quant.py` | Configurable DeiT/Swin ImageNet runner. |
+| `notebooks/configs/quant_config.json` | Main experiment config. Edit this to change quantized layers, bit widths, and run sizes. |
+| `notebooks/configs/quant_config_cola.json` | Example CoLA config for the generic GLUE runner. |
+| `notebooks/configs/quant_config_rte.json` | Example RTE config for the generic GLUE runner. |
+| `notebooks/configs/quant_config_sst2.json` | Example SST-2 config for the generic GLUE runner. |
+| `notebooks/configs/quant_config_qqp.json` | Example QQP config for the generic GLUE runner. |
+| `notebooks/configs/quant_config_mnli.json` | Example MNLI config for the generic GLUE runner. |
+| `notebooks/configs/quant_config_qnli.json` | Example QNLI config for the generic GLUE runner. |
+| `notebooks/configs/quant_config_squad.json` | Example SQuAD config for the question-answering runner. |
+| `notebooks/configs/quant_config_vision.json` | Example DeiT/Swin ImageNet config for the vision runner. |
 | `mrcp_quant/observers.py` | Observer classes. |
 | `mrcp_quant/quant_utils.py` | Integer approximation and lookup-table helpers. |
 | `mrcp_quant/quantized_layers.py` | Compatibility exports for quantized layers. |
@@ -33,8 +35,9 @@ Most exploratory notebooks are kept under `notebooks/` so the repository root st
 
 | Notebook | Purpose |
 | --- | --- |
-| `notebooks/bert_base_glue.ipynb` | BERT-base GLUE experiment workflow. |
+| `bert_base_glue.ipynb` | BERT-base GLUE experiment workflow. |
 | `notebooks/bert_large_squad_quant.ipynb` | BERT-large SQuAD quantization workflow. |
+| `notebooks/deit_swin_quant.ipynb` | DeiT/Swin ImageNet quantization workflow. |
 | `notebooks/exp_approx_variants.ipynb` | Compares CUDA exponential approximation variants. |
 | `notebooks/gelu_alpha_table_test.ipynb` | Tests and benchmarks optimized GELU with alpha-table and sigmoid variants. |
 | `notebooks/gelu_debug_pref.ipynb` | GELU approximation debugging and profiling notes. |
@@ -48,48 +51,58 @@ Most exploratory notebooks are kept under `notebooks/` so the repository root st
 By default, the script and notebook read:
 
 ```text
-quant_config.json
+notebooks/configs/quant_config.json
 ```
 
 To use another config file from the Python script, set `MRPC_QUANT_CONFIG`:
 
 ```bash
-MRPC_QUANT_CONFIG=my_config.json python copy_of_bert_glue_mrcp.py
+MRPC_QUANT_CONFIG=notebooks/configs/my_config.json python copy_of_bert_glue_mrcp.py
 ```
 
 In notebooks under `notebooks/`, edit the `CONFIG_PATH` cell or set the environment variable before running the notebook.
 
 ## Generic GLUE Runner
 
-Use `run_glue_quant.py` for task-configurable MRPC, CoLA, RTE, SST-2, QQP, MNLI, or QNLI runs:
+Use `notebooks/run_glue_quant.py` for task-configurable MRPC, CoLA, RTE, SST-2, QQP, MNLI, or QNLI runs:
 
 ```bash
-GLUE_QUANT_CONFIG=quant_config_cola.json python run_glue_quant.py
-GLUE_QUANT_CONFIG=quant_config_rte.json python run_glue_quant.py
-GLUE_QUANT_CONFIG=quant_config_sst2.json python run_glue_quant.py
-GLUE_QUANT_CONFIG=quant_config_qqp.json python run_glue_quant.py
-GLUE_QUANT_CONFIG=quant_config_mnli.json python run_glue_quant.py
-GLUE_QUANT_CONFIG=quant_config_qnli.json python run_glue_quant.py
+GLUE_QUANT_CONFIG=notebooks/configs/quant_config_cola.json python notebooks/run_glue_quant.py
+GLUE_QUANT_CONFIG=notebooks/configs/quant_config_rte.json python notebooks/run_glue_quant.py
+GLUE_QUANT_CONFIG=notebooks/configs/quant_config_sst2.json python notebooks/run_glue_quant.py
+GLUE_QUANT_CONFIG=notebooks/configs/quant_config_qqp.json python notebooks/run_glue_quant.py
+GLUE_QUANT_CONFIG=notebooks/configs/quant_config_mnli.json python notebooks/run_glue_quant.py
+GLUE_QUANT_CONFIG=notebooks/configs/quant_config_qnli.json python notebooks/run_glue_quant.py
 ```
 
 Set `task_name` to `mrpc`, `cola`, `rte`, `sst2`, `qqp`, `mnli`, or `qnli`. The runner chooses the matching custom head, tokenizer fields, GLUE split, metric, calibration flow, and timestamped JSON output.
 
 ## SQuAD Runner
 
-Use `run_squad_quant.py` for SQuAD question-answering runs:
+Use `notebooks/run_squad_quant.py` for SQuAD question-answering runs:
 
 ```bash
-SQUAD_QUANT_CONFIG=quant_config_squad.json python run_squad_quant.py
+SQUAD_QUANT_CONFIG=notebooks/configs/quant_config_squad.json python notebooks/run_squad_quant.py
 ```
 
 The runner uses the custom quantized question-answering head, calibrates on the SQuAD train split, evaluates on the validation split, and saves exact-match/F1 metrics to `output/`.
 
+## DeiT/Swin Vision Runner
+
+Use `notebooks/run_vision_quant.py` for ImageNet DeiT/Swin runs:
+
+```bash
+VISION_QUANT_CONFIG=notebooks/configs/quant_config_vision.json python notebooks/run_vision_quant.py
+```
+
+Valid `model_name` values are `deit_tiny_patch16_224`, `deit_small_patch16_224`, `deit_base_patch16_224`, `swin_tiny_patch4_window7_224`, `swin_small_patch4_window7_224`, and `swin_base_patch4_window7_224`. The runner streams ImageNet-1k train samples for calibration, evaluates on the validation split, and saves top-1/top-5 metrics to `output/`. ImageNet-1k access may require a Hugging Face token in your environment.
+
 ## Top-Level Options
 
-| Option | Type | Default in `quant_config.json` | Description |
+| Option | Type | Default in `notebooks/configs/quant_config.json` | Description |
 | --- | --- | --- | --- |
 | `model_name` | string | `lrs21/bert-base-uncased-finetuned-glue-mrpc` | Hugging Face checkpoint used for tokenizer, config, and reference weights. |
-| `task_name` | string | `mrpc` | Task used by `run_glue_quant.py`; valid values are `mrpc`, `cola`, `rte`, `sst2`, `qqp`, `mnli`, and `qnli`. |
+| `task_name` | string | `mrpc` | Task used by `notebooks/run_glue_quant.py`; valid values are `mrpc`, `cola`, `rte`, `sst2`, `qqp`, `mnli`, and `qnli`. |
 | `q_module_list` | list of strings | `["QLayerNorm"]` | Quantized layer classes to enable with `model.set_quant()`. |
 | `quantization.defaults` | object | See table below | Default bit/LUT settings applied before model construction. |
 | `quantization.layers` | object | `{}` | Optional per-module overrides keyed by `model.named_modules()` path. |

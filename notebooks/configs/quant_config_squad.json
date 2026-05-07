@@ -1,0 +1,39 @@
+{
+  "task_name": "squad",
+  "model_name": "bert-large-uncased-whole-word-masking-finetuned-squad",
+  "dataset_name": "squad",
+  "q_module_list": [
+    "IntGeluTS", "qHadamardProd"
+  ],
+  "quantization": {
+    "defaults": {
+      "quant": false,
+      "nof_bits_linear1": 8,
+      "nof_bits_linear2": 8,
+      "nof_bits_gelu": 8,
+      "lut_size_gelu": 16,
+      "split_table_gelu": 0,
+      "nof_bits_softmax": 8,
+      "lut_size_softmax": 7,
+      "split_table_softmax": 0,
+      "nof_bits_lnorm1": 12,
+      "nof_bits_lnorm2": 12,
+      "split_table_lnorm": 0,
+      "nof_bits_matmul1": 8,
+      "nof_bits_matmul2": 8
+    },
+    "layers": {}
+  },
+  "calibration": {
+    "num_samples": 32
+  },
+  "scale_optimization": {
+    "num_samples": 5
+  },
+  "evaluation": {
+    "batch_size": 16,
+    "max_len": 384,
+    "stride": 128,
+    "num_val_examples": 10570
+  }
+}

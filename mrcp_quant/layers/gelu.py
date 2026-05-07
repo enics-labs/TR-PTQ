@@ -1,7 +1,10 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from transformers.activations import ACT2FN
+try:
+    from transformers.activations import ACT2FN
+except ImportError:
+    ACT2FN = {"gelu": F.gelu}
 
 from mrcp_quant.observers import MinMaxObserver
 from mrcp_quant.quant_utils import new_ln, TaylorExponent
@@ -58,7 +61,7 @@ class IntGeluTS(nn.Module):
         self.k_values = torch.tensor([
             2.834596, 2.338217, 1.978175, 1.754823, 1.642511,
             1.642511, 1.754823, 1.978175, 2.338217, 2.834596
-        ]).cuda()
+        ])
 
         self.exp_lut = []
         self.ln_lut =  []
