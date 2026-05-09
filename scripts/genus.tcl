@@ -1,5 +1,9 @@
-set design(TOPLEVEL) "vec_mac_su"
-set debug_file "debug_vec_mac_su.txt"
+set design(TOPLEVEL) [lindex $argv 0]
+if {$design(TOPLEVEL) == ""} {
+    puts "Error: TOPLEVEL not provided as argument. Usage: genus -f genus.tcl <TOPLEVEL>"
+    exit 1
+}
+set debug_file "$design(TOPLEVEL).txt"
 set runtype "synthesis"
 
 # Variables
@@ -14,7 +18,7 @@ source ../scripts/procedures.tcl -quiet
 enics_start_stage "start"
 
 # Load the specific definitions for this project
-source ../inputs/$design(TOPLEVEL).defines -quiet
+source ../inputs/dut.defines -quiet
 
 # Load the library paths and definitions for this technology
 source ../libraries/libraries.$TECHNOLOGY.tcl -quiet
@@ -113,6 +117,12 @@ enics_report_timing $design(synthesis_reports)
 set_db [get_db design:$design(TOPLEVEL)] .lp_clock_gating_min_flops 8
 set_db [get_db design:$design(TOPLEVEL)] .lp_clock_gating_style latch 
 
+# Prevent specific modules from being ungrouped
+# set_db [get_db modules max_sub] .ungroup_ok false
+# set_db [get_db modules tr_exp*] .ungroup_ok false
+# set_db [get_db modules tr_reciprocal*] .ungroup_ok false
+set_db auto_ungroup none
+
 ##########################
 #     Synthesize
 ##########################
@@ -139,11 +149,6 @@ if {$phys_synth_type == "floorplan"} {
     # Synthesize to generics (non physical-aware)
     enics_start_stage "syn_generic"
     syn_generic 
-
-    # Run clock sweep
-    # source "$design(scripts_dir)/fmax_sweep.tcl"
-    # run_clock_sweep 10000 2000 1000 "clk" $design(synthesis_reports)
-
     # Map to technology (non physical-aware)
     enics_start_stage "technology_mapping"
     syn_map 

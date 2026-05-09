@@ -31,6 +31,9 @@ xcelium.d
 workspace/
 export/
 rtl/
+rtl_bb/
+rtl_cpy/
+rtl_soc/
 
 # ==================================================
 # Simulators
