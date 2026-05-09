@@ -75,6 +75,16 @@ set design(export_dir) "$design(project_root)/export/$design(TOPLEVEL)"
 set design(reports_dir) "$design(project_root)/reports/$design(TOPLEVEL)"
 set design(synthesis_reports) "$design(reports_dir)/synthesis"
 set design(functional_sdc) "$design(inputs_dir)/dut.sdc"
+set design(postsyn_netlist) "$design(export_dir)/$design(TOPLEVEL).postsyn.v"
+set design(postsyn_db_base_name) "$design(export_dir)/post_synth/$design(TOPLEVEL)"
+set design(postsyn_db) "$design(postsyn_db_base_name).stylus.enc"
+set design(postsyn_sdf) "$design(export_dir)/$design(TOPLEVEL).postsyn.sdf"
+set design(floorplan_def) "$design(inputs_dir)/$design(TOPLEVEL).floorplan.def"
+set design(postroute_netlist) "$design(export_dir)/$design(TOPLEVEL).final.v"
+set design(postroute_sdf) "$design(export_dir)/$design(TOPLEVEL).final.sdf"
+set design(mmmc_view_file) "$design(inputs_dir)/$design(TOPLEVEL).mmmc"
+set design(io_file) "$design(inputs_dir)/$design(TOPLEVEL).io"
+set design(clock_tree_spec) "$design(inputs_dir)/$design(TOPLEVEL).ccopt"
 
 #############################################
 #       MMMC

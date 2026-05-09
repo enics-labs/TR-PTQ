@@ -1,6 +1,10 @@
-set design(TOPLEVEL) [lindex $argv 0]
-if {$design(TOPLEVEL) == ""} {
-    puts "Error: TOPLEVEL not provided as argument. Usage: genus -f genus.tcl <TOPLEVEL>"
+if { [info exists env(TOPLEVEL)] } {
+    set design(TOPLEVEL) $env(TOPLEVEL)
+} elseif { [info exists TOPLEVEL] } {
+    set design(TOPLEVEL) $TOPLEVEL
+} else {
+    puts "Error: TOPLEVEL not provided."
+    puts "Usage (from workspace): genus -execute \"set TOPLEVEL <module>\" -f ../scripts/genus.tcl"
     exit 1
 }
 set debug_file "$design(TOPLEVEL).txt"
@@ -189,4 +193,4 @@ write_design -base_name "$design(export_dir)/post_synth/$design(TOPLEVEL)"
 write_hdl > $design(postsyn_netlist)
 write_sdf > "$design(export_dir)/post_synth/$design(TOPLEVEL).sdf"
 write_sdc > "$design(export_dir)/post_synth/$design(TOPLEVEL).sdc" 
-write_design -innovus -db -base_name "$design(export_dir)/pwr/genus/$design(TOPLEVEL)"
+# write_design -innovus -db -base_name "$design(export_dir)/pwr/genus/$design(TOPLEVEL)"
