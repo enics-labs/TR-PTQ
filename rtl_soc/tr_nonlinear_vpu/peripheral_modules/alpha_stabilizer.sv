@@ -10,8 +10,9 @@ module alpha_stabilizer #(
 
     generate
         for (genvar i = 0; i < N; i++) begin : GEN_LANES
-            logic [7:0] abs_z;
-            logic signed [7:0] alpha_g;
+            logic [7:0]         abs_z;
+            logic signed [15:0] x_ext;
+            logic signed [15:0] x_base;
             logic signed [15:0] x_mult;
             logic signed [W-1:0] x_scaled;
 
@@ -19,24 +20,27 @@ module alpha_stabilizer #(
                 // 1. Get absolute magnitude to determine region index
                 abs_z = (in_vec[i][W-1]) ? -in_vec[i] : in_vec[i];
                 
-                // 2. Extract integer bits [6:4] for 3-region Alpha LUT
+                // Sign-extend input to 16 bits to prevent overflow during shifts
+                x_ext = {{8{in_vec[i][W-1]}}, in_vec[i]};
+
+                // 2. Base Multiplier (x * 24) using zero-delay wire shifts
+                // 24 = 16 + 8 -> (x << 4) + (x << 3)
+                x_base = (x_ext <<< 4) + (x_ext <<< 3);
+
+                // 3. Add the remainder based on the region LUT
                 case (abs_z[6:4])
-                    3'b000:  alpha_g = 8'h1B; // ~1.702 in Q4.4
-                    3'b001:  alpha_g = 8'h1A;
-                    3'b010:  alpha_g = 8'h19;
-                    default: alpha_g = 8'h18;
+                    3'b000:  x_mult = x_base + (x_ext <<< 1) + x_ext; // * 27 (Base + 2x + 1x)
+                    3'b001:  x_mult = x_base + (x_ext <<< 1);         // * 26 (Base + 2x)
+                    3'b010:  x_mult = x_base + x_ext;                 // * 25 (Base + 1x)
+                    default: x_mult = x_base;                         // * 24 (Base)
                 endcase
 
-                // 3. Scale and Saturate to Q4.4 (7.93 to -8.0)
-                // Q4.4 * Q4.4 = Q8.8 result (16 bits)
-                x_mult = in_vec[i] * $signed({1'b0, alpha_g});
-                
-                if ($signed(x_mult) > 16'sd2032)       x_scaled = 8'sd127;
-                else if ($signed(x_mult) < -16'sd2048) x_scaled = -8'sd128;
-                else                                   x_scaled = x_mult[11:4];
+                // 4. Scale and Saturate to Q4.4 (7.93 to -8.0)
+                if (x_mult > 16'sd2032)       x_scaled = 8'sd127;
+                else if (x_mult < -16'sd2048) x_scaled = -8'sd128;
+                else                          x_scaled = x_mult[11:4];
 
-                // 4. Stabilization: Forced negative absolute value
-                // This ensures we always compute e^-|x| for the 1-ALU trick
+                // 5. Stabilization: Forced negative absolute value
                 out_vec[i] = (x_scaled > 0) ? -x_scaled : x_scaled;
             end
         end
