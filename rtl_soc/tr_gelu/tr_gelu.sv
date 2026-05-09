@@ -31,7 +31,6 @@ module tr_gelu #(
         .x_in(x_in), .mode_add_one(1'b1), .y_out(pre_ln_out)
     );
 
-    // FIX 2: High-Precision Logarithm Wrapper
     logic signed [W-1:0] ln_out [N];
     logic signed [W+3:0] ln_xq [N];
     logic signed [W+3:0] ln_yq [N];
@@ -146,8 +145,6 @@ module tr_gelu #(
                 vec_a_in[j] = s2_x_raw[j];
                 vec_b_in[j] = s2_sym_out[j];
             end else begin
-                // FIX 1: Correct handling of e^0. 
-                // We want the final product to be exactly 'mantisa'.
                 // Since output is >> 8, we calculate 128 * (mantisa * 2) = mantisa * 256.
                 if (s2_is_zero[j]) begin
                     vec_a_in[j] = 8'd128; 
