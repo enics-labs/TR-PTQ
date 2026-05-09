@@ -18,7 +18,12 @@ module tr_backbone_wrapper #(
     parameter int FRAC_W    = 4,
     parameter int LUT_IDX_W = 3
 )(
-    // Control Flags (from VPU Controller)
+    input  logic                    clk,
+    input  logic                    rst_n,
+    input  logic                    in_valid,
+    output logic                    out_valid,
+
+    // Control Flags
     input  logic                    mode_pre_ln,  // 0: Bypass, 1: Add +1.0
     input  logic [1:0]              mode_post_ln, // 00: By, 01: -1.0x, 10: -0.5x
     
@@ -31,14 +36,11 @@ module tr_backbone_wrapper #(
     output logic                        is_zero_out [N]
 );
 
-    // Internal routing arrays
+    // =========================================================
+    // STAGE 1: PRE-LN (Combinational)
+    // =========================================================
     logic signed [WIDTH_IN-1:0]  pre_ln_out  [N];
-    logic signed [WIDTH_OUT-1:0] tr_ln_out   [N];
-    logic signed [WIDTH_OUT-1:0] post_ln_out [N];
 
-    // ---------------------------------------------------------
-    // 1. Pre-LN Modifier (Operates at W_MAC precision)
-    // ---------------------------------------------------------
     pre_ln_modifier #(
         .N(N), 
         .WIDTH_IN(WIDTH_IN), 
@@ -49,40 +51,73 @@ module tr_backbone_wrapper #(
         .y_out        (pre_ln_out)
     );
 
-    // ---------------------------------------------------------
-    // Generate Block for N parallel lanes
-    // ---------------------------------------------------------
+    // --- PIPELINE REGISTER 1 ---
+    logic signed [WIDTH_IN-1:0] s1_pre_ln_reg [N];
+    logic [1:0]                 s1_mode_post_ln;
+    logic                       s1_valid;
+
+    always_ff @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            s1_valid <= 1'b0;
+            s1_mode_post_ln <= '0;
+            for(int i=0; i<N; i++) s1_pre_ln_reg[i] <= '0;
+        end else begin
+            s1_valid <= in_valid;
+            s1_mode_post_ln <= mode_post_ln; // Carry the control flag forward
+            s1_pre_ln_reg <= pre_ln_out;
+        end
+    end
+
+    // =========================================================
+    // STAGE 2: TR-LN & POST-LN (Combinational)
+    // =========================================================
+    logic signed [WIDTH_OUT-1:0] tr_ln_out   [N];
+    logic signed [WIDTH_OUT-1:0] post_ln_out [N];
+
     generate
         for (genvar i = 0; i < N; i++) begin : gen_tr_lanes
             
-            // 2. TR-LN ALU (Steps down WIDTH_IN -> WIDTH_OUT)
+            // TR-LN ALU (Steps down WIDTH_IN -> WIDTH_OUT)
             tr_ln_alu #(
                 .WIDTH(WIDTH_IN), 
                 .BITS(FRAC_W),          // Note: tr_ln_alu uses "BITS" for fractional width
                 .OUT_WIDTH(WIDTH_OUT)
             ) u_tr_ln (
-                .xq (pre_ln_out[i]),    // Note: tr_ln_alu expects unsigned/positive input 'xq'
+                .xq (s1_pre_ln_reg[i]),    // Note: tr_ln_alu expects unsigned/positive input 'xq'
                 .yq (tr_ln_out[i])
             );
 
         end
     endgenerate
 
-    // ---------------------------------------------------------
-    // 3. Post-LN Modifier (Operates at W_EXP precision)
-    // ---------------------------------------------------------
     post_ln_modifier #(
         .N(N), 
         .W(WIDTH_OUT)
     ) u_post_ln (
         .x_in     (tr_ln_out),
-        .mode_sel (mode_post_ln),
+        .mode_sel (s1_mode_post_ln),
         .y_out    (post_ln_out)
     );
 
-    // ---------------------------------------------------------
-    // Generate Block for N parallel TR-EXP lanes
-    // ---------------------------------------------------------
+    // --- PIPELINE REGISTER 2 ---
+    logic signed [WIDTH_OUT-1:0] s2_post_ln_reg [N];
+    logic                        s2_valid;
+
+    always_ff @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            s2_valid <= 1'b0;
+            for(int j=0; j<N; j++) s2_post_ln_reg[j] <= '0;
+        end else begin
+            s2_valid <= s1_valid;
+            s2_post_ln_reg <= post_ln_out;
+        end
+    end
+
+    // =========================================================
+    // STAGE 3: TR-EXP (Combinational to Output)
+    // =========================================================
+    assign out_valid = s2_valid;
+
     generate
         for (genvar i = 0; i < N; i++) begin : gen_tr_exp_lanes
             
@@ -91,14 +126,13 @@ module tr_backbone_wrapper #(
                 .WIDTH(WIDTH_OUT),
                 .FRAC_W(FRAC_W),
                 .LUT_IDX_W(LUT_IDX_W),
-                .ITER(2) // Defaults to Quadratic (2)
+                .ITER(2) // Quadratic
             ) u_tr_exp (
-                .x       (post_ln_out[i]),
+                .x       (s2_post_ln_reg[i]),
                 .a_idx   (a_idx_out[i]),
                 .mantisa (mantisa_out[i]),
                 .is_zero (is_zero_out[i])
             );
-
         end
     endgenerate
 

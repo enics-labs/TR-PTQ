@@ -50,9 +50,12 @@ module tr_nonlinear_vpu #(
     input  logic [1:0]  mac_op_mode,
     input  logic [1:0]  vecmul_op_mode,
     
+    input  logic        en_bb_valid,
     input  logic        bb_mode_pre_ln,
     input  logic [1:0]  bb_mode_post_ln,
-    input  logic        sym_mode_en
+    input  logic        sym_mode_en,
+
+    output logic        vpu_bb_valid_out
 );
 
     // =========================================================
@@ -183,6 +186,10 @@ module tr_nonlinear_vpu #(
         .FRAC_W(FRAC_W),
         .LUT_IDX_W(LUT_IDX_W)
     ) u_backbone (
+        .clk(clk),
+        .rst_n(rst_n),
+        .in_valid(en_bb_valid),
+        .out_valid(vpu_bb_valid_out),
         .mode_pre_ln(bb_mode_pre_ln),
         .mode_post_ln(bb_mode_post_ln),
         .vec_in(bb_in),

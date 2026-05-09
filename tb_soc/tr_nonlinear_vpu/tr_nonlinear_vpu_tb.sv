@@ -39,6 +39,8 @@ module tb_tr_nonlinear_vpu();
     logic       en_piped_max;
     logic       en_mac_valid;
     logic       en_vecmul_valid;
+    logic       en_bb_valid;
+    logic       vpu_bb_valid_out;
     logic       mac_clear_acc;
     logic [1:0] mac_op_mode;
     logic [1:0] vecmul_op_mode;
@@ -80,6 +82,7 @@ module tb_tr_nonlinear_vpu();
         en_piped_max    = 0;
         en_mac_valid    = 0;
         en_vecmul_valid = 0;
+        en_bb_valid     = 0;
         mac_clear_acc   = 0;
         mac_op_mode     = 0;
         vecmul_op_mode  = 0;
@@ -175,25 +178,25 @@ module tb_tr_nonlinear_vpu();
         $display("\n[TEST 3] Routing: Dot Reg -> TR-Backbone -> SRAM");
         clear_crossbar();
         
-        // We will fake a dot product output by forcing it in the testbench, 
-        // but normally this persists from Test 2. We use 16 (1.0 in Q4.4).
-        // Let's test the -1.0x division path.
-        
         // Setup Crossbar
-        mux_bb_in_sel   = 2'b00;   // Ingest from vpu_dot_out
-        bb_mode_post_ln = 2'b01;   // -1.0 * x (Division mode)
-        mux_vpu_out_sel = 3'b001;  // Output bb_mantisa to SRAM
+        mux_bb_in_sel   = 2'b00;    // Ingest from vpu_dot_out
+        bb_mode_post_ln = 2'b01;    // -1.0 * x (Division mode)
+        mux_vpu_out_sel = 3'b001;   // Output bb_mantisa to SRAM
         
-        // Wait for combinational backbone to settle (no clock required, just delta time)
-        #1; 
+        // Drive Data through the pipelined backbone
+        @(posedge clk);
+        en_bb_valid = 1;
         
-        // Note: Because the TR-Backbone relies on actual approximated math, 
-        // asserting exact binary output is tricky without knowing your exact LUTs. 
-        // We just assert the routing pathway is alive and not 'X'.
+        @(posedge clk);
+        en_bb_valid = 0;
+        
+        // Wait for pipelined backbone to settle (2 cycles)
+        do begin @(posedge clk); end while (!vpu_bb_valid_out);
+        
         if (vpu_data_out[0] !== 8'hxx)
-            $display("  -> [PASS] Backbone injection routing is active and combinational.");
+            $display("  -> [PASS] Pipelined backbone routing is active and propagating.");
         else
-            $error("  -> [FAIL] Backbone routing is disconnected.");
+            $error("  -> [FAIL] Pipelined backbone routing is disconnected or stuck.");
 
 
         // ====================================================================
