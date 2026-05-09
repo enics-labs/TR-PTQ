@@ -1,6 +1,6 @@
 `timescale 1ns/1ps
 
-module tb_tr_nonlinear_vpu();
+module tr_nonlinear_vpu_tb();
 
     // ---------------------------------------------------------
     // Parameters (Scaled down for simulation readability)
