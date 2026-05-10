@@ -47,6 +47,8 @@ module tr_soc_ctrl #(
     output logic                    src_sram_a_sel, 
     output logic                    src_sram_b_sel, 
     output logic                    write_ext_sram, 
+    output logic signed [W-1:0]     scratch_a_out [N],
+    output logic signed [W-1:0]     scratch_b_out [N],
     
     // VPU Status Inputs (Split Pipeline Valids)
     input  logic signed [W-1:0]     vpu_data_out [N],
@@ -81,6 +83,8 @@ module tr_soc_ctrl #(
 
     assign req_mult_out  = reg_req_mult;
     assign req_shift_out = reg_req_shift;
+    assign scratch_a_out = scratch_a;
+    assign scratch_b_out = scratch_b;
     
     always_comb begin
         mmio_rdata = '0;

@@ -70,6 +70,9 @@ module tr_soc_top #(
     logic                           src_sram_b_sel;
     logic                           write_ext_sram;
 
+    logic signed [W-1:0]            ctrl_scratch_a [N];
+    logic signed [W-1:0]            ctrl_scratch_b [N];
+
     // VPU Outputs
     logic signed [W-1:0]            vpu_sram_a_in [N];
     logic signed [W-1:0]            vpu_sram_b_in [N];
@@ -125,6 +128,8 @@ module tr_soc_top #(
         .src_sram_a_sel      (src_sram_a_sel),
         .src_sram_b_sel      (src_sram_b_sel),
         .write_ext_sram      (write_ext_sram),
+        .scratch_a_out       (ctrl_scratch_a),
+        .scratch_b_out       (ctrl_scratch_b),
         
         .vpu_data_out        (vpu_raw_out),
         .vpu_max_out         (vpu_max_out),
@@ -188,12 +193,12 @@ module tr_soc_top #(
     always_comb begin
         for(int i = 0; i < N; i++) begin
             if (i < M) begin
-                vpu_sram_a_in[i] = (src_sram_a_sel) ? u_ctrl.scratch_a[i] : req_vec_out[i];
+                vpu_sram_a_in[i] = (src_sram_a_sel) ? ctrl_scratch_a[i] : req_vec_out[i];
             end else begin
                 vpu_sram_a_in[i] = '0; 
             end
             
-            vpu_sram_b_in[i] = (src_sram_b_sel) ? u_ctrl.scratch_b[i] : ext_sram_b[i];
+            vpu_sram_b_in[i] = (src_sram_b_sel) ? ctrl_scratch_b[i] : ext_sram_b[i];
         end
     end
 
