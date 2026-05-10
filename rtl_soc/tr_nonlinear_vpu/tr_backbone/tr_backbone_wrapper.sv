@@ -37,42 +37,43 @@ module tr_backbone_wrapper #(
 );
 
     // =========================================================
-    // STAGE 1: PRE-LN (Combinational)
+    // STAGE 1: INPUT REGISTER (Fixes in2reg)
     // =========================================================
-    logic signed [WIDTH_IN-1:0]  pre_ln_out  [N];
-
-    pre_ln_modifier #(
-        .N(N), 
-        .WIDTH_IN(WIDTH_IN), 
-        .FRAC_W(FRAC_W)
-    ) u_pre_ln (
-        .x_in         (vec_in),
-        .mode_add_one (mode_pre_ln),
-        .y_out        (pre_ln_out)
-    );
-
-    // --- PIPELINE REGISTER 1 ---
-    logic signed [WIDTH_IN-1:0] s1_pre_ln_reg [N];
+    logic signed [WIDTH_IN-1:0] s1_vec_in [N];
+    logic                       s1_mode_pre_ln;
     logic [1:0]                 s1_mode_post_ln;
     logic                       s1_valid;
 
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             s1_valid <= 1'b0;
+            s1_mode_pre_ln <= 1'b0;
             s1_mode_post_ln <= '0;
-            for(int i=0; i<N; i++) s1_pre_ln_reg[i] <= '0;
+            for(int i=0; i<N; i++) s1_vec_in[i] <= '0;
         end else begin
             s1_valid <= in_valid;
-            s1_mode_post_ln <= mode_post_ln; // Carry the control flag forward
-            s1_pre_ln_reg <= pre_ln_out;
+            s1_mode_pre_ln <= mode_pre_ln;
+            s1_mode_post_ln <= mode_post_ln;
+            s1_vec_in <= vec_in;
         end
     end
 
     // =========================================================
-    // STAGE 2: TR-LN & POST-LN (Combinational)
+    // STAGE 1: PRE-LN, TR-LN, & POST-LN (Combinational)
     // =========================================================
+    logic signed [WIDTH_IN-1:0]  pre_ln_out  [N];
     logic signed [WIDTH_OUT-1:0] tr_ln_out   [N];
     logic signed [WIDTH_OUT-1:0] post_ln_out [N];
+
+    pre_ln_modifier #(
+        .N(N), 
+        .WIDTH_IN(WIDTH_IN), 
+        .FRAC_W(FRAC_W)
+    ) u_pre_ln (
+        .x_in         (s1_vec_in),
+        .mode_add_one (s1_mode_pre_ln),
+        .y_out        (pre_ln_out)
+    );
 
     generate
         for (genvar i = 0; i < N; i++) begin : gen_tr_lanes
@@ -83,7 +84,7 @@ module tr_backbone_wrapper #(
                 .BITS(FRAC_W),          // Note: tr_ln_alu uses "BITS" for fractional width
                 .OUT_WIDTH(WIDTH_OUT)
             ) u_tr_ln (
-                .xq (s1_pre_ln_reg[i]),    // Note: tr_ln_alu expects unsigned/positive input 'xq'
+                .xq (pre_ln_out[i]),    // Note: tr_ln_alu expects unsigned/positive input 'xq'
                 .yq (tr_ln_out[i])
             );
 

@@ -121,16 +121,25 @@ module tr_nonlinear_vpu #(
                 1'b0: vecmul_in_b[i] = sram_data_b[i];         // Standard
                 1'b1: vecmul_in_b[i] = sym_mod_out[i];         // GELU Symmetry (sigma)
             endcase
+        end
+    end
 
-            // MUX 6: VPU Final Output to SRAM
-            case (mux_vpu_out_sel)
-                3'b000: vpu_data_out[i] = vecmul_out_trunc[i]; 
-                3'b001: vpu_data_out[i] = $signed(bb_mantisa[i]); // Vector pass-through -> Explicit Cast
-                3'b010: vpu_data_out[i] = alpha_stab_out[i];
-                3'b011: vpu_data_out[i] = scalar_sub_out[i];
-                default: vpu_data_out[i] = vecmul_out_trunc[i];
-            endcase
-            
+    // =========================================================
+    // MUX 6: VPU Final Output to SRAM (REGISTERED)
+    // =========================================================
+    always_ff @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            for(int i=0; i<N; i++) vpu_data_out[i] <= '0;
+        end else begin
+            for(int i=0; i<N; i++) begin
+                case (mux_vpu_out_sel)
+                    3'b000: vpu_data_out[i] <= vecmul_out_trunc[i];
+                    3'b001: vpu_data_out[i] <= $signed(bb_mantisa[i]); 
+                    3'b010: vpu_data_out[i] <= alpha_stab_out[i];
+                    3'b011: vpu_data_out[i] <= scalar_sub_out[i];
+                    default: vpu_data_out[i] <= vecmul_out_trunc[i];
+                endcase
+            end
         end
     end
 
