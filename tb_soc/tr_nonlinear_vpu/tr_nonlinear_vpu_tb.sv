@@ -28,11 +28,11 @@ module tr_nonlinear_vpu_tb();
     logic signed [ACC_W-1:0] vpu_dot_out;
 
     // MUX Controls
-    logic [1:0] mux_bb_in_sel;
+    logic [2:0] mux_bb_in_sel;
     logic [1:0] mux_mac_a_sel;
-    logic       mux_mac_b_sel;
+    logic [1:0] mux_mac_b_sel;
     logic [1:0] mux_vecmul_a_sel;
-    logic       mux_vecmul_b_sel;
+    logic [1:0] mux_vecmul_b_sel;
     logic [2:0] mux_vpu_out_sel;
 
     // Enables & Modes
@@ -40,10 +40,18 @@ module tr_nonlinear_vpu_tb();
     logic       en_mac_valid;
     logic       en_vecmul_valid;
     logic       en_bb_valid;
+
     logic       vpu_bb_valid_out;
+    logic       vpu_mac_valid_out;
+    logic       vpu_vecmul_valid_out;
+
     logic       mac_clear_acc;
     logic [1:0] mac_op_mode;
     logic [1:0] vecmul_op_mode;
+    logic [1:0] vecmul_scale_mode;
+
+    logic       bb_shift_mode;
+    logic       bb_bypass_ln;
     logic       bb_mode_pre_ln;
     logic [1:0] bb_mode_post_ln;
     logic       sym_mode_en;
@@ -86,7 +94,10 @@ module tr_nonlinear_vpu_tb();
         mac_clear_acc   = 0;
         mac_op_mode     = 0;
         vecmul_op_mode  = 0;
+        vecmul_scale_mode = 0;
         
+        bb_shift_mode   = 0;
+        bb_bypass_ln    = 0;
         bb_mode_pre_ln  = 0;
         bb_mode_post_ln = 0;
         sym_mode_en     = 0;
@@ -150,7 +161,7 @@ module tr_nonlinear_vpu_tb();
         
         // Setup Crossbar
         mux_mac_a_sel = 2'b00; // SRAM A
-        mux_mac_b_sel = 1'b0;  // SRAM B
+        mux_mac_b_sel = 2'b00;  // SRAM B
         mac_clear_acc = 1'b1;  // Clear accumulator (no bias)
         mac_op_mode   = 2'd0;  // Signed x Signed
         
@@ -179,7 +190,7 @@ module tr_nonlinear_vpu_tb();
         clear_crossbar();
         
         // Setup Crossbar
-        mux_bb_in_sel   = 2'b00;    // Ingest from vpu_dot_out
+        mux_bb_in_sel   = 3'b000;    // Ingest from vpu_dot_out
         bb_mode_post_ln = 2'b01;    // -1.0 * x (Division mode)
         mux_vpu_out_sel = 3'b001;   // Output bb_mantisa to SRAM
         
@@ -208,7 +219,7 @@ module tr_nonlinear_vpu_tb();
         
         // Setup Crossbar
         mux_vecmul_a_sel = 2'b00; // SRAM A (Raw x)
-        mux_vecmul_b_sel = 1'b1;  // Sym Mod Output
+        mux_vecmul_b_sel = 2'b01;  // Sym Mod Output
         sym_mode_en      = 1'b1;  // Enable symmetry trick
         mux_vpu_out_sel  = 3'b000; // VecMul Out
         vecmul_op_mode   = 2'd0;  // Signed x Signed

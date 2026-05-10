@@ -24,6 +24,7 @@ module tr_backbone_wrapper #(
     output logic                    out_valid,
 
     // Control Flags
+    input  logic                    bypass_ln,
     input  logic                    mode_pre_ln,  // 0: Bypass, 1: Add +1.0
     input  logic [1:0]              mode_post_ln, // 00: By, 01: -1.0x, 10: -0.5x
     
@@ -31,15 +32,17 @@ module tr_backbone_wrapper #(
     input  logic signed [WIDTH_IN-1:0]  vec_in [N],
     
     // Datapath Outputs
-    output logic      [LUT_IDX_W-1:0]   a_idx_out [N],
-    output logic      [WIDTH_OUT-1:0]   mantisa_out [N],
-    output logic                        is_zero_out [N]
+    output logic signed [WIDTH_OUT-1:0]   log_out [N],
+    output logic        [LUT_IDX_W-1:0]   a_idx_out [N],
+    output logic        [WIDTH_OUT-1:0]   mantisa_out [N],
+    output logic                          is_zero_out [N]
 );
 
     // =========================================================
     // STAGE 1: INPUT REGISTER (Fixes in2reg)
     // =========================================================
     logic signed [WIDTH_IN-1:0] s1_vec_in [N];
+    logic                       s1_bypass_ln;
     logic                       s1_mode_pre_ln;
     logic [1:0]                 s1_mode_post_ln;
     logic                       s1_valid;
@@ -47,11 +50,13 @@ module tr_backbone_wrapper #(
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             s1_valid <= 1'b0;
+            s1_bypass_ln <= 1'b0;
             s1_mode_pre_ln <= 1'b0;
             s1_mode_post_ln <= '0;
             for(int i=0; i<N; i++) s1_vec_in[i] <= '0;
         end else begin
             s1_valid <= in_valid;
+            s1_bypass_ln <= bypass_ln;
             s1_mode_pre_ln <= mode_pre_ln;
             s1_mode_post_ln <= mode_post_ln;
             s1_vec_in <= vec_in;
@@ -91,11 +96,19 @@ module tr_backbone_wrapper #(
         end
     endgenerate
 
+    logic signed [WIDTH_OUT-1:0] ln_mux_out [N];
+    always_comb begin
+        for(int i=0; i<N; i++) begin
+            // Cast the 16-bit pre_ln_out down to 8-bit, preserving Q4.4
+            ln_mux_out[i] = s1_bypass_ln ? WIDTH_OUT'(pre_ln_out[i]) : tr_ln_out[i];
+        end
+    end
+    
     post_ln_modifier #(
         .N(N), 
         .W(WIDTH_OUT)
     ) u_post_ln (
-        .x_in     (tr_ln_out),
+        .x_in     (ln_mux_out),
         .mode_sel (s1_mode_post_ln),
         .y_out    (post_ln_out)
     );
@@ -118,6 +131,7 @@ module tr_backbone_wrapper #(
     // STAGE 3: TR-EXP (Combinational to Output)
     // =========================================================
     assign out_valid = s2_valid;
+    assign log_out = s2_post_ln_reg;
 
     generate
         for (genvar i = 0; i < N; i++) begin : gen_tr_exp_lanes
