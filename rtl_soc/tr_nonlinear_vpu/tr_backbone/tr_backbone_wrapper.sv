@@ -97,10 +97,25 @@ module tr_backbone_wrapper #(
     endgenerate
 
     logic signed [WIDTH_OUT-1:0] ln_mux_out [N];
+    // Calculate dynamic bounds based on WIDTH_OUT (e.g., for 8-bit: Max = 127, Min = -128)
+    localparam int MAX_VAL =  (1 << (WIDTH_OUT - 1)) - 1;
+    localparam int MIN_VAL = -(1 << (WIDTH_OUT - 1));
+
     always_comb begin
         for(int i=0; i<N; i++) begin
-            // Cast the 16-bit pre_ln_out down to 8-bit, preserving Q4.4
-            ln_mux_out[i] = s1_bypass_ln ? WIDTH_OUT'(pre_ln_out[i]) : tr_ln_out[i];
+            if (s1_bypass_ln) begin
+                // Saturation Clamp for bypassed 16-bit to 8-bit cast
+                if (pre_ln_out[i] > MAX_VAL) begin
+                    ln_mux_out[i] = WIDTH_OUT'(MAX_VAL);
+                end else if (pre_ln_out[i] < MIN_VAL) begin
+                    ln_mux_out[i] = WIDTH_OUT'(MIN_VAL);
+                end else begin
+                    ln_mux_out[i] = WIDTH_OUT'(pre_ln_out[i]);
+                end
+            end else begin
+                // Log ALU output is already scaled to WIDTH_OUT
+                ln_mux_out[i] = tr_ln_out[i];
+            end
         end
     end
     

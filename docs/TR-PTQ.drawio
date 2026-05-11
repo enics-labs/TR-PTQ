@@ -1653,7 +1653,7 @@
         </mxGraphModel>
     </diagram>
     <diagram id="Vzld_4NCBQ9gr0ZDW8BE" name="transformer_soc">
-        <mxGraphModel dx="718" dy="637" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="1" shadow="0">
+        <mxGraphModel dx="1065" dy="980" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="1" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -3171,7 +3171,7 @@
         </mxGraphModel>
     </diagram>
     <diagram id="xczvYaHaiK4NnB4666PM" name="MX exploration">
-        <mxGraphModel dx="737" dy="637" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="1" shadow="0">
+        <mxGraphModel dx="1420" dy="1307" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="1" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -3336,16 +3336,16 @@
                     <mxGeometry x="975" y="450" width="60" height="30" as="geometry"/>
                 </mxCell>
                 <mxCell id="FgR2fKPDiNnsEpZTf9Ao-77" value="$$Z_{max}=max(Z_0, Z_1, Z_2, Z_3)=M_{max}*2^E$$" style="text;strokeColor=none;align=center;fillColor=none;html=1;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
-                    <mxGeometry x="1240" y="120" width="265" height="30" as="geometry"/>
+                    <mxGeometry x="880" y="750" width="265" height="30" as="geometry"/>
                 </mxCell>
                 <mxCell id="FgR2fKPDiNnsEpZTf9Ao-78" value="$$Z_i=M_i*2^E, M=[M_0, M_1, M_2, M_3], E$$" style="text;strokeColor=none;align=center;fillColor=none;html=1;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
-                    <mxGeometry x="1240" y="80" width="255" height="30" as="geometry"/>
+                    <mxGeometry x="880" y="710" width="255" height="30" as="geometry"/>
                 </mxCell>
                 <mxCell id="FgR2fKPDiNnsEpZTf9Ao-81" value="$$S = \sum{e^{Z_i}-e^{Z_{max}}} = \sum{e^{\Delta Z}}$$" style="text;strokeColor=none;align=center;fillColor=none;html=1;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
-                    <mxGeometry x="1240" y="220" width="192.5" height="30" as="geometry"/>
+                    <mxGeometry x="880" y="850" width="192.5" height="30" as="geometry"/>
                 </mxCell>
                 <mxCell id="FgR2fKPDiNnsEpZTf9Ao-82" value="$$Z_i - Z_{max} = (M_i - M_{max})*2^E = \Delta M &amp;lt;&amp;lt; E$$" style="text;strokeColor=none;align=center;fillColor=none;html=1;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
-                    <mxGeometry x="1240" y="170" width="290" height="30" as="geometry"/>
+                    <mxGeometry x="880" y="800" width="290" height="30" as="geometry"/>
                 </mxCell>
                 <mxCell id="FgR2fKPDiNnsEpZTf9Ao-85" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="FgR2fKPDiNnsEpZTf9Ao-42" target="FgR2fKPDiNnsEpZTf9Ao-84">
                     <mxGeometry relative="1" as="geometry">
@@ -3373,7 +3373,7 @@
                     </mxGeometry>
                 </mxCell>
                 <mxCell id="FgR2fKPDiNnsEpZTf9Ao-90" value="$$P_i = e^{Z_i -(Z_{max}+ln(S))} = e^{(M_i - M_{max})*2^E - ln(S)} = e^{\Delta Z - ln(S)}$$" style="text;strokeColor=none;align=center;fillColor=none;html=1;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
-                    <mxGeometry x="1240" y="265" width="335" height="30" as="geometry"/>
+                    <mxGeometry x="880" y="895" width="335" height="30" as="geometry"/>
                 </mxCell>
                 <mxCell id="rj6dc42D86bwuilvSl8x-1" value="&lt;h1&gt;tr_softmax_MX&lt;/h1&gt;" style="text;strokeColor=none;align=center;fillColor=none;html=1;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
                     <mxGeometry x="1165" y="20" width="220" height="30" as="geometry"/>

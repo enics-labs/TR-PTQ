@@ -28,13 +28,19 @@
 ../rtl_soc/tr_nonlinear_vpu/tr_nonlinear_vpu.sv
 
 // requantize_engine
-../rtl_soc/requantize_engine/requantize_engine_int.sv
+../rtl_soc/requantize_engine/requantize_engine_mx.sv
+
+// mx_modules
+../rtl_soc/mx_modules/dynamic_shifter_mx.sv
+../rtl_soc/mx_modules/formatter_mx.sv
 
 // tr_soc_ctrl
-../rtl_soc/tr_soc_ctrl/tr_soc_ctrl_int.sv
+../rtl_soc/tr_soc_ctrl/tr_soc_ctrl_mx.sv
 
 // tr_soc_top
-../rtl_soc/tr_soc_top_int.sv
+../rtl_soc/tr_soc_top_mx.sv
 
 // tb
-../tb_soc/tr_soc_top/tr_soc_top_int_tb.sv
+../tb_soc/tr_soc_top/tr_soc_top_mx_tb.sv
+
++define+MX_MODE
