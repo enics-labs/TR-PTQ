@@ -28,13 +28,13 @@
 ../rtl_soc/tr_nonlinear_vpu/tr_nonlinear_vpu.sv
 
 // rquantize_array_engine
-../rtl_soc/requantize_array_engine/requantize_array_engine.sv
+../rtl_soc/requantize_engine/requantize_engine_int.sv
 
 // tr_soc_ctrl
-../rtl_soc/tr_soc_ctrl/tr_soc_ctrl.sv
+../rtl_soc/tr_soc_ctrl/tr_soc_ctrl_int.sv
 
 // tr_soc_top
-../rtl_soc/tr_soc_top.sv
+../rtl_soc/tr_soc_top_int.sv
 
 // tb
-../tb_soc/tr_soc_top/tr_soc_top_tb.sv
+../tb_soc/tr_soc_top/tr_soc_top_int_tb.sv

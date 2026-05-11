@@ -1,6 +1,6 @@
 `timescale 1ns/1ps
 
-module tr_soc_top #(
+module tr_soc_top_int #(
     parameter int M     = 4,   // Parallel Output Lanes
     parameter int N     = 8,   // Vector Dimension
     parameter int W     = 8,
@@ -86,7 +86,7 @@ module tr_soc_top #(
     // ---------------------------------------------------------
     // 1. MASTER CONTROLLER
     // ---------------------------------------------------------
-    tr_soc_ctrl #(
+    tr_soc_ctrl_int #(
         .N(N),
         .W(W),
         .ACC_W(ACC_W)
@@ -167,7 +167,7 @@ module tr_soc_top #(
     // 3. REQUANTIZER ENGINE
     // ---------------------------------------------------------
     // Note: Parameter M (Lanes) fits into N (Vector Dimension) of the VPU.
-    requantize_array_engine #(
+    requantize_engine_int #(
         .N(M),
         .ACC_W(ACC_W),
         .MUL_W(32),

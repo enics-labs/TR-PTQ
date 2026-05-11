@@ -5,7 +5,7 @@
  *           Out = Saturate( (Acc * M + Bias) >>> S )
  *           Features a 3-stage pipeline for high-frequency timing closure.
  */
-module requantize_array_engine #(
+module requantize_engine_int #(
     parameter int N       = 16, // Vector dimension
     parameter int ACC_W   = 32, // Input accumulator width
     parameter int MUL_W   = 32, // Multiplier scale width

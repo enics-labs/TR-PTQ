@@ -1,6 +1,6 @@
 `timescale 1ns/1ps
 
-module tr_soc_ctrl #(
+module tr_soc_ctrl_int #(
     parameter int N     = 8,
     parameter int W     = 8,
     parameter int ACC_W = 32

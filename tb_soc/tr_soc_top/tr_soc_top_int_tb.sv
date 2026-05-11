@@ -1,6 +1,6 @@
 `timescale 1ns/1ps
 
-module tb_tr_soc_top();
+module tr_soc_top_int_tb();
 
     localparam int M = 4;
     localparam int N = 8;
@@ -21,7 +21,7 @@ module tb_tr_soc_top();
     logic        vpu_out_valid;
     logic signed [W-1:0] vpu_data_out [N];
 
-    tr_soc_top #(.M(M), .N(N), .W(W), .ACC_W(32)) dut (.*);
+    tr_soc_top_int #(.M(M), .N(N), .W(W), .ACC_W(32)) dut (.*);
 
     initial begin clk = 0; forever #5 clk = ~clk; end
 

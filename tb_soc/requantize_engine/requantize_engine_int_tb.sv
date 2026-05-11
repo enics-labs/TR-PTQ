@@ -1,6 +1,6 @@
 `timescale 1ns/1ps
 
-module tb_requantize_array();
+module requantize_engine_int_tb();
 
     localparam int N       = 4;
     localparam int ACC_W   = 32;
@@ -18,7 +18,7 @@ module tb_requantize_array();
     logic signed [OUT_W-1:0] out_vec [N];
 
     // DUT
-    requantize_array_engine #(
+    requantize_engine_int #(
         .N(N), .ACC_W(ACC_W), .MUL_W(MUL_W), .SHIFT_W(SHIFT_W), .OUT_W(OUT_W)
     ) dut (.*);
 
