@@ -4,26 +4,35 @@
 // Evaluates: Out = SUM(a[i] * b[i]) + C
 // Used for: Matrix Multiplication (Dense Cluster), Variance/SoftMax Sums (VPU)
 // ===================================================================================
+/*
+ * @module   mac_array_engine
+ * @brief    TODO: Add one-line description
+ * @details  TODO: Add detailed description
+ *
+ * @param    N               TODO: Add description
+ * @param    W               TODO: Add description
+ * @param    ACC_W           TODO: Add description
+ */
 module mac_array_engine #(
     parameter int N     = 16,
     parameter int W     = 8,
     parameter int ACC_W = 32
 )(
-    input  logic                     clk,
-    input  logic                     rst_n,
+    input  logic clk,
+    input  logic rst_n,
 
     // Input stream
-    input  logic                     in_valid,
-    output logic                     in_ready,
+    input  logic in_valid,
+    output logic in_ready,
     input  logic [1:0]               op_mode,    // 0:SS, 1:SU, 2:UU
     input  logic [W-1:0]             a [N],
     input  logic [W-1:0]             b [N],
     input  logic signed [ACC_W-1:0]  c,          // Scalar Bias (+ C)
-    input  logic                     clear_acc,  // 1: Initialize Acc with C, 0: Accumulate
+    input  logic clear_acc,  // 1: Initialize Acc with C, 0: Accumulate
 
     // Output stream
-    output logic                     out_valid,
-    input  logic                     out_ready,
+    output logic out_valid,
+    input  logic out_ready,
     output logic signed [ACC_W-1:0]  out_dot     // Single scalar dot-product output
 );
 

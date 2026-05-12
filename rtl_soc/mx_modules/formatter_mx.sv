@@ -1,16 +1,24 @@
 `timescale 1ns/1ps
 
+/*
+ * @module   formatter_mx
+ * @brief    TODO: Add one-line description
+ * @details  TODO: Add detailed description
+ *
+ * @param    N               TODO: Add description
+ * @param    VPU_W           TODO: Add description
+ * @param    MX_W            TODO: Add description
+ */
 module formatter_mx #(
     parameter int N = 4,
     parameter int VPU_W = 16, // Width of data coming from VPU
     parameter int MX_W = 8    // Width of target mantissa
 )(
-    input  logic                 clk,
-    input  logic                 rst_n,
-    input  logic                 valid_in,
+    input  logic clk,
+    input  logic rst_n,
+    input  logic valid_in,
     input  logic signed [VPU_W-1:0] vpu_data_in [N],
-    
-    output logic                 valid_out,
+    output logic valid_out,
     output logic signed [MX_W-1:0]  mx_mantissas [N],
     output logic signed [7:0]    mx_shared_exp
 );

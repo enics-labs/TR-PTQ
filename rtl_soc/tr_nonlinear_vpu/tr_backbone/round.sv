@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 // UPDATE:                                                                                           //
 //      is_zero is assigned the rounded_mag value, instead of the input x.                           //
-//      The output fliped_rounded_int cleanly gets ~rounded_mag[2:0], removing the is_zero check.    //
+//      The output fliped_rounded_int cleanly gets ~rounded_mag[LUT_IDX_W-1:0], removing the is_zero check.    //
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////
 // UPDATE:
@@ -9,15 +9,24 @@
 //      MODE 1 - The original q4.4 rounding for the 8-bit LUT.
 //      MODE 2 - 12-bit signed LUT for LayerNorm.
 //////////////////////////////////////////////////////////////////
+/*
+ * @module   round
+ * @brief    TODO: Add one-line description
+ * @details  TODO: Add detailed description
+ *
+ * @param    WIDTH           TODO: Add description
+ * @param    FRAC_W          TODO: Add description
+ * @param    LUT_IDX_W       TODO: Add description
+ */
 module round #(
     parameter int WIDTH = 8,
     parameter int FRAC_W = 4,
     parameter int LUT_IDX_W = 3
 )(
-    input  wire signed [WIDTH-1:0] x,           
-    output wire                    is_zero,
-    output wire                    is_ceil,
-    output wire        [LUT_IDX_W-1:0] lut_idx  // Index for LUT
+    input  logic signed [WIDTH-1:0] x,           
+    output logic is_zero,
+    output logic is_ceil,
+    output logic [LUT_IDX_W-1:0] lut_idx  // Index for LUT
 );
 
     localparam int INT_W = WIDTH - FRAC_W;

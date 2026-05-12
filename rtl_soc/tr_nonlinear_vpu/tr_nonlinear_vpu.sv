@@ -22,7 +22,6 @@ module tr_nonlinear_vpu #(
     input  logic signed [W_VEC-1:0] sram_data_a [N],
     input  logic signed [W_VEC-1:0] sram_data_b [N],
     output logic signed [W_VEC-1:0] vpu_data_out [N],
-    
     input  logic signed [W_VEC-1:0] ctrl_scalar_sub_val, // For x - max or x - mu
     output logic signed [W_VEC-1:0] vpu_max_out,         // To Controller Reg
     output logic signed [ACC_W-1:0] vpu_dot_out,         // To Controller Reg
@@ -32,40 +31,38 @@ module tr_nonlinear_vpu #(
     // =========================================================
 `ifdef MX_MODE
     input  logic signed [7:0]       mx_shared_exp,
-    input  logic                    mx_shift_en,
+    input  logic mx_shift_en,
 `endif
 
     // =========================================================
     // Crossbar Routing Controls
     // =========================================================
-    input  logic [2:0]  mux_bb_in_sel,   // Backbone Input MUX
+    input  logic [LUT_IDX_W-1:0]  mux_bb_in_sel,   // Backbone Input MUX
     input  logic [1:0]  mux_mac_a_sel,   // MAC Input A MUX
     input  logic [1:0]  mux_mac_b_sel,   // MAC Input B MUX
     input  logic [1:0]  mux_vecmul_a_sel,// VecMul Input A MUX
     input  logic [1:0]  mux_vecmul_b_sel,// VecMul Input B MUX
-    input  logic [2:0]  mux_vpu_out_sel, // Final Output MUX to SRAM
+    input  logic [LUT_IDX_W-1:0]  mux_vpu_out_sel, // Final Output MUX to SRAM
 
     // =========================================================
     // Submodule Enables & Modes
     // =========================================================
-    input  logic        en_piped_max,
-    input  logic        en_mac_valid,
-    input  logic        en_vecmul_valid,
-    input  logic        mac_clear_acc,
+    input  logic en_piped_max,
+    input  logic en_mac_valid,
+    input  logic en_vecmul_valid,
+    input  logic mac_clear_acc,
     input  logic [1:0]  mac_op_mode,
     input  logic [1:0]  vecmul_op_mode,
-    input  logic [1:0]  vecmul_scale_mode, // 00:[7:0], 01:[11:4], 10:[15:8]
-    
-    input  logic        en_bb_valid,
-    input  logic        bb_bypass_ln,
-    input  logic        bb_shift_mode,     // 0: [23:8] (Softmax), 1: [19:4] (RMSNorm)
-    input  logic        bb_mode_pre_ln,
+    input  logic [1:0]  vecmul_scale_mode, // 00:[N-1:0], 01:[11:4], 10:[15:8]
+    input  logic en_bb_valid,
+    input  logic bb_bypass_ln,
+    input  logic bb_shift_mode,     // 0: [23:8] (Softmax), 1: [19:4] (RMSNorm)
+    input  logic bb_mode_pre_ln,
     input  logic [1:0]  bb_mode_post_ln,
-    input  logic        sym_mode_en,
-
-    output logic        vpu_bb_valid_out,
-    output logic        vpu_vecmul_valid_out,
-    output logic        vpu_mac_valid_out
+    input  logic sym_mode_en,
+    output logic vpu_bb_valid_out,
+    output logic vpu_vecmul_valid_out,
+    output logic vpu_mac_valid_out
 );
 
     // =========================================================
@@ -223,7 +220,7 @@ module tr_nonlinear_vpu #(
         .x_raw(sram_data_a), .y_sig(sram_data_b), .mode_en(sym_mode_en), .sig_corrected(sym_mod_out)
     );
 
-    logic        [7:0]           rom_e_a_8bit [N];
+    logic        [N-1:0]           rom_e_a_8bit [N];
 
     tr_backbone_wrapper #(
         .N(N), .WIDTH_IN(W_MAC), .WIDTH_OUT(W_VEC), .FRAC_W(FRAC_W), .LUT_IDX_W(LUT_IDX_W)

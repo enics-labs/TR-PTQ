@@ -1,3 +1,11 @@
+/*
+ * @module   alpha_stabilizer
+ * @brief    TODO: Add one-line description
+ * @details  TODO: Add detailed description
+ *
+ * @param    N               TODO: Add description
+ * @param    W               TODO: Add description
+ */
 module alpha_stabilizer #(
     parameter int N = 8,
     parameter int W = 8
@@ -10,7 +18,7 @@ module alpha_stabilizer #(
 
     generate
         for (genvar i = 0; i < N; i++) begin : GEN_LANES
-            logic [7:0]         abs_z;
+            logic [N-1:0]         abs_z;
             logic signed [15:0] x_ext;
             logic signed [15:0] x_base;
             logic signed [15:0] x_mult;

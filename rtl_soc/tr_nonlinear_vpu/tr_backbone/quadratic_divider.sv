@@ -4,12 +4,20 @@
 //      MODE 1 - The original optimized 8-bit.
 //      MODE 2 - 12-bit generic multiplier for LayerNorm.
 //////////////////////////////////////////////////////////////////
+/*
+ * @module   quadratic_divider
+ * @brief    TODO: Add one-line description
+ * @details  TODO: Add detailed description
+ *
+ * @param    WIDTH           TODO: Add description
+ * @param    FRAC_W          TODO: Add description
+ */
 module quadratic_divider #(
     parameter int WIDTH = 8,
     parameter int FRAC_W = 4
 )(
-    input  wire signed [FRAC_W-1:0] delta, 
-    output wire        [FRAC_W-1:0] quad_out
+    input  logic signed [FRAC_W-1:0] delta, 
+    output logic [FRAC_W-1:0] quad_out
 );
 
     generate

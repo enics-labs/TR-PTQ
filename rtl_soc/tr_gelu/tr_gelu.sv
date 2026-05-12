@@ -1,20 +1,28 @@
 `timescale 1ns/1ps
 
+/*
+ * @module   tr_gelu
+ * @brief    TODO: Add one-line description
+ * @details  TODO: Add detailed description
+ *
+ * @param    N               TODO: Add description
+ * @param    W               TODO: Add description
+ * @param    FRAC_W          TODO: Add description
+ * @param    ACC_W           TODO: Add description
+ */
 module tr_gelu #(
     parameter int N = 8,
     parameter int W = 8,
     parameter int FRAC_W = 4,
     parameter int ACC_W = 32
 )(
-    input  logic                 clk,
-    input  logic                 rst_n,
-    
-    input  logic                 valid_in,
+    input  logic clk,
+    input  logic rst_n,
+    input  logic valid_in,
     input  logic [1:0]           mode,       
     input  logic signed [W-1:0]  x_in [N],
     input  logic signed [W-1:0]  aux_in [N], 
-
-    output logic                 valid_out,
+    output logic valid_out,
     output logic signed [W-1:0]  y_out [N]
 );
 
@@ -86,8 +94,8 @@ module tr_gelu #(
     // DATAPATH STAGE 2: EXPONENTIAL & SYMMETRY 
     // ========================================================================
     logic [2:0]   a_idx [N];
-    logic [7:0]   e_a_comb [N];
-    logic [7:0]   mantisa_comb [N];
+    logic [N-1:0]   e_a_comb [N];
+    logic [N-1:0]   mantisa_comb [N];
     logic [N-1:0] is_zero_comb;
 
     generate
@@ -108,8 +116,8 @@ module tr_gelu #(
     // ------------------------------------------------------------------------
     // Stage 2 Pipeline Registers
     // ------------------------------------------------------------------------
-    logic [7:0]          s2_e_a [N];
-    logic [7:0]          s2_mantisa [N];
+    logic [N-1:0]          s2_e_a [N];
+    logic [N-1:0]          s2_mantisa [N];
     logic [N-1:0]        s2_is_zero;
     logic signed [W-1:0] s2_x_raw [N];
     logic signed [W-1:0] s2_sym_out [N];

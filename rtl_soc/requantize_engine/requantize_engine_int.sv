@@ -12,12 +12,12 @@ module requantize_engine_int #(
     parameter int SHIFT_W = 6,  // Shift amount width (up to 63 bits)
     parameter int OUT_W   = 8   // Target output width (e.g., 8-bit)
 )(
-    input  logic                     clk,
-    input  logic                     rst_n,
+    input  logic clk,
+    input  logic rst_n,
 
     // Stream Handshake
-    input  logic                     in_valid,
-    output logic                     in_ready,
+    input  logic in_valid,
+    output logic in_ready,
 
     // Datapath Inputs
     input  logic signed [ACC_W-1:0]  acc_in [N],
@@ -25,8 +25,8 @@ module requantize_engine_int #(
     input  logic [SHIFT_W-1:0]       shift,      // S from Controller
 
     // Stream Output
-    output logic                     out_valid,
-    input  logic                     out_ready,
+    output logic out_valid,
+    input  logic out_ready,
     output logic signed [OUT_W-1:0]  out_vec [N]
 );
 

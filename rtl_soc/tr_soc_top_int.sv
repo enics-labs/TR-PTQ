@@ -1,35 +1,45 @@
 `timescale 1ns/1ps
 
+/*
+ * @module   tr_soc_top_int
+ * @brief    TODO: Add one-line description
+ * @details  TODO: Add detailed description
+ *
+ * @param    M               TODO: Add description
+ * @param    N               TODO: Add description
+ * @param    W               TODO: Add description
+ * @param    ACC_W           TODO: Add description
+ */
 module tr_soc_top_int #(
     parameter int M     = 4,   // Parallel Output Lanes
     parameter int N     = 8,   // Vector Dimension
     parameter int W     = 8,
     parameter int ACC_W = 32
 )(
-    input  logic                    clk,
-    input  logic                    rst_n,
+    input  logic clk,
+    input  logic rst_n,
 
     // RISC-V MMIO Interface
     input  logic [7:0]              mmio_addr,
     input  logic [31:0]             mmio_wdata,
-    input  logic                    mmio_wen,
+    input  logic mmio_wen,
     output logic [31:0]             mmio_rdata,
 
     // Linear Engine External Inputs
-    input  logic                    dot_in_valid,
-    output logic                    dot_in_ready,
+    input  logic dot_in_valid,
+    output logic dot_in_ready,
     input  logic [W-1:0]            a_mat [M][N],
     input  logic [W-1:0]            b_vec [N],
     input  logic signed [ACC_W-1:0] c_vec [M],
     
     // Non-Linear Engine Memory Interfaces
     input  logic signed [W-1:0]     ext_sram_b [N],
-    output logic                    vpu_out_valid,
+    output logic vpu_out_valid,
     output logic signed [W-1:0]     vpu_data_out [N]
 );
 
     // Interconnect Wires
-    logic [31:0]                    req_mult;
+    logic [ACC_W-1:0]                    req_mult;
     logic [5:0]                     req_shift;
     
     // Dot -> Req Pipe

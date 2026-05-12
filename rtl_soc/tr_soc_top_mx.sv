@@ -1,5 +1,16 @@
 `timescale 1ns/1ps
 
+/*
+ * @module   tr_soc_top_mx
+ * @brief    TODO: Add one-line description
+ * @details  TODO: Add detailed description
+ *
+ * @param    M               TODO: Add description
+ * @param    N               TODO: Add description
+ * @param    W               TODO: Add description
+ * @param    ACC_W           TODO: Add description
+ * @param    VPU_W           TODO: Add description
+ */
 module tr_soc_top_mx #(
     parameter int M        = 4,
     parameter int N        = 8,
@@ -7,18 +18,18 @@ module tr_soc_top_mx #(
     parameter int ACC_W    = 32,
     parameter int VPU_W    = 16
 )(
-    input  logic                    clk,
-    input  logic                    rst_n,
+    input  logic clk,
+    input  logic rst_n,
 
     // RISC-V MMIO Interface
     input  logic [7:0]              mmio_addr,
     input  logic [31:0]             mmio_wdata,
-    input  logic                    mmio_wen,
+    input  logic mmio_wen,
     output logic [31:0]             mmio_rdata,
 
     // Linear Engine External Inputs + MX Exponents
-    input  logic                    dot_in_valid,
-    output logic                    dot_in_ready,
+    input  logic dot_in_valid,
+    output logic dot_in_ready,
     input  logic [W-1:0]            a_mat [M][N],
     input  logic signed [7:0]       a_mat_exp,
     input  logic [W-1:0]            b_vec [N],
@@ -27,7 +38,7 @@ module tr_soc_top_mx #(
     
     // Non-Linear Engine Memory Interfaces
     input  logic signed [W-1:0]     ext_sram_b [N],
-    output logic                    vpu_out_valid,
+    output logic vpu_out_valid,
     output logic signed [W-1:0]     vpu_data_out [N],
     output logic signed [7:0]       vpu_data_exp
 );

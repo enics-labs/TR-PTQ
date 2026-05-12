@@ -11,21 +11,21 @@ module dot_product_engine #(
     parameter int W     = 8,
     parameter int ACC_W = 32
 )(
-    input  logic                     clk,
-    input  logic                     rst_n,
+    input  logic clk,
+    input  logic rst_n,
 
     // Input stream
-    input  logic                     in_valid,
-    output logic                     in_ready,
+    input  logic in_valid,
+    output logic in_ready,
     input  logic [1:0]               op_mode,
     input  logic [W-1:0]             a_mat [M][N], // M independent vectors (Weights)
     input  logic [W-1:0]             b_vec [N],    // 1 shared vector (Activations)
     input  logic signed [ACC_W-1:0]  c_vec [M],    // Independent lane biases
-    input  logic                     clear_acc,
+    input  logic clear_acc,
 
     // Output stream
-    output logic                     out_valid,
-    input  logic                     out_ready,
+    output logic out_valid,
+    input  logic out_ready,
     output logic signed [ACC_W-1:0]  out_vec [M]   // M parallel dot product results
 );
 

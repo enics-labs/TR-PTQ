@@ -1,21 +1,30 @@
 `timescale 1ns/1ps
 
+/*
+ * @module   tr_soc_ctrl_int
+ * @brief    TODO: Add one-line description
+ * @details  TODO: Add detailed description
+ *
+ * @param    N               TODO: Add description
+ * @param    W               TODO: Add description
+ * @param    ACC_W           TODO: Add description
+ */
 module tr_soc_ctrl_int #(
     parameter int N     = 8,
     parameter int W     = 8,
     parameter int ACC_W = 32
 )(
-    input  logic                    clk,
-    input  logic                    rst_n,
+    input  logic clk,
+    input  logic rst_n,
 
     // MMIO Interface
     input  logic [7:0]              mmio_addr,
     input  logic [31:0]             mmio_wdata,
-    input  logic                    mmio_wen,
+    input  logic mmio_wen,
     output logic [31:0]             mmio_rdata,
 
     // Requantizer Parameters
-    output logic [31:0]             req_mult_out,
+    output logic [ACC_W-1:0]             req_mult_out,
     output logic [5:0]              req_shift_out,
 
     // VPU Crossbar Routing Controls
@@ -25,28 +34,25 @@ module tr_soc_ctrl_int #(
     output logic [1:0]              mux_vecmul_a_sel,
     output logic [1:0]              mux_vecmul_b_sel,
     output logic [2:0]              mux_vpu_out_sel,
-
-    output logic                    en_piped_max,
-    output logic                    en_mac_valid,
-    output logic                    en_vecmul_valid,
-    output logic                    en_bb_valid,
-    
-    output logic                    mac_clear_acc,
+    output logic en_piped_max,
+    output logic en_mac_valid,
+    output logic en_vecmul_valid,
+    output logic en_bb_valid,
+    output logic mac_clear_acc,
     output logic [1:0]              mac_op_mode,
     output logic [1:0]              vecmul_op_mode,
     output logic [1:0]              vecmul_scale_mode,
-    
-    output logic                    bb_shift_mode,
-    output logic                    bb_bypass_ln,
-    output logic                    bb_mode_pre_ln,
+    output logic bb_shift_mode,
+    output logic bb_bypass_ln,
+    output logic bb_mode_pre_ln,
     output logic [1:0]              bb_mode_post_ln,
-    output logic                    sym_mode_en,
+    output logic sym_mode_en,
     output logic signed [W-1:0]     ctrl_scalar_sub_val,
 
     // Datapath Routing
-    output logic                    src_sram_a_sel, 
-    output logic                    src_sram_b_sel, 
-    output logic                    write_ext_sram, 
+    output logic src_sram_a_sel, 
+    output logic src_sram_b_sel, 
+    output logic write_ext_sram, 
     output logic signed [W-1:0]     scratch_a_out [N],
     output logic signed [W-1:0]     scratch_b_out [N],
     
@@ -54,22 +60,22 @@ module tr_soc_ctrl_int #(
     input  logic signed [W-1:0]     vpu_data_out [N],
     input  logic signed [W-1:0]     vpu_max_out,
     input  logic signed [ACC_W-1:0] vpu_dot_out,
-    input  logic                    vpu_bb_valid,
-    input  logic                    vpu_vecmul_valid,
-    input  logic                    vpu_mac_valid
+    input  logic vpu_bb_valid,
+    input  logic vpu_vecmul_valid,
+    input  logic vpu_mac_valid
 );
 
-    localparam logic [7:0]          ADDR_CMD       = 8'h00; 
-    localparam logic [7:0]          ADDR_STATUS    = 8'h04;
-    localparam logic [7:0]          ADDR_REQ_MULT  = 8'h08;
-    localparam logic [7:0]          ADDR_REQ_SHIFT = 8'h0C;
+    localparam logic [N-1:0]          ADDR_CMD       = 8'h00; 
+    localparam logic [N-1:0]          ADDR_STATUS    = 8'h04;
+    localparam logic [N-1:0]          ADDR_REQ_MULT  = 8'h08;
+    localparam logic [N-1:0]          ADDR_REQ_SHIFT = 8'h0C;
     localparam logic signed [W-1:0] CONST_LN_SQRT_N = 8'd17; 
 
-    logic [31:0]                    reg_req_mult;
+    logic [ACC_W-1:0]                    reg_req_mult;
     logic [5:0]                     reg_req_shift;
     logic                           reg_busy;
     logic                           reg_done;
-    logic [7:0]                     cmd_trigger;
+    logic [N-1:0]                     cmd_trigger;
 
     logic signed [W-1:0]            scratch_a [N];
     logic signed [W-1:0]            scratch_b [N];

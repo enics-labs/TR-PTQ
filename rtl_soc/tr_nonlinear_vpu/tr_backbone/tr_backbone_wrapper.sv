@@ -18,14 +18,14 @@ module tr_backbone_wrapper #(
     parameter int FRAC_W    = 4,
     parameter int LUT_IDX_W = 3
 )(
-    input  logic                    clk,
-    input  logic                    rst_n,
-    input  logic                    in_valid,
-    output logic                    out_valid,
+    input  logic clk,
+    input  logic rst_n,
+    input  logic in_valid,
+    output logic out_valid,
 
     // Control Flags
-    input  logic                    bypass_ln,
-    input  logic                    mode_pre_ln,  // 0: Bypass, 1: Add +1.0
+    input  logic bypass_ln,
+    input  logic mode_pre_ln,  // 0: Bypass, 1: Add +1.0
     input  logic [1:0]              mode_post_ln, // 00: By, 01: -1.0x, 10: -0.5x
     
     // Datapath Input
@@ -33,9 +33,9 @@ module tr_backbone_wrapper #(
     
     // Datapath Outputs
     output logic signed [WIDTH_OUT-1:0]   log_out [N],
-    output logic        [LUT_IDX_W-1:0]   a_idx_out [N],
-    output logic        [WIDTH_OUT-1:0]   mantisa_out [N],
-    output logic                          is_zero_out [N]
+    output logic [LUT_IDX_W-1:0]   a_idx_out [N],
+    output logic [WIDTH_OUT-1:0]   mantisa_out [N],
+    output logic is_zero_out [N]
 );
 
     // =========================================================

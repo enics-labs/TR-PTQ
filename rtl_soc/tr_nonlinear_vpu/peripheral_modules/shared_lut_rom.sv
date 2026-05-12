@@ -1,10 +1,17 @@
 
 
+/*
+ * @module   shared_lut_rom
+ * @brief    TODO: Add one-line description
+ * @details  TODO: Add detailed description
+ *
+ * @param    N               TODO: Add description
+ */
 module shared_lut_rom #(
     parameter int N = 8
 )(
     input  logic [2:0] a_idx [N],  // Indices requested by the ALUs
-    output logic [7:0] e_a   [N]   // Anchors returned to the ALUs
+    output logic [N-1:0] e_a   [N]   // Anchors returned to the ALUs
 );
     // Definition of the Q4.4 LUT
     logic [7:0] exp_lut [0:7];

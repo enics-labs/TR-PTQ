@@ -16,7 +16,7 @@ module pre_ln_modifier #(
     parameter int FRAC_W    = 4
 )(
     input  logic signed [WIDTH_IN-1:0] x_in [N],
-    input  logic                       mode_add_one, // 0: Bypass, 1: Add +1.0
+    input  logic mode_add_one, // 0: Bypass, 1: Add +1.0
     output logic signed [WIDTH_IN-1:0] y_out [N]
 );
     // Hardware 1.0 Constant based on Fractional Width

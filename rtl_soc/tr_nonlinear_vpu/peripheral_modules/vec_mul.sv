@@ -28,26 +28,35 @@
 //
 // Both modes have the SAME output latency.
 // ===================================================================================
+/*
+ * @module   vec_mul
+ * @brief    TODO: Add one-line description
+ * @details  TODO: Add detailed description
+ *
+ * @param    N               TODO: Add description
+ * @param    W               TODO: Add description
+ * @param    ACC_W           TODO: Add description
+ */
 module vec_mul #(
     parameter int N     = 16,
     parameter int W     = 8,
     parameter int ACC_W = 32
 )(
-    input  logic                     clk,
-    input  logic                     rst_n,
+    input  logic clk,
+    input  logic rst_n,
 
     // Input stream
-    input  logic                     in_valid,
-    output logic                     in_ready,
+    input  logic in_valid,
+    output logic in_ready,
     input  logic [1:0]               op_mode,        // 0:SS, 1:SU, 2:UU
-    input  logic                     mode_elemwise,  // 0:DOT, 1:ELEMWISE
+    input  logic mode_elemwise,  // 0:DOT, 1:ELEMWISE
     input  logic [W-1:0]             a [N],          // raw bits
     input  logic [W-1:0]             b [N],          // raw bits
-    input  logic                     clear_acc,
+    input  logic clear_acc,
 
     // Output stream
-    output logic                     out_valid,
-    input  logic                     out_ready,
+    output logic out_valid,
+    input  logic out_ready,
     output logic [N-1:0]             out_valid_mask,
     output logic signed [ACC_W-1:0]  out_vec [N]
 );

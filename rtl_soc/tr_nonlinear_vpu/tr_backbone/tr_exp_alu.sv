@@ -1,15 +1,25 @@
 `timescale 1ns/1ps
 
+/*
+ * @module   tr_exp_alu
+ * @brief    TODO: Add one-line description
+ * @details  TODO: Add detailed description
+ *
+ * @param    WIDTH           TODO: Add description
+ * @param    FRAC_W          TODO: Add description
+ * @param    LUT_IDX_W       TODO: Add description
+ * @param    ITER            TODO: Add description
+ */
 module tr_exp_alu #(
     parameter int WIDTH = 8,
     parameter int FRAC_W = 4,
     parameter int LUT_IDX_W = 3,
     parameter int ITER = 2          // 0: Zero-Order, 1: Linear, 2: Quadratic
 )(
-    input  wire signed [WIDTH-1:0] x,
-    output wire        [LUT_IDX_W-1:0] a_idx,   // Sent out to external Shared ROM
-    output logic       [WIDTH-1:0] mantisa,
-    output wire                    is_zero
+    input  logic signed [WIDTH-1:0] x,
+    output logic [LUT_IDX_W-1:0] a_idx,   // Sent out to external Shared ROM
+    output logic [WIDTH-1:0] mantisa,
+    output logic is_zero
 );
 
     // ---------------------------------------------------------

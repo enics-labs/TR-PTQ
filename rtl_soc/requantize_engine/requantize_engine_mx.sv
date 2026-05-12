@@ -1,20 +1,26 @@
 `timescale 1ns/1ps
 
+/*
+ * @module   requantize_engine_mx
+ * @brief    TODO: Add one-line description
+ * @details  TODO: Add detailed description
+ *
+ * @param    N               TODO: Add description
+ * @param    ACC_W           TODO: Add description
+ * @param    OUT_W           TODO: Add description
+ */
 module requantize_engine_mx #(
     parameter int N = 4,         
     parameter int ACC_W = 32,    
     parameter int OUT_W = 8      
 )(
-    input  logic               clk,
-    input  logic               rst_n,
-    
-    input  logic               dot_in_valid,
-    output logic               req_out_valid,
-    
+    input  logic clk,
+    input  logic rst_n,
+    input  logic dot_in_valid,
+    output logic req_out_valid,
     input  logic signed [ACC_W-1:0] dot_in [N],
     input  logic signed [7:0]       exp_act_in,     
     input  logic signed [7:0]       exp_weight_in,  
-    
     output logic signed [OUT_W-1:0] req_vec_out [N],
     output logic signed [7:0]       exp_total_out   
 );
@@ -48,7 +54,7 @@ module requantize_engine_mx #(
     // 3. Count Leading Zeros to Determine Required Shift (S)
     // -------------------------------------------------------------------------
     logic [5:0] bit_width; // 6 bits to hold up to 32
-    logic signed [7:0] shift_needed;
+    logic signed [OUT_W-1:0] shift_needed;
 
     always_comb begin
         bit_width = 0;

@@ -1,5 +1,14 @@
 `timescale 1ns/1ps
 
+/*
+ * @module   dynamic_shifter_mx
+ * @brief    TODO: Add one-line description
+ * @details  TODO: Add detailed description
+ *
+ * @param    N               TODO: Add description
+ * @param    IN_W            TODO: Add description
+ * @param    OUT_W           TODO: Add description
+ */
 module dynamic_shifter_mx #(
     parameter int N     = 4,
     parameter int IN_W  = 8,
@@ -7,8 +16,7 @@ module dynamic_shifter_mx #(
 )(
     input  logic signed [IN_W-1:0]  data_in [N],
     input  logic signed [7:0]       shift_amount, // The Shared Exponent
-    input  logic                    shift_dir,    // 1 = Left (Expand), 0 = Right (Compress)
-    
+    input  logic shift_dir,    // 1 = Left (Expand), 0 = Right (Compress)
     output logic signed [OUT_W-1:0] data_out [N]
 );
 

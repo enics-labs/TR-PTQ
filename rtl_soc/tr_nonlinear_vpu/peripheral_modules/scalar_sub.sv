@@ -1,5 +1,13 @@
 `timescale 1ns/1ps
 
+/*
+ * @module   scalar_sub
+ * @brief    TODO: Add one-line description
+ * @details  TODO: Add detailed description
+ *
+ * @param    NUM_INPUTS      TODO: Add description
+ * @param    DATA_WIDTH      TODO: Add description
+ */
 module scalar_sub #(
     parameter int NUM_INPUTS = 8,
     parameter int DATA_WIDTH = 8

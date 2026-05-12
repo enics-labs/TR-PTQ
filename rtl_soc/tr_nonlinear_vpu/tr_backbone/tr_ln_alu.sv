@@ -1,10 +1,19 @@
+/*
+ * @module   tr_ln_alu
+ * @brief    TODO: Add one-line description
+ * @details  TODO: Add detailed description
+ *
+ * @param    WIDTH           TODO: Add description
+ * @param    BITS            TODO: Add description
+ * @param    OUT_WIDTH       TODO: Add description
+ */
 module tr_ln_alu #(
     parameter int WIDTH = 16,
     parameter int BITS  = 4,        // Fractional bits
     parameter int OUT_WIDTH = 8     // Defaults to SoftMax/GELU 16->8 reduction
 )(
-    input  wire        [WIDTH-1:0]   xq,
-    output wire signed [OUT_WIDTH-1:0] yq
+    input  logic [WIDTH-1:0]   xq,
+    output logic signed [OUT_WIDTH-1:0] yq
 );
 
     // ========================================================================

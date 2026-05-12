@@ -1,13 +1,21 @@
+/*
+ * @module   piped_max
+ * @brief    TODO: Add one-line description
+ * @details  TODO: Add detailed description
+ *
+ * @param    NUM_INPUTS      TODO: Add description
+ * @param    DATA_WIDTH      TODO: Add description
+ */
 module piped_max #(
     parameter int NUM_INPUTS = 8,  
     parameter int DATA_WIDTH = 8  
 )(
-    input  logic                          clk,
-    input  logic                          rst_n,
-    input  logic                          valid_in,
+    input  logic clk,
+    input  logic rst_n,
+    input  logic valid_in,
     input  logic signed [DATA_WIDTH-1:0]  in_data [NUM_INPUTS],
     output logic signed [DATA_WIDTH-1:0]  max_out, 
-    output logic                          valid_out
+    output logic valid_out
 );
 
     localparam int STAGES = $clog2(NUM_INPUTS);

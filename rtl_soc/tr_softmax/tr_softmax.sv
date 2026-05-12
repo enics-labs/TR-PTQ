@@ -1,23 +1,31 @@
 `timescale 1ns/1ps
 
+/*
+ * @module   tr_softmax
+ * @brief    TODO: Add one-line description
+ * @details  TODO: Add detailed description
+ *
+ * @param    N               TODO: Add description
+ * @param    W               TODO: Add description
+ * @param    FRAC_W          TODO: Add description
+ * @param    ACC_W           TODO: Add description
+ */
 module tr_softmax #(
     parameter int N = 8,
     parameter int W = 8,
     parameter int FRAC_W = 4,
     parameter int ACC_W = 32
 )(
-    input  logic                 clk,
-    input  logic                 rst_n,
-    
-    input  logic                 valid_in,
+    input  logic clk,
+    input  logic rst_n,
+    input  logic valid_in,
     input  logic [1:0]           mode,       
     input  logic signed [W-1:0]  x_in [N],
 
     // Auxiliary stateless inputs from Controller
     input  logic signed [W-1:0]  offset_in,  // Used for 'm' (Pass 2) or 'm + ln(S)' (Pass 4)
     input  logic signed [ACC_W-1:0] sum_in,  // Used for 'S' (Pass 3)
-
-    output logic                 valid_out,
+    output logic valid_out,
     output logic signed [W-1:0]  y_out [N],
     output logic signed [ACC_W-1:0] sum_out  // Dedicated wide output for DOT product
 );
@@ -92,8 +100,8 @@ module tr_softmax #(
     end
 
     logic [2:0] a_idx [N];
-    logic [7:0] e_a_comb [N];
-    logic [7:0] mantisa_comb [N];
+    logic [N-1:0] e_a_comb [N];
+    logic [N-1:0] mantisa_comb [N];
     logic [N-1:0] is_zero_comb;
 
     genvar i;
@@ -112,8 +120,8 @@ module tr_softmax #(
 
     shared_lut_rom #(.N(N)) u_lut (.a_idx(a_idx), .e_a(e_a_comb));
 
-    logic [7:0]   s2_e_a [N];
-    logic [7:0]   s2_mantisa [N];
+    logic [N-1:0]   s2_e_a [N];
+    logic [N-1:0]   s2_mantisa [N];
     logic [N-1:0] s2_is_zero;
     logic [1:0]   s2_mode;
     logic         s2_valid;
