@@ -42,5 +42,3 @@
 
 // tb
 ../tb_soc/tr_soc_top/tr_soc_top_mx_tb.sv
-
-+define+MX_MODE

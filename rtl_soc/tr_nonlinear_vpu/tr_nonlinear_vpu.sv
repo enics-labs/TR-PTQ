@@ -144,34 +144,13 @@ module tr_nonlinear_vpu #(
     end
 
     // =========================================================
-    // MX DYNAMIC SHIFTER INTERCEPT (Compile-Time Switched)
+    // VPU Backbone Direct Wire
     // =========================================================
-`ifdef MX_MODE
-    logic signed [W_MAC-1:0] shifted_bb_in [N];
-
-    dynamic_shifter_mx #(
-        .N(N), .IN_W(W_MAC), .OUT_W(W_MAC) // W_MAC is 16-bit
-    ) u_internal_shifter (
-        .data_in(bb_mux_out),
-        .shift_amount(mx_shared_exp),
-        .shift_dir(1'b1), // Expand
-        .data_out(shifted_bb_in)
-    );
-
-    always_comb begin
-        for(int i=0; i<N; i++) begin
-            if (mx_shift_en) bb_in[i] = shifted_bb_in[i];
-            else             bb_in[i] = bb_mux_out[i];
-        end
-    end
-`else
-    // Legacy INT mode: Direct wire
     always_comb begin
         for(int i=0; i<N; i++) begin
             bb_in[i] = bb_mux_out[i];
         end
     end
-`endif
 
     // =========================================================
     // MUX 6: VPU Final Output

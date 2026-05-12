@@ -174,10 +174,6 @@ module tr_soc_top_mx #(
         .clk(clk), .rst_n(rst_n),
         .sram_data_a(vpu_sram_a_in), .sram_data_b(vpu_sram_b_in), .vpu_data_out(vpu_raw_out),
         
-        // --- MX EXPANSION PORTS ---
-        .mx_shared_exp(mx_shared_exp),
-        .mx_shift_en(1'b0), // Disabled: Top shifter handles full expansion
-        
         .ctrl_scalar_sub_val(ctrl_scalar_sub_val), .vpu_max_out(vpu_max_out), .vpu_dot_out(vpu_dot_out),
         .mux_bb_in_sel(mux_bb_in_sel), .mux_mac_a_sel(mux_mac_a_sel), .mux_mac_b_sel(mux_mac_b_sel),
         .mux_vecmul_a_sel(mux_vecmul_a_sel), .mux_vecmul_b_sel(mux_vecmul_b_sel), .mux_vpu_out_sel(mux_vpu_out_sel),
