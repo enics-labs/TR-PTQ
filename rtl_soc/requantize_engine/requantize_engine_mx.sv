@@ -25,74 +25,77 @@ module requantize_engine_mx #(
     output logic signed [7:0]       exp_total_out   
 );
 
-    // -------------------------------------------------------------------------
-    // 1. Calculate the Base MAC Exponent
-    // -------------------------------------------------------------------------
-    logic signed [7:0] base_exp;
-    assign base_exp = exp_act_in + exp_weight_in;
+    // ========================================================================
+    // PIPELINE STAGE 1: Max-Tree & Latch
+    // ========================================================================
+    logic signed [ACC_W-1:0] st1_dot_in [N];
+    logic signed [7:0]       st1_base_exp;
+    logic [ACC_W-1:0]        st1_max_abs;
+    logic                    st1_valid;
 
-    // -------------------------------------------------------------------------
-    // 2. Find Maximum Absolute Value in the Block
-    // -------------------------------------------------------------------------
-    logic [ACC_W-1:0] abs_val [N];
-    logic [ACC_W-1:0] max_abs;
+    // Combinational Max-Tree
+    logic [ACC_W-1:0] comb_abs_val [N];
+    logic [ACC_W-1:0] comb_max_abs;
 
     always_comb begin
-        max_abs = '0;
+        comb_max_abs = '0;
         for (int i = 0; i < N; i++) begin
-            // 2's complement absolute value
-            abs_val[i] = (dot_in[i][ACC_W-1]) ? -dot_in[i] : dot_in[i];
-            
-            // Max Tree
-            if (abs_val[i] > max_abs) begin
-                max_abs = abs_val[i];
+            comb_abs_val[i] = (dot_in[i][ACC_W-1]) ? -dot_in[i] : dot_in[i];
+            if (comb_abs_val[i] > comb_max_abs) comb_max_abs = comb_abs_val[i];
+        end
+    end
+
+    // Stage 1 Registers
+    always_ff @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            st1_valid <= 1'b0;
+            st1_base_exp <= '0;
+            st1_max_abs <= '0;
+            for (int i = 0; i < N; i++) st1_dot_in[i] <= '0;
+        end else begin
+            st1_valid <= dot_in_valid;
+            if (dot_in_valid) begin
+                st1_base_exp <= exp_act_in + exp_weight_in;
+                st1_max_abs  <= comb_max_abs;
+                st1_dot_in   <= dot_in;
             end
         end
     end
 
-    // -------------------------------------------------------------------------
-    // 3. Count Leading Zeros to Determine Required Shift (S)
-    // -------------------------------------------------------------------------
-    logic [5:0] bit_width; // 6 bits to hold up to 32
-    logic signed [OUT_W-1:0] shift_needed;
+    // ========================================================================
+    // PIPELINE STAGE 2: LZC, Compression Shift, and Output
+    // ========================================================================
+    logic [5:0] bit_width;
+    logic [7:0] comp_shift;
 
+    // LZC on registered Max-Abs
     always_comb begin
         bit_width = 0;
         for (int i = ACC_W-1; i >= 0; i--) begin
-            if (max_abs[i] == 1'b1 && bit_width == 0) begin
+            if (st1_max_abs[i] == 1'b1 && bit_width == 0) begin
                 bit_width = i + 1;
             end
         end
         
-        // Calculate how many bits we must shift right to fit into OUT_W (8 bits)
-        // OUT_W - 1 is the magnitude portion (7 bits)
-        if (bit_width > (OUT_W - 1)) begin
-            shift_needed = bit_width - (OUT_W - 1);
-        end else begin
-            shift_needed = 0; // Already fits, no compression needed
-        end
+        if (bit_width > (OUT_W - 1)) comp_shift = bit_width - (OUT_W - 1);
+        else                         comp_shift = 0;
     end
 
-    // -------------------------------------------------------------------------
-    // 4. Shift, Update Exponent, and Register Outputs
-    // -------------------------------------------------------------------------
+    // Stage 2 Registers (Final Output)
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             req_out_valid <= 1'b0;
             exp_total_out <= '0;
             for (int i = 0; i < N; i++) req_vec_out[i] <= '0;
         end else begin
-            req_out_valid <= dot_in_valid;
-            if (dot_in_valid) begin
-                // The new total exponent merges the MAC base scale and the compression shift
-                exp_total_out <= base_exp + shift_needed;
+            req_out_valid <= st1_valid;
+            if (st1_valid) begin
+                exp_total_out <= st1_base_exp + $signed({1'b0, comp_shift}); 
                 
                 for (int i = 0; i < N; i++) begin
-                    automatic logic signed [ACC_W-1:0] shifted_val;
-                    
-                    // Compress 32-bit down to 8-bit
-                    shifted_val = dot_in[i] >>> shift_needed;
-                    req_vec_out[i] <= shifted_val[OUT_W-1:0]; 
+                    automatic logic signed [ACC_W-1:0] shifted;
+                    shifted = st1_dot_in[i] >>> comp_shift;
+                    req_vec_out[i] <= shifted[OUT_W-1:0];
                 end
             end
         end
