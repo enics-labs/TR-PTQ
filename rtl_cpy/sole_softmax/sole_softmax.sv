@@ -64,10 +64,11 @@ module sole_softmax #(
     );
 
     // B. SOLE Exponentiation Lanes (Combinational)
+    logic [3:0] k_comb [N];
     generate
         for (genvar i = 0; i < N; i++) begin : GEN_EXP
             sole_log2exp #(.W(W), .FRAC_W(FRAC_W)) u_exp (
-                .x(x_sub[i]), .exp_out(exp_comb[i])
+                .x(x_sub[i]), .exp_out(exp_comb[i]), .k_out(k_comb[i])
             );
         end
     endgenerate
@@ -82,18 +83,18 @@ module sole_softmax #(
 
     // D. Stage 2 Registers
     logic             stg2_valid;
-    logic [W-1:0]     exp_reg [N];
+    logic [3:0]       k_reg [N];
     logic [SUM_W-1:0] sum_reg;
 
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             stg2_valid <= 1'b0;
             sum_reg    <= '0;
-            for (int i = 0; i < N; i++) exp_reg[i] <= '0;
+            for (int i = 0; i < N; i++) k_reg[i] <= '0;
         end else begin
             stg2_valid <= max_valid; // Flows from piped_max
             sum_reg    <= sum_comb;
-            exp_reg    <= exp_comb;
+            k_reg      <= k_comb;
         end
     end
 
@@ -123,7 +124,7 @@ module sole_softmax #(
 
     // Stage 3 Registers
     logic        stg3_valid;
-    logic [W-1:0] exp_reg2 [N];
+    logic [3:0]  k_reg2 [N];
     logic [4:0]  lod_k_reg;
     logic [15:0] recip_reg;
 
@@ -132,12 +133,12 @@ module sole_softmax #(
             stg3_valid <= 1'b0;
             lod_k_reg  <= '0;
             recip_reg  <= '0;
-            for (int i = 0; i < N; i++) exp_reg2[i] <= '0;
+            for (int i = 0; i < N; i++) k_reg2[i] <= '0;
         end else begin
             stg3_valid <= stg2_valid;
             lod_k_reg  <= lod_k;
             recip_reg  <= recip_approx;
-            exp_reg2   <= exp_reg;
+            k_reg2     <= k_reg;
         end
     end
 
@@ -153,12 +154,13 @@ module sole_softmax #(
             out_valid <= stg3_valid;
             
             for (int i = 0; i < N; i++) begin
-                // Q4.4 Exponent * Q4.12 Reciprocal Proxy = Q8.16 Product
-                logic [23:0] prod;
-                prod = exp_reg2[i] * recip_reg;
-                
-                // Shift down by fractional width (12 + 4) and adjust for LOD Scale
-                out_data[i] = prod >> (lod_k_reg + 8); 
+                // If the shift amount k exceeded limits, probability is 0
+                if (k_reg2[i] >= W) begin
+                    out_data[i] <= '0;
+                end else begin
+                    // NO MULTIPLIERS! Pure Shift-Only Log Division
+                    out_data[i] <= recip_reg >> (k_reg2[i] + lod_k_reg + 4); 
+                end
             end
         end
     end
