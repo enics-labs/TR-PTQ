@@ -1,0 +1,4 @@
+[submodule "emulation/stable_code"]
+	path = emulation/stable_code
+	url = https://github.com/enics-labs/TR-PTQ.git
+	branch = stable-code
