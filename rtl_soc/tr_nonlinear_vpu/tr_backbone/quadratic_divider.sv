@@ -35,9 +35,13 @@ module quadratic_divider #(
             // Formula: b3 AND NOT b2 AND NOT b1 AND NOT b0
             assign y[1] = b3 & ~b2 & ~b1 & ~b0;
 
-            // y[0] (LSB) Logic: High when x is -7, -6, 6, or 7
-            // Formula derived from K-map: (b2 & b1) | (b3 & ~b2 & b0) | (b3 & ~b2 & b1)
-            assign y[0] = (b2 & b1) | (b3 & ~b2 & b0) | (b3 & ~b2 & b1);
+            // y[0] (LSB): High ONLY when x is 6, 7, -6, or -7
+            // 6, 7  -> ~b3 & b2 & b1
+            // -7    ->  b3 & ~b2 & ~b1 & b0
+            // -6    ->  b3 & ~b2 & b1 & ~b0
+            assign y[0] = (~b3 & b2 & b1) | 
+                          (b3 & ~b2 & ~b1 & b0) | 
+                          (b3 & ~b2 & b1 & ~b0);
             
             // Pad the 2-bit result to match the fractional width
             assign quad_out = {2'b00, y};
