@@ -35,30 +35,41 @@ module tr_ln_alu #(
     logic [WIDTH-1:0]       normalized_x;
 
     always_comb begin
-        // 1. Find the MSB (log2 floor)
-        msb = '0;
-        for (int i = 0; i < WIDTH; i++) begin
-            if (xq[i]) msb = i;
+        
+        if (xq == 0) begin
+            yq_full = '0;
+        end else begin
+            // 1. Find the MSB (log2 floor)
+            msb = '0;
+            for (int i = 0; i < WIDTH; i++) begin
+                if (xq[i]) msb = i;
+            end
+
+            // 2. Calculate aq = msb - BITS
+            aq_full = $signed({1'b0, msb}) - $signed(AQ_W'(BITS));
+
+            // 3. Perform the shift
+            normalized_x = xq << (WIDTH - 1 - msb);
+            k1_full = $signed({1'b0, normalized_x[WIDTH-1 : WIDTH-1-BITS]});
+
+            // 4. Compute k2 = (aq - 1) * (1 << BITS)
+            k2_full = $signed(aq_full - 1) <<< BITS;
+
+            // 5. Sum them up (Safe signed addition)
+            k_full = k1_full + k2_full;
+
+            // 6. Final approximation: yq = (k/2) + (k/8) + (k/16)
+            yq_full = (k_full >>> 1) + (k_full >>> 3) + (k_full >>> 4);
         end
-
-        // 2. Calculate aq = msb - BITS
-        aq_full = $signed({1'b0, msb}) - $signed(AQ_W'(BITS));
-
-        // 3. Perform the shift
-        normalized_x = xq << (WIDTH - 1 - msb);
-        k1_full = $signed({1'b0, normalized_x[WIDTH-1 : WIDTH-1-BITS]});
-
-        // 4. Compute k2 = (aq - 1) * (1 << BITS)
-        k2_full = $signed(aq_full - 1) <<< BITS;
-
-        // 5. Sum them up (Safe signed addition)
-        k_full = k1_full + k2_full;
-
-        // 6. Final approximation: yq = (k/2) + (k/8) + (k/16)
-        yq_full = (k_full >>> 1) + (k_full >>> 3) + (k_full >>> 4);
     end
-    
-    // Assign back out to the parameterized width
-    assign yq = OUT_WIDTH'(yq_full);
+
+    always_comb begin
+        if (yq_full > (2**(OUT_WIDTH-1) - 1))
+            yq = (2**(OUT_WIDTH-1) - 1);
+        else if (yq_full < -(2**(OUT_WIDTH-1)))
+            yq = -(2**(OUT_WIDTH-1));
+        else
+            yq = OUT_WIDTH'(yq_full);
+    end
 
 endmodule

@@ -46,11 +46,11 @@ module tr_exp_tb();
     logic [7:0] hw_final_y;
 
     initial begin
-        file_in = $fopen("input_vectors.txt", "r");
-        file_out = $fopen("hdl_exp_out.txt", "w");
+        file_in = $fopen("inputs.txt", "r");
+        file_out = $fopen("hdl_out.txt", "w");
         
         if (!file_in || !file_out) begin
-            $display("[ERROR] Could not open IO files! Ensure input_vectors.txt exists in workspace.");
+            $display("[ERROR] Could not open IO files! Ensure inputs.txt exists in workspace.");
             $finish;
         end
 
