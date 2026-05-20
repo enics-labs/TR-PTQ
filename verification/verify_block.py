@@ -62,11 +62,19 @@ def run_verification():
 
     # 4. Run RTL Simulation using the mapped .f file
     print(f">> [3/4] Running RTL Simulation for {args.block.upper()}...")
+    
+    # THE FIX: Force Python to use an interactive C-Shell (tcsh -i).
+    # This guarantees your IT department's 'qrsh' alias is expanded, 
+    # routing the simulation to the 'all.q' compute node where the licenses live!
+    xrun_cmd = f"xrun -f {config['f_file']}"
+    
     rtl_compile = subprocess.run(
-        ["xrun", "-f", config["f_file"]], 
-        capture_output=True, text=True
+        ["tcsh", "-i", "-c", xrun_cmd], 
+        capture_output=True, 
+        text=True
     )
     
+    # Standard output will now contain the qrsh wrapper text
     if rtl_compile.returncode != 0:
         print("[FATAL] RTL Simulation failed:\n", rtl_compile.stderr)
         print(rtl_compile.stdout)
