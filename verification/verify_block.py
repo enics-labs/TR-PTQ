@@ -8,7 +8,8 @@ def get_config(block_name):
         "exp":     {"f_file": "../tb_soc/tr_exp/tr_exp.f",         "max_error": 0},
         "ln":      {"f_file": "../tb_soc/tr_ln/tr_ln.f",           "max_error": 0},
         "softmax": {"f_file": "../tb_soc/tr_softmax/tr_softmax.f", "max_error": 0},
-        "gelu":    {"f_file": "../tb_soc/tr_gelu/tr_gelu.f",       "max_error": 0}
+        "gelu":    {"f_file": "../tb_soc/tr_gelu/tr_gelu.f",         "max_error": 0},
+        "swiglu":  {"f_file": "../tb_soc/tr_swiglu/tr_swiglu.f",   "max_error": 0}
     }
     return configs.get(block_name.lower())
 
@@ -137,7 +138,7 @@ def run_verification():
         if row_has_error and failed_rows_logged < 10:
             print(f"  [MISMATCH] Row {idx+1} (Max Error in row: {row_max_delta})")
             print(f"    Input   : {in_line.strip()}")
-            if args.block in ["softmax", "gelu"]:
+            if args.block in ["softmax", "gelu", "swiglu"]:
                 print(f"    Expected: {exp_line.strip()}")
                 print(f"    HDL Got : {hdl_line.strip()}\n")
             else:

@@ -158,6 +158,55 @@ int main(int argc, char* argv[]) {
         }
         std::cout << "[C++ MODEL] Generated SOFTMAX vectors using 2nd-order exp + exact division." << std::endl;
     }
+    else if (mode == "swiglu") {
+        const int N_LANES = 8;
+        const int N_VECS  = 256;
+        vec_file << N_VECS << "\n";
+        srand(1337);
+
+        for (int i = 0; i < N_VECS; i++) {
+            int x[N_LANES], g[N_LANES];
+
+            for (int j = 0; j < N_LANES; j++) x[j] = (rand() % 256) - 128;
+            for (int j = 0; j < N_LANES; j++) g[j] = (rand() % 256) - 128;
+
+            // Write x[0..7] g[0..7] on one line
+            for (int j = 0; j < N_LANES; j++) vec_file << x[j] << " ";
+            for (int j = 0; j < N_LANES; j++) vec_file << g[j] << (j == N_LANES - 1 ? "" : " ");
+            vec_file << "\n";
+
+            for (int j = 0; j < N_LANES; j++) {
+                int8_t xq = (int8_t)x[j];
+                int8_t gq = (int8_t)g[j];
+
+                // Pass 0: E = exp(-alpha|x|)
+                int8_t alpha_q44 = alpha_stabilizer_model(xq);
+                int    E_q44     = gelu_exp_q44(alpha_q44);
+
+                // Pass 1: recip = 1/(1+E) via exp(-ln(1+E))
+                int    pre_ln_q44  = E_q44 + 16;
+                int    ln_yq8      = tr_new_ln_scalar(pre_ln_q44 << 4, 8);
+                if (ln_yq8 >  2047) ln_yq8 =  2047;
+                if (ln_yq8 < -2048) ln_yq8 = -2048;
+                int8_t ln_out_q44  = (int8_t)((ln_yq8 + 8) >> 4);
+                int8_t neg_ln_q44  = (int8_t)(-(int16_t)ln_out_q44);
+                int    recip_q44   = gelu_exp_q44(neg_ln_q44);
+
+                // Pass 2: silu = x * sigma(x)  [mirrors SU multiply → [11:4]]
+                int sigma_q44  = (xq < 0) ? (16 - recip_q44) : recip_q44;
+                int silu_prod  = (int32_t)(int8_t)xq * (int32_t)(uint8_t)sigma_q44;
+                int8_t silu_q44 = (int8_t)(silu_prod >> 4);
+
+                // Pass 3: y = silu * g  [SS multiply → [11:4]]
+                int32_t final_prod = (int32_t)(int8_t)silu_q44 * (int32_t)(int8_t)gq;
+                int8_t  y_q44      = (int8_t)(final_prod >> 4);
+
+                exp_file << (int)y_q44 << (j == N_LANES - 1 ? "" : " ");
+            }
+            exp_file << "\n";
+        }
+        std::cout << "[C++ MODEL] Generated SWIGLU vectors." << std::endl;
+    }
     else if (mode == "gelu") {
         const int N_LANES = 8;
         const int N_VECS  = 256;
