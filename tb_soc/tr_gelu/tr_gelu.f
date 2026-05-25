@@ -13,6 +13,7 @@
 ../rtl_soc/tr_nonlinear_vpu/peripheral_modules/shared_lut_rom.sv
 ../rtl_soc/tr_nonlinear_vpu/peripheral_modules/alpha_stabilizer.sv
 ../rtl_soc/tr_nonlinear_vpu/peripheral_modules/symmetry_modifier.sv
+../rtl_soc/tr_nonlinear_vpu/peripheral_modules/vec_mul.sv
 
 ../rtl_soc/tr_gelu/tr_gelu.sv
 

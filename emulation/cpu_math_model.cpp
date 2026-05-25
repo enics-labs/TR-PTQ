@@ -17,6 +17,62 @@ const uint8_t EXP_LUT_CONST[9] = {0, 0, 1, 2, 5, 13, 35, 94, 255};
 // CUDA Math header
 #include "../emulation/stable_code/mrcp_quant/optimized_layers/common/tr_math.cuh"
 
+// GELU helpers — bit-exact replicas of the RTL submodules
+// ---------------------------------------------------------
+
+// Replicates alpha_stabilizer.sv: computes -|alpha_approx * x| in Q4.4.
+static int8_t alpha_stabilizer_model(int8_t x) {
+    uint8_t abs_z = (x < 0) ? (uint8_t)(-(int16_t)x) : (uint8_t)x;
+    int16_t x_ext  = (int16_t)x;
+    int16_t x_base = (x_ext << 4) + (x_ext << 3);  // x * 24
+
+    int16_t x_mult;
+    switch ((abs_z >> 4) & 0x7) {  // abs_z[6:4]
+        case 0:  x_mult = x_base + (x_ext << 1) + x_ext; break;  // * 27
+        case 1:  x_mult = x_base + (x_ext << 1);          break;  // * 26
+        case 2:  x_mult = x_base + x_ext;                 break;  // * 25
+        default: x_mult = x_base;                          break;  // * 24
+    }
+
+    int8_t x_scaled;
+    if      (x_mult >  2032) x_scaled =  127;
+    else if (x_mult < -2048) x_scaled = -128;
+    else                     x_scaled = (int8_t)((int16_t)x_mult >> 4);  // x_mult[11:4]
+
+    return (x_scaled > 0) ? (int8_t)(-x_scaled) : x_scaled;
+}
+
+// Replicates tr_exp_alu (ITER=2) + the GELU is_zero bypass:
+//   is_zero → vec_a=128, vec_b=mantisa<<1 → [15:8] = mantisa
+//   otherwise → vec_a=LUT[idx], vec_b=mantisa → [15:8] = (LUT*mantisa)>>8
+// Returns the Q4.4 exp value (integer, range 0..16).
+static int gelu_exp_q44(int8_t x) {
+    static const uint8_t EXP_LUT[8] = {94, 35, 13, 5, 2, 1, 0, 0};  // anchors -1..-8
+
+    // round.sv
+    int trunc_int      = (int)x >> 4;          // arithmetic shift → integer part
+    int frac_round_bit = ((uint8_t)x >> 3) & 1; // bit[3]
+    int rounded_mag    = trunc_int + frac_round_bit;
+    bool is_zero       = (rounded_mag == 0);
+
+    // tr_exp_alu mantisa (ITER=2, FRAC_W=4)
+    int frac_bits   = (uint8_t)x & 0xF;        // x[3:0]
+    int is_ceil     = frac_round_bit;
+    int first_order = ((!is_ceil) << 4) | frac_bits;  // {~is_ceil, x[3:0]}
+
+    // quadratic_divider K-map (8-bit Q4.4)
+    int b3=(frac_bits>>3)&1, b2=(frac_bits>>2)&1, b1=(frac_bits>>1)&1, b0=frac_bits&1;
+    int y1 =  b3 & !b2 & !b1 & !b0;
+    int y0 = (!b3 & b2 & b1) | (b3 & !b2 & !b1 & b0) | (b3 & !b2 & b1 & !b0);
+    int mantisa = (first_order + ((y1 << 1) | y0)) & 0xFF;
+
+    if (is_zero)
+        return mantisa;                         // 128*(mantisa<<1) → [15:8] = mantisa
+
+    int lut_idx = (~rounded_mag) & 0x7;
+    return (EXP_LUT[lut_idx] * mantisa) >> 8;  // [15:8] of 16-bit product
+}
+
 int main(int argc, char* argv[]) {
     if (argc < 2) {
         std::cerr << "[ERROR] Must provide a block mode (e.g., './cpu_model exp' or './cpu_model ln')" << std::endl;
@@ -101,6 +157,54 @@ int main(int argc, char* argv[]) {
             exp_file << "\n";
         }
         std::cout << "[C++ MODEL] Generated SOFTMAX vectors using 2nd-order exp + exact division." << std::endl;
+    }
+    else if (mode == "gelu") {
+        const int N_LANES = 8;
+        const int N_VECS  = 256;
+        vec_file << N_VECS << "\n";
+        srand(1337);
+
+        for (int i = 0; i < N_VECS; i++) {
+            int x[N_LANES];
+            for (int j = 0; j < N_LANES; j++) {
+                x[j] = (rand() % 256) - 128;
+                vec_file << x[j] << (j == N_LANES - 1 ? "" : " ");
+            }
+            vec_file << "\n";
+
+            for (int j = 0; j < N_LANES; j++) {
+                int8_t xq = (int8_t)x[j];
+
+                // Pass 0: E = exp(-alpha|x|)  [alpha_stabilizer → tr_exp_alu]
+                int8_t alpha_q44 = alpha_stabilizer_model(xq);
+                int    E_q44     = gelu_exp_q44(alpha_q44);
+
+                // Pass 1: recip = 1/(1+E)  via  exp(-ln(1+E))
+                // pre_ln_modifier adds 1.0 (16 in Q4.4), giving (E+16) in Q4.4.
+                // tr_ln_alu (WIDTH=12, BITS=8) expects Q4.8 → zero-pad by <<4.
+                int    pre_ln_q44  = E_q44 + 16;                  // (E+1) in Q4.4
+                int    ln_yq8      = tr_new_ln_scalar(pre_ln_q44 << 4, 8); // Q4.8
+                // Saturate to 12-bit signed
+                if (ln_yq8 >  2047) ln_yq8 =  2047;
+                if (ln_yq8 < -2048) ln_yq8 = -2048;
+                // Shift back Q4.8 → Q4.4 with rounding (factor 8)
+                int8_t ln_out_q44  = (int8_t)((ln_yq8 + 8) >> 4);
+                // post_ln_modifier mode 01: negate
+                int8_t neg_ln_q44  = (int8_t)(-(int16_t)ln_out_q44);
+                int    recip_q44   = gelu_exp_q44(neg_ln_q44);
+
+                // Pass 2: y = x * sigma(x)
+                // symmetry_modifier: sigma(x) = (x<0) ? 1-recip : recip
+                int sigma_q44 = (xq < 0) ? (16 - recip_q44) : recip_q44;
+                // vec_mul SS mode (op_mode=0): signed × signed, [11:4] extract
+                int product   = (int)xq * (int)(int8_t)sigma_q44;
+                int8_t y_q44  = (int8_t)(product >> 4);
+
+                exp_file << (int)y_q44 << (j == N_LANES - 1 ? "" : " ");
+            }
+            exp_file << "\n";
+        }
+        std::cout << "[C++ MODEL] Generated GELU vectors." << std::endl;
     }
     else {
         std::cerr << "[ERROR] Unknown mode: " << mode << std::endl;
