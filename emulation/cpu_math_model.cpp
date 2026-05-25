@@ -57,6 +57,51 @@ int main(int argc, char* argv[]) {
         }
         std::cout << "[C++ MODEL] Generated LN test vectors." << std::endl;
     } 
+    else if (mode == "softmax") {
+        vec_file << "256\n"; 
+        srand(1337); 
+        
+        for (int i = 0; i < 256; i++) {
+            int x[8];
+            int row_max = -128; // Simulating INT_MIN for Q4.4 8-bit limits
+            
+            // 1. Generate Row and Find Max (Mirrors CUDA Pass 1)
+            for (int j = 0; j < 8; j++) {
+                x[j] = (rand() % 256) - 128;
+                if (x[j] > row_max) row_max = x[j];
+                vec_file << x[j] << (j == 7 ? "" : " ");
+            }
+            vec_file << "\n";
+
+            // 2. Compute Sum of Exponents (Mirrors CUDA Pass 2)
+            // Uses 2nd-order Taylor approximation matching HDL tr_exp_alu ITER=2.
+            int local_sum = 0;
+            for (int j = 0; j < 8; j++) {
+                int z = x[j] - row_max;
+                local_sum += tr_approx_exp_scalar_2rd(z);
+            }
+
+            int denom = local_sum;
+            if (denom < 1) denom = 1;
+
+            // 3. Compute Final Output with Division (Mirrors CUDA Pass 3)
+            for (int j = 0; j < 8; j++) {
+                int z = x[j] - row_max;
+                int e = tr_approx_exp_scalar_2rd(z);
+                
+                // CUDA logic (Q0.8):
+                int y_q08 = (e << 8) / denom; 
+                
+                // Scale down to Q4.4 to match hardware output format
+                // A logical shift right by 4 converts Q0.8 (256 scale) to Q4.4 (16 scale)
+                int16_t y = (int16_t)(y_q08 >> 4);
+                
+                exp_file << y << (j == 7 ? "" : " ");
+            }
+            exp_file << "\n";
+        }
+        std::cout << "[C++ MODEL] Generated SOFTMAX vectors using 2nd-order exp + exact division." << std::endl;
+    }
     else {
         std::cerr << "[ERROR] Unknown mode: " << mode << std::endl;
         return -1;
