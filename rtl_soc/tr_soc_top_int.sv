@@ -200,14 +200,23 @@ module tr_soc_top_int #(
     // 4. NON-LINEAR VPU CROSSBAR
     // ---------------------------------------------------------
     // Top-Level SRAM routing (Controller decides Ext SRAM vs Scratchpad)
+    //
+    // sram_a lane mapping:
+    //   src_sram_a_sel=1  → ctrl_scratch_a[i]  for all N lanes (scratchpad path)
+    //   src_sram_a_sel=0  → req_vec_out[i]      for lanes 0..M-1 (requantizer output)
+    //                     → ext_sram_b[i]        for lanes M..N-1 (software-supplied
+    //                                             via XLR2_SRAMB, allows full N-wide
+    //                                             standalone VPU ops: softmax, rmsnorm)
     always_comb begin
         for(int i = 0; i < N; i++) begin
-            if (i < M) begin
-                vpu_sram_a_in[i] = (src_sram_a_sel) ? ctrl_scratch_a[i] : req_vec_out[i];
+            if (src_sram_a_sel) begin
+                vpu_sram_a_in[i] = ctrl_scratch_a[i];
+            end else if (i < M) begin
+                vpu_sram_a_in[i] = req_vec_out[i];
             end else begin
-                vpu_sram_a_in[i] = '0; 
+                vpu_sram_a_in[i] = ext_sram_b[i];
             end
-            
+
             vpu_sram_b_in[i] = (src_sram_b_sel) ? ctrl_scratch_b[i] : ext_sram_b[i];
         end
     end
