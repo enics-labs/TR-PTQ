@@ -16,8 +16,9 @@ module alpha_stabilizer #(
 
     localparam int FRAC_W = 4;
 
+    genvar i;
     generate
-        for (genvar i = 0; i < N; i++) begin : GEN_LANES
+        for (i = 0; i < N; i++) begin : GEN_LANES
             logic [N-1:0]         abs_z;
             logic signed [15:0] x_ext;
             logic signed [15:0] x_base;

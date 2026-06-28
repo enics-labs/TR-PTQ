@@ -23,8 +23,9 @@ module piped_max #(
     // --- 1. Explicit Declaration of the Tree Structure ---
     // We create an array of logic arrays. 
     // Each 'row' represents a stage of the pipeline.
+    genvar s, i;
     generate
-        for (genvar s = 0; s <= STAGES; s++) begin : stage_decl
+        for (s = 0; s <= STAGES; s++) begin : stage_decl
             localparam int WIDTH = NUM_INPUTS >> s;
             logic signed [DATA_WIDTH-1:0] data [WIDTH];
         end
@@ -33,15 +34,15 @@ module piped_max #(
     // --- 2. Data Logic ---
     generate
         // Connect inputs to the first stage
-        for (genvar i = 0; i < NUM_INPUTS; i++) begin : input_bind
+        for (i = 0; i < NUM_INPUTS; i++) begin : input_bind
             assign stage_decl[0].data[i] = in_data[i];
         end
 
         // Build the comparison tree
-        for (genvar s = 0; s < STAGES; s++) begin : tree_level
+        for (s = 0; s < STAGES; s++) begin : tree_level
             localparam int NEXT_WIDTH = NUM_INPUTS >> (s + 1);
             
-            for (genvar i = 0; i < NEXT_WIDTH; i++) begin : comp_block
+            for (i = 0; i < NEXT_WIDTH; i++) begin : comp_block
                 always_ff @(posedge clk or negedge rst_n) begin
                     if (!rst_n) begin
                         stage_decl[s+1].data[i] <= '0;
