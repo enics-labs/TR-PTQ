@@ -35,7 +35,16 @@ module tr_ln_alu #(
     logic [WIDTH-1:0]       normalized_x;
 
     always_comb begin
-        
+        // Defaults so every variable is assigned on all paths (no inferred
+        // latches; Quartus treats always_comb latch inference as a hard error).
+        msb          = '0;
+        aq_full      = '0;
+        normalized_x = '0;
+        k1_full      = '0;
+        k2_full      = '0;
+        k_full       = '0;
+        yq_full      = '0;
+
         if (xq == 0) begin
             yq_full = '0;
         end else begin

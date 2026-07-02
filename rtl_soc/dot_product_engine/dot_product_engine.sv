@@ -40,8 +40,9 @@ module dot_product_engine #(
     // =========================================================
     // PARALLEL MAC GENERATION
     // =========================================================
+    genvar i;
     generate
-        for (genvar i = 0; i < M; i++) begin : GEN_MAC_LANES
+        for (i = 0; i < M; i++) begin : GEN_MAC_LANES
             mac_array_engine #(
                 .N(N), .W(W), .ACC_W(ACC_W)
             ) u_mac_lane (

@@ -80,8 +80,9 @@ module tr_backbone_wrapper #(
         .y_out        (pre_ln_out)
     );
 
+    genvar i;
     generate
-        for (genvar i = 0; i < N; i++) begin : gen_tr_lanes
+        for (i = 0; i < N; i++) begin : gen_tr_lanes
             
             // TR-LN ALU (Steps down WIDTH_IN -> WIDTH_OUT)
             tr_ln_alu #(
@@ -149,7 +150,7 @@ module tr_backbone_wrapper #(
     assign log_out = s2_post_ln_reg;
 
     generate
-        for (genvar i = 0; i < N; i++) begin : gen_tr_exp_lanes
+        for (i = 0; i < N; i++) begin : gen_tr_exp_lanes
             
             // 4. TR-EXP ALU
             tr_exp_alu #(
