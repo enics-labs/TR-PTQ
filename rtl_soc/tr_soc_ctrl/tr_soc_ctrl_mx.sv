@@ -61,15 +61,26 @@ module tr_soc_ctrl_mx #(
     input  logic signed [ACC_W-1:0] vpu_dot_out,
     input  logic vpu_bb_valid,
     input  logic vpu_vecmul_valid,
-    input  logic vpu_mac_valid
+    input  logic vpu_mac_valid,
+
+    // Streaming matmul dispatch (CMD=0x04) — drives tr_matmul_ctrl in the top.
+    output logic         mm_start,
+    output logic [15:0]  mm_num_row_tiles,
+    output logic [15:0]  mm_num_ctiles,
+    input  logic         mm_done
 );
 
     localparam logic [N-1:0]          ADDR_CMD       = 8'h00;
     localparam logic [N-1:0]          ADDR_STATUS    = 8'h04;
-    localparam logic signed [W-1:0] CONST_LN_SQRT_N = 8'd17; 
+    localparam logic [N-1:0]          ADDR_MM_ROWS   = 8'h10;
+    localparam logic [N-1:0]          ADDR_MM_CTILES = 8'h14;
+    localparam logic signed [W-1:0] CONST_LN_SQRT_N = 8'd17;
 
     logic                           reg_busy;
     logic                           reg_done;
+    logic [15:0]                    reg_mm_rows;
+    logic [15:0]                    reg_mm_ctiles;
+    logic                           nxt_mm_start;
     logic [N-1:0]                     cmd_trigger;
     logic signed [W-1:0]            scratch_a [N];
     logic signed [W-1:0]            scratch_b [N];
@@ -81,8 +92,10 @@ module tr_soc_ctrl_mx #(
     logic                           latch_max;
     logic                           latch_log;
 
-    assign scratch_a_out = scratch_a;
-    assign scratch_b_out = scratch_b;
+    assign scratch_a_out    = scratch_a;
+    assign scratch_b_out    = scratch_b;
+    assign mm_num_row_tiles = reg_mm_rows;
+    assign mm_num_ctiles    = reg_mm_ctiles;
 
     always_comb begin
         mmio_rdata = '0;
@@ -98,6 +111,7 @@ module tr_soc_ctrl_mx #(
 
     typedef enum logic [5:0] {
         IDLE,
+        MM_START, MM_WAIT,
         GL_P1, GL_P1_W, GL_P1_MUL, GL_P1_MUL_W,
         GL_P2, GL_P2_W, GL_P2_MUL, GL_P2_MUL_W,
         GL_P3, GL_P3_W,
@@ -130,14 +144,16 @@ module tr_soc_ctrl_mx #(
 
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
-            state       <= IDLE;
-            cmd_trigger <= '0;
+            state         <= IDLE;
+            cmd_trigger   <= '0;
+            reg_mm_rows   <= '0;
+            reg_mm_ctiles <= '0;
         end else begin
             state       <= next_state;
-            cmd_trigger <= 8'h00; 
-            if (mmio_wen && mmio_addr == ADDR_CMD) begin
-                cmd_trigger <= mmio_wdata[7:0];
-            end
+            cmd_trigger <= 8'h00;
+            if (mmio_wen && mmio_addr == ADDR_CMD)       cmd_trigger   <= mmio_wdata[7:0];
+            if (mmio_wen && mmio_addr == ADDR_MM_ROWS)   reg_mm_rows   <= mmio_wdata[15:0];
+            if (mmio_wen && mmio_addr == ADDR_MM_CTILES) reg_mm_ctiles <= mmio_wdata[15:0];
         end
     end
 
@@ -174,6 +190,7 @@ module tr_soc_ctrl_mx #(
             bb_mode_post_ln          <= 2'b00;
             sym_mode_en              <= 1'b0;
             ctrl_scalar_sub_val      <= '0;
+            mm_start                 <= 1'b0;
         end else begin
             reg_busy                 <= nxt_reg_busy;
             reg_done                 <= nxt_reg_done;
@@ -205,6 +222,7 @@ module tr_soc_ctrl_mx #(
             bb_mode_post_ln          <= nxt_bb_mode_post_ln;
             sym_mode_en              <= nxt_sym_mode_en;
             ctrl_scalar_sub_val      <= nxt_ctrl_scalar_sub_val;
+            mm_start                 <= nxt_mm_start;
         end
     end
 
@@ -242,6 +260,7 @@ module tr_soc_ctrl_mx #(
         nxt_bb_mode_post_ln          = 2'b00;
         nxt_sym_mode_en              = 1'b0;
         nxt_ctrl_scalar_sub_val      = '0;
+        nxt_mm_start                 = 1'b0;
 
         case (state)
             IDLE: begin
@@ -249,6 +268,16 @@ module tr_soc_ctrl_mx #(
                 if (cmd_trigger == 8'h01) next_state = SM_P1;
                 if (cmd_trigger == 8'h02) next_state = GL_P1;
                 if (cmd_trigger == 8'h03) next_state = RM_P1;
+                if (cmd_trigger == 8'h04) next_state = MM_START;
+            end
+
+            // Streaming matmul: kick tr_matmul_ctrl and wait for it.
+            MM_START: begin
+                nxt_mm_start = 1'b1;
+                next_state   = MM_WAIT;
+            end
+            MM_WAIT: begin
+                if (mm_done) next_state = DONE;
             end
 
             GL_P1, GL_P1_W, GL_P1_MUL_W: begin

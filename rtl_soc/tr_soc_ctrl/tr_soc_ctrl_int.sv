@@ -62,17 +62,27 @@ module tr_soc_ctrl_int #(
     input  logic signed [ACC_W-1:0] vpu_dot_out,
     input  logic vpu_bb_valid,
     input  logic vpu_vecmul_valid,
-    input  logic vpu_mac_valid
+    input  logic vpu_mac_valid,
+
+    // Streaming matmul dispatch (CMD=0x04) — drives tr_matmul_ctrl in the top.
+    output logic         mm_start,
+    output logic [15:0]  mm_num_row_tiles,
+    output logic [15:0]  mm_num_ctiles,
+    input  logic         mm_done
 );
 
-    localparam logic [N-1:0]          ADDR_CMD       = 8'h00; 
+    localparam logic [N-1:0]          ADDR_CMD       = 8'h00;
     localparam logic [N-1:0]          ADDR_STATUS    = 8'h04;
     localparam logic [N-1:0]          ADDR_REQ_MULT  = 8'h08;
     localparam logic [N-1:0]          ADDR_REQ_SHIFT = 8'h0C;
-    localparam logic signed [W-1:0] CONST_LN_SQRT_N = 8'd17; 
+    localparam logic [N-1:0]          ADDR_MM_ROWS   = 8'h10;  // matmul: output row tiles
+    localparam logic [N-1:0]          ADDR_MM_CTILES = 8'h14;  // matmul: contraction tiles
+    localparam logic signed [W-1:0] CONST_LN_SQRT_N = 8'd17;
 
     logic [ACC_W-1:0]                    reg_req_mult;
     logic [5:0]                     reg_req_shift;
+    logic [15:0]                    reg_mm_rows;
+    logic [15:0]                    reg_mm_ctiles;
     logic                           reg_busy;
     logic                           reg_done;
     logic [N-1:0]                     cmd_trigger;
@@ -87,10 +97,12 @@ module tr_soc_ctrl_int #(
     logic                           latch_max;
     logic                           latch_log;
 
-    assign req_mult_out  = reg_req_mult;
-    assign req_shift_out = reg_req_shift;
-    assign scratch_a_out = scratch_a;
-    assign scratch_b_out = scratch_b;
+    assign req_mult_out     = reg_req_mult;
+    assign req_shift_out    = reg_req_shift;
+    assign scratch_a_out    = scratch_a;
+    assign scratch_b_out    = scratch_b;
+    assign mm_num_row_tiles = reg_mm_rows;
+    assign mm_num_ctiles    = reg_mm_ctiles;
     
     always_comb begin
         mmio_rdata = '0;
@@ -109,6 +121,8 @@ module tr_soc_ctrl_int #(
     // Expanded FSM to handle chained pipelining (Backbone -> VecMul/MAC)
     typedef enum logic [5:0] {
         IDLE,
+        // Streaming matmul (CMD=0x04)
+        MM_START, MM_WAIT,
         // GELU
         GL_P1, GL_P1_W, GL_P1_MUL, GL_P1_MUL_W,
         GL_P2, GL_P2_W, GL_P2_MUL, GL_P2_MUL_W,
@@ -133,15 +147,19 @@ module tr_soc_ctrl_int #(
             state         <= IDLE;
             reg_req_mult  <= '0;
             reg_req_shift <= '0;
+            reg_mm_rows   <= '0;
+            reg_mm_ctiles <= '0;
             cmd_trigger   <= '0;
         end else begin
             state         <= next_state;
-            cmd_trigger   <= 8'h00; 
-            
+            cmd_trigger   <= 8'h00;
+
             if (mmio_wen) begin
                 if (mmio_addr == ADDR_CMD)       cmd_trigger   <= mmio_wdata[7:0];
                 if (mmio_addr == ADDR_REQ_MULT)  reg_req_mult  <= mmio_wdata;
                 if (mmio_addr == ADDR_REQ_SHIFT) reg_req_shift <= mmio_wdata[5:0];
+                if (mmio_addr == ADDR_MM_ROWS)   reg_mm_rows   <= mmio_wdata[15:0];
+                if (mmio_addr == ADDR_MM_CTILES) reg_mm_ctiles <= mmio_wdata[15:0];
             end
         end
     end
@@ -151,6 +169,7 @@ module tr_soc_ctrl_int #(
         next_state          = state;
         reg_busy            = 1'b1;
         reg_done            = 1'b0;
+        mm_start            = 1'b0;
         
         write_ext_sram      = 1'b0;
         write_scratch_a     = 1'b0;
@@ -189,8 +208,20 @@ module tr_soc_ctrl_int #(
             IDLE: begin
                 reg_busy = 1'b0;
                 if (cmd_trigger == 8'h01) next_state = SM_P1;
-                if (cmd_trigger == 8'h02) next_state = GL_P1; 
+                if (cmd_trigger == 8'h02) next_state = GL_P1;
                 if (cmd_trigger == 8'h03) next_state = RM_P1;
+                if (cmd_trigger == 8'h04) next_state = MM_START;
+            end
+
+            // =========================================================
+            // STREAMING MATMUL: kick tr_matmul_ctrl and wait for it.
+            // =========================================================
+            MM_START: begin
+                mm_start   = 1'b1;
+                next_state = MM_WAIT;
+            end
+            MM_WAIT: begin
+                if (mm_done) next_state = DONE;
             end
 
             // =========================================================

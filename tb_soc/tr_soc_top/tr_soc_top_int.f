@@ -33,6 +33,9 @@
 // tr_soc_ctrl
 ../rtl_soc/tr_soc_ctrl/tr_soc_ctrl_int.sv
 
+// streaming matmul sequencer (shared control)
+../rtl_soc/tr_matmul_ctrl.sv
+
 // tr_soc_top
 ../rtl_soc/tr_soc_top_int.sv
 

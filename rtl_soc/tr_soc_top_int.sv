@@ -31,17 +31,45 @@ module tr_soc_top_int #(
     input  logic [W-1:0]            a_mat [M][N],
     input  logic [W-1:0]            b_vec [N],
     input  logic signed [ACC_W-1:0] c_vec [M],
-    
+    // Streaming matmul: on the first tile of a dot drive clear_acc=1 (init the
+    // accumulator with c_vec bias); drive 0 on the following tiles to accumulate
+    // a[i]*b[i] across an arbitrarily long contraction.  For the legacy
+    // single-tile use, tie this high.
+    input  logic clear_acc,
+
     // Non-Linear Engine Memory Interfaces
     input  logic signed [W-1:0]     ext_sram_b [N],
     output logic vpu_out_valid,
-    output logic signed [W-1:0]     vpu_data_out [N]
+    output logic signed [W-1:0]     vpu_data_out [N],
+
+    // Streaming matmul memory interface (CMD=0x04).  The wrapper supplies the
+    // weight/activation tiles for (mm_tile_row, mm_tile_col) combinationally and
+    // stores mm_out_data[M] for mm_out_row when mm_out_we pulses.
+    output logic [15:0]             mm_tile_row,
+    output logic [15:0]             mm_tile_col,
+    output logic                    mm_mem_rd,
+    input  logic [W-1:0]            mm_a_tile [M][N],
+    input  logic [W-1:0]            mm_b_tile [N],
+    output logic                    mm_out_we,
+    output logic [15:0]             mm_out_row,
+    output logic signed [W-1:0]     mm_out_data [M]
 );
 
     // Interconnect Wires
     logic [ACC_W-1:0]                    req_mult;
     logic [5:0]                     req_shift;
     
+    // Streaming matmul controller <-> datapath
+    logic                           mm_start, mm_done, mm_busy;
+    logic [15:0]                    mm_num_rt, mm_num_ct;
+    logic                           mm_dot_in_valid, mm_clear_acc;
+
+    // Muxed linear-engine inputs (matmul controller vs legacy single-tile ports)
+    logic [W-1:0]                   dot_a_mux [M][N];
+    logic [W-1:0]                   dot_b_mux [N];
+    logic signed [ACC_W-1:0]        dot_c_mux [M];
+    logic                           dot_iv_mux, dot_clr_mux;
+
     // Dot -> Req Pipe
     logic                           dot_out_valid;
     logic                           req_in_ready;
@@ -147,8 +175,56 @@ module tr_soc_top_int #(
         
         .vpu_bb_valid        (vpu_bb_valid),
         .vpu_vecmul_valid    (vpu_vecmul_valid),
-        .vpu_mac_valid       (vpu_mac_valid)
+        .vpu_mac_valid       (vpu_mac_valid),
+
+        .mm_start            (mm_start),
+        .mm_num_row_tiles    (mm_num_rt),
+        .mm_num_ctiles       (mm_num_ct),
+        .mm_done             (mm_done)
     );
+
+    // ---------------------------------------------------------
+    // 1b. STREAMING MATMUL SEQUENCER (shares u_dot + u_req)
+    // ---------------------------------------------------------
+    tr_matmul_ctrl #(.M(M), .N(N)) u_mm (
+        .clk                 (clk),
+        .rst_n               (rst_n),
+        .start               (mm_start),
+        .num_row_tiles       (mm_num_rt),
+        .num_ctiles          (mm_num_ct),
+        .busy                (mm_busy),
+        .done                (mm_done),
+        .tile_row            (mm_tile_row),
+        .tile_col            (mm_tile_col),
+        .mem_rd              (mm_mem_rd),
+        .dot_in_valid        (mm_dot_in_valid),
+        .clear_acc           (mm_clear_acc),
+        .req_valid           (req_out_valid),
+        .result_we           (mm_out_we),
+        .result_row          (mm_out_row)
+    );
+    // Requantizer output is the accumulated dot on the capture cycle.
+    assign mm_out_data = req_vec_out;
+
+    // Route the linear engine to the matmul controller while it is busy,
+    // otherwise to the legacy single-tile ports.
+    always_comb begin
+        if (mm_busy) begin
+            dot_iv_mux  = mm_dot_in_valid;
+            dot_clr_mux = mm_clear_acc;
+            for (int m = 0; m < M; m++) begin
+                dot_c_mux[m] = '0;
+                for (int i = 0; i < N; i++) dot_a_mux[m][i] = mm_a_tile[m][i];
+            end
+            for (int i = 0; i < N; i++) dot_b_mux[i] = mm_b_tile[i];
+        end else begin
+            dot_iv_mux  = dot_in_valid;
+            dot_clr_mux = clear_acc;
+            dot_a_mux   = a_mat;
+            dot_b_mux   = b_vec;
+            dot_c_mux   = c_vec;
+        end
+    end
 
     // ---------------------------------------------------------
     // 2. LINEAR DOT ENGINE
@@ -161,13 +237,13 @@ module tr_soc_top_int #(
     ) u_dot (
         .clk                 (clk),
         .rst_n               (rst_n),
-        .in_valid            (dot_in_valid),
+        .in_valid            (dot_iv_mux),
         .in_ready            (dot_in_ready),
         .op_mode             (2'b00),
-        .a_mat               (a_mat),
-        .b_vec               (b_vec),
-        .c_vec               (c_vec),
-        .clear_acc           (1'b1),
+        .a_mat               (dot_a_mux),
+        .b_vec               (dot_b_mux),
+        .c_vec               (dot_c_mux),
+        .clear_acc           (dot_clr_mux),
         .out_valid           (dot_out_valid),
         .out_ready           (req_in_ready),
         .out_vec             (dot_acc_out)

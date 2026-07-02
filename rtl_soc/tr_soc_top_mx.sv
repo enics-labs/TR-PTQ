@@ -35,12 +35,26 @@ module tr_soc_top_mx #(
     input  logic [W-1:0]            b_vec [N],
     input  logic signed [7:0]       b_vec_exp,
     input  logic signed [ACC_W-1:0] c_vec [M],
-    
+    input  logic clear_acc,   // streaming matmul: 1=init accumulator, 0=accumulate
+
     // Non-Linear Engine Memory Interfaces
     input  logic signed [W-1:0]     ext_sram_b [N],
     output logic vpu_out_valid,
     output logic signed [W-1:0]     vpu_data_out [N],
-    output logic signed [7:0]       vpu_data_exp
+    output logic signed [7:0]       vpu_data_exp,
+
+    // Streaming matmul memory interface (CMD=0x04).  The wrapper holds the
+    // MX exponents (a_mat_exp, b_vec_exp) constant across the contraction, so
+    // the result is {mm_out_data mantissas[M], mm_out_exp shared exponent}.
+    output logic [15:0]             mm_tile_row,
+    output logic [15:0]             mm_tile_col,
+    output logic                    mm_mem_rd,
+    input  logic [W-1:0]            mm_a_tile [M][N],
+    input  logic [W-1:0]            mm_b_tile [N],
+    output logic                    mm_out_we,
+    output logic [15:0]             mm_out_row,
+    output logic signed [W-1:0]     mm_out_data [M],
+    output logic signed [7:0]       mm_out_exp
 );
 
     // =========================================================
@@ -54,6 +68,15 @@ module tr_soc_top_mx #(
     logic                           req_out_valid;
     logic signed [W-1:0]            req_vec_out [M];
     logic signed [7:0]              mx_shared_exp;
+
+    // Streaming matmul controller <-> datapath
+    logic                           mm_start, mm_done, mm_busy;
+    logic [15:0]                    mm_num_rt, mm_num_ct;
+    logic                           mm_dot_in_valid, mm_clear_acc;
+    logic [W-1:0]                   dot_a_mux [M][N];
+    logic [W-1:0]                   dot_b_mux [N];
+    logic signed [ACC_W-1:0]        dot_c_mux [M];
+    logic                           dot_iv_mux, dot_clr_mux;
 
     logic signed [VPU_W-1:0]             vpu_sram_a_in [N];
     logic signed [VPU_W-1:0]             vpu_sram_b_in [N];
@@ -98,8 +121,44 @@ module tr_soc_top_mx #(
         .scratch_a_out(ctrl_scratch_a), .scratch_b_out(ctrl_scratch_b),
         
         .vpu_data_out(vpu_raw_out), .vpu_max_out(vpu_max_out), .vpu_dot_out(vpu_dot_out),
-        .vpu_bb_valid(vpu_bb_valid), .vpu_vecmul_valid(vpu_vecmul_valid), .vpu_mac_valid(vpu_mac_valid)
+        .vpu_bb_valid(vpu_bb_valid), .vpu_vecmul_valid(vpu_vecmul_valid), .vpu_mac_valid(vpu_mac_valid),
+        .mm_start(mm_start), .mm_num_row_tiles(mm_num_rt), .mm_num_ctiles(mm_num_ct), .mm_done(mm_done)
     );
+
+    // =========================================================
+    // 1b. STREAMING MATMUL SEQUENCER (shares u_dot + u_req_mx)
+    // =========================================================
+    tr_matmul_ctrl #(.M(M), .N(N)) u_mm (
+        .clk(clk), .rst_n(rst_n),
+        .start(mm_start), .num_row_tiles(mm_num_rt), .num_ctiles(mm_num_ct),
+        .busy(mm_busy), .done(mm_done),
+        .tile_row(mm_tile_row), .tile_col(mm_tile_col), .mem_rd(mm_mem_rd),
+        .dot_in_valid(mm_dot_in_valid), .clear_acc(mm_clear_acc),
+        .req_valid(req_out_valid),
+        .result_we(mm_out_we), .result_row(mm_out_row)
+    );
+    assign mm_out_data = req_vec_out;    // mantissas on the capture cycle
+    assign mm_out_exp  = mx_shared_exp;  // shared exponent for the row-tile
+
+    // Route the linear engine to the matmul controller while it is busy,
+    // otherwise to the legacy single-tile ports.
+    always_comb begin
+        if (mm_busy) begin
+            dot_iv_mux  = mm_dot_in_valid;
+            dot_clr_mux = mm_clear_acc;
+            for (int m = 0; m < M; m++) begin
+                dot_c_mux[m] = '0;
+                for (int i = 0; i < N; i++) dot_a_mux[m][i] = mm_a_tile[m][i];
+            end
+            for (int i = 0; i < N; i++) dot_b_mux[i] = mm_b_tile[i];
+        end else begin
+            dot_iv_mux  = dot_in_valid;
+            dot_clr_mux = clear_acc;
+            dot_a_mux   = a_mat;
+            dot_b_mux   = b_vec;
+            dot_c_mux   = c_vec;
+        end
+    end
 
     // =========================================================
     // 2. LINEAR DOT ENGINE
@@ -108,9 +167,9 @@ module tr_soc_top_mx #(
         .M(M), .N(N), .W(W), .ACC_W(ACC_W)
     ) u_dot (
         .clk(clk), .rst_n(rst_n),
-        .in_valid(dot_in_valid), .in_ready(dot_in_ready),
-        .op_mode(2'b00), .a_mat(a_mat), .b_vec(b_vec), .c_vec(c_vec),
-        .clear_acc(1'b1), .out_valid(dot_out_valid), .out_ready(req_in_ready),
+        .in_valid(dot_iv_mux), .in_ready(dot_in_ready),
+        .op_mode(2'b00), .a_mat(dot_a_mux), .b_vec(dot_b_mux), .c_vec(dot_c_mux),
+        .clear_acc(dot_clr_mux), .out_valid(dot_out_valid), .out_ready(req_in_ready),
         .out_vec(dot_acc_out)
     );
 

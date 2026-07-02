@@ -13,6 +13,7 @@ module tr_soc_top_int_tb();
     logic [31:0] mmio_rdata;
 
     logic        dot_in_valid, dot_in_ready;
+    logic        clear_acc;
     logic [W-1:0] a_mat [M][N];
     logic [W-1:0] b_vec [N];
     logic signed [31:0] c_vec [M];
@@ -21,7 +22,42 @@ module tr_soc_top_int_tb();
     logic        vpu_out_valid;
     logic signed [W-1:0] vpu_data_out [N];
 
+    // Streaming matmul interface
+    logic [15:0] mm_tile_row, mm_tile_col;
+    logic        mm_mem_rd;
+    logic [W-1:0] mm_a_tile [M][N];
+    logic [W-1:0] mm_b_tile [N];
+    logic        mm_out_we;
+    logic [15:0] mm_out_row;
+    logic signed [W-1:0] mm_out_data [M];
+
     tr_soc_top_int #(.M(M), .N(N), .W(W), .ACC_W(32)) dut (.*);
+
+    // ── Streaming matmul memory model (combinational read) ──────────────
+    localparam int MM_ROWS = 8, MM_COLS = 16;
+    logic signed [W-1:0] MMA [MM_ROWS][MM_COLS];
+    logic signed [W-1:0] MMB [MM_COLS];
+    logic signed [W-1:0] MMO [MM_ROWS];
+
+    always_comb begin
+        for (int m = 0; m < M; m++)
+            for (int i = 0; i < N; i++)
+                mm_a_tile[m][i] = MMA[mm_tile_row*M + m][mm_tile_col*N + i];
+        for (int i = 0; i < N; i++)
+            mm_b_tile[i] = MMB[mm_tile_col*N + i];
+    end
+    always_ff @(posedge clk)
+        if (mm_out_we)
+            for (int m = 0; m < M; m++) MMO[mm_out_row*M + m] <= mm_out_data[m];
+
+    function automatic logic signed [W-1:0] mm_ref(input int r);
+        int acc;
+        acc = 0;
+        for (int c = 0; c < MM_COLS; c++) acc += MMA[r][c] * MMB[c];
+        if (acc >  127) acc =  127;
+        if (acc < -128) acc = -128;
+        return acc[W-1:0];
+    endfunction
 
     initial begin clk = 0; forever #5 clk = ~clk; end
 
@@ -58,8 +94,9 @@ module tr_soc_top_int_tb();
         $display("\n---> Pushing new data through Linear -> Requantize Pipe");
         @(posedge clk);
         dot_in_valid = 1;
+        clear_acc = 1;   // single-tile: initialise accumulator with c_vec bias
         c_vec[0] = l0; c_vec[1] = l1; c_vec[2] = l2; c_vec[3] = l3;
-        @(posedge clk); 
+        @(posedge clk);
         dot_in_valid = 0;
         
         // Wait for Requantizer output valid flag
@@ -74,7 +111,7 @@ module tr_soc_top_int_tb();
     // MAIN SIMULATION SEQUENCE
     // =========================================================
     initial begin
-        rst_n = 0; mmio_wen = 0; dot_in_valid = 0;
+        rst_n = 0; mmio_wen = 0; dot_in_valid = 0; clear_acc = 1;
         for(int i=0; i<N; i++) begin b_vec[i]=0; ext_sram_b[i]=0; end
         for(int i=0; i<M; i++) begin c_vec[i]=0; for(int j=0; j<N; j++) a_mat[i][j]=0; end
         
@@ -88,6 +125,75 @@ module tr_soc_top_int_tb();
         // This allows c_vec to pass directly into the VPU unharmed
         mmio_write(8'h08, 32'd1); // REQ_MULT
         mmio_write(8'h0C, 32'd0); // REQ_SHIFT
+
+        // ---------------------------------------------------------
+        // TEST 0: STREAMING MATMUL (multi-tile accumulating dot)
+        // ---------------------------------------------------------
+        // Stream NT tiles: first tile clear_acc=1 (init acc with c_vec=0), the
+        // rest clear_acc=0 (accumulate).  With a_mat[m][i]=m+1 and b_vec[i]=1,
+        // each tile adds (m+1)*N per lane, so the requantized (1:1) result must
+        // be (m+1)*N*NT.  Proves an arbitrary-length contraction streams through
+        // the linear->requantize path.
+        begin : stream_matmul_test
+            int NT;
+            NT = 3;
+            $display("\n---> STREAMING MATMUL: %0d tiles of %0dx%0d (contraction %0d)",
+                     NT, M, N, N*NT);
+            for (int t = 0; t < NT; t++) begin
+                @(posedge clk);
+                dot_in_valid = 1;
+                clear_acc    = (t == 0);
+                for (int m = 0; m < M; m++) begin
+                    c_vec[m] = 0;
+                    for (int i = 0; i < N; i++) a_mat[m][i] = (m + 1);
+                end
+                for (int i = 0; i < N; i++) b_vec[i] = 1;
+            end
+            @(posedge clk);
+            dot_in_valid = 0;
+            clear_acc    = 1;
+            repeat (10) @(posedge clk);   // flush MAC + requantizer pipeline
+
+            for (int m = 0; m < M; m++) begin
+                if (dut.req_vec_out[m] !== (m+1)*N*NT)
+                    $error("  [FAIL] stream lane %0d: got %0d, expected %0d",
+                           m, dut.req_vec_out[m], (m+1)*N*NT);
+                else
+                    $display("  [PASS] stream lane %0d = %0d (expected %0d)",
+                             m, dut.req_vec_out[m], (m+1)*N*NT);
+            end
+            // Restore zero inputs so the legacy single-tile tests below are clean.
+            for (int i = 0; i < N; i++) b_vec[i] = 0;
+            for (int m = 0; m < M; m++) for (int i = 0; i < N; i++) a_mat[m][i] = 0;
+        end
+
+        // ---------------------------------------------------------
+        // TEST MM: STREAMING MATMUL via CMD=0x04 (integrated sequencer)
+        // ---------------------------------------------------------
+        begin : mm_test
+            int fails;
+            for (int r = 0; r < MM_ROWS; r++)
+                for (int c = 0; c < MM_COLS; c++) MMA[r][c] = ((r*3 + c) % 5) - 2;
+            for (int c = 0; c < MM_COLS; c++) MMB[c] = (c % 3) - 1;
+
+            $display("\n---> CPU Executing OP_MATMUL (CMD=0x04): %0dx%0d", MM_ROWS, MM_COLS);
+            mmio_write(8'h08, 32'd1);            // REQ_MULT  = 1  (1:1)
+            mmio_write(8'h0C, 32'd0);            // REQ_SHIFT = 0
+            mmio_write(8'h10, MM_ROWS/M);        // num_row_tiles
+            mmio_write(8'h14, MM_COLS/N);        // num_ctiles
+            mmio_write(8'h00, 32'h04);           // CMD = matmul
+            wait_for_done();
+
+            fails = 0;
+            for (int r = 0; r < MM_ROWS; r++) begin
+                if (MMO[r] !== mm_ref(r)) begin
+                    $error("  [FAIL] mm row %0d: got %0d, expected %0d", r, MMO[r], mm_ref(r));
+                    fails++;
+                end else
+                    $display("  [PASS] mm row %0d = %0d", r, MMO[r]);
+            end
+            if (fails == 0) $display("  === MATMUL: ALL %0d ROWS PASS ===", MM_ROWS);
+        end
 
         // ---------------------------------------------------------
         // TEST 1: MAC / LINEAR ONLY

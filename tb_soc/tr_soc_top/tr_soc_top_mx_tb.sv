@@ -32,10 +32,42 @@ module tr_soc_top_mx_tb();
     logic signed [W-1:0] vpu_data_out [N];
     logic signed [7:0]   vpu_data_exp; // NEW MX Formatter Exponent
 
+    logic        clear_acc;
+    // Streaming matmul interface
+    logic [15:0] mm_tile_row, mm_tile_col;
+    logic        mm_mem_rd;
+    logic [W-1:0] mm_a_tile [M][N];
+    logic [W-1:0] mm_b_tile [N];
+    logic        mm_out_we;
+    logic [15:0] mm_out_row;
+    logic signed [W-1:0] mm_out_data [M];
+    logic signed [7:0]   mm_out_exp;
+
     // DUT Instantiation
     tr_soc_top_mx #(
         .M(M), .N(N), .W(W), .ACC_W(ACC_W)
     ) dut (.*);
+
+    // ── Streaming matmul memory model (combinational read) ──────────────
+    localparam int MM_ROWS = 8, MM_COLS = 16;
+    logic signed [W-1:0] MMA [MM_ROWS][MM_COLS];
+    logic signed [W-1:0] MMB [MM_COLS];
+    logic signed [W-1:0] MMO   [MM_ROWS];
+    logic signed [7:0]   MMO_E [MM_ROWS];
+
+    always_comb begin
+        for (int m = 0; m < M; m++)
+            for (int i = 0; i < N; i++)
+                mm_a_tile[m][i] = MMA[mm_tile_row*M + m][mm_tile_col*N + i];
+        for (int i = 0; i < N; i++)
+            mm_b_tile[i] = MMB[mm_tile_col*N + i];
+    end
+    always_ff @(posedge clk)
+        if (mm_out_we)
+            for (int m = 0; m < M; m++) begin
+                MMO[mm_out_row*M + m]   <= mm_out_data[m];
+                MMO_E[mm_out_row*M + m] <= mm_out_exp;
+            end
 
     // Clock Generation
     initial begin clk = 0; forever #5 clk = ~clk; end
@@ -81,10 +113,11 @@ module tr_soc_top_mx_tb();
         $display("\n---> Pushing new data through Linear -> MX Requantize Pipe");
         @(posedge clk);
         dot_in_valid = 1;
+        clear_acc = 1;   // single-tile: initialise accumulator
         c_vec[0] = l0; c_vec[1] = l1; c_vec[2] = l2; c_vec[3] = l3;
         a_mat_exp = exp_a;
         b_vec_exp = exp_b;
-        @(posedge clk); 
+        @(posedge clk);
         dot_in_valid = 0;
         
         // Wait for Requantizer output valid flag
@@ -101,7 +134,7 @@ module tr_soc_top_mx_tb();
     // =========================================================
     initial begin
         // Reset and Default Initializations
-        rst_n = 0; mmio_wen = 0; dot_in_valid = 0;
+        rst_n = 0; mmio_wen = 0; dot_in_valid = 0; clear_acc = 1;
         a_mat_exp = 0; b_vec_exp = 0;
         for(int i=0; i<N; i++) begin b_vec[i]=0; ext_sram_b[i]=0; end
         for(int i=0; i<M; i++) begin c_vec[i]=0; for(int j=0; j<N; j++) a_mat[i][j]=0; end
@@ -120,6 +153,31 @@ module tr_soc_top_mx_tb();
         // Mantissas: 10, -5, 0, 25. Exponents: Act=0, Wgt=0
         load_mac_vector(32'd10, -32'd5, 32'd0, 32'd25, 8'd0, 8'd0);
         $display("   [PASS] MX Linear Pipeline successfully handed off to VPU.");
+
+        // ---------------------------------------------------------
+        // TEST MM: STREAMING MATMUL via CMD=0x04 (integrated sequencer)
+        // ---------------------------------------------------------
+        // Smoke test: exercises the shared tr_matmul_ctrl on the mx datapath.
+        // The mx requant emits {mantissa, shared exp}; exact numeric format is
+        // covered by the op tests, so here we verify the control flow completes
+        // and print the streamed matmul result per row (constant exponents).
+        begin : mm_test
+            for (int r = 0; r < MM_ROWS; r++)
+                for (int c = 0; c < MM_COLS; c++) MMA[r][c] = ((r*3 + c) % 5) - 2;
+            for (int c = 0; c < MM_COLS; c++) MMB[c] = (c % 3) - 1;
+            a_mat_exp = 0; b_vec_exp = 0;   // constant across the contraction
+
+            $display("\n---> CPU Executing OP_MATMUL (CMD=0x04): %0dx%0d", MM_ROWS, MM_COLS);
+            mmio_write(8'h10, MM_ROWS/M);   // num_row_tiles
+            mmio_write(8'h14, MM_COLS/N);   // num_ctiles
+            mmio_write(8'h00, 32'h04);      // CMD = matmul
+            wait_for_done();
+
+            $display("   --- Streamed matmul result (mantissa @ shared exp) ---");
+            for (int r = 0; r < MM_ROWS; r++)
+                $display("     row %0d: %0d @ 2^%0d", r, MMO[r], MMO_E[r]);
+            $display("   [PASS] MX matmul control flow completed.");
+        end
 
         // ---------------------------------------------------------
         // TEST 2: GELU (Scale-Variant - Uses Dynamic Shifter Expansion)
