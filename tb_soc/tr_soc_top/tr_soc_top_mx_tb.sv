@@ -36,6 +36,7 @@ module tr_soc_top_mx_tb();
     // Streaming matmul interface
     logic [15:0] mm_tile_row, mm_tile_col;
     logic        mm_mem_rd;
+    logic        mm_mem_valid;
     logic [W-1:0] mm_a_tile [M][N];
     logic [W-1:0] mm_b_tile [N];
     logic        mm_out_we;
@@ -55,6 +56,7 @@ module tr_soc_top_mx_tb();
     logic signed [W-1:0] MMO   [MM_ROWS];
     logic signed [7:0]   MMO_E [MM_ROWS];
 
+    assign mm_mem_valid = 1'b1;   // combinational memory: data ready same cycle
     always_comb begin
         for (int m = 0; m < M; m++)
             for (int i = 0; i < N; i++)

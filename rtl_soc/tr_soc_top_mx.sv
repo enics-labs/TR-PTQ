@@ -49,6 +49,7 @@ module tr_soc_top_mx #(
     output logic [15:0]             mm_tile_row,
     output logic [15:0]             mm_tile_col,
     output logic                    mm_mem_rd,
+    input  logic                    mm_mem_valid,   // a_tile/b_tile valid this cycle
     input  logic [W-1:0]            mm_a_tile [M][N],
     input  logic [W-1:0]            mm_b_tile [N],
     output logic                    mm_out_we,
@@ -133,6 +134,7 @@ module tr_soc_top_mx #(
         .start(mm_start), .num_row_tiles(mm_num_rt), .num_ctiles(mm_num_ct),
         .busy(mm_busy), .done(mm_done),
         .tile_row(mm_tile_row), .tile_col(mm_tile_col), .mem_rd(mm_mem_rd),
+        .mem_valid(mm_mem_valid),
         .dot_in_valid(mm_dot_in_valid), .clear_acc(mm_clear_acc),
         .req_valid(req_out_valid),
         .result_we(mm_out_we), .result_row(mm_out_row)

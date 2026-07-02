@@ -34,7 +34,8 @@ module tr_matmul_ctrl #(
     // Datapath drive (tile addresses + MAC control)
     output logic [15:0]  tile_row,        // current output-row-tile
     output logic [15:0]  tile_col,        // current contraction tile
-    output logic         mem_rd,          // asserted while feeding tiles
+    output logic         mem_rd,          // request: read tile (tile_row,tile_col)
+    input  logic         mem_valid,       // response: a_tile/b_tile valid this cycle
     output logic         dot_in_valid,
     output logic         clear_acc,
 
@@ -51,12 +52,14 @@ module tr_matmul_ctrl #(
 
     logic [15:0] rt, ct, vcount, n_rt, n_ct;
 
-    logic feeding, capture;
-    // Feed one tile per cycle until all num_ctiles are issued.
+    logic feeding, consume, capture;
+    // Request tile (rt,ct) while feeding; only consume it (feed the MAC and
+    // advance) on mem_valid, so the sequencer tolerates any memory read latency.
     assign feeding      = (state == S_RUN) && (ct < n_ct);
+    assign consume      = feeding && mem_valid;
     assign mem_rd       = feeding;
-    assign dot_in_valid = feeding;
-    assign clear_acc    = feeding && (ct == 16'd0);
+    assign dot_in_valid = consume;
+    assign clear_acc    = consume && (ct == 16'd0);
     assign tile_row     = rt;
     assign tile_col     = ct;
 
@@ -82,7 +85,7 @@ module tr_matmul_ctrl #(
                 end
 
                 S_RUN: begin
-                    if (ct < n_ct)  ct     <= ct + 16'd1;
+                    if (consume)    ct     <= ct + 16'd1;
                     if (req_valid)  vcount <= vcount + 16'd1;
                     if (capture) begin
                         // capture wins over the vcount++ above (next row-tile)
