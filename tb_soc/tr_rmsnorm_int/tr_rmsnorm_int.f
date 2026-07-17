@@ -1,0 +1,43 @@
+// global config
+-f ../scripts/xrun_config.f
+
+// mult_engine
+../rtl_soc/mult_engines/mac_array_engine.sv
+../rtl_soc/mult_engines/vec_mul_array_engine.sv
+
+// dot_product_engine
+../rtl_soc/dot_product_engine/dot_product_engine.sv
+
+// tr_backbone
+../rtl_soc/tr_nonlinear_vpu/tr_backbone/pre_ln_modifier.sv
+../rtl_soc/tr_nonlinear_vpu/tr_backbone/tr_ln_alu.sv
+../rtl_soc/tr_nonlinear_vpu/tr_backbone/post_ln_modifier.sv
+../rtl_soc/tr_nonlinear_vpu/tr_backbone/tr_exp_alu.sv
+../rtl_soc/tr_nonlinear_vpu/tr_backbone/round.sv
+../rtl_soc/tr_nonlinear_vpu/tr_backbone/quadratic_divider.sv
+../rtl_soc/tr_nonlinear_vpu/tr_backbone/tr_backbone_wrapper.sv
+
+// peripheral_modules
+../rtl_soc/tr_nonlinear_vpu/peripheral_modules/alpha_stabilizer.sv
+../rtl_soc/tr_nonlinear_vpu/peripheral_modules/piped_max.sv
+../rtl_soc/tr_nonlinear_vpu/peripheral_modules/scalar_sub.sv
+../rtl_soc/tr_nonlinear_vpu/peripheral_modules/shared_lut_rom.sv
+../rtl_soc/tr_nonlinear_vpu/peripheral_modules/symmetry_modifier.sv
+
+// tr_nonlinear_vpu
+../rtl_soc/tr_nonlinear_vpu/tr_nonlinear_vpu.sv
+
+// requantize_engine
+../rtl_soc/requantize_engine/requantize_engine_int.sv
+
+// tr_soc_ctrl
+../rtl_soc/tr_soc_ctrl/tr_soc_ctrl_int.sv
+
+// streaming matmul sequencer (shared control)
+../rtl_soc/tr_matmul_ctrl.sv
+
+// tr_soc_top
+../rtl_soc/tr_soc_top_int.sv
+
+// tb
+../tb_soc/tr_rmsnorm_int/tr_rmsnorm_int_tb.sv

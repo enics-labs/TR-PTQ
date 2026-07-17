@@ -1,76 +1,73 @@
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <vector>
 #include <string>
 
-// CUDA CPU Compilation Overrides
-#ifndef __CUDACC__
-    #define __device__ 
-    #define __forceinline__ inline
-    #define __constant__ const
-    #define __clz(x) __builtin_clz(x)
-#endif
+// Single source of truth for all the bit-exact hardware math models
+// (alpha_stabilizer_model, gelu_exp_q44, gelu_hw_model, rmsnorm_hw_model,
+// quant_model, matmul_model) and the tr_math.cuh exp/ln primitives — shared
+// with the ctypes-callable library (tr_math_model_capi.cpp /
+// tools/infra/tr_math_hw.py) so there is exactly one implementation of each op.
+#include "tr_math_model.hpp"
 
-// LUT Constant
-const uint8_t EXP_LUT_CONST[9] = {0, 0, 1, 2, 5, 13, 35, 94, 255};
-
-// CUDA Math header
-#include "../emulation/stable_code/mrcp_quant/optimized_layers/common/tr_math.cuh"
-
-// GELU helpers — bit-exact replicas of the RTL submodules
-// ---------------------------------------------------------
-
-// Replicates alpha_stabilizer.sv: computes -|alpha_approx * x| in Q4.4.
-static int8_t alpha_stabilizer_model(int8_t x) {
-    uint8_t abs_z = (x < 0) ? (uint8_t)(-(int16_t)x) : (uint8_t)x;
-    int16_t x_ext  = (int16_t)x;
-    int16_t x_base = (x_ext << 4) + (x_ext << 3);  // x * 24
-
-    int16_t x_mult;
-    switch ((abs_z >> 4) & 0x7) {  // abs_z[6:4]
-        case 0:  x_mult = x_base + (x_ext << 1) + x_ext; break;  // * 27
-        case 1:  x_mult = x_base + (x_ext << 1);          break;  // * 26
-        case 2:  x_mult = x_base + x_ext;                 break;  // * 25
-        default: x_mult = x_base;                          break;  // * 24
+// ── --eval FILE support: run a model function over externally-supplied      //
+// values (e.g. captured firmware activations) instead of self-generated     //
+// random vectors.  Reuses the exact same functions the self-test path uses. //
+static bool run_eval_mode(const std::string& mode, const std::string& in_path,
+                          const std::string& out_path) {
+    std::ifstream fin(in_path);
+    if (!fin.is_open()) {
+        std::cerr << "[ERROR] --eval: could not open " << in_path << std::endl;
+        return false;
+    }
+    std::ofstream fout(out_path);
+    if (!fout.is_open()) {
+        std::cerr << "[ERROR] --eval: could not open " << out_path << " for writing" << std::endl;
+        return false;
     }
 
-    int8_t x_scaled;
-    if      (x_mult >  2032) x_scaled =  127;
-    else if (x_mult < -2048) x_scaled = -128;
-    else                     x_scaled = (int8_t)((int16_t)x_mult >> 4);  // x_mult[11:4]
+    std::string line;
+    while (std::getline(fin, line)) {
+        if (line.find_first_not_of(" \t\r\n") == std::string::npos) continue;
+        std::istringstream iss(line);
 
-    return (x_scaled > 0) ? (int8_t)(-x_scaled) : x_scaled;
-}
-
-// Replicates tr_exp_alu (ITER=2) + the GELU is_zero bypass:
-//   is_zero → vec_a=128, vec_b=mantisa<<1 → [15:8] = mantisa
-//   otherwise → vec_a=LUT[idx], vec_b=mantisa → [15:8] = (LUT*mantisa)>>8
-// Returns the Q4.4 exp value (integer, range 0..16).
-static int gelu_exp_q44(int8_t x) {
-    static const uint8_t EXP_LUT[8] = {94, 35, 13, 5, 2, 1, 0, 0};  // anchors -1..-8
-
-    // round.sv
-    int trunc_int      = (int)x >> 4;          // arithmetic shift → integer part
-    int frac_round_bit = ((uint8_t)x >> 3) & 1; // bit[3]
-    int rounded_mag    = trunc_int + frac_round_bit;
-    bool is_zero       = (rounded_mag == 0);
-
-    // tr_exp_alu mantisa (ITER=2, FRAC_W=4)
-    int frac_bits   = (uint8_t)x & 0xF;        // x[3:0]
-    int is_ceil     = frac_round_bit;
-    int first_order = ((!is_ceil) << 4) | frac_bits;  // {~is_ceil, x[3:0]}
-
-    // quadratic_divider K-map (8-bit Q4.4)
-    int b3=(frac_bits>>3)&1, b2=(frac_bits>>2)&1, b1=(frac_bits>>1)&1, b0=frac_bits&1;
-    int y1 =  b3 & !b2 & !b1 & !b0;
-    int y0 = (!b3 & b2 & b1) | (b3 & !b2 & !b1 & b0) | (b3 & !b2 & b1 & !b0);
-    int mantisa = (first_order + ((y1 << 1) | y0)) & 0xFF;
-
-    if (is_zero)
-        return mantisa;                         // 128*(mantisa<<1) → [15:8] = mantisa
-
-    int lut_idx = (~rounded_mag) & 0x7;
-    return (EXP_LUT[lut_idx] * mantisa) >> 8;  // [15:8] of 16-bit product
+        if (mode == "rmsnorm") {
+            int8_t x[8], y[8];
+            for (int i = 0; i < 8; i++) { int v; iss >> v; x[i] = (int8_t)v; }
+            rmsnorm_hw_model(x, y);
+            for (int i = 0; i < 8; i++) fout << (int)y[i] << (i == 7 ? "" : " ");
+            fout << "\n";
+        } else if (mode == "gelu") {
+            int8_t x[8], y[8];
+            for (int i = 0; i < 8; i++) { int v; iss >> v; x[i] = (int8_t)v; }
+            gelu_hw_model(x, y);
+            for (int i = 0; i < 8; i++) fout << (int)y[i] << (i == 7 ? "" : " ");
+            fout << "\n";
+        } else if (mode == "quant") {
+            int64_t acc[4]; int32_t mult; int shift; int8_t y[4];
+            for (int i = 0; i < 4; i++) iss >> acc[i];
+            iss >> mult >> shift;
+            for (int i = 0; i < 4; i++) y[i] = quant_model(acc[i], mult, shift);
+            for (int i = 0; i < 4; i++) fout << (int)y[i] << (i == 3 ? "" : " ");
+            fout << "\n";
+        } else if (mode == "matmul") {
+            int8_t A[4][8]; int8_t b[8]; int32_t c[4]; int32_t mult; int shift; int8_t y[4];
+            for (int m = 0; m < 4; m++)
+                for (int k = 0; k < 8; k++) { int v; iss >> v; A[m][k] = (int8_t)v; }
+            for (int k = 0; k < 8; k++) { int v; iss >> v; b[k] = (int8_t)v; }
+            for (int m = 0; m < 4; m++) iss >> c[m];
+            iss >> mult >> shift;
+            matmul_model(A, b, c, mult, shift, y);
+            for (int m = 0; m < 4; m++) fout << (int)y[m] << (m == 3 ? "" : " ");
+            fout << "\n";
+        } else {
+            std::cerr << "[ERROR] --eval: unsupported mode '" << mode << "'" << std::endl;
+            return false;
+        }
+    }
+    std::cout << "[C++ MODEL] --eval " << mode << ": wrote " << out_path << std::endl;
+    return true;
 }
 
 int main(int argc, char* argv[]) {
@@ -80,6 +77,18 @@ int main(int argc, char* argv[]) {
     }
 
     std::string mode = argv[1];
+
+    // --eval <input_file> [<output_file>]: evaluate this mode's model function
+    // over externally-supplied values instead of generating self-test vectors.
+    if (argc >= 3 && std::string(argv[2]) == "--eval") {
+        if (argc < 4) {
+            std::cerr << "[ERROR] --eval requires an input file path" << std::endl;
+            return -1;
+        }
+        std::string out_path = (argc >= 5) ? argv[4] : "eval_out.txt";
+        return run_eval_mode(mode, argv[3], out_path) ? 0 : -1;
+    }
+
     std::ofstream vec_file("inputs.txt");
     std::ofstream exp_file("expected.txt");
 
@@ -88,7 +97,82 @@ int main(int argc, char* argv[]) {
         return -1;
     }
 
-    if (mode == "exp") {
+    if (mode == "rmsnorm") {
+        const int N_VECS = 256;
+        vec_file << N_VECS << "\n";
+        srand(1337);
+        for (int i = 0; i < N_VECS; i++) {
+            int8_t x[8], y[8];
+            for (int j = 0; j < 8; j++) {
+                x[j] = (int8_t)((rand() % 256) - 128);
+                vec_file << (int)x[j] << (j == 7 ? "" : " ");
+            }
+            vec_file << "\n";
+            rmsnorm_hw_model(x, y);
+            for (int j = 0; j < 8; j++) exp_file << (int)y[j] << (j == 7 ? "" : " ");
+            exp_file << "\n";
+        }
+        std::cout << "[C++ MODEL] Generated RMSNORM test vectors." << std::endl;
+    }
+    else if (mode == "quant") {
+        // Realistic (mult, shift) pairs map SOME expected max accumulator range
+        // to ~127 (as calibration does); acc is generated relative to that
+        // per-vector boundary so each vector gets a natural mix of in-range,
+        // rounding-boundary, and saturating lanes -- not everything clamped.
+        const int N_VECS = 256;
+        vec_file << N_VECS << "\n";
+        srand(1337);
+        for (int i = 0; i < N_VECS; i++) {
+            int shift = 4 + (rand() % 14);            // 4..17
+            int32_t mult = 50 + (rand() % 200);       // 50..249
+            double boundary = (double)((int64_t)1 << shift) * 127.0 / (double)mult;
+            int64_t acc[4]; int8_t y[4];
+            for (int j = 0; j < 4; j++) {
+                double frac = ((rand() % 2600) - 500) / 1000.0;   // -0.5 .. 2.1
+                acc[j] = (int64_t)(frac * boundary);
+                vec_file << acc[j] << " ";
+            }
+            vec_file << mult << " " << shift << "\n";
+            for (int j = 0; j < 4; j++) y[j] = quant_model(acc[j], mult, shift);
+            for (int j = 0; j < 4; j++) exp_file << (int)y[j] << (j == 3 ? "" : " ");
+            exp_file << "\n";
+        }
+        std::cout << "[C++ MODEL] Generated QUANT test vectors." << std::endl;
+    }
+    else if (mode == "matmul") {
+        // A, b fully random int8 (natural accumulate magnitude is well below
+        // the worst case 8*127*127, so a realistic (mult,shift) already gives a
+        // natural mix of in-range/rounding/saturating results without needing
+        // per-vector scaling like the quant case above).
+        const int N_VECS = 256;
+        vec_file << N_VECS << "\n";
+        srand(1337);
+        for (int i = 0; i < N_VECS; i++) {
+            int8_t A[4][8]; int8_t b[8]; int32_t c[4];
+            int shift = 14 + (rand() % 5);            // 14..18
+            int32_t mult = 20 + (rand() % 130);       // 20..149
+            int8_t y[4];
+            for (int m = 0; m < 4; m++)
+                for (int k = 0; k < 8; k++) {
+                    A[m][k] = (int8_t)((rand() % 256) - 128);
+                    vec_file << (int)A[m][k] << " ";
+                }
+            for (int k = 0; k < 8; k++) {
+                b[k] = (int8_t)((rand() % 256) - 128);
+                vec_file << (int)b[k] << " ";
+            }
+            for (int m = 0; m < 4; m++) {
+                c[m] = (int32_t)((rand() % 2001) - 1000);
+                vec_file << c[m] << " ";
+            }
+            vec_file << mult << " " << shift << "\n";
+            matmul_model(A, b, c, mult, shift, y);
+            for (int m = 0; m < 4; m++) exp_file << (int)y[m] << (m == 3 ? "" : " ");
+            exp_file << "\n";
+        }
+        std::cout << "[C++ MODEL] Generated MATMUL test vectors." << std::endl;
+    }
+    else if (mode == "exp") {
         vec_file << "129\n"; // Header for valid negative domain + zero
         for (int i = -128; i <= 0; i++) {
             int z_q44 = i;
@@ -214,43 +298,16 @@ int main(int argc, char* argv[]) {
         srand(1337);
 
         for (int i = 0; i < N_VECS; i++) {
-            int x[N_LANES];
+            int8_t x[N_LANES], y[N_LANES];
             for (int j = 0; j < N_LANES; j++) {
-                x[j] = (rand() % 256) - 128;
-                vec_file << x[j] << (j == N_LANES - 1 ? "" : " ");
+                x[j] = (int8_t)((rand() % 256) - 128);
+                vec_file << (int)x[j] << (j == N_LANES - 1 ? "" : " ");
             }
             vec_file << "\n";
 
-            for (int j = 0; j < N_LANES; j++) {
-                int8_t xq = (int8_t)x[j];
-
-                // Pass 0: E = exp(-alpha|x|)  [alpha_stabilizer → tr_exp_alu]
-                int8_t alpha_q44 = alpha_stabilizer_model(xq);
-                int    E_q44     = gelu_exp_q44(alpha_q44);
-
-                // Pass 1: recip = 1/(1+E)  via  exp(-ln(1+E))
-                // pre_ln_modifier adds 1.0 (16 in Q4.4), giving (E+16) in Q4.4.
-                // tr_ln_alu (WIDTH=12, BITS=8) expects Q4.8 → zero-pad by <<4.
-                int    pre_ln_q44  = E_q44 + 16;                  // (E+1) in Q4.4
-                int    ln_yq8      = tr_new_ln_scalar(pre_ln_q44 << 4, 8); // Q4.8
-                // Saturate to 12-bit signed
-                if (ln_yq8 >  2047) ln_yq8 =  2047;
-                if (ln_yq8 < -2048) ln_yq8 = -2048;
-                // Shift back Q4.8 → Q4.4 with rounding (factor 8)
-                int8_t ln_out_q44  = (int8_t)((ln_yq8 + 8) >> 4);
-                // post_ln_modifier mode 01: negate
-                int8_t neg_ln_q44  = (int8_t)(-(int16_t)ln_out_q44);
-                int    recip_q44   = gelu_exp_q44(neg_ln_q44);
-
-                // Pass 2: y = x * sigma(x)
-                // symmetry_modifier: sigma(x) = (x<0) ? 1-recip : recip
-                int sigma_q44 = (xq < 0) ? (16 - recip_q44) : recip_q44;
-                // vec_mul SS mode (op_mode=0): signed × signed, [11:4] extract
-                int product   = (int)xq * (int)(int8_t)sigma_q44;
-                int8_t y_q44  = (int8_t)(product >> 4);
-
-                exp_file << (int)y_q44 << (j == N_LANES - 1 ? "" : " ");
-            }
+            gelu_hw_model(x, y);
+            for (int j = 0; j < N_LANES; j++)
+                exp_file << (int)y[j] << (j == N_LANES - 1 ? "" : " ");
             exp_file << "\n";
         }
         std::cout << "[C++ MODEL] Generated GELU vectors." << std::endl;
