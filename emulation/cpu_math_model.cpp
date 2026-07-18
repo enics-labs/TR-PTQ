@@ -312,6 +312,34 @@ int main(int argc, char* argv[]) {
         }
         std::cout << "[C++ MODEL] Generated GELU vectors." << std::endl;
     }
+    else if (mode == "gelu_fused") {
+        // Exercises the SAME composition the firmware's fused
+        // _xlr2_vpu(acc, CMD_GELU, mult, shift, out) call uses: raw INT32
+        // accumulator -> requantize (mult,shift) -> GELU LUT, in one
+        // hardware pass. Model = gelu_hw_scalar(quant_model(acc,mult,shift))
+        // per lane (M=4, matching TR_M) -- if RTL disagrees with this
+        // composition, the bug is in how the two verified primitives fuse
+        // in hardware, not in either primitive alone.
+        const int N_VECS = 256;
+        vec_file << N_VECS << "\n";
+        srand(1337);
+        for (int i = 0; i < N_VECS; i++) {
+            int shift = 4 + (rand() % 14);            // 4..17
+            int32_t mult = 50 + (rand() % 200);       // 50..249
+            double boundary = (double)((int64_t)1 << shift) * 127.0 / (double)mult;
+            int64_t acc[4]; int8_t y[4];
+            for (int j = 0; j < 4; j++) {
+                double frac = ((rand() % 2600) - 500) / 1000.0;   // -0.5 .. 2.1
+                acc[j] = (int64_t)(frac * boundary);
+                vec_file << acc[j] << " ";
+            }
+            vec_file << mult << " " << shift << "\n";
+            for (int j = 0; j < 4; j++) y[j] = gelu_hw_scalar(quant_model(acc[j], mult, shift));
+            for (int j = 0; j < 4; j++) exp_file << (int)y[j] << (j == 3 ? "" : " ");
+            exp_file << "\n";
+        }
+        std::cout << "[C++ MODEL] Generated GELU_FUSED test vectors." << std::endl;
+    }
     else {
         std::cerr << "[ERROR] Unknown mode: " << mode << std::endl;
         return -1;

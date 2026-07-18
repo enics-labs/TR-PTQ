@@ -58,19 +58,29 @@ inline int8_t alpha_stabilizer_model(int8_t x) {
 // Replicates tr_exp_alu (ITER=2) + the GELU is_zero bypass:
 //   is_zero → vec_a=128, vec_b=mantisa<<1 → [15:8] = mantisa
 //   otherwise → vec_a=LUT[idx], vec_b=mantisa → [15:8] = (LUT*mantisa)>>8
-// Returns the Q4.4 exp value (integer, range 0..16). Also reused by
-// rmsnorm_hw_model's Pass 3 (same shared VPU backbone — see its comment).
-inline int gelu_exp_q44(int8_t x) {
+// Returns the Q4.4 exp value (integer, range 0..16).
+//
+// gelu_exp_q44_raw takes the FULL-WIDTH value (no pre-narrowing to int8):
+// round.sv's ">>4 then check bit 3" truncation/rounding is applied directly
+// to whatever precision the caller has, matching the RTL, where (per
+// tr_nonlinear_vpu.sv's MUX 4/5 in GL_P2 and post_ln_modifier's negate mode)
+// the round+LUT stage consumes the backbone's wide LN output directly --
+// there is no intermediate narrow-to-int8 rounding step in hardware between
+// negate(ln(...)) and the second exp lookup. gelu_exp_q44(int8_t) is kept as
+// a thin wrapper for callers that already have a genuinely narrow INT8 value
+// (GL_P1's alpha_stabilizer output; RMSNorm Pass 3's ctrl_scalar, both
+// already clamped to [-128,127] before the call).
+inline int gelu_exp_q44_raw(int x) {
     static const uint8_t EXP_LUT[8] = {94, 35, 13, 5, 2, 1, 0, 0};  // anchors -1..-8
 
     // round.sv
-    int trunc_int      = (int)x >> 4;          // arithmetic shift → integer part
-    int frac_round_bit = ((uint8_t)x >> 3) & 1; // bit[3]
+    int trunc_int      = x >> 4;          // arithmetic shift → integer part
+    int frac_round_bit = (x >> 3) & 1;    // bit[3]
     int rounded_mag    = trunc_int + frac_round_bit;
     bool is_zero       = (rounded_mag == 0);
 
     // tr_exp_alu mantisa (ITER=2, FRAC_W=4)
-    int frac_bits   = (uint8_t)x & 0xF;        // x[3:0]
+    int frac_bits   = x & 0xF;                 // x[3:0]
     int is_ceil     = frac_round_bit;
     int first_order = ((!is_ceil) << 4) | frac_bits;  // {~is_ceil, x[3:0]}
 
@@ -87,6 +97,8 @@ inline int gelu_exp_q44(int8_t x) {
     return (EXP_LUT[lut_idx] * mantisa) >> 8;  // [15:8] of 16-bit product
 }
 
+inline int gelu_exp_q44(int8_t x) { return gelu_exp_q44_raw((int)x); }
+
 // ============================================================================
 // GELU — alpha_stabilizer -> exp -> ln -> exp -> sigma -> multiply, bit-exact
 // to the RTL's GELU CMD sequence. Q4.4 fixed point (scale 1/16) throughout —
@@ -101,11 +113,15 @@ inline int8_t gelu_hw_scalar(int8_t x) {
     int8_t alpha = alpha_stabilizer_model(x);
     int    E     = gelu_exp_q44(alpha);
     int    pre_ln  = E + 16;
-    int    ln_yq8  = tr_new_ln_scalar(pre_ln << 4, 8);
-    if (ln_yq8 >  2047) ln_yq8 =  2047;
-    if (ln_yq8 < -2048) ln_yq8 = -2048;
-    int8_t ln_out  = (int8_t)((ln_yq8 + 8) >> 4);
-    int8_t neg_ln  = (int8_t)(-(int16_t)ln_out);
+    // bits=4 (matching FRAC_W=4 -- the same precision RMSNorm's verified
+    // tr_new_ln_scalar(s_shifted, 4) call uses), input NOT pre-shifted by
+    // <<4 -- confirmed bit-exact against tr_soc_top_int's actual bb_log
+    // register (512/512 match); the previous bits=8 + extra <<4/>>4 shuffle
+    // was never independently RTL-verified (it was reverse-engineered from
+    // tr_gelu.sv, the dead-code module -- see tr_gelu_int_tb.sv) and simply
+    // used the wrong LN precision.
+    int    ln_q44  = tr_new_ln_scalar(pre_ln, 4);
+    int8_t neg_ln  = (int8_t)(-(int16_t)(int8_t)ln_q44);
     int    recip   = gelu_exp_q44(neg_ln);
     int    sigma   = (x < 0) ? (16 - recip) : recip;
     int    product = (int)x * (int8_t)sigma;
