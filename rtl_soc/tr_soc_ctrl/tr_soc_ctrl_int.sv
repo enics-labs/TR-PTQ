@@ -63,6 +63,7 @@ module tr_soc_ctrl_int #(
     input  logic vpu_bb_valid,
     input  logic vpu_vecmul_valid,
     input  logic vpu_mac_valid,
+    input  logic vpu_max_valid,
 
     // Streaming matmul dispatch (CMD=0x04) — drives tr_matmul_ctrl in the top.
     output logic         mm_start,
@@ -294,10 +295,11 @@ module tr_soc_ctrl_int #(
             // SOFTMAX SEQUENCE (Fixed Pipeline Latency)
             // =========================================================
             SM_P1, SM_P1_W: begin
-                en_piped_max = 1; 
-                // Wait 1 cycle for max tree to settle before latching
-                if (state == SM_P1) next_state = SM_P1_W; 
-                else if (state == SM_P1_W) begin latch_max = 1; next_state = SM_P2; end
+                en_piped_max = 1;
+                // Wait for the piped_max tree's own valid handshake before latching
+                // (its comparison tree takes $clog2(N) cycles to settle).
+                if (state == SM_P1) next_state = SM_P1_W;
+                else if (state == SM_P1_W && vpu_max_valid) begin latch_max = 1; next_state = SM_P2; end
             end
             
             SM_P2, SM_P2_W1, SM_P2_W2: begin

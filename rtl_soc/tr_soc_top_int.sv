@@ -121,6 +121,7 @@ module tr_soc_top_int #(
     logic                           vpu_bb_valid;
     logic                           vpu_vecmul_valid;
     logic                           vpu_mac_valid;
+    logic                           vpu_max_valid;
 
     // ---------------------------------------------------------
     // 1. MASTER CONTROLLER
@@ -177,6 +178,7 @@ module tr_soc_top_int #(
         .vpu_bb_valid        (vpu_bb_valid),
         .vpu_vecmul_valid    (vpu_vecmul_valid),
         .vpu_mac_valid       (vpu_mac_valid),
+        .vpu_max_valid       (vpu_max_valid),
 
         .mm_start            (mm_start),
         .mm_num_row_tiles    (mm_num_rt),
@@ -342,7 +344,8 @@ module tr_soc_top_int #(
         
         .vpu_bb_valid_out    (vpu_bb_valid),
         .vpu_vecmul_valid_out(vpu_vecmul_valid),
-        .vpu_mac_valid_out   (vpu_mac_valid)
+        .vpu_mac_valid_out   (vpu_mac_valid),
+        .vpu_max_valid_out   (vpu_max_valid)
     );
 
     // Final Output Gate

@@ -62,7 +62,8 @@ module tr_nonlinear_vpu #(
     input  logic sym_mode_en,
     output logic vpu_bb_valid_out,
     output logic vpu_vecmul_valid_out,
-    output logic vpu_mac_valid_out
+    output logic vpu_mac_valid_out,
+    output logic vpu_max_valid_out
 );
 
     // =========================================================
@@ -91,6 +92,7 @@ module tr_nonlinear_vpu #(
     logic int_bb_valid;
     logic int_mac_valid;
     logic int_vecmul_valid;
+    logic int_max_valid;
 
     // =========================================================
     // CROSSBAR MUX NETWORK (Software-Defined Routing)
@@ -178,7 +180,7 @@ module tr_nonlinear_vpu #(
         .NUM_INPUTS(N), .DATA_WIDTH(W_VEC)
     ) u_max (
         .clk(clk), .rst_n(rst_n), .valid_in(en_piped_max),
-        .in_data(sram_data_a), .max_out(vpu_max_out), .valid_out()
+        .in_data(sram_data_a), .max_out(vpu_max_out), .valid_out(int_max_valid)
     );
 
     scalar_sub #(
@@ -239,10 +241,12 @@ module tr_nonlinear_vpu #(
             vpu_bb_valid_out     <= 1'b0;
             vpu_mac_valid_out    <= 1'b0;
             vpu_vecmul_valid_out <= 1'b0;
+            vpu_max_valid_out    <= 1'b0;
         end else begin
             vpu_bb_valid_out     <= int_bb_valid;
             vpu_mac_valid_out    <= int_mac_valid;
             vpu_vecmul_valid_out <= int_vecmul_valid;
+            vpu_max_valid_out    <= int_max_valid;
         end
     end
 
