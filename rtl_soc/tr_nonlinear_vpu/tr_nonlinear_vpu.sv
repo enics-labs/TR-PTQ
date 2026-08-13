@@ -252,9 +252,24 @@ module tr_nonlinear_vpu #(
 
     always_comb begin
         for(int i=0; i<N; i++) begin
-            if (vecmul_scale_mode == 2'b10)      vecmul_out_trunc[i] = W_VEC'(vecmul_out_acc[i] >>> 8);
-            else if (vecmul_scale_mode == 2'b01) vecmul_out_trunc[i] = W_VEC'(vecmul_out_acc[i] >>> 4);
-            else                                 vecmul_out_trunc[i] = W_VEC'(vecmul_out_acc[i]);
+            logic signed [ACC_W-1:0] shifted;
+            if (vecmul_scale_mode == 2'b11) begin
+                // Softmax Q0.8 UNSIGNED probability output: E(Q0.8) x mantissa(Q4.4)
+                // scales the product by 4096, so >>>4 lands back on Q0.8 (scale 256)
+                // instead of >>>8's Q4.4 (scale 16). Softmax values are always in
+                // [0,1], so the 4 "integer" bits Q4.4 spent on them were wasted --
+                // Q0.8 gives 16x the fractional resolution in the same byte.
+                // Saturate at 255 (~0.996) instead of wrapping (e.g. the single-
+                // dominant-logit case can land exactly on 256).
+                shifted = vecmul_out_acc[i] >>> 4;
+                vecmul_out_trunc[i] = (shifted > 255) ? W_VEC'(255) : W_VEC'(shifted);
+            end else if (vecmul_scale_mode == 2'b10) begin
+                vecmul_out_trunc[i] = W_VEC'(vecmul_out_acc[i] >>> 8);
+            end else if (vecmul_scale_mode == 2'b01) begin
+                vecmul_out_trunc[i] = W_VEC'(vecmul_out_acc[i] >>> 4);
+            end else begin
+                vecmul_out_trunc[i] = W_VEC'(vecmul_out_acc[i]);
+            end
         end
     end
 

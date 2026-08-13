@@ -198,9 +198,35 @@ int main(int argc, char* argv[]) {
         std::cout << "[C++ MODEL] Generated LN test vectors." << std::endl;
     } 
     else if (mode == "softmax") {
-        vec_file << "256\n"; 
-        srand(1337); 
-        
+        // PRODUCTION path: tr_soc_top_int CMD=0x01 (SM_P1..SM_P4), bit-exact
+        // via softmax_hw_model -- see tr_softmax_int_tb.sv. Output is Q0.8
+        // UNSIGNED (0..255, saturating), not the Q4.4 this used to emit.
+        const int N_VECS = 256;
+        vec_file << N_VECS << "\n";
+        srand(1337);
+        for (int i = 0; i < N_VECS; i++) {
+            int8_t x[8]; uint8_t y[8];
+            for (int j = 0; j < 8; j++) {
+                x[j] = (int8_t)((rand() % 256) - 128);
+                vec_file << (int)x[j] << (j == 7 ? "" : " ");
+            }
+            vec_file << "\n";
+
+            softmax_hw_model(x, y);
+            for (int j = 0; j < 8; j++)
+                exp_file << (int)y[j] << (j == 7 ? "" : " ");
+            exp_file << "\n";
+        }
+        std::cout << "[C++ MODEL] Generated SOFTMAX (production tr_soc_top_int path) vectors." << std::endl;
+    }
+    else if (mode == "softmax_dead_module") {
+        // The standalone tr_softmax.sv module (rtl_soc/tr_softmax/) -- NOT
+        // instantiated by tr_soc_top_int.sv, same dead-code trap gelu/rmsnorm
+        // already fell into (see tr_gelu_int_tb.sv). Kept only so that module
+        // can still be checked in isolation if anyone cares to.
+        vec_file << "256\n";
+        srand(1337);
+
         for (int i = 0; i < 256; i++) {
             int x[8];
             int row_max = -128; // Simulating INT_MIN for Q4.4 8-bit limits
@@ -228,19 +254,21 @@ int main(int argc, char* argv[]) {
             for (int j = 0; j < 8; j++) {
                 int z = x[j] - row_max;
                 int e = tr_approx_exp_scalar_2rd(z);
-                
-                // CUDA logic (Q0.8):
-                int y_q08 = (e << 8) / denom; 
-                
-                // Scale down to Q4.4 to match hardware output format
-                // A logical shift right by 4 converts Q0.8 (256 scale) to Q4.4 (16 scale)
-                int16_t y = (int16_t)(y_q08 >> 4);
-                
-                exp_file << y << (j == 7 ? "" : " ");
+
+                // CUDA logic (Q0.8, scale 256): softmax output is always in
+                // [0,1], so keep it as an UNSIGNED Q0.8 value instead of
+                // shifting down to Q4.4 (scale 16) -- Q4.4 spent 4 bits on an
+                // integer range this value never uses. Saturate at 255
+                // (~0.996) rather than wrap (e.g. a single dominant logit
+                // drives e == denom, giving exactly 256 before saturation).
+                int y_q08 = (e << 8) / denom;
+                if (y_q08 > 255) y_q08 = 255;
+
+                exp_file << y_q08 << (j == 7 ? "" : " ");
             }
             exp_file << "\n";
         }
-        std::cout << "[C++ MODEL] Generated SOFTMAX vectors using 2nd-order exp + exact division." << std::endl;
+        std::cout << "[C++ MODEL] Generated SOFTMAX vectors using 2nd-order exp + exact division (Q0.8 unsigned output)." << std::endl;
     }
     else if (mode == "swiglu") {
         const int N_LANES = 8;

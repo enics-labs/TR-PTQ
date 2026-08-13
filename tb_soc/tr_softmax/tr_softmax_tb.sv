@@ -94,9 +94,11 @@ module tr_softmax_tb();
             for (int j = 0; j < N; j++) x_in[j] = exp_vals[j];
             send_and_wait();
 
+            // Pass 6 output is now an UNSIGNED Q0.8 probability (0..255) --
+            // print unsigned to match cpu_math_model.cpp's golden output.
             $fwrite(file_out, "%0d %0d %0d %0d %0d %0d %0d %0d\n",
-                $signed(y_out[0]), $signed(y_out[1]), $signed(y_out[2]), $signed(y_out[3]),
-                $signed(y_out[4]), $signed(y_out[5]), $signed(y_out[6]), $signed(y_out[7]));
+                $unsigned(y_out[0]), $unsigned(y_out[1]), $unsigned(y_out[2]), $unsigned(y_out[3]),
+                $unsigned(y_out[4]), $unsigned(y_out[5]), $unsigned(y_out[6]), $unsigned(y_out[7]));
 
             // Debug print for every vector — shows all pass intermediates
             if (v == 20 || v == 24) begin
@@ -107,13 +109,14 @@ module tr_softmax_tb();
                 $display("  P1 max  : %0d", $signed(max_val));
                 $display("  P2 S    : %0d  [23:8]=%0d", S, S[23:8]);
                 $display("  P3 ln_S : %0d", $signed(ln_S));
+                // Passes 4/5/6 are UNSIGNED Q0.8 magnitudes now -- print unsigned.
                 $display("  P4 exp  : %0d %0d %0d %0d %0d %0d %0d %0d",
-                    $signed(exp_vals[0]), $signed(exp_vals[1]), $signed(exp_vals[2]), $signed(exp_vals[3]),
-                    $signed(exp_vals[4]), $signed(exp_vals[5]), $signed(exp_vals[6]), $signed(exp_vals[7]));
-                $display("  P5 inv_S: %0d", $signed(inv_S));
+                    $unsigned(exp_vals[0]), $unsigned(exp_vals[1]), $unsigned(exp_vals[2]), $unsigned(exp_vals[3]),
+                    $unsigned(exp_vals[4]), $unsigned(exp_vals[5]), $unsigned(exp_vals[6]), $unsigned(exp_vals[7]));
+                $display("  P5 inv_S: %0d", $unsigned(inv_S));
                 $display("  P6 out  : %0d %0d %0d %0d %0d %0d %0d %0d",
-                    $signed(y_out[0]), $signed(y_out[1]), $signed(y_out[2]), $signed(y_out[3]),
-                    $signed(y_out[4]), $signed(y_out[5]), $signed(y_out[6]), $signed(y_out[7]));
+                    $unsigned(y_out[0]), $unsigned(y_out[1]), $unsigned(y_out[2]), $unsigned(y_out[3]),
+                    $unsigned(y_out[4]), $unsigned(y_out[5]), $unsigned(y_out[6]), $unsigned(y_out[7]));
             end
         end
 

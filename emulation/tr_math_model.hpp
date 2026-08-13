@@ -70,7 +70,13 @@ inline int8_t alpha_stabilizer_model(int8_t x) {
 // a thin wrapper for callers that already have a genuinely narrow INT8 value
 // (GL_P1's alpha_stabilizer output; RMSNorm Pass 3's ctrl_scalar, both
 // already clamped to [-128,127] before the call).
-inline int gelu_exp_q44_raw(int x) {
+// Raw (UNSHIFTED) tr_exp_alu product: E(Q0.8) x mantisa(Q4.4), scaled by
+// 4096 -- the same round.sv + quadratic_divider.sv K-map bit-trick used by
+// every exp lookup in the RTL (GELU, RMSNorm, Softmax alike), factored out
+// so each caller applies its own datapath's shift/saturation instead of
+// three copies of this LUT/rounding logic silently drifting apart (see the
+// file header note on gelu_int8 -- this is exactly that trap).
+inline int tr_exp_alu_product_raw(int x) {
     static const uint8_t EXP_LUT[8] = {94, 35, 13, 5, 2, 1, 0, 0};  // anchors -1..-8
 
     // round.sv
@@ -91,11 +97,16 @@ inline int gelu_exp_q44_raw(int x) {
     int mantisa = (first_order + ((y1 << 1) | y0)) & 0xFF;
 
     if (is_zero)
-        return mantisa;                         // 128*(mantisa<<1) → [15:8] = mantisa
+        return 128 * (mantisa << 1);   // mac_in_a/vecmul_a's is_zero->128 doubling trick
 
     int lut_idx = (~rounded_mag) & 0x7;
-    return (EXP_LUT[lut_idx] * mantisa) >> 8;  // [15:8] of 16-bit product
+    return EXP_LUT[lut_idx] * mantisa;
 }
+
+// GELU's exp lookup consumes the raw product at [15:8] (Q4.4, scale 16):
+// is_zero -> 128*(mantisa<<1) = 256*mantisa, >>8 = mantisa (unchanged from
+// before this was factored out); non-zero -> (E*mantisa)>>8, also unchanged.
+inline int gelu_exp_q44_raw(int x) { return tr_exp_alu_product_raw(x) >> 8; }
 
 inline int gelu_exp_q44(int8_t x) { return gelu_exp_q44_raw((int)x); }
 
@@ -163,6 +174,64 @@ inline void rmsnorm_hw_model(const int8_t x[8], int8_t out[8]) {
         int product = (int)x[i] * inv_rms;
         int shifted = product >> 4;
         out[i] = (int8_t)shifted;   // truncating cast (wraps on overflow)
+    }
+}
+
+// ============================================================================
+// Softmax — bit-exact replica of the tr_soc_top_int PRODUCTION path (the
+// SM_P1..SM_P4 FSM in tr_soc_ctrl_int.sv driving tr_nonlinear_vpu), NOT the
+// standalone tr_softmax.sv module (that one is a differently-architected,
+// separate RTL block -- explicit reciprocal-via-exp instead of this FSM's
+// log-sum-exp trick, and its own is_zero->255 anchor instead of this
+// pipeline's is_zero->128-doubling trick -- and isn't instantiated by
+// tr_soc_top_int.sv at all; see tr_softmax_int_tb.sv / cpu_model
+// "softmax_dead_module" for that one instead).
+//
+// max -> Sum(exp(xi-max)) -> ln(Sum) -> exp(xi-max-ln(Sum)), no divider.
+// Output is Q0.8 UNSIGNED (0..255, saturating): softmax values are always in
+// [0,1], so the whole byte is spent as fraction instead of wasting 4 bits on
+// an integer range that's never used (matches tr_nonlinear_vpu.sv's
+// vecmul_scale_mode==2'b11 path).
+// ============================================================================
+inline int8_t softmax_sat8_sub(int a, int b) {
+    int diff = a - b;
+    if (diff < -128) diff = -128;
+    if (diff > 127) diff = 127;
+    return (int8_t)diff;
+}
+
+inline void softmax_hw_model(const int8_t x[8], uint8_t out[8]) {
+    int8_t max_x = x[0];
+    for (int i = 1; i < 8; i++) if (x[i] > max_x) max_x = x[i];
+
+    // SM_P1/P2: S = sum_i exp(x_i - max), exact 32-bit accumulate (mirrors
+    // mac_array_engine's UU multiply-accumulate -- no rounding loss here).
+    int32_t S = 0;
+    for (int i = 0; i < 8; i++) {
+        int8_t d = softmax_sat8_sub(x[i], max_x);
+        S += tr_exp_alu_product_raw(d);
+    }
+
+    // SM_P3: ln(S) via the [23:8] bit-slice into tr_ln_alu (bits=4, matching
+    // FRAC_W=4 -- same primitive GELU/RMSNorm already verify), saturated to
+    // int8 (tr_ln_alu.sv itself saturates its OUT_WIDTH-bit output).
+    int slice16 = (int)((uint32_t)S >> 8) & 0xFFFF;
+    int ln_S = tr_new_ln_scalar(slice16, 4);
+    if (ln_S > 127) ln_S = 127;
+    if (ln_S < -128) ln_S = -128;
+
+    // ctrl_scalar_sub_val = max + ln(S), truncated to 8 bits -- this
+    // reproduces the RTL's un-saturated add exactly (tr_soc_ctrl_int.sv's
+    // SM_P4 state), a known overflow condition when max and ln(S) are both
+    // large. Modeled faithfully since this function exists to check the RTL
+    // as it's actually built, not as it was intended.
+    int8_t sub_val2 = (int8_t)((int)max_x + (int)ln_S);
+
+    // SM_P4: softmax_i = exp(x_i - max - ln(S)), Q0.8 UNSIGNED, saturating.
+    for (int i = 0; i < 8; i++) {
+        int8_t d2 = softmax_sat8_sub(x[i], sub_val2);
+        int shifted = tr_exp_alu_product_raw(d2) >> 4;
+        out[i] = (uint8_t)((shifted > 255) ? 255 : shifted);
     }
 }
 

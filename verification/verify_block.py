@@ -7,7 +7,13 @@ def get_config(block_name):
     configs = {
         "exp":     {"f_file": "../tb_soc/tr_exp/tr_exp.f",         "max_error": 0},
         "ln":      {"f_file": "../tb_soc/tr_ln/tr_ln.f",           "max_error": 0},
-        "softmax": {"f_file": "../tb_soc/tr_softmax/tr_softmax.f", "max_error": 0},
+        # softmax: tr_softmax_int.f drives the REAL production SM_P1..SM_P4
+        # sequence via tr_soc_top_int (CMD=0x01) -- tr_softmax.sv
+        # (tb_soc/tr_softmax/, the prior target) is a separate module not
+        # instantiated anywhere in tr_soc_top_int.sv. Same trap gelu/rmsnorm
+        # already fell into below.
+        "softmax": {"f_file": "../tb_soc/tr_softmax_int/tr_softmax_int.f", "max_error": 0},
+        "softmax_dead_module": {"f_file": "../tb_soc/tr_softmax/tr_softmax.f", "max_error": 0},
         # gelu: tr_gelu_int.f drives the REAL production GL_P1..GL_P3 sequence
         # via tr_soc_top_int (CMD=0x02) -- tr_gelu.sv (tb_soc/tr_gelu/, the
         # prior target) is dead code outside tr_swiglu.sv, unused in the
@@ -147,7 +153,7 @@ def run_verification():
         if row_has_error and failed_rows_logged < 10:
             print(f"  [MISMATCH] Row {idx+1} (Max Error in row: {row_max_delta})")
             print(f"    Input   : {in_line.strip()}")
-            if args.block in ["softmax", "gelu", "swiglu", "quant", "matmul", "rmsnorm", "gelu_fused"]:
+            if args.block in ["softmax", "softmax_dead_module", "gelu", "swiglu", "quant", "matmul", "rmsnorm", "gelu_fused"]:
                 print(f"    Expected: {exp_line.strip()}")
                 print(f"    HDL Got : {hdl_line.strip()}\n")
             else:

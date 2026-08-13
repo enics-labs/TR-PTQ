@@ -321,10 +321,10 @@ module tr_soc_ctrl_int #(
             end
             
             SM_P4, SM_P4_W, SM_P4_MUL_W: begin
-                bb_bypass_ln = 1'b1; 
+                bb_bypass_ln = 1'b1;
                 ctrl_scalar_sub_val = reg_scalar_max + reg_scalar_log;
-                mux_bb_in_sel = 3'b010; 
-                vecmul_op_mode = 2'd2; vecmul_scale_mode = 2'b10; // UU [15:8]
+                mux_bb_in_sel = 3'b010;
+                vecmul_op_mode = 2'd2; vecmul_scale_mode = 2'b11; // UU, Q0.8 unsigned (saturating)
                 mux_vecmul_a_sel = 2'b11; mux_vecmul_b_sel = 2'b10;
                 mux_vpu_out_sel = 3'b000;
 

@@ -165,7 +165,10 @@ module tr_softmax #(
         .rst_n         (rst_n),
         .in_valid      (valid_in && (mode == 3'b011 || mode == 3'b100 || mode == 3'b101)),
         .in_ready      (),
-        .op_mode       ((mode == 3'b101) ? 2'd0 : 2'd2),  // SS for pass 6, UU for exp passes
+        // UU for all passes: pass 6 now multiplies two Q0.8 UNSIGNED magnitudes
+        // (see output mux below), so SS would corrupt any operand >= 128 by
+        // reading its top bit as a sign.
+        .op_mode       (2'd2),
         .mode_elemwise (1'b1),                              // ELEMWISE, fixed
         .a             (ew_a),
         .b             (ew_b),
@@ -203,16 +206,32 @@ module tr_softmax #(
                 y_out[0]  = ln_out;
             end
             3'b011, 3'b100: begin
-                // Pass 4/5: Q4.4 exp result lives in product bits [15:8]
+                // Pass 4/5: E(Q0.8) x mantisa(Q4.4) product is scaled by 4096;
+                // >>>4 lands on Q0.8 UNSIGNED (scale 256) instead of the old
+                // >>>8 Q4.4 (scale 16) -- these values (exp(xi-max) and 1/S)
+                // are always in [0,~1], so Q0.8 keeps 16x the useful
+                // resolution. Saturate at 255 rather than wrap (the is_zero
+                // anchor, E=255, can push the shifted product past 255).
                 valid_out = ew_valid;
-                for (int j = 0; j < N; j++)
-                    y_out[j] = ew_out[j][15:8];
+                for (int j = 0; j < N; j++) begin
+                    logic signed [ACC_W-1:0] shifted;
+                    shifted  = ew_out[j] >>> 4;
+                    y_out[j] = (shifted > 255) ? W'(255) : W'(shifted);
+                end
             end
             3'b101: begin
-                // Pass 6: Q4.4 × Q4.4 → Q8.8 product; [11:4] extracts Q4.4
+                // Pass 6: Q0.8 UNSIGNED x Q0.8 UNSIGNED -> Q0.16 product (scale
+                // 65536); >>>8 extracts Q0.8 UNSIGNED (scale 256) directly --
+                // the whole probability already lives in the low byte since it
+                // never exceeds 1.0. Saturate at 255 defensively (max observed
+                // product is 15*15=225, well under the 255 ceiling, but this
+                // keeps the same safety margin as passes 4/5 above).
                 valid_out = ew_valid;
-                for (int j = 0; j < N; j++)
-                    y_out[j] = ew_out[j][11:4];
+                for (int j = 0; j < N; j++) begin
+                    logic signed [ACC_W-1:0] shifted;
+                    shifted  = ew_out[j] >>> 8;
+                    y_out[j] = (shifted > 255) ? W'(255) : W'(shifted);
+                end
             end
             default: valid_out = 1'b0;
         endcase
