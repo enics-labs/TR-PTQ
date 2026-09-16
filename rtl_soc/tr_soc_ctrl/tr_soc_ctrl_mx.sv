@@ -92,6 +92,18 @@ module tr_soc_ctrl_mx #(
     logic                           latch_max;
     logic                           latch_log;
 
+    // RMSNorm Pass 3 sign-guard fix (see the RM_P3 case block below for the
+    // full derivation -- same fix as tr_soc_ctrl_int.sv / tr_rmsnorm.sv,
+    // see docs/iscas_paper_support/): registered like every other FSM output
+    // in this module (nxt_* computed in the big case-based always_comb,
+    // latched in the "Control Pipeline Register" always_ff below). True only
+    // during RM_P3/RM_P3_W/RM_P3_MUL_W when ctrl_scalar (reg_scalar_log +
+    // CONST_LN_SQRT_N) came out positive -- defaults to 0 everywhere else
+    // (including GELU's GL_P2, which also uses write_scratch_b), so this
+    // cannot affect any other sequence.
+    logic                           rm_offset_was_positive;
+    logic                           nxt_rm_offset_was_positive;
+
     assign scratch_a_out    = scratch_a;
     assign scratch_b_out    = scratch_b;
     assign mm_num_row_tiles = reg_mm_rows;
@@ -102,9 +114,60 @@ module tr_soc_ctrl_mx #(
         if (mmio_addr == ADDR_STATUS) mmio_rdata = {30'd0, reg_done, reg_busy};
     end
 
+    // RMSNorm Pass 3 sign-guard fix, continued: reciprocal LUT. E (the
+    // decay-side exp result the guarded path always produces now)
+    // realistically ranges 0..16 (Q4.4 "1.0" = 16, is_zero case); sized to
+    // 0..31 for headroom. recip_lut[E] = round(256/E), saturated to 127
+    // (max signed 8-bit) -- 256 = 16*16, converting Q4.4 E back out through
+    // the same Q4.4 convention this datapath already uses everywhere else.
+    // New logic scoped entirely to this module -- tr_nonlinear_vpu (the
+    // shared backbone GELU and Softmax also use) is untouched.
+    function automatic logic signed [W-1:0] recip_lut(input logic signed [W-1:0] e);
+        case (e)
+            8'sd0,  8'sd1: recip_lut = 8'sd127;
+            8'sd2:         recip_lut = 8'sd127;
+            8'sd3:         recip_lut = 8'sd85;
+            8'sd4:         recip_lut = 8'sd64;
+            8'sd5:         recip_lut = 8'sd51;
+            8'sd6:         recip_lut = 8'sd43;
+            8'sd7:         recip_lut = 8'sd37;
+            8'sd8:         recip_lut = 8'sd32;
+            8'sd9:         recip_lut = 8'sd28;
+            8'sd10:        recip_lut = 8'sd26;
+            8'sd11:        recip_lut = 8'sd23;
+            8'sd12:        recip_lut = 8'sd21;
+            8'sd13:        recip_lut = 8'sd20;
+            8'sd14:        recip_lut = 8'sd18;
+            8'sd15:        recip_lut = 8'sd17;
+            8'sd16:        recip_lut = 8'sd16;
+            8'sd17:        recip_lut = 8'sd15;
+            8'sd18:        recip_lut = 8'sd14;
+            8'sd19:        recip_lut = 8'sd13;
+            8'sd20:        recip_lut = 8'sd13;
+            8'sd21:        recip_lut = 8'sd12;
+            8'sd22:        recip_lut = 8'sd12;
+            8'sd23:        recip_lut = 8'sd11;
+            8'sd24:        recip_lut = 8'sd11;
+            8'sd25:        recip_lut = 8'sd10;
+            8'sd26:        recip_lut = 8'sd10;
+            8'sd27:        recip_lut = 8'sd9;
+            8'sd28:        recip_lut = 8'sd9;
+            8'sd29:        recip_lut = 8'sd9;
+            8'sd30:        recip_lut = 8'sd9;
+            8'sd31:        recip_lut = 8'sd8;
+            default:       recip_lut = 8'sd127;   // E outside the expected range -- saturate, don't wrap
+        endcase
+    endfunction
+
     always_ff @(posedge clk) begin
         if (write_scratch_a) scratch_a <= vpu_data_out;
-        if (write_scratch_b) scratch_b <= vpu_data_out;
+        if (write_scratch_b) begin
+            if (rm_offset_was_positive) begin
+                for (int k = 0; k < N; k++) scratch_b[k] <= recip_lut(vpu_data_out[k]);
+            end else begin
+                scratch_b <= vpu_data_out;
+            end
+        end
         if (latch_max)       reg_scalar_max <= vpu_max_out;
         if (latch_log)       reg_scalar_log <= vpu_data_out[0];
     end
@@ -191,6 +254,7 @@ module tr_soc_ctrl_mx #(
             sym_mode_en              <= 1'b0;
             ctrl_scalar_sub_val      <= '0;
             mm_start                 <= 1'b0;
+            rm_offset_was_positive   <= 1'b0;   // sign-guard fix
         end else begin
             reg_busy                 <= nxt_reg_busy;
             reg_done                 <= nxt_reg_done;
@@ -223,6 +287,7 @@ module tr_soc_ctrl_mx #(
             sym_mode_en              <= nxt_sym_mode_en;
             ctrl_scalar_sub_val      <= nxt_ctrl_scalar_sub_val;
             mm_start                 <= nxt_mm_start;
+            rm_offset_was_positive   <= nxt_rm_offset_was_positive;   // sign-guard fix
         end
     end
 
@@ -261,6 +326,7 @@ module tr_soc_ctrl_mx #(
         nxt_sym_mode_en              = 1'b0;
         nxt_ctrl_scalar_sub_val      = '0;
         nxt_mm_start                 = 1'b0;
+        nxt_rm_offset_was_positive   = 1'b0;   // sign-guard fix
 
         case (state)
             IDLE: begin
@@ -387,8 +453,36 @@ module tr_soc_ctrl_mx #(
             end
             
             RM_P3, RM_P3_W, RM_P3_MUL_W: begin
+                logic signed [W-1:0] rm_ctrl_scalar_raw;
                 nxt_bb_bypass_ln = 1'b1;
-                nxt_ctrl_scalar_sub_val = reg_scalar_log + CONST_LN_SQRT_N;
+
+                // SIGN-GUARD FIX: tr_nonlinear_vpu's shared exp backbone
+                // (round.sv's own comment: "8-bit Negative-Only LUT
+                // Indexing") was only ever built for alpha_stabilizer-style
+                // inputs, which are always forced non-positive.
+                // rm_ctrl_scalar_raw can legitimately be positive for small
+                // Sum(x^2) -- a normal, expected input, not a corner case --
+                // and feeding that straight to the backbone silently
+                // collapses InvRMS toward 0 instead of growing it, as it
+                // mathematically should (root cause verified in
+                // docs/iscas_paper_support/). Force it non-positive before
+                // it reaches the backbone (cheap: comparator + negate,
+                // mirrors alpha_stabilizer's own "forced negative absolute
+                // value" step) and remember that a flip happened via
+                // nxt_rm_offset_was_positive; the raw value is stable for
+                // the whole RM_P3/RM_P3_W/RM_P3_MUL_W wait sequence since
+                // reg_scalar_log doesn't change during it, and both this
+                // flag and write_scratch_b pass through the SAME "Control
+                // Pipeline Register" stage together, so they stay aligned
+                // one cycle later at the write_scratch_b capture point
+                // above -- no extra pipelining needed beyond what this
+                // module already does for every other FSM output. The flip
+                // itself is undone there (see the recip_lut() call), not
+                // here.
+                rm_ctrl_scalar_raw = reg_scalar_log + CONST_LN_SQRT_N;
+                nxt_rm_offset_was_positive = ~rm_ctrl_scalar_raw[W-1] && (rm_ctrl_scalar_raw != '0);
+                nxt_ctrl_scalar_sub_val = nxt_rm_offset_was_positive ? -rm_ctrl_scalar_raw : rm_ctrl_scalar_raw;
+
                 nxt_src_sram_a_sel = 1;
                 nxt_mux_bb_in_sel = 3'b100;
                 nxt_vecmul_op_mode = 2'd2; nxt_vecmul_scale_mode = 2'b10;

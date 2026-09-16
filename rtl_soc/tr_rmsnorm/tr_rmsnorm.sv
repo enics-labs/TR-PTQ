@@ -47,6 +47,32 @@ module tr_rmsnorm #(
     );
 
     // ------------------------------------------------------------------------
+    // SIGN-GUARD (Pass 3 fix): tr_exp_alu / round.sv's "8-bit Negative-Only
+    // LUT Indexing" (see round.sv's own comment) was built only for
+    // alpha_stabilizer-style inputs, which are always forced non-positive.
+    // offset_in (= ctrl_scalar = 0.5*ln(8) - 0.5*ln(Sum x^2), computed by the
+    // controller) has no such guarantee -- for small Sum x^2 it goes
+    // positive, the negative-only LUT indexing wraps/breaks, and InvRMS
+    // collapses toward 0 instead of growing, as it mathematically should.
+    // Root cause + fix verified numerically in the bit-true emulation model
+    // (tr_math_model.hpp's rmsnorm_hw_model_signguard_fixed(), see
+    // docs/iscas_paper_support/); this is that same fix in RTL.
+    //
+    // Fix: force offset_in non-positive before it ever reaches tr_exp_alu
+    // (cheap: comparator + two's-complement negate, mirrors
+    // alpha_stabilizer's own "forced negative absolute value" step), and
+    // remember that a flip happened. tr_exp_alu then always evaluates the
+    // decay-side case it was actually built for -- no change to the shared
+    // exp/ln backbone at all. The flip is undone at the OUTPUT stage (see
+    // the recip_lut below), not here -- this stage only prepares the sign.
+    // ------------------------------------------------------------------------
+    logic                 offset_was_positive;
+    logic signed [W-1:0]  offset_guarded;
+
+    assign offset_was_positive = ~offset_in[W-1] && (offset_in != '0);
+    assign offset_guarded      = offset_was_positive ? -offset_in : offset_in;
+
+    // ------------------------------------------------------------------------
     // Stage 1 Pipeline Registers
     // ------------------------------------------------------------------------
     logic signed [W-1:0] s1_x [N];
@@ -55,18 +81,21 @@ module tr_rmsnorm #(
     logic signed [W-1:0] s1_ln_out;
     logic [1:0]          s1_mode;
     logic                s1_valid;
+    logic                s1_offset_neg;   // sign-guard fix: was offset_in positive?
 
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             s1_valid <= 1'b0; s1_mode <= 2'b00; s1_offset <= '0; s1_ln_out <= '0;
+            s1_offset_neg <= 1'b0;
             for(int j=0; j<N; j++) begin s1_x[j] <= '0; s1_aux[j] <= '0; end
         end else begin
             s1_valid  <= valid_in;
             s1_mode   <= mode;
             s1_x      <= x_in;
             s1_aux    <= aux_in;
-            s1_offset <= offset_in;
+            s1_offset <= offset_guarded;   // sign-guard fix: guarded, not raw offset_in
             s1_ln_out <= post_ln_out[0];
+            s1_offset_neg <= offset_was_positive;   // sign-guard fix
         end
     end
 
@@ -102,10 +131,12 @@ module tr_rmsnorm #(
     logic signed [W-1:0] s2_ln_out;
     logic [1:0]          s2_mode;
     logic                s2_valid;
+    logic                s2_offset_neg;   // sign-guard fix
 
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             s2_valid <= 1'b0; s2_mode <= 2'b00; s2_is_zero <= '0; s2_ln_out <= '0;
+            s2_offset_neg <= 1'b0;
         end else begin
             s2_valid   <= s1_valid;
             s2_mode    <= s1_mode;
@@ -115,6 +146,7 @@ module tr_rmsnorm #(
             s2_x       <= s1_x;
             s2_aux     <= s1_aux;
             s2_ln_out  <= s1_ln_out;
+            s2_offset_neg <= s1_offset_neg;   // sign-guard fix
         end
     end
 
@@ -168,11 +200,62 @@ module tr_rmsnorm #(
         .out_valid_mask(vec_out_mask), .out_vec(vec_out)
     );
 
+    // ------------------------------------------------------------------------
+    // SIGN-GUARD (Pass 3 fix), continued: reciprocal LUT. E (the decay-side
+    // exp result the guarded path always produces now) realistically ranges
+    // 0..16 (Q4.4 "1.0" = 16, is_zero case); sized to 0..31 for headroom.
+    // recip_lut[E] = round(256/E), saturated to 127 (max signed 8-bit) --
+    // 256 = 16*16, converting Q4.4 E back out through the same Q4.4
+    // convention the rest of this module already uses. E=0 guarded to the
+    // same saturated max as E=1 (division by zero shouldn't occur given E's
+    // real range, but must not corrupt the pipeline if it ever does).
+    // New logic scoped entirely to this module -- tr_exp_alu, round,
+    // quadratic_divider, shared_lut_rom (the SHARED backbone GELU and
+    // Softmax also use) are untouched.
+    // ------------------------------------------------------------------------
+    function automatic logic [W-1:0] recip_lut(input logic [W-1:0] e);
+        case (e)
+            8'd0,  8'd1:  recip_lut = 8'd127;
+            8'd2:         recip_lut = 8'd127;
+            8'd3:         recip_lut = 8'd85;
+            8'd4:         recip_lut = 8'd64;
+            8'd5:         recip_lut = 8'd51;
+            8'd6:         recip_lut = 8'd43;
+            8'd7:         recip_lut = 8'd37;
+            8'd8:         recip_lut = 8'd32;
+            8'd9:         recip_lut = 8'd28;
+            8'd10:        recip_lut = 8'd26;
+            8'd11:        recip_lut = 8'd23;
+            8'd12:        recip_lut = 8'd21;
+            8'd13:        recip_lut = 8'd20;
+            8'd14:        recip_lut = 8'd18;
+            8'd15:        recip_lut = 8'd17;
+            8'd16:        recip_lut = 8'd16;
+            8'd17:        recip_lut = 8'd15;
+            8'd18:        recip_lut = 8'd14;
+            8'd19:        recip_lut = 8'd13;
+            8'd20:        recip_lut = 8'd13;
+            8'd21:        recip_lut = 8'd12;
+            8'd22:        recip_lut = 8'd12;
+            8'd23:        recip_lut = 8'd11;
+            8'd24:        recip_lut = 8'd11;
+            8'd25:        recip_lut = 8'd10;
+            8'd26:        recip_lut = 8'd10;
+            8'd27:        recip_lut = 8'd9;
+            8'd28:        recip_lut = 8'd9;
+            8'd29:        recip_lut = 8'd9;
+            8'd30:        recip_lut = 8'd9;
+            8'd31:        recip_lut = 8'd8;
+            default:      recip_lut = 8'd127;   // E outside the expected range -- saturate, don't wrap
+        endcase
+    endfunction
+
     // ========================================================================
     // STATELESS OUTPUT MUXING
     // ========================================================================
     logic [1:0]          mode_pipe [1:4];
     logic signed [W-1:0] ln_pipe [1:4];
+    logic                neg_pipe [1:4];   // sign-guard fix
 
     always_ff @(posedge clk) begin
         mode_pipe[1] <= s2_mode;
@@ -184,6 +267,11 @@ module tr_rmsnorm #(
         ln_pipe[2] <= ln_pipe[1];
         ln_pipe[3] <= ln_pipe[2];
         ln_pipe[4] <= ln_pipe[3];
+
+        neg_pipe[1] <= s2_offset_neg;   // sign-guard fix
+        neg_pipe[2] <= neg_pipe[1];
+        neg_pipe[3] <= neg_pipe[2];
+        neg_pipe[4] <= neg_pipe[3];
     end
 
     always_ff @(posedge clk or negedge rst_n) begin
@@ -199,7 +287,15 @@ module tr_rmsnorm #(
                     sum_out <= vec_out[0];
                 end else if (mode_pipe[4] == 2'b10) begin
                     // Pass 3: Scalar InvRMS (Q0.8 * Q4.4 = Q4.12) -> Slice [15:8]
-                    y_out[0] <= vec_out[0][15:8];
+                    // Sign-guard fix: if offset_in (ctrl_scalar) was originally
+                    // positive, vec_out[0][15:8] is E = exp(-|ctrl_scalar|) --
+                    // the correct decay-side evaluation of the WRONG (negated)
+                    // argument. Recover the true (growing) InvRMS via
+                    // exp(+t) = 1/exp(-t), i.e. InvRMS = 256/E, via recip_lut.
+                    // If it was already non-positive, this is exactly the
+                    // original, unmodified behavior.
+                    y_out[0] <= neg_pipe[4] ? recip_lut(vec_out[0][15:8])
+                                             : vec_out[0][15:8];
                 end else begin
                     // Pass 2 & 4: (Q4.4 * Q4.4 = Q8.8) -> Slice [11:4]
                     for(int j=0; j<N; j++) y_out[j] <= vec_out[j][11:4];

@@ -41,11 +41,57 @@ module tb_tr_rmsnorm();
 
         // Test Vector: [2.0, 1.0, 0.0, -1.0, -2.0, 0.0, 1.0, -1.0]
         // Gamma Vector: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0] (for simplicity)
+        // Sum x^2 = 3072 (code units) -- just above the ~3000 floor, so this
+        // vector alone never exercised the sign-guard fix.
         test_rmsnorm(
-            '{32, 16, 0, -16, -32, 0, 16, -16}, 
+            '{32, 16, 0, -16, -32, 0, 16, -16},
             '{16, 16, 16, 16, 16, 16, 16, 16}
         );
-        
+
+        // =======================================================================
+        // SIGN-GUARD FIX REGRESSION TESTS
+        // Equal-magnitude vectors so the golden ratio is exactly x/rms(x) = +-1.0
+        // (rms(x) = |x| when every element has the same magnitude) regardless of
+        // scale -- a clean check that doesn't depend on trusting float rounding.
+        // Sum x^2 (code units) = 8 * mag^2.
+        // =======================================================================
+        $display("\n=======================================================================");
+        $display(" SIGN-GUARD FIX: previously-broken small-Sum(x^2) regime");
+        $display("=======================================================================");
+
+        // mag=3  -> Sum x^2 = 72    (deep in the old floor-collapse zone)
+        test_rmsnorm(
+            '{3, -3, 3, -3, 3, -3, 3, -3},
+            '{16, 16, 16, 16, 16, 16, 16, 16}
+        );
+
+        // mag=8  -> Sum x^2 = 512   (still well below the ~3000 floor)
+        test_rmsnorm(
+            '{8, -8, 8, -8, 8, -8, 8, -8},
+            '{16, 16, 16, 16, 16, 16, 16, 16}
+        );
+
+        // mag=15 -> Sum x^2 = 1800  (near the crossover region)
+        test_rmsnorm(
+            '{15, -15, 15, -15, 15, -15, 15, -15},
+            '{16, 16, 16, 16, 16, 16, 16, 16}
+        );
+
+        // Non-uniform small vector (mixed magnitudes, not just +-mag) --
+        // Sum x^2 = 1+4+9+1+4+9+1+4 = 33 (deep broken zone), asymmetric to
+        // make sure the fix isn't accidentally relying on symmetry.
+        test_rmsnorm(
+            '{1, -2, 3, -1, 2, -3, 1, -2},
+            '{16, 16, 16, 16, 16, 16, 16, 16}
+        );
+
+        // mag=100 -> Sum x^2 = 80000 (deep in the healthy zone -- confirms
+        // the fix is a true no-op far from the floor).
+        test_rmsnorm(
+            '{100, -100, 100, -100, 100, -100, 100, -100},
+            '{16, 16, 16, 16, 16, 16, 16, 16}
+        );
+
         $finish;
     end
 

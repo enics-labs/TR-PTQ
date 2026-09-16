@@ -211,10 +211,58 @@ module tr_soc_top_mx_tb();
         // RMSNorm is scale-invariant. The Exponent cancels out during the math.
         // We feed it an exponent of +5 to ensure the FSM correctly bypasses the shifter
         // and doesn't accidentally overflow the VPU with massive numbers.
-        load_mac_vector(32'd16, -32'd16, 32'd16, -32'd16, 8'd5, 8'd0); 
-        mmio_write(8'h00, 32'h03); 
+        load_mac_vector(32'd16, -32'd16, 32'd16, -32'd16, 8'd5, 8'd0);
+        mmio_write(8'h00, 32'h03);
         wait_for_done();
         print_vpu_results();
+
+        // ---------------------------------------------------------
+        // TEST 5: RMSNORM SIGN-GUARD FIX (small Sum(x^2), previously broken)
+        // ---------------------------------------------------------
+        // Same regression as tr_soc_top_int_tb.sv's TEST 5 (see that file
+        // and docs/iscas_paper_support/ for the full derivation): mantissas
+        // {3,-3,3,-3} push Sum(x^2) deep into the previously-broken small-
+        // Sum(x^2) regime -- RMSNorm is scale-invariant, so the MX exponent
+        // (kept at 0 here) doesn't change which regime this hits, only the
+        // mantissa's own Sum(x^2) does. Before the sign-guard fix,
+        // tr_soc_ctrl_mx.sv's RM_P3 fed a positive ctrl_scalar straight to
+        // tr_nonlinear_vpu's decay-only exp backbone and InvRMS collapsed
+        // to 0 on every lane; confirmed directly by a controlled A/B
+        // (rm_offset_was_positive forced to 0 reproduces that all-zero
+        // result exactly; with the fix restored it does not) -- same check
+        // as the INT variant, not repeated here since it's identical
+        // mechanism and RTL structure. Checking what that A/B proved --
+        // non-zero, correctly signed -- rather than an exact value: this
+        // test doesn't independently know lanes 4-7's contents, so it can't
+        // derive the precise golden output the way tr_rmsnorm_tb.sv's
+        // dedicated, fully-controlled 8-lane test already did.
+        $display("\n---> CPU Executing OP_RMSNORM (CMD = 0x03), sign-guard fix regression test");
+        load_mac_vector(32'd3, -32'd3, 32'd3, -32'd3, 8'd0, 8'd0);
+        mmio_write(8'h00, 32'h03);
+        wait_for_done();
+        print_vpu_results();
+        begin : rmsnorm_signguard_check
+            int unsigned fails;
+            fails = 0;
+            for (int m = 0; m < 2; m++) begin   // lanes 0-1 are known non-zero inputs (3, -3)
+                if (vpu_data_out[m] === 8'sd0) begin
+                    $error("  [FAIL] rmsnorm sign-guard lane %0d: got 0 -- looks like the pre-fix collapse", m);
+                    fails++;
+                end else
+                    $display("  [PASS] rmsnorm sign-guard lane %0d = %0d (non-zero -- not the collapse)",
+                             m, vpu_data_out[m]);
+            end
+            // +-1 LSB tolerance: truncating (not rounding) fixed-point
+            // division isn't perfectly symmetric for +-x -- not a
+            // correctness issue, same as the INT variant's identical check.
+            if ((vpu_data_out[0] + vpu_data_out[1]) > 1 || (vpu_data_out[0] + vpu_data_out[1]) < -1) begin
+                $error("  [FAIL] rmsnorm sign-guard: lane 0 (%0d) and lane 1 (%0d) should be within 1 LSB of exact negatives (x=3,-3)",
+                       vpu_data_out[0], vpu_data_out[1]);
+                fails++;
+            end
+            if (fails == 0)
+                $display("  === RMSNORM SIGN-GUARD FIX: non-zero and correctly signed (was all-zero pre-fix) ===");
+        end
 
         $display("\n=================================================");
         $display(" ALL MX MACRO-INSTRUCTIONS EXECUTED SUCCESSFULLY!");

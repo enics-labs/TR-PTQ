@@ -26,6 +26,18 @@ void tr_hw_rmsnorm_batch(const int8_t* x, int8_t* out, int32_t n_groups) {
         rmsnorm_hw_model(x + g * 8, out + g * 8);
 }
 
+// PROPOSED FIX, not real hardware -- see tr_math_model.hpp's
+// rmsnorm_hw_model_signguard_fixed() comment and docs/iscas_paper_support
+// for the analysis. x, out: 8 int8 each.
+void tr_hw_rmsnorm_signguard_fixed(const int8_t* x, int8_t* out) {
+    rmsnorm_hw_model_signguard_fixed(x, out);
+}
+
+void tr_hw_rmsnorm_signguard_fixed_batch(const int8_t* x, int8_t* out, int32_t n_groups) {
+    for (int32_t g = 0; g < n_groups; g++)
+        rmsnorm_hw_model_signguard_fixed(x + g * 8, out + g * 8);
+}
+
 // x, out: 8 int8 each.
 void tr_hw_gelu(const int8_t* x, int8_t* out) {
     gelu_hw_model(x, out);
@@ -47,6 +59,32 @@ int8_t tr_hw_quant(int64_t acc, int32_t mult, int32_t shift) {
 void tr_hw_quant_batch(const int64_t* acc, int32_t mult, int32_t shift,
                        int8_t* out, int32_t n) {
     for (int32_t i = 0; i < n; i++) out[i] = quant_model(acc[i], mult, shift);
+}
+
+// x: 8 int8 (Q4.4, same domain as gelu_hw); out: 8 uint8 (Q0.8 unsigned,
+// range 0..255 -- softmax outputs are always in [0,1], so the full byte is
+// spent as fraction). Bit-exact replica of the tr_soc_top_int SM_P1..SM_P4
+// FSM (CMD=0x01), NOT infra/quant.py's softmax_row() -- that is a separate,
+// hand-written CPU/firmware model with no RTL backing (see its own
+// docstring). This is the genuine RTL-verified hardware softmax on the
+// shared exp/ln backbone with GELU and RMSNorm.
+void tr_hw_softmax(const int8_t* x, uint8_t* out) {
+    softmax_hw_model(x, out);
+}
+
+void tr_hw_softmax_batch(const int8_t* x, uint8_t* out, int32_t n_groups) {
+    for (int32_t g = 0; g < n_groups; g++)
+        softmax_hw_model(x + g * 8, out + g * 8);
+}
+
+// Modeling-only extension (NOT a new RTL/production interface): also returns
+// z_out, the tile's internal log-partition value (see softmax_hw_model_ex's
+// comment in tr_math_model.hpp) for building a controller-level streaming
+// composition on top of this fixed-N=8 primitive. Bit-identical softmax
+// output to tr_hw_softmax() -- this only exposes one already-computed
+// internal value, nothing about the per-tile math changes.
+void tr_hw_softmax_ex(const int8_t* x, uint8_t* out, int8_t* z_out) {
+    softmax_hw_model_ex(x, out, z_out);
 }
 
 // Matmul tile: A flattened row-major [4][8], b[8], c[4] bias, -> y[4].

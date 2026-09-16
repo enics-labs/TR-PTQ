@@ -228,12 +228,61 @@ module tr_soc_top_int_tb();
         // TEST 4: RMSNORM
         // ---------------------------------------------------------
         $display("\n---> CPU Executing OP_RMSNORM (CMD = 0x03)");
-        // Using inputs: {16, -16, 16, -16} 
+        // Using inputs: {16, -16, 16, -16}
         // Squares should all be positive, mean squared should process correctly.
-        load_mac_vector(32'd16, -32'd16, 32'd16, -32'd16); 
-        mmio_write(8'h00, 32'h03); 
+        load_mac_vector(32'd16, -32'd16, 32'd16, -32'd16);
+        mmio_write(8'h00, 32'h03);
         wait_for_done();
         print_vpu_results();
+
+        // ---------------------------------------------------------
+        // TEST 5: RMSNORM SIGN-GUARD FIX (small Sum(x^2), previously broken)
+        // ---------------------------------------------------------
+        // Inputs {3,-3,3,-3} on lanes 0-3 (lanes 4-7 come from whatever this
+        // harness's own SRAM routing leaves on the other 4 lanes at this
+        // point -- not independently re-derived here) push Sum(x^2) deep
+        // into the previously-broken small-Sum(x^2) regime. ctrl_scalar
+        // (reg_scalar_log + CONST_LN_SQRT_N) goes positive; before the
+        // sign-guard fix, tr_soc_ctrl_int.sv's RM_P3 fed that straight to
+        // tr_nonlinear_vpu's decay-only exp backbone and InvRMS collapsed to
+        // 0, giving an all-zero VPU result on every lane regardless of x --
+        // CONFIRMED directly by a controlled A/B: re-running this exact test
+        // with rm_offset_was_positive forced to 0 (fix disabled) reproduces
+        // that all-zero result precisely; with the fix restored it does not.
+        // Check what that A/B proved -- non-zero, i.e. no longer the
+        // collapse -- rather than an exact value: this test doesn't
+        // independently know lanes 4-7's contents, so it can't derive the
+        // precise golden output the way tr_rmsnorm_tb.sv's dedicated,
+        // fully-controlled 8-lane test already did (see that testbench and
+        // docs/iscas_paper_support/ for exact-value verification).
+        $display("\n---> CPU Executing OP_RMSNORM (CMD = 0x03), sign-guard fix regression test");
+        load_mac_vector(32'd3, -32'd3, 32'd3, -32'd3);
+        mmio_write(8'h00, 32'h03);
+        wait_for_done();
+        print_vpu_results();
+        begin : rmsnorm_signguard_check
+            int unsigned fails;
+            fails = 0;
+            for (int m = 0; m < 2; m++) begin   // lanes 0-1 are known non-zero inputs (3, -3)
+                if (vpu_data_out[m] === 8'sd0) begin
+                    $error("  [FAIL] rmsnorm sign-guard lane %0d: got 0 -- looks like the pre-fix collapse", m);
+                    fails++;
+                end else
+                    $display("  [PASS] rmsnorm sign-guard lane %0d = %0d (non-zero -- not the collapse)",
+                             m, vpu_data_out[m]);
+            end
+            // +-1 LSB tolerance: truncating (not rounding) fixed-point
+            // division isn't perfectly symmetric for +-x, same as every
+            // other test in this file (e.g. TEST 4 above happened to land
+            // symmetric, TEST 2/3 don't) -- not a correctness issue.
+            if ((vpu_data_out[0] + vpu_data_out[1]) > 1 || (vpu_data_out[0] + vpu_data_out[1]) < -1) begin
+                $error("  [FAIL] rmsnorm sign-guard: lane 0 (%0d) and lane 1 (%0d) should be within 1 LSB of exact negatives (x=3,-3)",
+                       vpu_data_out[0], vpu_data_out[1]);
+                fails++;
+            end
+            if (fails == 0)
+                $display("  === RMSNORM SIGN-GUARD FIX: non-zero and correctly signed (was all-zero pre-fix, confirmed by A/B) ===");
+        end
 
         $display("\n=================================================");
         $display(" ALL MACRO-INSTRUCTIONS EXECUTED SUCCESSFULLY!   ");

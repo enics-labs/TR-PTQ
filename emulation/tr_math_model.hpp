@@ -177,6 +177,65 @@ inline void rmsnorm_hw_model(const int8_t x[8], int8_t out[8]) {
     }
 }
 
+// PROPOSED FIX (not real hardware -- see docs/iscas_paper_support write-up,
+// Part 5, for the analysis). Root cause: ctrl_scalar goes POSITIVE for small
+// Sigma x^2 (small S -> less-negative/positive log_s -> reg_scalar_log can
+// exceed -CONST_LN_SQRT_N), and gelu_exp_q44's shared backbone
+// (tr_exp_alu_product_raw) is a DECAY-only evaluator -- it was designed for
+// alpha_stabilizer's always-non-positive output and has no mechanism to
+// evaluate a growing exponential; for the pathological positive-ctrl_scalar
+// case its rounded_mag/lut_idx bit-trick simply breaks down (see the
+// write-up for the exact mechanism), collapsing inv_rms to near 0 instead
+// of growing.
+//
+// Fix: sign-guard ctrl_scalar (force it non-positive before calling the
+// SAME existing decay-side backbone, mirroring alpha_stabilizer's own
+// "forced negative absolute value" step -- cheap: one comparator, one
+// two's-complement negate, one mux), then for the ORIGINAL-positive case,
+// recover the needed growing value via a reciprocal: exp(+t) = 1/exp(-t).
+// Concretely: E = gelu_exp_q44(-|ctrl_scalar|) is already computed
+// correctly by the EXISTING decay-only backbone (no new exp/ln evaluation
+// needed); inv_rms = 256/E is then a SINGLE integer division (256 = 16*16,
+// converting Q4.4 E back through the same Q4.4 output convention). This is
+// NOT a reuse of tr_recip_u8_scalar (that primitive uses different, wider
+// Q8 ln/exp primitives not otherwise used by this Q4.4 backbone, and is
+// unused/unsynthesized anywhere in this codebase's RTL today) -- it's a
+// small dedicated divider, new arithmetic scoped to the RMSNorm wrapper,
+// not a control-only fix and not a shared-backbone change.
+inline void rmsnorm_hw_model_signguard_fixed(const int8_t x[8], int8_t out[8]) {
+    int32_t S = 0;
+    for (int i = 0; i < 8; i++) S += (int32_t)x[i] * (int32_t)x[i];
+
+    int s_shifted = (S >> 4) & 0xFFFF;
+    int log_s = tr_new_ln_scalar(s_shifted, 4);
+    if (log_s > 127) log_s = 127; if (log_s < -128) log_s = -128;
+    int reg_scalar_log = -(log_s >> 1);
+    if (reg_scalar_log > 127) reg_scalar_log = 127;
+    if (reg_scalar_log < -128) reg_scalar_log = -128;
+
+    int ctrl_scalar = reg_scalar_log + RMSNORM_CONST_LN_SQRT_N;
+    if (ctrl_scalar > 127) ctrl_scalar = 127; if (ctrl_scalar < -128) ctrl_scalar = -128;
+
+    bool was_positive = ctrl_scalar > 0;
+    int8_t ctrl_stab = (int8_t)(was_positive ? -ctrl_scalar : ctrl_scalar);
+    int E = gelu_exp_q44(ctrl_stab);           // exp(-|ctrl_scalar|), always correct (decay side)
+    int inv_rms;
+    if (!was_positive) {
+        inv_rms = E;                            // ctrl_scalar<=0: unchanged from the original model
+    } else {
+        int E_safe = (E < 1) ? 1 : E;            // guard divide-by-zero
+        inv_rms = (256 + E_safe / 2) / E_safe;   // round-to-nearest integer division
+    }
+    if (inv_rms > 255) inv_rms = 255;
+    if (inv_rms < 0) inv_rms = 0;
+
+    for (int i = 0; i < 8; i++) {
+        int product = (int)x[i] * inv_rms;
+        int shifted = product >> 4;
+        out[i] = (int8_t)shifted;
+    }
+}
+
 // ============================================================================
 // Softmax — bit-exact replica of the tr_soc_top_int PRODUCTION path (the
 // SM_P1..SM_P4 FSM in tr_soc_ctrl_int.sv driving tr_nonlinear_vpu), NOT the
@@ -200,7 +259,24 @@ inline int8_t softmax_sat8_sub(int a, int b) {
     return (int8_t)diff;
 }
 
-inline void softmax_hw_model(const int8_t x[8], uint8_t out[8]) {
+// z_out (optional, may be NULL): the tile's own internal log-partition value
+// (SM_P4's sub_val2 = max_x + ln(S), int8, same domain as x). Exposed ONLY
+// for modeling a controller-level streaming/multi-tile composition on top of
+// this fixed-N=8 primitive -- softmax_hw_model() itself is unchanged RTL
+// behavior; this is an additive, backward-compatible parameter (existing
+// callers passing NULL, including the original signature below, are
+// bit-identical to before). See docs/vit_inference_completion_plan.md /
+// hw_function_accuracy.py's streaming_softmax_sweep() for why: exp(z_out) is
+// exactly this tile's own absolute exp-sum (Sum_i exp(x_i)), so combining
+// per-tile z_out values via a running logsumexp, using the SAME shared
+// exp/ln backbone already used here, correctly composes softmax across
+// tiles wider than N=8 -- this is NOT implemented in any existing RTL,
+// firmware, or testbench (confirmed by inspection: tr_soc_ctrl_int.sv's
+// SM_P1..SM_P4 FSM and tr_softmax_int_tb.sv both only ever process one
+// independent N=8 tile per invocation, and the real firmware path,
+// tr_softmax_row() in tr_tensor.c, is pure CPU code that never touches this
+// VPU primitive at all).
+inline void softmax_hw_model_ex(const int8_t x[8], uint8_t out[8], int8_t* z_out) {
     int8_t max_x = x[0];
     for (int i = 1; i < 8; i++) if (x[i] > max_x) max_x = x[i];
 
@@ -220,12 +296,15 @@ inline void softmax_hw_model(const int8_t x[8], uint8_t out[8]) {
     if (ln_S > 127) ln_S = 127;
     if (ln_S < -128) ln_S = -128;
 
-    // ctrl_scalar_sub_val = max + ln(S), truncated to 8 bits -- this
-    // reproduces the RTL's un-saturated add exactly (tr_soc_ctrl_int.sv's
-    // SM_P4 state), a known overflow condition when max and ln(S) are both
-    // large. Modeled faithfully since this function exists to check the RTL
-    // as it's actually built, not as it was intended.
-    int8_t sub_val2 = (int8_t)((int)max_x + (int)ln_S);
+    // ctrl_scalar_sub_val = max + ln(S), saturating (tr_soc_ctrl_int.sv's
+    // SM_P4 state widens to 9 bits and clamps before truncating back to
+    // int8 -- a plain 8-bit add here used to silently wrap on large
+    // max+ln(S), corrupting the whole row's exponent argument).
+    int sub_val2_wide = (int)max_x + (int)ln_S;
+    if (sub_val2_wide > 127) sub_val2_wide = 127;
+    if (sub_val2_wide < -128) sub_val2_wide = -128;
+    int8_t sub_val2 = (int8_t)sub_val2_wide;
+    if (z_out) *z_out = sub_val2;
 
     // SM_P4: softmax_i = exp(x_i - max - ln(S)), Q0.8 UNSIGNED, saturating.
     for (int i = 0; i < 8; i++) {
@@ -233,6 +312,10 @@ inline void softmax_hw_model(const int8_t x[8], uint8_t out[8]) {
         int shifted = tr_exp_alu_product_raw(d2) >> 4;
         out[i] = (uint8_t)((shifted > 255) ? 255 : shifted);
     }
+}
+
+inline void softmax_hw_model(const int8_t x[8], uint8_t out[8]) {
+    softmax_hw_model_ex(x, out, nullptr);
 }
 
 // ============================================================================
