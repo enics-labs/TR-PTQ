@@ -166,9 +166,37 @@ if {$phys_synth_type == "floorplan"} {
 }
 
 #############################
+#   Exporting the Design
+#############################
+# Moved ahead of the post-synthesis reports on purpose: syn_opt is the
+# expensive, multi-hour step, and it had already finished cleanly the run
+# that hit the -summary crash below -- but because no checkpoint had been
+# saved yet, that completed synthesis was unrecoverable and the whole run
+# had to be redone from scratch. Saving the db/netlist/sdf/sdc immediately
+# once synthesis is done means a report-command bug (like that one) can
+# only cost the report, never the synthesis result itself.
+enics_start_stage "export_design"
+write_db $design(TOPLEVEL) -to_file "$design(export_dir)/post_synth/$design(TOPLEVEL).db"
+write_design -base_name "$design(export_dir)/post_synth/$design(TOPLEVEL)"
+write_hdl > $design(postsyn_netlist)
+write_sdf > "$design(export_dir)/post_synth/$design(TOPLEVEL).sdf"
+write_sdc > "$design(export_dir)/post_synth/$design(TOPLEVEL).sdc"
+# write_design -innovus -db -base_name "$design(export_dir)/pwr/genus/$design(TOPLEVEL)"
+
+#############################
 #     Post Synthesis Reports
 #############################
-enics_report_timing $design(synthesis_reports) 
+# Each call is wrapped in catch so a single bad report (e.g. an invalid
+# flag, as just happened) prints an error and moves on instead of aborting
+# the whole script -- the design is already safely exported above by the
+# time any of this runs, but there's no reason a typo in one report
+# command should also cost the other N-1 reports.
+if {[catch {enics_report_timing $design(synthesis_reports)} err]} {
+    enics_message "enics_report_timing failed: $err" medium
+}
+if {[catch {enics_report_timing_full $design(synthesis_reports) 50} err]} {
+    enics_message "enics_report_timing_full failed: $err" medium
+}
 set post_synth_reports [list \
     report_area \
     report_gates \
@@ -180,17 +208,10 @@ set post_synth_reports [list \
 ]
 foreach rpt $post_synth_reports {
     enics_message "$rpt" medium
-    $rpt
-    $rpt > "$design(synthesis_reports)/post_opt/${rpt}.rpt"
+    if {[catch {
+        $rpt
+        $rpt > "$design(synthesis_reports)/post_opt/${rpt}.rpt"
+    } err]} {
+        enics_message "$rpt failed: $err" medium
+    }
 }
-
-#############################
-#   Exporting the Design
-#############################
-enics_start_stage "export_design"
-write_db $design(TOPLEVEL) -to_file "$design(export_dir)/post_synth/$design(TOPLEVEL).db" 
-write_design -base_name "$design(export_dir)/post_synth/$design(TOPLEVEL)" 
-write_hdl > $design(postsyn_netlist)
-write_sdf > "$design(export_dir)/post_synth/$design(TOPLEVEL).sdf"
-write_sdc > "$design(export_dir)/post_synth/$design(TOPLEVEL).sdc" 
-# write_design -innovus -db -base_name "$design(export_dir)/pwr/genus/$design(TOPLEVEL)"

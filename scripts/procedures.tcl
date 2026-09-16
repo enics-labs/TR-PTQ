@@ -113,11 +113,47 @@ proc enics_report_timing {{reports_path "../reports/"} } {
     set_db timing_report_fields \
         "timing_point flags arc edge cell fanout transition delay arrival"
     #set timing_report_enable_auto_column_width  true
-    #set_table_style -nosplit -no_frame_fix_width    report_timing 
+    #set_table_style -nosplit -no_frame_fix_width    report_timing
     foreach cg $design(cost_groups) {
         report_timing -group [get_db cost_groups -match $cg] \
             > "${reports_path}/$this_run(stage)/${cg}.timing.rpt"
     }
+}
+
+##################################################
+#       enics_report_timing_full
+#       -------------------------
+#  Like enics_report_timing, but reports the N worst paths per cost
+#  group instead of just the single worst one (report_timing with no
+#  -nworst/-max_paths only ever reports path #1) -- for a paper-facing
+#  Fmax/critical-path claim, seeing the top N paths (not just the
+#  single worst) shows whether the critical path is one narrow outlier
+#  or the design is broadly balanced near its Fmax, and gives a real
+#  slack distribution instead of one data point.
+#
+#  reg2reg is the group that actually determines internal Fmax
+#  (clock-to-clock pipeline timing); in2reg/reg2out/in2out are I/O
+#  interface timing, useful for completeness but not the number to
+#  quote for a clock-frequency claim.
+#
+#  Also emits a per-corner WNS/TNS-style summary via
+#  report_timing -path_type summary, a single-command view of all cost
+#  groups' slack at a glance instead of opening every N-path file.
+#  (Genus's report_timing has no bare -summary flag -- "summary" is one
+#  of the -path_type values, confirmed against this exact Genus
+#  25.12-s067_1 build's own -help usage dump.)
+##################################################
+proc enics_report_timing_full {{reports_path "../reports/"} {nworst 50} } {
+    global design this_run
+    set_db timing_report_fields \
+        "timing_point flags arc edge cell fanout transition delay arrival"
+    foreach cg $design(cost_groups) {
+        report_timing -group [get_db cost_groups -match $cg] \
+            -nworst $nworst -max_paths $nworst \
+            > "${reports_path}/$this_run(stage)/${cg}.timing_full.rpt"
+    }
+    report_timing -path_type summary \
+        > "${reports_path}/$this_run(stage)/timing_summary.rpt"
 }
 
 ##################################################
