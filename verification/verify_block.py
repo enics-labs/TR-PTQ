@@ -5,7 +5,7 @@ import argparse
 
 def get_config(block_name):
     configs = {
-        "exp":     {"f_file": "../tb_soc/tr_exp/tr_exp.f",         "max_error": 0},
+        "exp":     {"f_file": "../tb_soc/tr_exp_alu/tr_exp_alu.f", "max_error": 0},
         "ln":      {"f_file": "../tb_soc/tr_ln/tr_ln.f",           "max_error": 0},
         # softmax: tr_softmax_int.f drives the REAL production SM_P1..SM_P4
         # sequence via tr_soc_top_int (CMD=0x01) -- tr_softmax.sv
