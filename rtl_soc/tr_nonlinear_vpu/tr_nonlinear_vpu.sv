@@ -103,7 +103,10 @@ module tr_nonlinear_vpu #(
             
             // MUX 1: TR-Backbone Input (Needs padding W_VEC -> W_MAC)
             case (mux_bb_in_sel)
-                3'b000: bb_mux_out[i] = bb_shift_mode ? vpu_dot_out[19:4] : vpu_dot_out[23:8];
+                // RMSNorm's shift is FRAC_W (was hardcoded [19:4]=">>>4" for
+                // Q4.4); Softmax's stays >>>8 -- anchor_q_bits=max(FRAC_W,8)
+                // is fixed at 8 for every FRAC_W<=8 target format.
+                3'b000: bb_mux_out[i] = bb_shift_mode ? W_MAC'(vpu_dot_out >>> FRAC_W) : vpu_dot_out[23:8];
                 3'b001: bb_mux_out[i] = W_MAC'(alpha_stab_out[i]);   // GELU stabilized
                 3'b010: bb_mux_out[i] = W_MAC'(scalar_sub_out[i]);   // Softmax (x - max)
                 3'b011: bb_mux_out[i] = W_MAC'(sram_data_a[i]);      // Raw pass-through
@@ -190,7 +193,7 @@ module tr_nonlinear_vpu #(
     );
 
     alpha_stabilizer #(
-        .N(N), .W(W_VEC)
+        .N(N), .W(W_VEC), .FRAC_W(FRAC_W)
     ) u_alpha (
         .in_vec(sram_data_a), .out_vec(alpha_stab_out)
     );
@@ -201,7 +204,7 @@ module tr_nonlinear_vpu #(
         .x_raw(sram_data_a), .y_sig(sram_data_b), .mode_en(sym_mode_en), .sig_corrected(sym_mod_out)
     );
 
-    logic        [N-1:0]           rom_e_a_8bit [N];
+    logic        [7:0]             rom_e_a_8bit [N];
 
     tr_backbone_wrapper #(
         .N(N), .WIDTH_IN(W_MAC), .WIDTH_OUT(W_VEC), .FRAC_W(FRAC_W), .LUT_IDX_W(LUT_IDX_W)
@@ -212,7 +215,7 @@ module tr_nonlinear_vpu #(
         .log_out(bb_log), .a_idx_out(bb_a_idx), .mantisa_out(bb_mantisa), .is_zero_out(bb_is_zero)
     );
 
-    shared_lut_rom #(.N(N)) u_rom (.a_idx(bb_a_idx), .e_a(rom_e_a_8bit));
+    shared_lut_rom #(.N(N), .LUT_IDX_W(LUT_IDX_W)) u_rom (.a_idx(bb_a_idx), .e_a(rom_e_a_8bit));
 
     always_comb begin
         for (int i = 0; i < N; i++) begin
@@ -254,19 +257,18 @@ module tr_nonlinear_vpu #(
         for(int i=0; i<N; i++) begin
             logic signed [ACC_W-1:0] shifted;
             if (vecmul_scale_mode == 2'b11) begin
-                // Softmax Q0.8 UNSIGNED probability output: E(Q0.8) x mantissa(Q4.4)
-                // scales the product by 4096, so >>>4 lands back on Q0.8 (scale 256)
-                // instead of >>>8's Q4.4 (scale 16). Softmax values are always in
-                // [0,1], so the 4 "integer" bits Q4.4 spent on them were wasted --
-                // Q0.8 gives 16x the fractional resolution in the same byte.
-                // Saturate at 255 (~0.996) instead of wrapping (e.g. the single-
-                // dominant-logit case can land exactly on 256).
-                shifted = vecmul_out_acc[i] >>> 4;
+                // Softmax Q0.8 UNSIGNED probability output: shift =
+                // anchor_q_bits(8, fixed for every FRAC_W<=8 format) +
+                // FRAC_W - 8 = FRAC_W. Saturate at 255 (~0.996) instead of
+                // wrapping (e.g. the single-dominant-logit case can land
+                // exactly on 256).
+                shifted = vecmul_out_acc[i] >>> FRAC_W;
                 vecmul_out_trunc[i] = (shifted > 255) ? W_VEC'(255) : W_VEC'(shifted);
             end else if (vecmul_scale_mode == 2'b10) begin
+                // anchor_q_bits fixed at 8 -- not FRAC_W-dependent.
                 vecmul_out_trunc[i] = W_VEC'(vecmul_out_acc[i] >>> 8);
             end else if (vecmul_scale_mode == 2'b01) begin
-                vecmul_out_trunc[i] = W_VEC'(vecmul_out_acc[i] >>> 4);
+                vecmul_out_trunc[i] = W_VEC'(vecmul_out_acc[i] >>> FRAC_W);
             end else begin
                 vecmul_out_trunc[i] = W_VEC'(vecmul_out_acc[i]);
             end

@@ -20,8 +20,18 @@ module quadratic_divider #(
     output logic [FRAC_W-1:0] quad_out
 );
 
+    // MODE 1's K-map equations operate only on delta[3:0] (a FRAC_W-wide
+    // port already, independent of WIDTH) and compute exactly
+    // (delta*delta)>>(FRAC_W+1) for the FRAC_W==4 case -- mathematically
+    // identical to MODE 2's generic multiplier at FRAC_W==4 regardless of
+    // WIDTH (cross-validated bit-exact against the real hardware model for
+    // multiple WIDTHs at FRAC_W==4 in the accompanying Python bit-true
+    // model). So the gating condition only needs FRAC_W==4, not
+    // WIDTH==8&&FRAC_W==4 -- the original WIDTH==8 check was over-narrow
+    // and would have silently routed Q6.4/Q8.4/Q12.4 (FRAC_W==4,
+    // WIDTH!=8) to the generic path despite being K-map-eligible.
     generate
-        if (WIDTH == 8 && FRAC_W == 4) begin : gen_opt_8bit
+        if (FRAC_W == 4) begin : gen_opt_8bit
             // ----------------------------------------------------------------
             // MODE 1: 8-bit Optimized (Using exact K-map equations)
             // ----------------------------------------------------------------

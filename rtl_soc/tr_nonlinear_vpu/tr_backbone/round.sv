@@ -21,7 +21,8 @@
 module round #(
     parameter int WIDTH = 8,
     parameter int FRAC_W = 4,
-    parameter int LUT_IDX_W = 3
+    parameter int LUT_IDX_W = 3,
+    parameter bit DECAY_ONLY_LUT = 1  // 1: MODE1 (decay-only anchor table); 0: MODE2 (bidirectional/LayerNorm)
 )(
     input  logic signed [WIDTH-1:0] x,           
     output logic is_zero,
@@ -49,7 +50,7 @@ module round #(
     
     // 4. LUT Index Generation
     generate
-        if (WIDTH == 8 && FRAC_W == 4) begin : gen_idx_8bit
+        if (DECAY_ONLY_LUT) begin : gen_idx_8bit
             // ----------------------------------------------------------------
             // MODE 1: 8-bit Negative-Only LUT Indexing
             // ----------------------------------------------------------------

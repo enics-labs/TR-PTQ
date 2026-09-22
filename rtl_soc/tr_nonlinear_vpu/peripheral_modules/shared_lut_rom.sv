@@ -8,10 +8,11 @@
  * @param    N               TODO: Add description
  */
 module shared_lut_rom #(
-    parameter int N = 8
+    parameter int N = 8,
+    parameter int LUT_IDX_W = 3  // table stays 8 entries regardless; only low 3 bits of a_idx are used
 )(
-    input  logic [2:0] a_idx [N],  // Indices requested by the ALUs
-    output logic [N-1:0] e_a   [N]   // Anchors returned to the ALUs
+    input  logic [LUT_IDX_W-1:0] a_idx [N],  // Indices requested by the ALUs
+    output logic [7:0]           e_a   [N]   // Anchors returned to the ALUs (Q0.8, format-independent)
 );
     // Definition of the Q4.4 LUT
     logic [7:0] exp_lut [0:7];
@@ -28,7 +29,7 @@ module shared_lut_rom #(
     // Combinational routing to all lanes
     always_comb begin
         for (int i = 0; i < N; i++) begin
-            e_a[i] = exp_lut[a_idx[i]];
+            e_a[i] = exp_lut[a_idx[i][2:0]];
         end
     end
 endmodule

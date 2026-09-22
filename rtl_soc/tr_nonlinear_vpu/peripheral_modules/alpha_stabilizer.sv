@@ -5,51 +5,56 @@
  *
  * @param    N               TODO: Add description
  * @param    W               TODO: Add description
+ * @param    FRAC_W          TODO: Add description
  */
 module alpha_stabilizer #(
-    parameter int N = 8,
-    parameter int W = 8
+    parameter int N      = 8,
+    parameter int W      = 8,
+    parameter int FRAC_W = 4
 )(
     input  logic signed [W-1:0] in_vec [N],
     output logic signed [W-1:0] out_vec [N]
 );
 
-    localparam int FRAC_W = 4;
+    // Headroom for x*coef; reduces to today's 16 bits at W=8,FRAC_W=4.
+    localparam int EXT_W = W + FRAC_W + 4;
+
+    // Coefficients 27,26,25,24 (sixteenths), re-scaled to FRAC_W. Exact
+    // (no rounding) since FRAC_W>=4 is assumed, so 2^(FRAC_W-4) is integral.
+    localparam int COEF1 = 27 <<< (FRAC_W - 4);
+    localparam int COEF2 = 26 <<< (FRAC_W - 4);
+    localparam int COEF3 = 25 <<< (FRAC_W - 4);
+    localparam int COEF4 = 24 <<< (FRAC_W - 4);
+
+    localparam signed [W-1:0] MAX_OUT = (1 <<< (W-1)) - 1;
+    localparam signed [W-1:0] MIN_OUT = -(1 <<< (W-1));
 
     genvar i;
     generate
         for (i = 0; i < N; i++) begin : GEN_LANES
-            logic [N-1:0]         abs_z;
-            logic signed [15:0] x_ext;
-            logic signed [15:0] x_base;
-            logic signed [15:0] x_mult;
-            logic signed [W-1:0] x_scaled;
+            logic signed [EXT_W-1:0] x_ext;
+            logic signed [EXT_W-1:0] abs_x;
+            logic        [EXT_W-1:0] coef_sel;
+            logic signed [EXT_W-1:0] x_mult;
+            logic signed [W-1:0]     x_scaled;
 
             always_comb begin
-                // 1. Get absolute magnitude to determine region index
-                abs_z = (in_vec[i][W-1]) ? -in_vec[i] : in_vec[i];
-                
-                // Sign-extend input to 16 bits to prevent overflow during shifts
-                x_ext = {{8{in_vec[i][W-1]}}, in_vec[i]};
+                x_ext = {{(EXT_W-W){in_vec[i][W-1]}}, in_vec[i]};
+                abs_x = x_ext[EXT_W-1] ? -x_ext : x_ext;
 
-                // 2. Base Multiplier (x * 24) using zero-delay wire shifts
-                // 24 = 16 + 8 -> (x << 4) + (x << 3)
-                x_base = (x_ext <<< 4) + (x_ext <<< 3);
+                // Region boundaries |x| = 1, 2, 3 (real), at this format's LSB
+                if (abs_x < (1 <<< FRAC_W))      coef_sel = EXT_W'(COEF1);
+                else if (abs_x < (2 <<< FRAC_W)) coef_sel = EXT_W'(COEF2);
+                else if (abs_x < (3 <<< FRAC_W)) coef_sel = EXT_W'(COEF3);
+                else                             coef_sel = EXT_W'(COEF4);
 
-                // 3. Add the remainder based on the region LUT
-                case (abs_z[6:4])
-                    3'b000:  x_mult = x_base + (x_ext <<< 1) + x_ext; // * 27 (Base + 2x + 1x)
-                    3'b001:  x_mult = x_base + (x_ext <<< 1);         // * 26 (Base + 2x)
-                    3'b010:  x_mult = x_base + x_ext;                 // * 25 (Base + 1x)
-                    default: x_mult = x_base;                         // * 24 (Base)
-                endcase
+                x_mult = x_ext * $signed(coef_sel);
 
-                // 4. Scale and Saturate to Q4.4 (7.93 to -8.0)
-                if (x_mult > 16'sd2032)       x_scaled = 8'sd127;
-                else if (x_mult < -16'sd2048) x_scaled = -8'sd128;
-                else                          x_scaled = x_mult[11:4];
+                if (x_mult > ($signed({MAX_OUT}) <<< FRAC_W))      x_scaled = MAX_OUT;
+                else if (x_mult < ($signed({MIN_OUT}) <<< FRAC_W)) x_scaled = MIN_OUT;
+                else                                               x_scaled = W'(x_mult >>> FRAC_W);
 
-                // 5. Stabilization: Forced negative absolute value
+                // Stabilization: forced negative absolute value
                 out_vec[i] = (x_scaled > 0) ? -x_scaled : x_scaled;
             end
         end
