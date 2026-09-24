@@ -54,8 +54,13 @@ module round #(
             // ----------------------------------------------------------------
             // MODE 1: 8-bit Negative-Only LUT Indexing
             // ----------------------------------------------------------------
-            // Use bitwise NOT to map negative magnitudes to 0-based index 
-            assign lut_idx = ~rounded_mag[LUT_IDX_W-1:0];
+            // Use bitwise NOT to map negative magnitudes to 0-based index.
+            // rounded_mag in [-1,-2^LUT_IDX_W] uses all LUT_IDX_W bits
+            // distinctly; beyond that it would alias back to a low (large
+            // anchor) index instead of decaying further, so saturate to the
+            // highest index (its anchor is 0, i.e. fully decayed) instead.
+            localparam logic [LUT_IDX_W-1:0] LUT_MAX = {LUT_IDX_W{1'b1}};
+            assign lut_idx = (rounded_mag < -(int'(LUT_MAX) + 1)) ? LUT_MAX : ~rounded_mag[LUT_IDX_W-1:0];
         end else begin : gen_idx_12bit
             // ----------------------------------------------------------------
             // MODE 2: 12-bit Signed LUT Indexing (LayerNorm)

@@ -83,6 +83,20 @@ module tr_nonlinear_vpu #(
     logic                        bb_is_zero [N];
     logic        [W_VEC-1:0]     rom_e_a [N];
 
+    // Fractional bits of shared_lut_rom.sv's anchor entries (Q0.8, all formats).
+    localparam int ANCHOR_Q_BITS = 8;
+
+    // RMSNorm sum-of-squares into the ln backbone: S>>FRAC_W saturates at the
+    // W_MAC-bit unsigned max instead of wrapping (a wrapped huge S looked like
+    // a tiny one, so the outlier passed through un-normalized).
+    localparam int S_SAT_MAX = (1 << W_MAC) - 1;
+    logic signed [ACC_W-1:0] rms_s_shifted;
+    logic        [W_MAC-1:0] rms_s_sat;
+    always_comb begin
+        rms_s_shifted = vpu_dot_out >>> FRAC_W;
+        rms_s_sat     = (rms_s_shifted > S_SAT_MAX) ? '1 : W_MAC'(rms_s_shifted);
+    end
+
     // Math Engines
     logic        [W_VEC-1:0] mac_in_a [N], mac_in_b [N];
     logic        [W_VEC-1:0] vecmul_in_a [N], vecmul_in_b [N];
@@ -103,10 +117,12 @@ module tr_nonlinear_vpu #(
             
             // MUX 1: TR-Backbone Input (Needs padding W_VEC -> W_MAC)
             case (mux_bb_in_sel)
-                // RMSNorm's shift is FRAC_W (was hardcoded [19:4]=">>>4" for
-                // Q4.4); Softmax's stays >>>8 -- anchor_q_bits=max(FRAC_W,8)
-                // is fixed at 8 for every FRAC_W<=8 target format.
-                3'b000: bb_mux_out[i] = bb_shift_mode ? W_MAC'(vpu_dot_out >>> FRAC_W) : vpu_dot_out[23:8];
+                // RMSNorm's shift is FRAC_W (sum of squares, unrelated to the
+                // anchor table). Softmax's dot-product is e_a*mantissa-scaled
+                // (2**(ANCHOR_Q_BITS+FRAC_W)), so >>>ANCHOR_Q_BITS restores
+                // FRAC_W scale for the ln backbone (== the old [23:8] slice
+                // at ANCHOR_Q_BITS=8, without baking the 8 in).
+                3'b000: bb_mux_out[i] = bb_shift_mode ? rms_s_sat : W_MAC'(vpu_dot_out >>> ANCHOR_Q_BITS);
                 3'b001: bb_mux_out[i] = W_MAC'(alpha_stab_out[i]);   // GELU stabilized
                 3'b010: bb_mux_out[i] = W_MAC'(scalar_sub_out[i]);   // Softmax (x - max)
                 3'b011: bb_mux_out[i] = W_MAC'(sram_data_a[i]);      // Raw pass-through
