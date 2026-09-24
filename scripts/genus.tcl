@@ -133,9 +133,9 @@ set_db auto_ungroup none
 enics_start_stage "synthesis"
 
 # Set Synthesis Efforts
-set_db syn_generic_effort low
-set_db syn_map_effort low
-set_db syn_opt_effort low
+set_db syn_generic_effort high
+set_db syn_map_effort high
+set_db syn_opt_effort high
 suppress_messages "ST-110 ST-112"
 
 if {$phys_synth_type == "floorplan"} {
