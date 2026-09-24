@@ -266,7 +266,7 @@ inline int8_t softmax_sat8_sub(int a, int b) {
 // behavior; this is an additive, backward-compatible parameter (existing
 // callers passing NULL, including the original signature below, are
 // bit-identical to before). See docs/vit_inference_completion_plan.md /
-// hw_function_accuracy.py's streaming_softmax_sweep() for why: exp(z_out) is
+// tools/scripts/vpu_precision_archive/hw_function_accuracy.py's streaming_softmax_sweep() for why: exp(z_out) is
 // exactly this tile's own absolute exp-sum (Sum_i exp(x_i)), so combining
 // per-tile z_out values via a running logsumexp, using the SAME shared
 // exp/ln backbone already used here, correctly composes softmax across

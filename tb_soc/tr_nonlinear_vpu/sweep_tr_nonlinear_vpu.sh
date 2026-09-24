@@ -3,7 +3,7 @@
 # Sweeps tr_nonlinear_vpu's full GELU/Softmax/RMSNorm(decay)/RMSNorm(growth)
 # sequences across all 6 target formats at the FROZEN configuration
 # (anchor table Q0.8/LUT_IDX_W=3 everywhere, W_MAC per format below: only Q4.8 needs 18),
-# comparing RTL output to the Python golden model (precision_analysis_v3.py,
+# comparing RTL output to the Python golden model (tools/scripts/vpu_precision/tr_vpu_model.py,
 # native I/O mode; bit-exact to tr_math_model.hpp at Q4.4).
 setenv CDS_LIC_FILE 5280@enicsw01
 setenv DISPLAY ""

@@ -2,7 +2,7 @@
 """Q4.4-only functional check generator: writes inputs.txt/expected.txt using
 the REAL compiled hardware model (tools/infra/tr_math_hw.py -> the exact
 tr_math_model.hpp code cpu_math_model.cpp/verify_block.py checks real RTL
-against), NOT the Python precision_analysis_v3 approximation used by
+against), NOT the Python tr_vpu_model approximation used by
 gen_vpu_golden.py. RMSNorm decay (op 2) uses rmsnorm_hw(); growth (op 3)
 uses rmsnorm_hw_signguard_fixed(), the model of the production FSM's
 sign-guard + recip_lut path (plain rmsnorm_hw() is the pre-fix hardware and

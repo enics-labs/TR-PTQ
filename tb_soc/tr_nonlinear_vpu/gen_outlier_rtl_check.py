@@ -8,31 +8,28 @@ import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.normpath(os.path.join(HERE, "..", "..", "..", "..", ".."))
-sys.path.insert(0, os.path.join(ROOT, "tools", "scripts", "vit_tiny"))
+sys.path.insert(0, os.path.join(ROOT, "tools", "scripts", "vpu_precision"))
 sys.path.insert(0, os.path.join(ROOT, "tools"))
 sys.path.insert(0, HERE)
 import numpy as np  # noqa: E402
-import precision_sweep as ps  # noqa: E402
-import precision_analysis_v3 as v3  # noqa: E402
-import precision_analysis_v4 as v4  # noqa: E402
-import gen_vpu_golden as gg  # noqa: E402
-import gen_final_error_tables as g  # noqa: E402
+import tr_vpu_model as model  # noqa: E402
+import gen_final as g  # noqa: E402  (MAGNITUDES, outlier_vectors: the CSV's own stimulus)
 
 N_PER_M = 60
 ib, fw, wmac = int(sys.argv[1]), int(sys.argv[2]), int(sys.argv[3])
 io_lo, io_hi = -(1 << (ib + fw - 1)), (1 << (ib + fw - 1)) - 1
-K = ps._RM_CONST_LN_SQRT_N_Q44
+K = model.LN_SQRT_N_SHIPPED
 rows, meta, skipped = [], [], 0
 for M in g.MAGNITUDES:
     vecs, _ = g.outlier_vectors(M)
     for row in vecs[:N_PER_M]:
         c = np.clip(np.round(row * (1 << fw)), io_lo, io_hi).astype(np.int64)
-        y = v3.gelu_precision_v3(c, ib, fw, fw, regions=None, n_anchors_override=8, lut_idx_w=3)
+        y = model.gelu_model(c, ib, fw, fw, regions=None, n_anchors_override=8, lut_idx_w=3)
         rows.append((0, c, y, 0)); meta.append(M)
-        y, z = v4._softmax_v3_with_z(c, ib, fw, fw, n_anchors_override=8, lut_idx_w=3)
+        y, z = model.softmax_model(c, ib, fw, fw, n_anchors_override=8, lut_idx_w=3)
         rows.append((1, c, y, z)); meta.append(M)
-        if gg.rmsnorm_is_decay_only(c, ib, fw, K, wmac):
-            y = v3.rmsnorm_precision_v3(c, ib, fw, fw, const_value=K, n_anchors_override=8, lut_idx_w=3,
+        if model.rmsnorm_is_decay_only(c, ib, fw, K, wmac):
+            y = model.rmsnorm_model(c, ib, fw, fw, const_value=K, n_anchors_override=8, lut_idx_w=3,
                                         w_mac_trunc_bits=wmac, w_mac_saturate=True, acc_w=32)
             rows.append((2, c, y, 0)); meta.append(M)
         else:
