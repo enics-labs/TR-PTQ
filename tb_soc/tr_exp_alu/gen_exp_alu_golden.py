@@ -24,8 +24,12 @@ def golden(width, frac_w, lut_idx_w=3):
         mantissa = (first_order + quad_out) & ((1 << (frac_w + 2)) - 1)
         is_zero = 1 if rounded_mag == 0 else 0
 
-        low_bits = rounded_mag & ((1 << lut_idx_w) - 1)
-        a_idx = (~low_bits) & ((1 << lut_idx_w) - 1)
+        lut_max = (1 << lut_idx_w) - 1
+        if rounded_mag < -(lut_max + 1):
+            a_idx = lut_max  # saturate instead of aliasing; lut_max's anchor is 0
+        else:
+            low_bits = rounded_mag & ((1 << lut_idx_w) - 1)
+            a_idx = (~low_bits) & ((1 << lut_idx_w) - 1)
 
         e_a = 255 if is_zero else EXP_LUT[a_idx]
         hw_final_y = ((e_a * mantissa) >> frac_w) & ((1 << width) - 1)

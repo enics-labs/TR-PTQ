@@ -278,19 +278,33 @@ module tr_nonlinear_vpu_tb();
     endtask
 
     // ---------------------------------------------------------
-    // RMSNorm, DECAY-ONLY case (ctrl_scalar = reg_scalar_log +
-    // RM_CONST_LN_SQRT_N <= 0): RM_P1 -> RM_P2 -> RM_P3 -> RM_P4. The
-    // POSITIVE-ctrl_scalar branch uses tr_soc_ctrl_int.sv's own recip_lut()
-    // (a separate, Q4.4-hardcoded controller-side reciprocal LUT, not part
-    // of tr_nonlinear_vpu) -- out of scope here; this task only exercises
-    // the decay-only path, which is pure VPU-level backbone/crossbar
-    // behavior with no controller-constant dependency beyond
-    // RM_CONST_LN_SQRT_N itself.
+    // RMSNorm, both branches: RM_P1 -> RM_P2 -> RM_P3 -> RM_P4, mirroring
+    // tr_soc_ctrl_int.sv's FSM (incl. its sign-guard: a positive
+    // ctrl_scalar is negated before the backbone and undone by a
+    // reciprocal on the way into scratch_b).
+    //
+    // The reciprocal itself is CONTROLLER logic (tr_soc_ctrl_int.sv's
+    // recip_lut(), 8-bit / Q4.4-only), not part of tr_nonlinear_vpu, and
+    // the controller is not parameterized. recip_ideal() below emulates
+    // it: round(2^(2*FRAC_W)/max(E,1)) saturated to [0, 2^(W_VEC-1)-1]. At
+    // Q4.4 it equals recip_lut() for every E in 0..31 (checked in
+    // gen_vpu_golden_from_hw.py); at the other formats it is the
+    // specification the model uses, with no controller RTL behind it yet.
     // ---------------------------------------------------------
-    task automatic run_rmsnorm_decay(input logic signed [W_VEC-1:0] x_in [N], output logic signed [W_VEC-1:0] y_out [N]);
+    function automatic logic signed [W_VEC-1:0] recip_ideal(input logic signed [W_VEC-1:0] e);
+        longint unsigned num, den, r, hi;
+        den = (e < 1) ? 64'd1 : longint'(e);
+        num = 64'd1 << (2*FRAC_W);
+        r   = (num + den/2) / den;
+        hi  = (64'd1 << (W_VEC-1)) - 1;
+        recip_ideal = (r > hi) ? W_VEC'(hi) : W_VEC'(r);
+    endfunction
+
+    task automatic run_rmsnorm(input logic signed [W_VEC-1:0] x_in [N], output logic signed [W_VEC-1:0] y_out [N]);
         logic signed [W_VEC-1:0] reg_scalar_log;
         logic signed [W_VEC-1:0] scratch_b [N];
         logic signed [W_VEC-1:0] rm_ctrl_scalar_raw;
+        logic                    was_positive;
 
         // RM_P1: sum of squares
         clear_crossbar();
@@ -312,16 +326,12 @@ module tr_nonlinear_vpu_tb();
         @(posedge clk);  // vpu_data_out lags vpu_bb_valid_out by 1 cycle with no intervening vecmul/mac stage
         reg_scalar_log = vpu_data_out[0];
 
-        // RM_P3: reconstruct InvRMS (decay-only: ctrl_scalar already <= 0)
+        // RM_P3: reconstruct InvRMS
         rm_ctrl_scalar_raw = reg_scalar_log + RM_CONST_LN_SQRT_N[W_VEC-1:0];
-        if (!(~rm_ctrl_scalar_raw[W_VEC-1] && (rm_ctrl_scalar_raw != '0))) begin
-            // ctrl_scalar <= 0, as expected for this task
-        end else begin
-            $display("[SKIP] run_rmsnorm_decay called with a positive-ctrl_scalar input -- out of scope, result invalid.");
-        end
+        was_positive = ~rm_ctrl_scalar_raw[W_VEC-1] && (rm_ctrl_scalar_raw != '0);
 
         clear_crossbar();
-        ctrl_scalar_sub_val = rm_ctrl_scalar_raw;
+        ctrl_scalar_sub_val = was_positive ? -rm_ctrl_scalar_raw : rm_ctrl_scalar_raw;
         // src_sram_a_sel=1, reading empty scratch (never written) == 0
         for (int i = 0; i < N; i++) sram_data_a[i] = '0;
         bb_bypass_ln = 1'b1;
@@ -333,7 +343,7 @@ module tr_nonlinear_vpu_tb();
         mux_vpu_out_sel = 3'b000;
         do_bb();
         do_vecmul();
-        scratch_b = vpu_data_out;
+        for (int i = 0; i < N; i++) scratch_b[i] = was_positive ? recip_ideal(vpu_data_out[i]) : vpu_data_out[i];
 
         // RM_P4: X * InvRMS
         clear_crossbar();
@@ -350,7 +360,7 @@ module tr_nonlinear_vpu_tb();
 
     // ---------------------------------------------------------
     // File-I/O driven multi-format regression. Format per line:
-    // "op x0 x1 ... x7" where op is 0=GELU, 1=SOFTMAX, 2=RMSNORM_DECAY.
+    // "op x0 x1 ... x7" where op is 0=GELU, 1=SOFTMAX, 2=RMSNORM_DECAY, 3=RMSNORM_GROWTH.
     // Writes "y0 y1 ... y7 [z]" to hdl_out.txt (z only for softmax, else 0).
     // ---------------------------------------------------------
     task automatic run_file_regression();
@@ -382,7 +392,7 @@ module tr_nonlinear_vpu_tb();
                 run_softmax(x_in, y_out_u, z_out);
                 $fwrite(file_out, "%0d %0d %0d %0d %0d %0d %0d %0d %0d\n", y_out_u[0], y_out_u[1], y_out_u[2], y_out_u[3], y_out_u[4], y_out_u[5], y_out_u[6], y_out_u[7], $signed(z_out));
             end else begin
-                run_rmsnorm_decay(x_in, y_out_s);
+                run_rmsnorm(x_in, y_out_s);
                 $fwrite(file_out, "%0d %0d %0d %0d %0d %0d %0d %0d %0d\n", $signed(y_out_s[0]), $signed(y_out_s[1]), $signed(y_out_s[2]), $signed(y_out_s[3]), $signed(y_out_s[4]), $signed(y_out_s[5]), $signed(y_out_s[6]), $signed(y_out_s[7]), 0);
             end
         end
@@ -512,7 +522,7 @@ module tr_nonlinear_vpu_tb();
         // ====================================================================
         // TEST 5: Full-sequence multi-format regression (file I/O)
         // ====================================================================
-        $display("\n[TEST 5] Full GELU/Softmax/RMSNorm(decay) sequences vs Python golden model");
+        $display("\n[TEST 5] Full GELU/Softmax/RMSNorm(decay+growth) sequences vs golden model");
         clear_crossbar();
         @(posedge clk);
         run_file_regression();
