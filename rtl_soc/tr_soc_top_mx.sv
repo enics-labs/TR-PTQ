@@ -2,14 +2,30 @@
 
 /*
  * @module   tr_soc_top_mx
- * @brief    TODO: Add one-line description
- * @details  TODO: Add detailed description
+ * @brief    Top-level MX-datapath SoC integration -- the MX counterpart of
+ *           tr_soc_top_int, using shared-exponent (MX) formatting instead of
+ *           a fixed-point requantizer between the linear and nonlinear
+ *           engines.
+ * @details  Instantiates: tr_soc_ctrl_mx (master FSM), tr_matmul_ctrl
+ *           (streaming matmul sequencer sharing u_dot/u_req_mx via the same
+ *           busy-gated mux as the INT top), dot_product_engine (M-lane
+ *           matrix-vector MAC), requantize_engine_mx (compresses the wide
+ *           accumulator to OUT_W mantissas plus a combined mx_shared_exp
+ *           from a_mat_exp/b_vec_exp), dynamic_shifter_mx (expands the
+ *           requantized mantissas up to the wider VPU_W domain by
+ *           mx_shared_exp before the VPU consumes them, registered here to
+ *           break a timing-critical path), tr_nonlinear_vpu (running at
+ *           VPU_W for both its vector and internal-backbone width, since MX
+ *           carries no separate narrow SRAM format), and formatter_mx
+ *           (compresses the VPU's VPU_W-wide result back down to W-bit
+ *           mantissas plus a shared exponent for output/SRAM).
  *
- * @param    M               TODO: Add description
- * @param    N               TODO: Add description
- * @param    W               TODO: Add description
- * @param    ACC_W           TODO: Add description
- * @param    VPU_W           TODO: Add description
+ * @param    M      Parallel output lanes of the linear engine (matmul/dot tile height).
+ * @param    N      Vector dimension of the nonlinear VPU / contraction tile width.
+ * @param    W      Narrow MX mantissa width (a_mat/b_vec/ext_sram_b/vpu_data_out).
+ * @param    ACC_W  Accumulator width (c_vec bias, dot_acc_out, vpu_dot_out).
+ * @param    VPU_W  Wide internal width the VPU and its backbone operate at
+ *                    (both W_VEC and W_MAC of tr_nonlinear_vpu here).
  */
 module tr_soc_top_mx #(
     parameter int M        = 4,

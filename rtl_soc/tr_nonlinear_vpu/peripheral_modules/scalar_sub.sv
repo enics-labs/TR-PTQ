@@ -2,11 +2,15 @@
 
 /*
  * @module   scalar_sub
- * @brief    TODO: Add one-line description
- * @details  TODO: Add detailed description
+ * @brief    Saturating vector-minus-scalar: out_data[i] = sat(in_data[i] - sub_val).
+ * @details  Combinationally subtracts the same scalar (typically the row max
+ *           from piped_max, for softmax's max-subtraction step) from every
+ *           lane, computing the difference one bit wider than DATA_WIDTH to
+ *           safely detect over/underflow before clamping to the signed
+ *           DATA_WIDTH range.
  *
- * @param    NUM_INPUTS      TODO: Add description
- * @param    DATA_WIDTH      TODO: Add description
+ * @param    NUM_INPUTS  Number of parallel input lanes.
+ * @param    DATA_WIDTH  Signed data width of in_data/sub_val/out_data.
  */
 module scalar_sub #(
     parameter int NUM_INPUTS = 8,

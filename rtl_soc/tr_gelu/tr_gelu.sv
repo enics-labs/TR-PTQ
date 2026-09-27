@@ -2,13 +2,36 @@
 
 /*
  * @module   tr_gelu
- * @brief    TODO: Add one-line description
- * @details  TODO: Add detailed description
+ * @brief    Pass-based GELU via the shared log/exp Taylor-Region backbone:
+ *           GELU(x) ~= x * sigma(alpha(x)), computed as a sigmoid gate in
+ *           three controller-selected passes over one shared pipeline.
+ * @details  'mode' selects which pass this beat performs (sequenced
+ *           externally by the controller, matching tr_softmax/tr_rmsnorm's
+ *           own pass-based convention):
+ *             mode 00: exp pass -- alpha_stabilizer scales x_in into the
+ *               negative-only domain tr_exp_alu expects, which is evaluated
+ *               directly (s1_exp_in=alpha_out) to produce exp_val=exp(alpha(x)).
+ *             mode 01: reciprocal pass -- x_in (fed back as exp_val from the
+ *               previous pass) goes through pre_ln_modifier (+1.0),
+ *               tr_ln_alu (ln), and post_ln_modifier (negate) to form
+ *               -ln(1+exp_val), which tr_exp_alu then re-exponentiates into
+ *               1/(1+exp_val) -- the log-domain division trick documented on
+ *               post_ln_modifier/pre_ln_modifier, giving the sigmoid magnitude.
+ *             mode 10: gate pass -- symmetry_modifier restores the sigmoid's
+ *               true sign from the original x_raw (sigma(-z)=1-sigma(z),
+ *               needed because alpha_stabilizer discarded the sign), then
+ *               vec_mul multiplies x_raw by the corrected sigmoid to produce
+ *               the final GELU output.
+ *           Stage 2/3 also reconstruct exp(y)=mantisa*2^e_a from
+ *           tr_exp_alu's/shared_lut_rom's Taylor mantissa and LUT anchor for
+ *           the non-gate passes. A 5-stage pipeline (backbone lookup -> exp
+ *           ALU+symmetry -> reconstruction multiply -> output mux) carries
+ *           valid/mode alongside the data.
  *
- * @param    N               TODO: Add description
- * @param    W               TODO: Add description
- * @param    FRAC_W          TODO: Add description
- * @param    ACC_W           TODO: Add description
+ * @param    N       Vector dimension.
+ * @param    W       Data word width (x_in/aux_in/y_out).
+ * @param    FRAC_W  Fractional bits of the Q(W-FRAC_W).FRAC_W format.
+ * @param    ACC_W   Width of vec_mul's internal product/output (vec_out).
  */
 module tr_gelu #(
     parameter int N = 8,
@@ -166,7 +189,6 @@ module tr_gelu #(
     end
 
     logic                vec_out_valid;
-    logic [N-1:0]        vec_out_mask;
     logic signed [ACC_W-1:0] vec_out [N];
 
     vec_mul #(
@@ -177,9 +199,9 @@ module tr_gelu #(
         .op_mode(vec_op_mode),
         .mode_elemwise(1'b1),
         .a(vec_a_in), .b(vec_b_in),
-        .clear_acc(1'b0), 
+        .clear_acc(1'b0),
         .out_valid(vec_out_valid), .out_ready(1'b1),
-        .out_valid_mask(vec_out_mask), .out_vec(vec_out)
+        .out_valid_mask(), .out_vec(vec_out)
     );
 
     // ========================================================================

@@ -2,12 +2,37 @@
 
 /*
  * @module   tr_soc_ctrl_int
- * @brief    TODO: Add one-line description
- * @details  TODO: Add detailed description
+ * @brief    MMIO-driven master FSM controller for the INT-datapath SoC: on
+ *           an MMIO command write, sequences tr_nonlinear_vpu's crossbar
+ *           through the multi-pass GELU/Softmax/RMSNorm routes, or kicks off
+ *           a streaming matmul via tr_matmul_ctrl.
+ * @details  MMIO register map: ADDR_CMD (0x00, write triggers a command:
+ *           1=Softmax, 2=GELU, 3=RMSNorm, 4=streaming matmul), ADDR_STATUS
+ *           (0x04, {done,busy}), ADDR_REQ_MULT/ADDR_REQ_SHIFT (0x08/0x0C,
+ *           requantizer M/S), ADDR_MM_ROWS/ADDR_MM_CTILES (0x10/0x14,
+ *           streaming-matmul tile counts for tr_matmul_ctrl).
  *
- * @param    N               TODO: Add description
- * @param    W               TODO: Add description
- * @param    ACC_W           TODO: Add description
+ *           Each command is a fixed sequence of states (GL_*/SM_*/RM_*)
+ *           driving tr_nonlinear_vpu's crossbar-select/enable/mode outputs
+ *           pass-by-pass, gated on that pass's own vpu_*_valid handshake
+ *           (the VPU's submodules have no external ready signal, so each
+ *           pass waits out its producer's own valid pulse before advancing).
+ *           scratch_a/scratch_b hold intermediate per-lane vectors between
+ *           passes (e.g. GELU's exp(alpha(x)) and reciprocal-sigmoid
+ *           results); reg_scalar_max/reg_scalar_log hold Softmax's row-max
+ *           and log-sum-exp scalars, and RMSNorm's log(sum-of-squares)
+ *           scalar, between their own passes.
+ *
+ *           RM_P3 includes a sign-guard fix (forces the log-domain argument
+ *           non-positive before tr_nonlinear_vpu's shared exp backbone,
+ *           which only supports the decay/negative-domain case, then
+ *           corrects the result back via recip_lut when the true value was
+ *           positive) -- see the inline comment at rm_ctrl_scalar_raw for
+ *           the full derivation; this mirrors the same fix in tr_rmsnorm.sv.
+ *
+ * @param    N      Vector dimension (lanes) of the driven VPU/datapath.
+ * @param    W      Data word width (ctrl_scalar_sub_val, scratch_a/b, vpu_data_out).
+ * @param    ACC_W  Accumulator width (req_mult_out, vpu_dot_out).
  */
 module tr_soc_ctrl_int #(
     parameter int N     = 8,
@@ -102,11 +127,8 @@ module tr_soc_ctrl_int #(
     logic                           latch_max;
     logic                           latch_log;
 
-    // RMSNorm Pass 3 sign-guard fix (see the RM_P3 case block below for the
-    // full derivation): true only during RM_P3/RM_P3_W/RM_P3_MUL_W when
-    // ctrl_scalar (reg_scalar_log + CONST_LN_SQRT_N) came out positive --
-    // defaults to 0 everywhere else (including GELU's GL_P2, which also
-    // uses write_scratch_b), so this cannot affect any other sequence.
+    // RMSNorm Pass 3 sign-guard (see RM_P3 below): true only when
+    // ctrl_scalar came out positive during RM_P3/RM_P3_W/RM_P3_MUL_W.
     logic                           rm_offset_was_positive;
 
     assign req_mult_out     = reg_req_mult;
@@ -123,18 +145,10 @@ module tr_soc_ctrl_int #(
         if (mmio_addr == ADDR_REQ_SHIFT) mmio_rdata = {26'd0, reg_req_shift};
     end
 
-    // RMSNorm Pass 3 sign-guard fix, continued: reciprocal LUT. E (the
-    // decay-side exp result the guarded path always produces now)
-    // realistically ranges 0..16 (Q4.4 "1.0" = 16, is_zero case); sized to
-    // 0..31 for headroom. recip_lut[E] = round(256/E), saturated to 127
-    // (max signed 8-bit) -- 256 = 16*16, converting Q4.4 E back out through
-    // the same Q4.4 convention this datapath already uses everywhere else.
-    // Root cause + fix verified numerically in the bit-true emulation model
-    // (tr_math_model.hpp's rmsnorm_hw_model_signguard_fixed()) and in RTL
-    // simulation against tr_rmsnorm.sv (see docs/iscas_paper_support/);
-    // this is that same fix applied to the production FSM/VPU path. New
-    // logic scoped entirely to this module -- tr_nonlinear_vpu (the shared
-    // backbone GELU and Softmax also use) is untouched.
+    // Sign-guard reciprocal LUT: undoes the flip above. E is the decay-side
+    // exp result (Q4.4, realistically 0..16); recip_lut[E] = round(256/E)
+    // saturated to 127 (256 = 16*16, same Q4.4 convention throughout).
+    // See docs/iscas_paper_support/ for the numerical derivation.
     function automatic logic signed [W-1:0] recip_lut(input logic signed [W-1:0] e);
         case (e)
             8'sd0,  8'sd1: recip_lut = 8'sd127;
@@ -191,18 +205,18 @@ module tr_soc_ctrl_int #(
         // Streaming matmul (CMD=0x04)
         MM_START, MM_WAIT,
         // GELU
-        GL_P1, GL_P1_W, GL_P1_MUL, GL_P1_MUL_W,
-        GL_P2, GL_P2_W, GL_P2_MUL, GL_P2_MUL_W,
+        GL_P1, GL_P1_W, GL_P1_MUL_W,
+        GL_P2, GL_P2_W, GL_P2_MUL_W,
         GL_P3, GL_P3_W,
         // Softmax
         SM_P1, SM_P1_W,
-        SM_P2, SM_P2_W1, SM_P2_MAC, SM_P2_W2,
+        SM_P2, SM_P2_W1, SM_P2_W2,
         SM_P3, SM_P3_W,
-        SM_P4, SM_P4_W, SM_P4_MUL, SM_P4_MUL_W,
+        SM_P4, SM_P4_W, SM_P4_MUL_W,
         // RMSNorm
         RM_P1, RM_P1_W,
         RM_P2, RM_P2_W,
-        RM_P3, RM_P3_W, RM_P3_MUL, RM_P3_MUL_W,
+        RM_P3, RM_P3_W, RM_P3_MUL_W,
         RM_P4, RM_P4_W,
         DONE
     } state_t;
@@ -390,12 +404,9 @@ module tr_soc_ctrl_int #(
             SM_P4, SM_P4_W, SM_P4_MUL_W: begin
                 logic signed [W:0] sub_val_wide;
                 bb_bypass_ln = 1'b1;
-                // Saturating add (was a raw W-bit add that could wrap: e.g.
-                // max=125 + log_sum=3 = 128 silently became -128, corrupting
-                // the exponent argument for every lane in the row). max and
-                // log_sum are each valid Q4.4 int8 values individually, but
-                // their sum can exceed the W-bit range, so widen before
-                // clamping instead of truncating in the assignment.
+                // Saturating add: max+log_sum can exceed the W-bit range even
+                // though each is individually valid (e.g. 125+3=128 would
+                // wrap to -128), so widen before clamping.
                 sub_val_wide = $signed({reg_scalar_max[W-1], reg_scalar_max}) +
                                $signed({reg_scalar_log[W-1], reg_scalar_log});
                 if (sub_val_wide > SUB_VAL_MAX)      ctrl_scalar_sub_val = SUB_VAL_MAX[W-1:0];
@@ -429,31 +440,16 @@ module tr_soc_ctrl_int #(
                 else if (state == RM_P2_W && vpu_bb_valid) begin latch_log = 1; next_state = RM_P3; end
             end
             
-            // NEW PASS 3: Reconstruct InvRMS and save to Scratch B
+            // Reconstruct InvRMS and save to Scratch B
             RM_P3, RM_P3_W, RM_P3_MUL_W: begin
                 logic signed [W-1:0] rm_ctrl_scalar_raw;
                 bb_bypass_ln = 1'b1;
 
-                // SIGN-GUARD FIX: tr_nonlinear_vpu's shared exp backbone
-                // (round.sv's own comment: "8-bit Negative-Only LUT
-                // Indexing") was only ever built for alpha_stabilizer-style
-                // inputs, which are always forced non-positive.
-                // rm_ctrl_scalar_raw can legitimately be positive for small
-                // Sum(x^2) -- a normal, expected input, not a corner case --
-                // and feeding that straight to the backbone silently
-                // collapses InvRMS toward 0 instead of growing it, as it
-                // mathematically should (root cause verified in
-                // docs/iscas_paper_support/). Force it non-positive before
-                // it reaches the backbone (cheap: comparator + negate,
-                // mirrors alpha_stabilizer's own "forced negative absolute
-                // value" step) and remember that a flip happened via
-                // rm_offset_was_positive; the value is stable for the whole
-                // RM_P3/RM_P3_W/RM_P3_MUL_W wait sequence since
-                // reg_scalar_log doesn't change during it, so no extra
-                // pipelining is needed -- the flag is read back at the
-                // write_scratch_b capture point above, in the very same
-                // cycle it's set here (RM_P3_MUL_W). The flip itself is
-                // undone there (see the recip_lut() call), not here.
+                // Sign-guard: the shared exp backbone only supports
+                // non-positive inputs, but this can legitimately go positive
+                // for small Sum(x^2). Force it non-positive and remember the
+                // flip via rm_offset_was_positive, read back and undone at
+                // the write_scratch_b capture point (see recip_lut()).
                 rm_ctrl_scalar_raw = reg_scalar_log + CONST_LN_SQRT_N;
                 rm_offset_was_positive = ~rm_ctrl_scalar_raw[W-1] && (rm_ctrl_scalar_raw != '0);
                 ctrl_scalar_sub_val = rm_offset_was_positive ? -rm_ctrl_scalar_raw : rm_ctrl_scalar_raw;

@@ -2,12 +2,18 @@
 
 /*
  * @module   formatter_mx
- * @brief    TODO: Add one-line description
- * @details  TODO: Add detailed description
+ * @brief    Converts an N-wide VPU output vector into MX (shared-exponent)
+ *           format: N narrow mantissas plus one shared exponent.
+ * @details  Finds the maximum magnitude across the N lanes, derives the
+ *           minimum right-shift (as a bit-width-over-target-width count,
+ *           via a priority-encoder bit-width finder) needed to fit that
+ *           maximum into MX_W-bit mantissas, then right-shifts (truncating)
+ *           every lane by that shared amount and registers the mantissas
+ *           plus the shared exponent together.
  *
- * @param    N               TODO: Add description
- * @param    VPU_W           TODO: Add description
- * @param    MX_W            TODO: Add description
+ * @param    N       Number of parallel lanes.
+ * @param    VPU_W   Width of the incoming per-lane VPU data (vpu_data_in).
+ * @param    MX_W    Width of the outgoing per-lane mantissa (mx_mantissas).
  */
 module formatter_mx #(
     parameter int N = 4,

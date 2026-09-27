@@ -6,12 +6,21 @@
 // ===================================================================================
 /*
  * @module   mac_array_engine
- * @brief    TODO: Add one-line description
- * @details  TODO: Add detailed description
+ * @brief    Pipelined N-wide dot-product MAC array with scalar bias and
+ *           streaming accumulation.
+ * @details  Evaluates out_dot = SUM(a[i]*b[i]) + C over a 4-stage pipeline:
+ *           (1) register inputs, (2) compute N per-lane products (mode-
+ *           selectable signed/unsigned operands via op_mode), (3) reduce
+ *           the N products with a combinational adder tree, (4) either
+ *           initialize the accumulator with the reduced sum plus the bias
+ *           C (clear_acc=1, first beat of a K-dimension reduction) or add
+ *           the reduced sum onto the running out_dot (clear_acc=0,
+ *           subsequent beats) -- used for matmul dot products and for the
+ *           VPU's variance/softmax-sum reductions.
  *
- * @param    N               TODO: Add description
- * @param    W               TODO: Add description
- * @param    ACC_W           TODO: Add description
+ * @param    N      Number of parallel lanes (vector length reduced per beat).
+ * @param    W      Input operand width (a/b).
+ * @param    ACC_W  Accumulator/output width (also the width of bias c and out_dot).
  */
 module mac_array_engine #(
     parameter int N     = 16,

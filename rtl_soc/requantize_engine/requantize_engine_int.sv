@@ -1,9 +1,19 @@
 /*
- * @module   requantize_array_engine
+ * @module   requantize_engine_int
  * @brief    Vectorized Integer Requantizer with Saturation.
  * @details  Converts wide accumulators back to base precision using:
  *           Out = Saturate( (Acc * M + Bias) >>> S )
- *           Features a 3-stage pipeline for high-frequency timing closure.
+ *           Features a 3-stage pipeline for high-frequency timing closure:
+ *           (1) wide signed multiply (acc_in * multiplier), (2) add a
+ *           rounding bias of 1<<<(shift-1) then arithmetic-right-shift by
+ *           the controller-supplied shift amount, (3) saturate to the
+ *           signed OUT_W range.
+ *
+ * @param    N        Number of parallel lanes.
+ * @param    ACC_W    Input accumulator width (acc_in).
+ * @param    MUL_W    Multiplier scale width (multiplier, "M" from the controller).
+ * @param    SHIFT_W  Shift amount width (shift, "S" from the controller).
+ * @param    OUT_W    Target output width (out_vec), e.g. 8-bit.
  */
 module requantize_engine_int #(
     parameter int N       = 16, // Vector dimension

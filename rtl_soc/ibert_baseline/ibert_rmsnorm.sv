@@ -90,13 +90,13 @@ module ibert_rmsnorm #(
     // ---------------------------------------------------------------
     logic                  div_valid_in;
     logic [DIV_W-1:0]      div_dividend, div_divisor;
-    logic                  div_busy, div_valid_out;
+    logic                  div_valid_out;
     logic [DIV_W-1:0]      div_quotient;
 
     ibert_divider #(.WIDTH(DIV_W)) u_div (
         .clk(clk), .rst_n(rst_n),
         .valid_in(div_valid_in), .dividend(div_dividend), .divisor(div_divisor),
-        .busy(div_busy), .valid_out(div_valid_out), .quotient(div_quotient), .remainder()
+        .busy(), .valid_out(div_valid_out), .quotient(div_quotient), .remainder()
     );
 
     logic [W-1:0] abs_x [N];

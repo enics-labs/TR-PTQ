@@ -10,16 +10,6 @@
  * @param    WIDTH_Y   Word width of the sigmoid input/output.
  * @param    FRAC_W    Fractional bit width of y (defines the 1.0 constant).
  */
-/*
- * @module   symmetry_modifier
- * @brief    TODO: Add one-line description
- * @details  TODO: Add detailed description
- *
- * @param    N               TODO: Add description
- * @param    WIDTH_X         TODO: Add description
- * @param    WIDTH_Y         TODO: Add description
- * @param    FRAC_W          TODO: Add description
- */
 module symmetry_modifier #(
     parameter int N         = 8,
     parameter int WIDTH_X   = 8,

@@ -1,11 +1,22 @@
 /*
  * @module   alpha_stabilizer
- * @brief    TODO: Add one-line description
- * @details  TODO: Add detailed description
+ * @brief    Piecewise-linear GELU sigmoid-slope scaler, forced into the
+ *           negative domain tr_exp_alu's Taylor-Region backbone supports.
+ * @details  Scales |x| by one of four region-dependent coefficients (27,
+ *           26, 25, 24 sixteenths, re-scaled to FRAC_W), selected by which
+ *           of the |x|<1/2/3 real-valued bands x falls into -- a piecewise
+ *           refinement of the constant GELU sigmoid-slope factor (~1.702)
+ *           for better accuracy across magnitude ranges. The result is
+ *           saturated to the signed W-bit range, then unconditionally
+ *           negated to non-positive (out_vec = -|x_scaled|) so it lands in
+ *           the negative-only domain shared_lut_rom's anchor table and
+ *           tr_exp_alu's Taylor polynomial expect, regardless of the
+ *           original sign of x.
  *
- * @param    N               TODO: Add description
- * @param    W               TODO: Add description
- * @param    FRAC_W          TODO: Add description
+ * @param    N       Vector dimension.
+ * @param    W       Word width of in_vec/out_vec.
+ * @param    FRAC_W  Fractional bits (defines the |x|=1/2/3 region boundaries
+ *                     and the coefficient scaling).
  */
 module alpha_stabilizer #(
     parameter int N      = 8,

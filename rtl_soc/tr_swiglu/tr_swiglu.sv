@@ -187,7 +187,6 @@ module tr_swiglu #(
     end
 
     logic                    vec_out_valid;
-    logic [N-1:0]            vec_out_mask;
     logic signed [ACC_W-1:0] vec_out [N];
 
     vec_mul #(.N(N), .W(W), .ACC_W(ACC_W)) u_vec_mul (
@@ -198,7 +197,7 @@ module tr_swiglu #(
         .a(vec_a_in), .b(vec_b_in),
         .clear_acc(1'b0),
         .out_valid(vec_out_valid), .out_ready(1'b1),
-        .out_valid_mask(vec_out_mask), .out_vec(vec_out)
+        .out_valid_mask(), .out_vec(vec_out)
     );
 
     // ========================================================================

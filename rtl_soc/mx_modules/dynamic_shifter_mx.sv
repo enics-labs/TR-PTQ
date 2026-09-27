@@ -2,12 +2,20 @@
 
 /*
  * @module   dynamic_shifter_mx
- * @brief    TODO: Add one-line description
- * @details  TODO: Add detailed description
+ * @brief    N-wide bidirectional arithmetic shifter for MX shared-exponent
+ *           scaling.
+ * @details  Combinationally shifts every lane of data_in by shift_amount
+ *           (the MX block's shared exponent), left (shift_dir=1) to expand
+ *           a narrow MX mantissa up before the VPU consumes it, or right
+ *           (shift_dir=0, sign-preserving) to compress a wide VPU result
+ *           back down when the MX formatter re-quantizes it. Each lane is
+ *           cast to OUT_W before shifting so left-shifted bits have room to
+ *           expand without truncation.
  *
- * @param    N               TODO: Add description
- * @param    IN_W            TODO: Add description
- * @param    OUT_W           TODO: Add description
+ * @param    N      Number of parallel lanes.
+ * @param    IN_W   Input data width (data_in).
+ * @param    OUT_W  Output data width (data_out); must be >= IN_W to
+ *                   accommodate left-shift expansion without loss.
  */
 module dynamic_shifter_mx #(
     parameter int N     = 4,

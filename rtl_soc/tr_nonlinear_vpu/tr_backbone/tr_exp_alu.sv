@@ -2,13 +2,25 @@
 
 /*
  * @module   tr_exp_alu
- * @brief    TODO: Add one-line description
- * @details  TODO: Add detailed description
+ * @brief    Taylor-Region (TR) exponential ALU: approximates exp(x)
+ *           (x expected <= 0) via nearest-LUT-anchor lookup plus a local
+ *           Taylor polynomial in the residual delta=x-a.
+ * @details  round.sv rounds x to the nearest of shared_lut_rom's anchor
+ *           points, returning the LUT index a_idx (for the caller to fetch
+ *           e^a from shared_lut_rom), is_zero (x anchors to the most-
+ *           negative/underflow point, so exp(x) should be treated as 0),
+ *           and is_ceil (whether x rounded up past its anchor, i.e. the
+ *           sign of delta). quadratic_divider computes the delta^2/2 term
+ *           from x's fractional bits. The Taylor mantissa -- truncated to
+ *           order ITER (0: 1.0 only, 1: 1+delta, 2: 1+delta+delta^2/2) --
+ *           is assembled from these and returned for the caller to multiply
+ *           against shared_lut_rom's e_a, reconstructing exp(x) ~=
+ *           e_a * mantisa.
  *
- * @param    WIDTH           TODO: Add description
- * @param    FRAC_W          TODO: Add description
- * @param    LUT_IDX_W       TODO: Add description
- * @param    ITER            TODO: Add description
+ * @param    WIDTH      I/O word width (x, mantisa).
+ * @param    FRAC_W     Fractional bits of x (also the Taylor delta's width).
+ * @param    LUT_IDX_W  Width of the shared LUT index (a_idx).
+ * @param    ITER       Taylor truncation order: 0=zero-order, 1=linear, 2=quadratic.
  */
 module tr_exp_alu #(
     parameter int WIDTH = 8,

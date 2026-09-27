@@ -1,41 +1,25 @@
-// ===================================================================================
-// ARCHITECTURE NOTE: Mixed-Sign Multiplication
-// ===================================================================================
-// This module supports mixed-sign vector dot products via the `op_mode` signal.
-//
-//   * Mode 0 (SS) - Signed x Signed:
-//       Both operands are cast directly to $signed(). SV naturally sign-extends.
-//       Logic: $signed(a) * $signed(b)
-//
-//   * Mode 1 (SU) - Signed x Unsigned:
-//       Operand 'a' is signed (left alone). Operand 'b' is unsigned, so we
-//       force a leading zero to ensure it remains a positive magnitude.
-//       Logic: $signed(a) * $signed({1'b0, b})
-//
-//   * Mode 2 (UU) - Unsigned x Unsigned:
-//       Both operands are zero-padded to protect their MSBs, then cast to signed
-//       so the resulting product container behaves correctly in the accumulator.
-//       Logic: $signed({1'b0, a}) * $signed({1'b0, b})
-//
-// ADDITIONAL EXECUTION MODE:
-//   * mode_elemwise = 0  --> DOT mode
-//       out_vec[0] contains the accumulated dot-product result
-//       out_valid_mask = 1 on bit 0 only
-//
-//   * mode_elemwise = 1  --> ELEMWISE mode
-//       out_vec[i] contains a[i] * b[i] for all i
-//       out_valid_mask = all ones
-//
-// Both modes have the SAME output latency.
-// ===================================================================================
+// op_mode: 0 (SS) signed*signed; 1 (SU) $signed(a)*$signed({1'b0,b});
+// 2 (UU) $signed({1'b0,a})*$signed({1'b0,b}) -- zero-padded to protect the MSB.
+// mode_elemwise: 0 = DOT (out_vec[0] = accumulated sum, out_valid_mask bit 0
+// only), 1 = ELEMWISE (out_vec[i]=a[i]*b[i] for all i, out_valid_mask all
+// ones). Both modes share the same output latency.
 /*
  * @module   vec_mul
- * @brief    TODO: Add one-line description
- * @details  TODO: Add detailed description
+ * @brief    4-stage pipelined N-wide vector multiplier, dual-mode
+ *           (accumulating dot-product or elementwise) with mixed-sign
+ *           operand support.
+ * @details  See the architecture note above for the op_mode
+ *           (SS/SU/UU operand signedness) and mode_elemwise (DOT vs
+ *           ELEMWISE output shape) encodings; both modes share the same
+ *           4-stage latency (register inputs -> per-lane products ->
+ *           adder-tree reduction + pass-through -> output mux). In DOT
+ *           mode, clear_acc selects between initializing out_vec[0] with
+ *           this beat's reduced sum or accumulating onto it (streaming
+ *           K-dimension reduction, as in tr_gelu's reconstruction multiply).
  *
- * @param    N               TODO: Add description
- * @param    W               TODO: Add description
- * @param    ACC_W           TODO: Add description
+ * @param    N      Number of parallel lanes.
+ * @param    W      Input operand width (a/b).
+ * @param    ACC_W  Accumulator/output width (out_vec).
  */
 module vec_mul #(
     parameter int N     = 16,

@@ -1,11 +1,21 @@
 /*
  * @module   tr_ln_alu
- * @brief    TODO: Add one-line description
- * @details  TODO: Add detailed description
+ * @brief    Integer natural-logarithm approximator via MSB-exponent +
+ *           linear-mantissa log2 decomposition.
+ * @details  Finds the position of xq's MSB (floor(log2(xq))), normalizes xq
+ *           so that bit sits at the top of the word, and takes its top
+ *           BITS+1 bits as a linear mantissa term k1 (log2(1.f) ~= f over
+ *           [0,1), the standard piecewise-linear log2 approximation).
+ *           Combines that with the (fixed-point-scaled) exponent term
+ *           k2=(msb-BITS-1)<<<BITS into a single log2(xq) estimate k=k1+k2,
+ *           then converts log2->ln by multiplying by the fixed-point
+ *           constant 0.6875 (~= ln(2), realized as k>>>1 + k>>>3 + k>>>4 to
+ *           avoid a real multiplier), and saturates the result to
+ *           OUT_WIDTH. xq==0 short-circuits to yq=0.
  *
- * @param    WIDTH           TODO: Add description
- * @param    BITS            TODO: Add description
- * @param    OUT_WIDTH       TODO: Add description
+ * @param    WIDTH      Input width (xq).
+ * @param    BITS       Fractional bits of xq (also the mantissa's linear-term width).
+ * @param    OUT_WIDTH  Output width (yq), saturated.
  */
 module tr_ln_alu #(
     parameter int WIDTH = 16,

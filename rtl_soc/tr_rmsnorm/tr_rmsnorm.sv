@@ -2,13 +2,33 @@
 
 /*
  * @module   tr_rmsnorm
- * @brief    TODO: Add one-line description
- * @details  TODO: Add detailed description
+ * @brief    Pass-based RMSNorm via the shared log/exp Taylor-Region backbone,
+ *           sequenced across 4 controller-selected passes over one pipeline.
+ * @details  'mode' selects the pass (matching tr_gelu/tr_softmax's own
+ *           pass-based convention):
+ *             mode 00: sum-of-squares pass -- dot-product X*X (aux_in=X)
+ *               accumulates into sum_out.
+ *             mode 01: log/invsqrt pass -- elementwise X*Gamma (aux_in=Gamma)
+ *               runs on the vec_mul datapath while, in parallel, sum_in (the
+ *               controller-fed sum_out from pass 00) is ln'd (tr_ln_alu) and
+ *               scaled by -0.5 (post_ln_modifier, InvSqrt mode) to produce
+ *               ln_out = -0.5*ln(sum); the controller combines this with a
+ *               ln(sqrt(N)) constant into offset_in for the next pass.
+ *             mode 10: InvRMS reconstruction pass -- tr_exp_alu evaluates
+ *               exp(offset_in) via shared_lut_rom/vec_mul reconstruction to
+ *               produce the scalar InvRMS in y_out[0]. Includes a sign-guard
+ *               (see the inline comment above offset_guarded) that forces
+ *               offset_in non-positive before it reaches tr_exp_alu -- which
+ *               only supports the decay/negative-domain case -- and corrects
+ *               the result back via recip_lut (E -> 256/E) when the true
+ *               offset was positive.
+ *             mode 11: final scale pass -- elementwise X'*InvRMS (aux_in=
+ *               InvRMS, broadcast) produces y_out.
  *
- * @param    N               TODO: Add description
- * @param    W               TODO: Add description
- * @param    FRAC_W          TODO: Add description
- * @param    ACC_W           TODO: Add description
+ * @param    N       Vector dimension.
+ * @param    W       Data word width (x_in/aux_in/offset_in/y_out/ln_out).
+ * @param    FRAC_W  Fractional bits of the Q(W-FRAC_W).FRAC_W format.
+ * @param    ACC_W   Width of vec_mul's internal product/output (sum_in/sum_out/vec_out).
  */
 module tr_rmsnorm #(
     parameter int N = 8,
@@ -46,26 +66,12 @@ module tr_rmsnorm #(
         .x_in(ln_out_comb), .mode_sel(2'b10), .y_out(post_ln_out)
     );
 
-    // ------------------------------------------------------------------------
-    // SIGN-GUARD (Pass 3 fix): tr_exp_alu / round.sv's "8-bit Negative-Only
-    // LUT Indexing" (see round.sv's own comment) was built only for
-    // alpha_stabilizer-style inputs, which are always forced non-positive.
-    // offset_in (= ctrl_scalar = 0.5*ln(8) - 0.5*ln(Sum x^2), computed by the
-    // controller) has no such guarantee -- for small Sum x^2 it goes
-    // positive, the negative-only LUT indexing wraps/breaks, and InvRMS
-    // collapses toward 0 instead of growing, as it mathematically should.
-    // Root cause + fix verified numerically in the bit-true emulation model
-    // (tr_math_model.hpp's rmsnorm_hw_model_signguard_fixed(), see
-    // docs/iscas_paper_support/); this is that same fix in RTL.
-    //
-    // Fix: force offset_in non-positive before it ever reaches tr_exp_alu
-    // (cheap: comparator + two's-complement negate, mirrors
-    // alpha_stabilizer's own "forced negative absolute value" step), and
-    // remember that a flip happened. tr_exp_alu then always evaluates the
-    // decay-side case it was actually built for -- no change to the shared
-    // exp/ln backbone at all. The flip is undone at the OUTPUT stage (see
-    // the recip_lut below), not here -- this stage only prepares the sign.
-    // ------------------------------------------------------------------------
+    // SIGN-GUARD (Pass 3): tr_exp_alu only supports non-positive inputs
+    // (round.sv's negative-only LUT indexing), but offset_in can legitimately
+    // go positive for small Sum(x^2), which would collapse InvRMS toward 0
+    // instead of growing it. Force it non-positive here and remember the
+    // flip; it's undone at the output stage via recip_lut below. See
+    // docs/iscas_paper_support/ for the numerical root-cause derivation.
     logic                 offset_was_positive;
     logic signed [W-1:0]  offset_guarded;
 
@@ -184,7 +190,6 @@ module tr_rmsnorm #(
     end
 
     logic                vec_out_valid;
-    logic [N-1:0]        vec_out_mask;
     logic signed [ACC_W-1:0] vec_out [N];
 
     vec_mul #(
@@ -197,22 +202,13 @@ module tr_rmsnorm #(
         .a(vec_a_in), .b(vec_b_in),
         .clear_acc(s2_valid && s2_mode == 2'b00), // Clear DOT accum on valid sum pass
         .out_valid(vec_out_valid), .out_ready(1'b1),
-        .out_valid_mask(vec_out_mask), .out_vec(vec_out)
+        .out_valid_mask(), .out_vec(vec_out)
     );
 
-    // ------------------------------------------------------------------------
-    // SIGN-GUARD (Pass 3 fix), continued: reciprocal LUT. E (the decay-side
-    // exp result the guarded path always produces now) realistically ranges
-    // 0..16 (Q4.4 "1.0" = 16, is_zero case); sized to 0..31 for headroom.
-    // recip_lut[E] = round(256/E), saturated to 127 (max signed 8-bit) --
-    // 256 = 16*16, converting Q4.4 E back out through the same Q4.4
-    // convention the rest of this module already uses. E=0 guarded to the
-    // same saturated max as E=1 (division by zero shouldn't occur given E's
-    // real range, but must not corrupt the pipeline if it ever does).
-    // New logic scoped entirely to this module -- tr_exp_alu, round,
-    // quadratic_divider, shared_lut_rom (the SHARED backbone GELU and
-    // Softmax also use) are untouched.
-    // ------------------------------------------------------------------------
+    // SIGN-GUARD, continued: undoes the offset_guarded flip above. E is the
+    // decay-side exp result (Q4.4, realistically 0..16); recip_lut[E] =
+    // round(256/E) saturated to 127, converting back through the same Q4.4
+    // convention (256 = 16*16). E=0/1 both saturate to the max.
     function automatic logic [W-1:0] recip_lut(input logic [W-1:0] e);
         case (e)
             8'd0,  8'd1:  recip_lut = 8'd127;
@@ -286,14 +282,9 @@ module tr_rmsnorm #(
                     // Pass 1: Sum of Squares
                     sum_out <= vec_out[0];
                 end else if (mode_pipe[4] == 2'b10) begin
-                    // Pass 3: Scalar InvRMS (Q0.8 * Q4.4 = Q4.12) -> Slice [15:8]
-                    // Sign-guard fix: if offset_in (ctrl_scalar) was originally
-                    // positive, vec_out[0][15:8] is E = exp(-|ctrl_scalar|) --
-                    // the correct decay-side evaluation of the WRONG (negated)
-                    // argument. Recover the true (growing) InvRMS via
-                    // exp(+t) = 1/exp(-t), i.e. InvRMS = 256/E, via recip_lut.
-                    // If it was already non-positive, this is exactly the
-                    // original, unmodified behavior.
+                    // Pass 3: Scalar InvRMS (Q0.8 * Q4.4 = Q4.12) -> Slice [15:8].
+                    // If the sign was flipped, vec_out[0][15:8] is E=exp(-|t|);
+                    // recover InvRMS=exp(+t)=1/E via recip_lut.
                     y_out[0] <= neg_pipe[4] ? recip_lut(vec_out[0][15:8])
                                              : vec_out[0][15:8];
                 end else begin

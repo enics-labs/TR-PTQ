@@ -6,12 +6,17 @@
 // ===================================================================================
 /*
  * @module   vec_mul_array_engine
- * @brief    TODO: Add one-line description
- * @details  TODO: Add detailed description
+ * @brief    Pipelined N-wide elementwise multiplier array.
+ * @details  Evaluates out_vec[i] = a[i]*b[i] for each of the N lanes over a
+ *           3-stage pipeline: (1) register inputs, (2) compute the N
+ *           per-lane products (mode-selectable signed/unsigned operands via
+ *           op_mode, same convention as mac_array_engine), (3) register the
+ *           products, sign-extended/cast to the output width -- used for
+ *           softmax probability scaling and GELU's final elementwise gate.
  *
- * @param    N               TODO: Add description
- * @param    W               TODO: Add description
- * @param    ACC_W           TODO: Add description
+ * @param    N      Number of parallel lanes.
+ * @param    W      Input operand width (a/b).
+ * @param    ACC_W  Output width (out_vec).
  */
 module vec_mul_array_engine #(
     parameter int N     = 16,

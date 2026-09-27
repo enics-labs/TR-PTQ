@@ -6,9 +6,9 @@
  *           Implemented as a zero-cost bit flip (concatenation) at the 
  *           integer boundary.
  *
- * @param    N      Vector dimension.
- * @param    W      Word width.
- * @param    FRAC_W Fractional bits (defines the location of the 1.0 bit).
+ * @param    N         Vector dimension.
+ * @param    WIDTH_IN  Word width of x_in/y_out.
+ * @param    FRAC_W    Fractional bits (defines the location of the 1.0 bit).
  */
 module pre_ln_modifier #(
     parameter int N         = 8,

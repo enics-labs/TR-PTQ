@@ -2,12 +2,32 @@
 
 /*
  * @module   tr_soc_ctrl_mx
- * @brief    TODO: Add one-line description
- * @details  TODO: Add detailed description
+ * @brief    MMIO-driven master FSM controller for the MX-datapath SoC --
+ *           the MX counterpart of tr_soc_ctrl_int, sequencing the same
+ *           GELU/Softmax/RMSNorm/streaming-matmul passes over
+ *           tr_nonlinear_vpu's crossbar.
+ * @details  Same command dispatch as tr_soc_ctrl_int (ADDR_CMD triggers
+ *           1=Softmax/2=GELU/3=RMSNorm/4=streaming matmul; ADDR_STATUS is
+ *           {done,busy}; ADDR_MM_ROWS/ADDR_MM_CTILES set the streaming-
+ *           matmul tile counts), but differs in two ways specific to the MX
+ *           datapath: (1) every FSM output is double-buffered through an
+ *           explicit nxt_*/"Control Pipeline Register" stage instead of
+ *           being driven straight from the combinational case block, adding
+ *           one cycle of latency per state for MX's tighter timing closure;
+ *           (2) it drives ctrl_enable_linear_shift (the MX dynamic
+ *           shifter's enable) instead of the INT variant's explicit
+ *           req_mult_out/req_shift_out requantizer registers, since MX
+ *           rescaling is exponent-based rather than an explicit multiply-
+ *           shift. Softmax's SM_P1 max-reduction also waits a fixed 3-cycle
+ *           latency (SM_P1_W1/W2/W) instead of polling a vpu_max_valid
+ *           handshake, since that signal isn't wired into this variant. The
+ *           RMSNorm sign-guard fix (see the inline comment at
+ *           rm_ctrl_scalar_raw) is the same fix as tr_soc_ctrl_int.sv /
+ *           tr_rmsnorm.sv, applied here to the pipelined nxt_* outputs.
  *
- * @param    N               TODO: Add description
- * @param    W               TODO: Add description
- * @param    ACC_W           TODO: Add description
+ * @param    N      Vector dimension (lanes) of the driven VPU/datapath.
+ * @param    W      Data word width (ctrl_scalar_sub_val, scratch_a/b, vpu_data_out).
+ * @param    ACC_W  Accumulator width (vpu_dot_out).
  */
 module tr_soc_ctrl_mx #(
     parameter int N     = 8,
@@ -92,15 +112,9 @@ module tr_soc_ctrl_mx #(
     logic                           latch_max;
     logic                           latch_log;
 
-    // RMSNorm Pass 3 sign-guard fix (see the RM_P3 case block below for the
-    // full derivation -- same fix as tr_soc_ctrl_int.sv / tr_rmsnorm.sv,
-    // see docs/iscas_paper_support/): registered like every other FSM output
-    // in this module (nxt_* computed in the big case-based always_comb,
-    // latched in the "Control Pipeline Register" always_ff below). True only
-    // during RM_P3/RM_P3_W/RM_P3_MUL_W when ctrl_scalar (reg_scalar_log +
-    // CONST_LN_SQRT_N) came out positive -- defaults to 0 everywhere else
-    // (including GELU's GL_P2, which also uses write_scratch_b), so this
-    // cannot affect any other sequence.
+    // RMSNorm Pass 3 sign-guard (see RM_P3 below; same fix as
+    // tr_soc_ctrl_int.sv / tr_rmsnorm.sv), registered through the usual
+    // nxt_*/Control Pipeline Register stage like every other FSM output here.
     logic                           rm_offset_was_positive;
     logic                           nxt_rm_offset_was_positive;
 
@@ -114,14 +128,9 @@ module tr_soc_ctrl_mx #(
         if (mmio_addr == ADDR_STATUS) mmio_rdata = {30'd0, reg_done, reg_busy};
     end
 
-    // RMSNorm Pass 3 sign-guard fix, continued: reciprocal LUT. E (the
-    // decay-side exp result the guarded path always produces now)
-    // realistically ranges 0..16 (Q4.4 "1.0" = 16, is_zero case); sized to
-    // 0..31 for headroom. recip_lut[E] = round(256/E), saturated to 127
-    // (max signed 8-bit) -- 256 = 16*16, converting Q4.4 E back out through
-    // the same Q4.4 convention this datapath already uses everywhere else.
-    // New logic scoped entirely to this module -- tr_nonlinear_vpu (the
-    // shared backbone GELU and Softmax also use) is untouched.
+    // Sign-guard reciprocal LUT: undoes the flip above. E is the decay-side
+    // exp result (Q4.4, realistically 0..16); recip_lut[E] = round(256/E)
+    // saturated to 127 (256 = 16*16, same Q4.4 convention throughout).
     function automatic logic signed [W-1:0] recip_lut(input logic signed [W-1:0] e);
         case (e)
             8'sd0,  8'sd1: recip_lut = 8'sd127;
@@ -175,16 +184,16 @@ module tr_soc_ctrl_mx #(
     typedef enum logic [5:0] {
         IDLE,
         MM_START, MM_WAIT,
-        GL_P1, GL_P1_W, GL_P1_MUL, GL_P1_MUL_W,
-        GL_P2, GL_P2_W, GL_P2_MUL, GL_P2_MUL_W,
+        GL_P1, GL_P1_W, GL_P1_MUL_W,
+        GL_P2, GL_P2_W, GL_P2_MUL_W,
         GL_P3, GL_P3_W,
         SM_P1, SM_P1_W1, SM_P1_W2, SM_P1_W,
-        SM_P2, SM_P2_W1, SM_P2_MAC, SM_P2_W2,
+        SM_P2, SM_P2_W1, SM_P2_W2,
         SM_P3, SM_P3_W,
-        SM_P4, SM_P4_W, SM_P4_MUL, SM_P4_MUL_W,
+        SM_P4, SM_P4_W, SM_P4_MUL_W,
         RM_P1, RM_P1_W,
         RM_P2, RM_P2_W,
-        RM_P3, RM_P3_W, RM_P3_MUL, RM_P3_MUL_W,
+        RM_P3, RM_P3_W, RM_P3_MUL_W,
         RM_P4, RM_P4_W,
         DONE
     } state_t;
@@ -456,29 +465,13 @@ module tr_soc_ctrl_mx #(
                 logic signed [W-1:0] rm_ctrl_scalar_raw;
                 nxt_bb_bypass_ln = 1'b1;
 
-                // SIGN-GUARD FIX: tr_nonlinear_vpu's shared exp backbone
-                // (round.sv's own comment: "8-bit Negative-Only LUT
-                // Indexing") was only ever built for alpha_stabilizer-style
-                // inputs, which are always forced non-positive.
-                // rm_ctrl_scalar_raw can legitimately be positive for small
-                // Sum(x^2) -- a normal, expected input, not a corner case --
-                // and feeding that straight to the backbone silently
-                // collapses InvRMS toward 0 instead of growing it, as it
-                // mathematically should (root cause verified in
-                // docs/iscas_paper_support/). Force it non-positive before
-                // it reaches the backbone (cheap: comparator + negate,
-                // mirrors alpha_stabilizer's own "forced negative absolute
-                // value" step) and remember that a flip happened via
-                // nxt_rm_offset_was_positive; the raw value is stable for
-                // the whole RM_P3/RM_P3_W/RM_P3_MUL_W wait sequence since
-                // reg_scalar_log doesn't change during it, and both this
-                // flag and write_scratch_b pass through the SAME "Control
-                // Pipeline Register" stage together, so they stay aligned
-                // one cycle later at the write_scratch_b capture point
-                // above -- no extra pipelining needed beyond what this
-                // module already does for every other FSM output. The flip
-                // itself is undone there (see the recip_lut() call), not
-                // here.
+                // Sign-guard: the shared exp backbone only supports
+                // non-positive inputs, but this can legitimately go positive
+                // for small Sum(x^2). Force it non-positive and remember the
+                // flip via nxt_rm_offset_was_positive, which passes through
+                // the same Control Pipeline Register stage as write_scratch_b
+                // so they stay aligned at the capture point; the flip is
+                // undone there (see recip_lut()).
                 rm_ctrl_scalar_raw = reg_scalar_log + CONST_LN_SQRT_N;
                 nxt_rm_offset_was_positive = ~rm_ctrl_scalar_raw[W-1] && (rm_ctrl_scalar_raw != '0);
                 nxt_ctrl_scalar_sub_val = nxt_rm_offset_was_positive ? -rm_ctrl_scalar_raw : rm_ctrl_scalar_raw;

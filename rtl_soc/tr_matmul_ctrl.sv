@@ -16,6 +16,9 @@
  *           num_ctiles-th requantizer valid — the final accumulated dot.  Using
  *           the valid COUNT (not a fixed drain latency) keeps it independent of
  *           the datapath's pipeline depth.
+ *
+ * @param    M  Output-tile height (rows per row-tile) of the driven dot_product_engine.
+ * @param    N  Contraction-tile width (columns per c-tile) of the driven dot_product_engine.
  */
 module tr_matmul_ctrl #(
     parameter int M = 4,

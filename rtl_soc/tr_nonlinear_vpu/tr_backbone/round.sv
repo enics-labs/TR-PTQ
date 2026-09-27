@@ -1,22 +1,27 @@
-///////////////////////////////////////////////////////////////////////////////////////////////////////
-// UPDATE:                                                                                           //
-//      is_zero is assigned the rounded_mag value, instead of the input x.                           //
-//      The output fliped_rounded_int cleanly gets ~rounded_mag[LUT_IDX_W-1:0], removing the is_zero check.    //
-///////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////
-// UPDATE:
-//      Two modes created: 
-//      MODE 1 - The original q4.4 rounding for the 8-bit LUT.
-//      MODE 2 - 12-bit signed LUT for LayerNorm.
-//////////////////////////////////////////////////////////////////
 /*
  * @module   round
- * @brief    TODO: Add one-line description
- * @details  TODO: Add detailed description
+ * @brief    Rounds a fixed-point input to its nearest integer anchor and
+ *           generates the corresponding shared-LUT index.
+ * @details  Rounds x to the nearest integer (toward zero for negatives, via
+ *           its 0.5 fractional bit), returning is_ceil (whether that
+ *           rounding moved x up past its anchor -- the sign of the
+ *           residual delta=x-anchor that tr_exp_alu's Taylor polynomial
+ *           needs) and is_zero (the rounded integer is exactly 0). lut_idx
+ *           is generated in one of two modes (DECAY_ONLY_LUT): MODE 1
+ *           (default) bitwise-NOTs the rounded magnitude to map the
+ *           negative-only decay anchors (0, -1, -2, ...) onto a 0-based
+ *           index for shared_lut_rom's 8-entry decay table, saturating to
+ *           the highest index (fully-decayed anchor) once the magnitude
+ *           exceeds what LUT_IDX_W bits can distinguish; MODE 2 passes the
+ *           rounded integer straight through as a signed index, for a
+ *           bidirectional (positive and negative anchors) LUT used by
+ *           LayerNorm-style callers.
  *
- * @param    WIDTH           TODO: Add description
- * @param    FRAC_W          TODO: Add description
- * @param    LUT_IDX_W       TODO: Add description
+ * @param    WIDTH           Input width (x).
+ * @param    FRAC_W          Fractional bits of x.
+ * @param    LUT_IDX_W       Width of the generated LUT index (lut_idx).
+ * @param    DECAY_ONLY_LUT  1: MODE 1 (decay-only anchor table, tr_exp_alu's
+ *                            default); 0: MODE 2 (bidirectional/LayerNorm).
  */
 module round #(
     parameter int WIDTH = 8,

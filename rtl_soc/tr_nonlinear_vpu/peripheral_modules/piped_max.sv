@@ -1,10 +1,15 @@
 /*
  * @module   piped_max
- * @brief    TODO: Add one-line description
- * @details  TODO: Add detailed description
+ * @brief    Fully-pipelined binary-tree max reduction over NUM_INPUTS lanes.
+ * @details  Builds log2(NUM_INPUTS) comparison levels, each registered (one
+ *           pipeline stage per tree level), so max_out emerges
+ *           STAGES=$clog2(NUM_INPUTS) cycles after valid_in, with valid_out
+ *           tracking it through a matching shift-register delay. Used where
+ *           a single-cycle combinational max-scan (as in a plain for-loop)
+ *           would be too deep a critical path for a wide reduction.
  *
- * @param    NUM_INPUTS      TODO: Add description
- * @param    DATA_WIDTH      TODO: Add description
+ * @param    NUM_INPUTS  Number of parallel input lanes to reduce.
+ * @param    DATA_WIDTH  Signed data width of in_data/max_out.
  */
 module piped_max #(
     parameter int NUM_INPUTS = 8,  
@@ -59,15 +64,15 @@ module piped_max #(
     endgenerate
 
     // --- 3. Valid Signal Pipeline (Shift Register) ---
-    logic [STAGES:0] v_pipe; // Size is STAGES+1 to account for input + stages
+    logic [STAGES-1:0] v_pipe;
 
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             v_pipe <= '0;
         end else begin
-            // v_pipe[0] is the current input, 
+            // v_pipe[0] is the current input,
             // others are delayed versions
-            v_pipe <= {v_pipe[STAGES-1:0], valid_in};
+            v_pipe <= {v_pipe[STAGES-2:0], valid_in};
         end
     end
 

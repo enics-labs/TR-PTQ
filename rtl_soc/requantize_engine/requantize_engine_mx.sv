@@ -2,12 +2,23 @@
 
 /*
  * @module   requantize_engine_mx
- * @brief    TODO: Add one-line description
- * @details  TODO: Add detailed description
+ * @brief    2-stage pipelined MX-format requantizer: compresses N wide
+ *           accumulator outputs down to OUT_W-bit mantissas plus a combined
+ *           exponent.
+ * @details  Stage 1 finds the max magnitude across the N dot_in lanes
+ *           (combinational max-tree) and latches the base exponent
+ *           (exp_act_in + exp_weight_in, the product of the two MX inputs'
+ *           shared exponents that produced this accumulation). Stage 2
+ *           leading-zero-counts the registered max to derive the minimum
+ *           right-shift that fits it into OUT_W-1 magnitude bits, shifts
+ *           every lane by that shared amount, and adds the shift onto the
+ *           base exponent to produce exp_total_out -- the MX-format
+ *           counterpart of requantize_engine_int's fixed-point (Mult>>>Shift)
+ *           requantization.
  *
- * @param    N               TODO: Add description
- * @param    ACC_W           TODO: Add description
- * @param    OUT_W           TODO: Add description
+ * @param    N      Number of parallel lanes.
+ * @param    ACC_W  Width of the incoming per-lane accumulator value (dot_in).
+ * @param    OUT_W  Width of the outgoing per-lane mantissa (req_vec_out).
  */
 module requantize_engine_mx #(
     parameter int N = 4,         

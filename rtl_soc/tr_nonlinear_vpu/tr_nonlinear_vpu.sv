@@ -1,9 +1,20 @@
 /*
  * @module   tr_nonlinear_vpu
  * @brief    Software-Defined Vector Processing Unit.
- * @details  A strictly combinational/pipelined crossbar that routes SRAM data 
- *           through isolated math modifiers, a log-domain backbone, and local 
+ * @details  A strictly combinational/pipelined crossbar that routes SRAM data
+ *           through isolated math modifiers, a log-domain backbone, and local
  *           vector/MAC engines. Contains ZERO internal state memory.
+ *
+ * @param    N          Vector dimension (lanes).
+ * @param    W_VEC      SRAM/vector data width (sram_data_a/b, vpu_data_out,
+ *                        modifier and math-engine operand width).
+ * @param    W_MAC      Internal log/exp backbone working width (wider than
+ *                        W_VEC, since ln/exp intermediates need headroom).
+ * @param    ACC_W      MAC/vecmul accumulator width (vpu_dot_out, vecmul's
+ *                        internal accumulation before rescale to W_VEC).
+ * @param    FRAC_W     Fractional bits of the Q(W_VEC-FRAC_W).FRAC_W format.
+ * @param    LUT_IDX_W  Width of the shared exp-LUT index, reused here as the
+ *                        crossbar select width for mux_bb_in_sel/mux_vpu_out_sel.
  */
 module tr_nonlinear_vpu #(
     parameter int N         = 8,

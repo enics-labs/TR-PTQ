@@ -2,13 +2,27 @@
 
 /*
  * @module   tr_soc_top_int
- * @brief    TODO: Add one-line description
- * @details  TODO: Add detailed description
+ * @brief    Top-level INT-datapath SoC integration: wires the matmul/
+ *           requantize linear pipeline and the log/exp nonlinear VPU
+ *           together under one MMIO-driven controller.
+ * @details  Instantiates: tr_soc_ctrl_int (master FSM), tr_matmul_ctrl
+ *           (streaming matmul sequencer, sharing the same dot+requant
+ *           datapath as the legacy single-tile ports via a busy-gated mux),
+ *           dot_product_engine (M-lane matrix-vector MAC), requantize_engine_int
+ *           (Acc*M+Bias>>>S rescale back to W-bit), and tr_nonlinear_vpu (the
+ *           GELU/Softmax/RMSNorm crossbar). SRAM-A routing lets the VPU see
+ *           either the controller's scratchpad (multi-pass intermediates) or
+ *           the requantizer's fresh output for lanes 0..M-1 combined with
+ *           externally-supplied ext_sram_b for lanes M..N-1 (so a full
+ *           N-wide standalone VPU op like softmax/rmsnorm can run on data
+ *           the linear engine didn't produce).
  *
- * @param    M               TODO: Add description
- * @param    N               TODO: Add description
- * @param    W               TODO: Add description
- * @param    ACC_W           TODO: Add description
+ * @param    M      Parallel output lanes of the linear engine (matmul/dot
+ *                    tile height); also sized into the VPU's N-wide crossbar
+ *                    for lanes 0..M-1.
+ * @param    N      Vector dimension of the nonlinear VPU / contraction tile width.
+ * @param    W      Data word width (a_mat/b_vec/ext_sram_b/vpu_data_out).
+ * @param    ACC_W  Accumulator width (c_vec bias, dot_acc_out, vpu_dot_out).
  */
 module tr_soc_top_int #(
     parameter int M     = 4,   // Parallel Output Lanes

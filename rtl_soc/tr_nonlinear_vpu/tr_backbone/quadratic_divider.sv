@@ -1,16 +1,21 @@
-//////////////////////////////////////////////////////////////////
-// UPDATE:
-//      Two modes created: 
-//      MODE 1 - The original optimized 8-bit.
-//      MODE 2 - 12-bit generic multiplier for LayerNorm.
-//////////////////////////////////////////////////////////////////
 /*
  * @module   quadratic_divider
- * @brief    TODO: Add one-line description
- * @details  TODO: Add detailed description
+ * @brief    Computes the delta^2/2 quadratic term of tr_exp_alu's Taylor
+ *           polynomial for exp(x) ~= e_a*(1+delta+delta^2/2).
+ * @details  quad_out = (delta*delta) >> (FRAC_W+1), i.e. delta^2 rescaled
+ *           back into the FRAC_W fractional domain and divided by 2. At
+ *           FRAC_W==4, this uses exact K-map equations over delta[3:0]
+ *           (MODE 1) instead of a real multiplier; any other FRAC_W falls
+ *           back to a generic signed multiply (MODE 2, e.g. for LayerNorm's
+ *           wider fractional format). Both modes are mathematically
+ *           identical at FRAC_W==4 regardless of WIDTH (cross-validated
+ *           bit-exact against the hardware model), so the gate is FRAC_W==4
+ *           alone, not tied to any particular WIDTH.
  *
- * @param    WIDTH           TODO: Add description
- * @param    FRAC_W          TODO: Add description
+ * @param    WIDTH   Nominal word width this quadratic term feeds into
+ *                     (does not itself size any signal here; delta/quad_out
+ *                     are always FRAC_W-wide).
+ * @param    FRAC_W  Fractional bits of delta (also selects MODE 1 vs MODE 2).
  */
 module quadratic_divider #(
     parameter int WIDTH = 8,

@@ -157,7 +157,6 @@ module tr_softmax #(
     // Fixed ELEMWISE mode; op_mode selected per-pass at input capture time.
     // ====================================================================
     logic                    ew_valid;
-    logic [N-1:0]            ew_mask;
     logic signed [ACC_W-1:0] ew_out [N];
 
     vec_mul #(.N(N), .W(W), .ACC_W(ACC_W)) u_vec_mul_ew (
@@ -175,7 +174,7 @@ module tr_softmax #(
         .clear_acc     (1'b1),
         .out_valid     (ew_valid),
         .out_ready     (1'b1),
-        .out_valid_mask(ew_mask),
+        .out_valid_mask(),
         .out_vec       (ew_out)
     );
 

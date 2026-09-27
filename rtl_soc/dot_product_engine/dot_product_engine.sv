@@ -1,9 +1,14 @@
 /*
  * @module   dot_product_engine
  * @brief    Dense Matrix-Vector Compute Wrapper.
- * @details  Instantiates M parallel `mac_array_engine` lanes. 
+ * @details  Instantiates M parallel `mac_array_engine` lanes.
  *           Computes: Out[i] = SUM(A[i] * B) + C[i].
  *           Uses a broadcast architecture where Vector B is shared across all lanes.
+ *
+ * @param    M      Number of parallel output lanes (matrix height / rows of A).
+ * @param    N      Dot-product vector dimension (matrix width / shared length of A's rows and B).
+ * @param    W      Input operand width (a_mat/b_vec).
+ * @param    ACC_W  Accumulator/output width (c_vec bias and out_vec).
  */
 module dot_product_engine #(
     parameter int M     = 4,  // Number of parallel output lanes (Matrix Height)

@@ -2,10 +2,16 @@
 
 /*
  * @module   shared_lut_rom
- * @brief    TODO: Add one-line description
- * @details  TODO: Add detailed description
+ * @brief    8-entry e^-k anchor table shared by every tr_exp_alu lane.
+ * @details  Fixed Q0.8, format-independent ROM holding e^-1..e^-8 (the
+ *           decay-only anchor points tr_exp_alu's round.sv rounds x to).
+ *           Each of the N lanes independently indexes the same 8-entry
+ *           table via its own a_idx (only a_idx's low 3 bits are used --
+ *           the table itself does not grow with LUT_IDX_W).
  *
- * @param    N               TODO: Add description
+ * @param    N          Number of parallel lanes (independent index/lookup pairs).
+ * @param    LUT_IDX_W  Width of each a_idx port; only bits [2:0] select the
+ *                        (always 8-entry) table.
  */
 module shared_lut_rom #(
     parameter int N = 8,
