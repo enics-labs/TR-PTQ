@@ -28,8 +28,15 @@
  *           operator. Only Q4.4 (N=8, W=8, FRAC_W=4) is implemented/verified;
  *           other formats are out of scope for this comparison.
  *
- *           2-cycle latency: valid_in latches x_in, the polynomial is
- *           evaluated combinationally, y_out/valid_out register the result.
+ *           5-cycle latency, one multiply-sized chain per stage: S0 latches
+ *           x_in; S1 computes t=x/sqrt2 and the clipped erf-argument delta;
+ *           S2 squares delta; S3 forms erf(t) and (1+erf(t)); S4 does the
+ *           final x*(1+erf(t)) multiply, rescale and output clip. Every
+ *           intermediate is sized to its actual (hand-verified) numeric
+ *           range, not a generic wide type -- an earlier single-cycle,
+ *           unpipelined, 64-bit-everywhere version of this module missed a
+ *           3.3ns reg2reg target by ~4.5x (two chained ~50-bit multiplies on
+ *           one combinational path); this version fixes that.
  *
  * @param    N       Number of parallel lanes.
  * @param    W       Data width (Q4.4 native: 8).
@@ -67,70 +74,188 @@ module ibert_gelu #(
     localparam int ONE_Q8    = 256;
     localparam int Y_SHIFT   = 9;     // x_code(Q4.4) * one_plus_erf(Q1.8) -> /2 (GELU's 1/2) and back to Q4.4
 
-    function automatic signed [63:0] round_shift(input signed [63:0] val, input int shift);
-        round_shift = (val + (64'sd1 <<< (shift - 1))) >>> shift;
-    endfunction
+    // Hand-verified numeric ranges (x_code in [-128,127]):
+    //   t_code    in [-1449, 1449]          -> 12-bit signed is enough, use 13
+    //   delta     in [-453, 0]              -> 10-bit signed
+    //   delta_sq  in [0, 453^2=205209]      -> 18-bit unsigned, keep as 19-bit signed (sign=0)
+    //   erf_partial (post-shift) in [-232,0] -> 10-bit signed
+    //   one_plus_erf in [0, 512]            -> 11-bit signed (sign=0)
+    //   y_raw (post-shift) in ~[-128,128]   -> 10-bit signed, then clipped to W bits
 
     // ---------------------------------------------------------------
     // Stage 0: latch input
     // ---------------------------------------------------------------
-    logic signed [W-1:0] x_reg [N];
+    logic signed [W-1:0] x_reg0 [N];
     logic                s0_valid;
 
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             s0_valid <= 1'b0;
-            for (int i = 0; i < N; i++) x_reg[i] <= '0;
+            for (int i = 0; i < N; i++) x_reg0[i] <= '0;
         end else begin
             s0_valid <= valid_in;
-            if (valid_in) x_reg <= x_in;
+            if (valid_in) x_reg0 <= x_in;
         end
     end
 
     // ---------------------------------------------------------------
-    // Stage 1: combinational polynomial evaluation, per lane
+    // Stage 1: t = x/sqrt2 (Q0.8), clipped erf-argument delta = clip(|t|,CLIP_T)+B_CODE
+    // ---------------------------------------------------------------
+    logic signed [W-1:0]  x_reg1 [N];
+    logic signed [9:0]    delta1 [N];
+    logic                 qsgn1  [N];
+    logic                 s1_valid;
+
+    always_comb begin
+        for (int i = 0; i < N; i++) begin
+            logic signed [19:0] t_raw;
+            logic signed [19:0] t_shifted;
+            logic signed [12:0] t_code;
+            logic [10:0]        q_abs_full;
+            logic [8:0]         q_abs;
+
+            t_raw     = 20'(x_reg0[i]) * 20'(K1);
+            t_shifted = (t_raw + (20'sd1 <<< (K1_SHIFT - 1))) >>> K1_SHIFT;
+            t_code    = 13'(t_shifted);
+
+            qsgn1[i]   = t_code[12];
+            q_abs_full = qsgn1[i] ? 11'(-t_code) : 11'(t_code);
+            q_abs      = (q_abs_full > 11'(CLIP_T)) ? 9'(CLIP_T) : 9'(q_abs_full);
+
+            delta1[i] = {1'b0, q_abs} + 10'(B_CODE);
+        end
+    end
+
+    always_ff @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            s1_valid <= 1'b0;
+            for (int i = 0; i < N; i++) begin
+                x_reg1[i] <= '0;
+            end
+        end else begin
+            s1_valid <= s0_valid;
+            if (s0_valid) x_reg1 <= x_reg0;
+        end
+    end
+
+    logic signed [9:0] delta_reg [N];
+    logic              qsgn_reg  [N];
+
+    always_ff @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            for (int i = 0; i < N; i++) begin delta_reg[i] <= '0; qsgn_reg[i] <= 1'b0; end
+        end else if (s0_valid) begin
+            delta_reg <= delta1;
+            qsgn_reg  <= qsgn1;
+        end
+    end
+
+    // ---------------------------------------------------------------
+    // Stage 2: delta_sq = delta^2
+    // ---------------------------------------------------------------
+    logic signed [W-1:0] x_reg2 [N];
+    logic signed [18:0]  delta_sq2 [N];
+    logic                qsgn2     [N];
+    logic                s2_valid;
+
+    always_comb
+        for (int i = 0; i < N; i++)
+            delta_sq2[i] = 19'(delta_reg[i]) * 19'(delta_reg[i]);
+
+    always_ff @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            s2_valid <= 1'b0;
+            for (int i = 0; i < N; i++) x_reg2[i] <= '0;
+        end else begin
+            s2_valid <= s1_valid;
+            if (s1_valid) x_reg2 <= x_reg1;
+        end
+    end
+
+    logic signed [18:0] delta_sq_reg [N];
+    logic                qsgn_reg2   [N];
+
+    always_ff @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            for (int i = 0; i < N; i++) begin delta_sq_reg[i] <= '0; qsgn_reg2[i] <= 1'b0; end
+        end else if (s1_valid) begin
+            delta_sq_reg <= delta_sq2;
+            qsgn_reg2    <= qsgn_reg;
+        end
+    end
+
+    // ---------------------------------------------------------------
+    // Stage 3: erf(t) = sgn(t)*(a*delta^2 + 1), one_plus_erf = 1 + erf(t)
+    // ---------------------------------------------------------------
+    logic signed [W-1:0] x_reg3 [N];
+    logic signed [10:0]  one_plus_erf3 [N];
+    logic                s3_valid;
+
+    always_comb begin
+        for (int i = 0; i < N; i++) begin
+            logic signed [24:0] erf_raw;
+            logic signed [24:0] erf_shifted;
+            logic signed [9:0]  erf_partial;
+            logic signed [10:0] erf_pos, erf;
+
+            erf_raw     = 25'(A_CODE) * 25'(delta_sq_reg[i]);
+            erf_shifted = (erf_raw + (25'sd1 <<< (A_SHIFT - 1))) >>> A_SHIFT;
+            erf_partial = 10'(erf_shifted);
+
+            erf_pos = 11'(erf_partial) + 11'(ONE_Q8);
+            erf     = qsgn_reg2[i] ? -erf_pos : erf_pos;
+
+            one_plus_erf3[i] = erf + 11'(ONE_Q8);
+        end
+    end
+
+    always_ff @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            s3_valid <= 1'b0;
+            for (int i = 0; i < N; i++) x_reg3[i] <= '0;
+        end else begin
+            s3_valid <= s2_valid;
+            if (s2_valid) x_reg3 <= x_reg2;
+        end
+    end
+
+    logic signed [10:0] one_plus_erf_reg [N];
+    always_ff @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            for (int i = 0; i < N; i++) one_plus_erf_reg[i] <= '0;
+        end else if (s2_valid) begin
+            one_plus_erf_reg <= one_plus_erf3;
+        end
+    end
+
+    // ---------------------------------------------------------------
+    // Stage 4: y = round(x * (1+erf(t)) / 2^Y_SHIFT), clip to W-bit signed
     // ---------------------------------------------------------------
     logic signed [W-1:0] y_comb [N];
 
     always_comb begin
         for (int i = 0; i < N; i++) begin
-            logic signed [63:0] t_code, q_abs_full, q_abs, delta, delta_sq;
-            logic signed [63:0] erf_partial, erf_pos, erf, one_plus_erf, y_raw, y_clip;
-            logic qsgn;
+            logic signed [18:0] y_raw_full;
+            logic signed [18:0] y_shifted;
+            logic signed [9:0]  y_raw;
 
-            t_code     = round_shift(64'(x_reg[i]) * K1, K1_SHIFT);
-            qsgn       = t_code[63];
-            q_abs_full = qsgn ? -t_code : t_code;
-            q_abs      = (q_abs_full > CLIP_T) ? 64'(CLIP_T) : q_abs_full;
+            y_raw_full = 19'(x_reg3[i]) * 19'(one_plus_erf_reg[i]);
+            y_shifted  = (y_raw_full + (19'sd1 <<< (Y_SHIFT - 1))) >>> Y_SHIFT;
+            y_raw      = 10'(y_shifted);
 
-            delta       = q_abs + B_CODE;               // in [B_CODE, 0]
-            delta_sq    = delta * delta;                  // in [0, CLIP_T^2]
-            erf_partial = round_shift(A_CODE * delta_sq, A_SHIFT);
-            erf_pos     = erf_partial + ONE_Q8;            // L(t) for t>=0, Q0.8
-            erf         = qsgn ? -erf_pos : erf_pos;       // sgn(t) applied
-
-            one_plus_erf = erf + ONE_Q8;                   // (1+erf(t)) in Q1.8, range [0, 2*ONE_Q8]
-            y_raw        = round_shift(64'(x_reg[i]) * one_plus_erf, Y_SHIFT);
-
-            // Saturate to the signed W-bit output range.
-            if (y_raw > (64'sd1 <<< (W - 1)) - 1) y_clip = (64'sd1 <<< (W - 1)) - 1;
-            else if (y_raw < -(64'sd1 <<< (W - 1))) y_clip = -(64'sd1 <<< (W - 1));
-            else y_clip = y_raw;
-
-            y_comb[i] = W'(y_clip);
+            if (y_raw > 10'((1 <<< (W - 1)) - 1)) y_comb[i] = W'((1 <<< (W - 1)) - 1);
+            else if (y_raw < -10'(1 <<< (W - 1))) y_comb[i] = -W'(1 <<< (W - 1));
+            else y_comb[i] = W'(y_raw);
         end
     end
 
-    // ---------------------------------------------------------------
-    // Stage 2: register output
-    // ---------------------------------------------------------------
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             valid_out <= 1'b0;
             for (int i = 0; i < N; i++) y_out[i] <= '0;
         end else begin
-            valid_out <= s0_valid;
-            if (s0_valid) y_out <= y_comb;
+            valid_out <= s3_valid;
+            if (s3_valid) y_out <= y_comb;
         end
     end
 
