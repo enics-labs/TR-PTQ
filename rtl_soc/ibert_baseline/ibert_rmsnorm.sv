@@ -27,6 +27,18 @@
  *           reused sequentially across the sqrt iterations and the N lane
  *           divisions. Only Q4.4 (N=8, W=8, FRAC_W=4) is implemented/verified.
  *
+ *           Timing fix: the original sum-of-squares reduction used generic
+ *           32-bit signed multiplies and a linear (sequentially-dependent,
+ *           depth-N) accumulate, and the I-SQRT initial-guess exponent finder
+ *           used a 16-way *linear* priority scan over mean_sq -- both are the
+ *           same class of long-combinational-chain bug that made ibert_gelu
+ *           miss its 3.3ns reg2reg target. This version narrows the squaring
+ *           to its hand-verified 15-bit range, replaces the linear sum with a
+ *           balanced 3-level reduction tree (depth log2(N)=3), and replaces
+ *           the 16-way linear MSB scan with a 4-level binary-search MSB
+ *           finder (hardcoded for MEANSQ_W=16, the only width this module
+ *           supports).
+ *
  * @param    N       Number of parallel lanes (must be a power of 2 for the
  *                    >>>3 exact-divide-by-N shortcut used here; N=8).
  * @param    W       Data width (Q4.4 native: 8).
@@ -111,21 +123,64 @@ module ibert_rmsnorm #(
     end
 
     // ---------------------------------------------------------------
-    // sum(x_j^2) and its own combinational MSB finder (for I-SQRT's x0)
+    // sum(x_j^2): per-lane square hand-sized to its real range (x_reg in
+    // [-128,127] -> square in [0,16384], 15 bits), summed via a balanced
+    // 3-level reduction tree instead of a linear (depth-N) accumulate.
     // ---------------------------------------------------------------
+    logic [14:0] sq [N];
+    always_comb
+        for (int i = 0; i < N; i++)
+            // abs_x is unsigned magnitude (0..128); widen both multiplicands
+            // to 9 bits before multiplying so the product isn't truncated to
+            // the operands' own (too-narrow) self-determined width.
+            sq[i] = 15'(9'(abs_x[i]) * 9'(abs_x[i]));
+
+    logic [15:0] sumsq_l1 [N/2];
+    logic [16:0] sumsq_l2 [N/4];
     logic [SUMSQ_W-1:0] sumsq_comb;
     always_comb begin
-        sumsq_comb = '0;
-        for (int i = 0; i < N; i++)
-            sumsq_comb = sumsq_comb + SUMSQ_W'(32'(x_reg[i]) * 32'(x_reg[i]));
+        for (int i = 0; i < N/2; i++)
+            sumsq_l1[i] = 16'(sq[2*i]) + 16'(sq[2*i+1]);
+        for (int i = 0; i < N/4; i++)
+            sumsq_l2[i] = 17'(sumsq_l1[2*i]) + 17'(sumsq_l1[2*i+1]);
+        sumsq_comb = SUMSQ_W'(sumsq_l2[0]) + SUMSQ_W'(sumsq_l2[1]);
     end
 
+    // MSB finder for I-SQRT's x0: 4-level binary search (hardcoded for
+    // MEANSQ_W=16) instead of a 16-way linear scan.
     logic [$clog2(MEANSQ_W)-1:0] msb_pos;
     logic [$clog2(MEANSQ_W+1)-1:0] bits_n, ceil_half;
     always_comb begin
-        msb_pos = '0;
-        for (int i = 0; i < MEANSQ_W; i++)
-            if (mean_sq[i]) msb_pos = i[$clog2(MEANSQ_W)-1:0];
+        logic [7:0] v8;
+        logic [3:0] v4;
+        logic [1:0] v2;
+
+        if (mean_sq[15:8] != 8'b0) begin
+            msb_pos[3] = 1'b1;
+            v8 = mean_sq[15:8];
+        end else begin
+            msb_pos[3] = 1'b0;
+            v8 = mean_sq[7:0];
+        end
+
+        if (v8[7:4] != 4'b0) begin
+            msb_pos[2] = 1'b1;
+            v4 = v8[7:4];
+        end else begin
+            msb_pos[2] = 1'b0;
+            v4 = v8[3:0];
+        end
+
+        if (v4[3:2] != 2'b0) begin
+            msb_pos[1] = 1'b1;
+            v2 = v4[3:2];
+        end else begin
+            msb_pos[1] = 1'b0;
+            v2 = v4[1:0];
+        end
+
+        msb_pos[0] = v2[1];
+
         bits_n    = {1'b0, msb_pos} + 1'b1;
         ceil_half = (bits_n + 1'b1) >> 1;
     end
