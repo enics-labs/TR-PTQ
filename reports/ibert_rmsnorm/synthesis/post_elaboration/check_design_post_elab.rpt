@@ -1,0 +1,519 @@
+
+ 	 Check Design Report (c)
+	 ------------------- 
+No subdesign's name is greater than 1.5k in length.
+
+ Feedthrough Module(s)
+ -------------------------
+No feed through module in 'ibert_rmsnorm'
+
+  Unresolved References & Empty Modules
+  ------------------------------------- 
+No unresolved references in design 'ibert_rmsnorm'
+
+No empty modules in design 'ibert_rmsnorm'
+
+ Unloaded Pin(s), Port(s)
+ -------------------------
+design 'ibert_rmsnorm' has the following unloaded sequential elements
+inst:ibert_rmsnorm/u_div/busy_reg
+inst:ibert_rmsnorm/u_div/remainder_reg[0]
+inst:ibert_rmsnorm/u_div/remainder_reg[1]
+inst:ibert_rmsnorm/u_div/remainder_reg[2]
+inst:ibert_rmsnorm/u_div/remainder_reg[3]
+inst:ibert_rmsnorm/u_div/remainder_reg[4]
+inst:ibert_rmsnorm/u_div/remainder_reg[5]
+inst:ibert_rmsnorm/u_div/remainder_reg[6]
+inst:ibert_rmsnorm/u_div/remainder_reg[7]
+inst:ibert_rmsnorm/u_div/remainder_reg[8]
+inst:ibert_rmsnorm/u_div/remainder_reg[9]
+inst:ibert_rmsnorm/u_div/remainder_reg[10]
+inst:ibert_rmsnorm/u_div/remainder_reg[11]
+inst:ibert_rmsnorm/u_div/remainder_reg[12]
+inst:ibert_rmsnorm/u_div/remainder_reg[13]
+inst:ibert_rmsnorm/u_div/remainder_reg[14]
+inst:ibert_rmsnorm/u_div/remainder_reg[15]
+inst:ibert_rmsnorm/u_div/remainder_reg[16]
+inst:ibert_rmsnorm/u_div/remainder_reg[17]
+inst:ibert_rmsnorm/u_div/remainder_reg[18]
+inst:ibert_rmsnorm/u_div/remainder_reg[19]
+inst:ibert_rmsnorm/u_div/remainder_reg[20]
+inst:ibert_rmsnorm/u_div/remainder_reg[21]
+inst:ibert_rmsnorm/u_div/remainder_reg[22]
+inst:ibert_rmsnorm/u_div/remainder_reg[23]
+Total number of unloaded sequential elements in design 'ibert_rmsnorm' : 25
+
+No unloaded port in 'ibert_rmsnorm'
+
+ Unloaded Combinational Pin(s)
+ -------------------------------
+design 'ibert_rmsnorm' has the following unloaded combinational elements
+pin:ibert_rmsnorm/u_div/ctl_state_60_19/g6/z
+pin:ibert_rmsnorm/add_146_44/g1/z
+pin:ibert_rmsnorm/add_146_44/g155/z
+pin:ibert_rmsnorm/add_146_44/g157/z
+pin:ibert_rmsnorm/add_239_46/g1/z
+pin:ibert_rmsnorm/minus_262_70/g68/z
+pin:ibert_rmsnorm/add006335/g1/z
+pin:ibert_rmsnorm/ctl_state_204_19/g25/z
+Total number of unloaded combinational elements in design 'ibert_rmsnorm' : 8
+
+ Assigns
+ ------- 
+Encountered an assign statement at hport 'hport:ibert_rmsnorm/minus_262_70/Z[31]' in module sub_unsigned_391
+Encountered an assign statement at hport 'hport:ibert_rmsnorm/minus_262_70/Z[30]' in module sub_unsigned_391
+Encountered an assign statement at hport 'hport:ibert_rmsnorm/minus_262_70/Z[29]' in module sub_unsigned_391
+Encountered an assign statement at hport 'hport:ibert_rmsnorm/minus_262_70/Z[28]' in module sub_unsigned_391
+Encountered an assign statement at hport 'hport:ibert_rmsnorm/minus_262_70/Z[27]' in module sub_unsigned_391
+Encountered an assign statement at hport 'hport:ibert_rmsnorm/minus_262_70/Z[26]' in module sub_unsigned_391
+Encountered an assign statement at hport 'hport:ibert_rmsnorm/minus_262_70/Z[25]' in module sub_unsigned_391
+Encountered an assign statement at hport 'hport:ibert_rmsnorm/minus_262_70/Z[24]' in module sub_unsigned_391
+Encountered an assign statement at hport 'hport:ibert_rmsnorm/minus_262_70/Z[23]' in module sub_unsigned_391
+Encountered an assign statement at hport 'hport:ibert_rmsnorm/minus_262_70/Z[22]' in module sub_unsigned_391
+Encountered an assign statement at hport 'hport:ibert_rmsnorm/minus_262_70/Z[21]' in module sub_unsigned_391
+Encountered an assign statement at hport 'hport:ibert_rmsnorm/minus_262_70/Z[20]' in module sub_unsigned_391
+Encountered an assign statement at hport 'hport:ibert_rmsnorm/minus_262_70/Z[19]' in module sub_unsigned_391
+Encountered an assign statement at hport 'hport:ibert_rmsnorm/minus_262_70/Z[18]' in module sub_unsigned_391
+Encountered an assign statement at hport 'hport:ibert_rmsnorm/minus_262_70/Z[17]' in module sub_unsigned_391
+Encountered an assign statement at hport 'hport:ibert_rmsnorm/minus_262_70/Z[16]' in module sub_unsigned_391
+Encountered an assign statement at hport 'hport:ibert_rmsnorm/minus_262_70/Z[15]' in module sub_unsigned_391
+Encountered an assign statement at hport 'hport:ibert_rmsnorm/minus_262_70/Z[14]' in module sub_unsigned_391
+Encountered an assign statement at hport 'hport:ibert_rmsnorm/minus_262_70/Z[13]' in module sub_unsigned_391
+Encountered an assign statement at hport 'hport:ibert_rmsnorm/minus_262_70/Z[12]' in module sub_unsigned_391
+Encountered an assign statement at hport 'hport:ibert_rmsnorm/minus_262_70/Z[11]' in module sub_unsigned_391
+Encountered an assign statement at hport 'hport:ibert_rmsnorm/minus_262_70/Z[10]' in module sub_unsigned_391
+Encountered an assign statement at hport 'hport:ibert_rmsnorm/minus_262_70/Z[9]' in module sub_unsigned_391
+Encountered an assign statement at hport 'hport:ibert_rmsnorm/minus_262_70/Z[8]' in module sub_unsigned_391
+Encountered an assign statement at hport 'hport:ibert_rmsnorm/ctl_lane_cnt_262_25/out_0[0]' in module case_box_38
+Total number of assign statements in design 'ibert_rmsnorm' : 25
+
+ Undriven Port(s)/Pin(s)
+ ------------------------
+No undriven combinational pin in 'ibert_rmsnorm'
+
+No undriven sequential pin in 'ibert_rmsnorm'
+
+No undriven hierarchical pin in 'ibert_rmsnorm'
+
+No undriven port in 'ibert_rmsnorm'
+
+ Multidriven Port(s)/Pin(s)
+--------------------------
+
+No multidriven combinational pin in 'ibert_rmsnorm'
+
+No multidriven sequential pin in 'ibert_rmsnorm'
+
+No multidriven hierarchical pin in 'ibert_rmsnorm'
+
+No multidriven ports in 'ibert_rmsnorm'
+
+No multidriven unloaded nets in 'ibert_rmsnorm'
+
+  Constant Pin(s)
+  ----------------
+No constant combinational pin(s) in design 'ibert_rmsnorm'
+
+No constant sequential pin(s) in design 'ibert_rmsnorm'
+
+design 'ibert_rmsnorm' has the following constant input hierarchical pin(s)
+hpin:ibert_rmsnorm/u_div/divisor[23] 	 (fanout : 2)
+hpin:ibert_rmsnorm/u_div/divisor[22] 	 (fanout : 2)
+hpin:ibert_rmsnorm/u_div/divisor[21] 	 (fanout : 2)
+hpin:ibert_rmsnorm/u_div/divisor[20] 	 (fanout : 2)
+hpin:ibert_rmsnorm/u_div/divisor[19] 	 (fanout : 2)
+hpin:ibert_rmsnorm/u_div/divisor[18] 	 (fanout : 2)
+hpin:ibert_rmsnorm/u_div/divisor[17] 	 (fanout : 2)
+hpin:ibert_rmsnorm/u_div/divisor[16] 	 (fanout : 2)
+hpin:ibert_rmsnorm/eq_218_33/B 	 (fanout : 1)
+hpin:ibert_rmsnorm/eq_113_19/B[1] 	 (fanout : 1)
+hpin:ibert_rmsnorm/eq_113_19/B[0] 	 (fanout : 1)
+hpin:ibert_rmsnorm/eq_113_46/B[2] 	 (fanout : 1)
+hpin:ibert_rmsnorm/eq_113_46/B[1] 	 (fanout : 1)
+hpin:ibert_rmsnorm/eq_113_46/B[0] 	 (fanout : 1)
+hpin:ibert_rmsnorm/add_120_68/A[23] 	 (fanout : 2)
+hpin:ibert_rmsnorm/add_120_68/A[22] 	 (fanout : 2)
+hpin:ibert_rmsnorm/add_120_68/A[21] 	 (fanout : 2)
+hpin:ibert_rmsnorm/add_120_68/A[20] 	 (fanout : 2)
+hpin:ibert_rmsnorm/add_120_68/A[19] 	 (fanout : 2)
+hpin:ibert_rmsnorm/add_120_68/A[18] 	 (fanout : 2)
+hpin:ibert_rmsnorm/add_120_68/A[17] 	 (fanout : 2)
+hpin:ibert_rmsnorm/add_120_68/A[16] 	 (fanout : 2)
+hpin:ibert_rmsnorm/add_120_68/A[15] 	 (fanout : 2)
+hpin:ibert_rmsnorm/add_120_68/A[14] 	 (fanout : 2)
+hpin:ibert_rmsnorm/add_120_68/A[13] 	 (fanout : 2)
+hpin:ibert_rmsnorm/add_120_68/A[12] 	 (fanout : 2)
+hpin:ibert_rmsnorm/add_120_68/A[3] 	 (fanout : 2)
+hpin:ibert_rmsnorm/add_120_68/A[2] 	 (fanout : 2)
+hpin:ibert_rmsnorm/add_120_68/A[1] 	 (fanout : 2)
+hpin:ibert_rmsnorm/add_120_68/A[0] 	 (fanout : 2)
+hpin:ibert_rmsnorm/add_120_68/B[23] 	 (fanout : 2)
+hpin:ibert_rmsnorm/add_120_68/B[22] 	 (fanout : 2)
+hpin:ibert_rmsnorm/add_120_68/B[21] 	 (fanout : 2)
+hpin:ibert_rmsnorm/add_120_68/B[20] 	 (fanout : 2)
+hpin:ibert_rmsnorm/add_120_68/B[19] 	 (fanout : 2)
+hpin:ibert_rmsnorm/add_120_68/B[18] 	 (fanout : 2)
+hpin:ibert_rmsnorm/add_120_68/B[17] 	 (fanout : 2)
+hpin:ibert_rmsnorm/add_120_68/B[16] 	 (fanout : 2)
+hpin:ibert_rmsnorm/add_120_68/B[15] 	 (fanout : 2)
+hpin:ibert_rmsnorm/gte_240_32/A[16] 	 (fanout : 1)
+hpin:ibert_rmsnorm/eq_240_65/B[3] 	 (fanout : 1)
+hpin:ibert_rmsnorm/eq_240_65/B[2] 	 (fanout : 1)
+hpin:ibert_rmsnorm/eq_240_65/B[1] 	 (fanout : 1)
+hpin:ibert_rmsnorm/eq_240_65/B[0] 	 (fanout : 1)
+hpin:ibert_rmsnorm/eq_263_38/B[2] 	 (fanout : 1)
+hpin:ibert_rmsnorm/eq_263_38/B[1] 	 (fanout : 1)
+hpin:ibert_rmsnorm/eq_263_38/B[0] 	 (fanout : 1)
+hpin:ibert_rmsnorm/sll_221_52/A 	 (fanout : 0)
+hpin:ibert_rmsnorm/add_246_46/B 	 (fanout : 2)
+hpin:ibert_rmsnorm/minus_262_70/A 	 (fanout : 2)
+hpin:ibert_rmsnorm/gt_260_43/B[6] 	 (fanout : 2)
+hpin:ibert_rmsnorm/gt_260_43/B[5] 	 (fanout : 2)
+hpin:ibert_rmsnorm/gt_260_43/B[4] 	 (fanout : 2)
+hpin:ibert_rmsnorm/gt_260_43/B[3] 	 (fanout : 2)
+hpin:ibert_rmsnorm/gt_260_43/B[2] 	 (fanout : 2)
+hpin:ibert_rmsnorm/gt_260_43/B[1] 	 (fanout : 2)
+hpin:ibert_rmsnorm/gt_260_43/B[0] 	 (fanout : 1)
+hpin:ibert_rmsnorm/add_266_50/B 	 (fanout : 2)
+hpin:ibert_rmsnorm/minus_105_43_I1/A 	 (fanout : 14)
+hpin:ibert_rmsnorm/minus_105_43_I2/A 	 (fanout : 14)
+hpin:ibert_rmsnorm/minus_105_43_I3/A 	 (fanout : 14)
+hpin:ibert_rmsnorm/minus_105_43_I4/A 	 (fanout : 14)
+hpin:ibert_rmsnorm/minus_105_43_I5/A 	 (fanout : 14)
+hpin:ibert_rmsnorm/minus_105_43_I6/A 	 (fanout : 14)
+hpin:ibert_rmsnorm/minus_105_43_I7/A 	 (fanout : 14)
+hpin:ibert_rmsnorm/minus_105_43_I8/A 	 (fanout : 14)
+hpin:ibert_rmsnorm/add006335/A[1] 	 (fanout : 2)
+hpin:ibert_rmsnorm/add006335/A[0] 	 (fanout : 2)
+hpin:ibert_rmsnorm/neq_174_21/B 	 (fanout : 1)
+hpin:ibert_rmsnorm/neq_166_21/B 	 (fanout : 1)
+hpin:ibert_rmsnorm/neq_158_27/B 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_state_218_33/in_0[1] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_state_218_33/in_0[0] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_state_218_33/in_1[1] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_state_218_33/in_1[0] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_msb_pos_158_27/in_0 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_msb_pos_158_27/in_1 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_msb_pos_166_21/in_0 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_msb_pos_166_21/in_1 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_msb_pos_174_21/in_0 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_msb_pos_174_21/in_1 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_div_dividend_113_37/in_1[23] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_div_dividend_113_37/in_1[22] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_div_dividend_113_37/in_1[21] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_div_dividend_113_37/in_1[20] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_div_dividend_113_37/in_1[19] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_div_dividend_113_37/in_1[18] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_div_dividend_113_37/in_1[17] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_div_dividend_113_37/in_1[16] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_state_240_53/in_0 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_state_240_53/in_1 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_state_263_38/in_0[2] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_state_263_38/in_0[1] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_state_263_38/in_0[0] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_state_263_38/in_1[2] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_state_263_38/in_1[1] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_state_263_38/in_1[0] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_cmbsop_div_valid_in_204_19/in_0[1] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_cmbsop_div_valid_in_204_19/in_0[0] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_cmbsop_div_valid_in_204_19/in_1[1] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_cmbsop_div_valid_in_204_19/in_1[0] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_cmbsop_div_valid_in_204_19/in_2[1] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_cmbsop_div_valid_in_204_19/in_2[0] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_cmbsop_div_valid_in_204_19/in_3[1] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_cmbsop_div_valid_in_204_19/in_3[0] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_cmbsop_div_valid_in_204_19/in_4[1] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_cmbsop_div_valid_in_204_19/in_4[0] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_iter_cnt_204_19/in_0[4] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_iter_cnt_204_19/in_0[3] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_iter_cnt_204_19/in_0[2] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_iter_cnt_204_19/in_0[1] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_iter_cnt_204_19/in_0[0] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_lane_cnt_204_19/in_0[2] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_lane_cnt_204_19/in_0[1] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_lane_cnt_204_19/in_0[0] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_state_204_19/in_0[3] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_state_204_19/in_0[2] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_state_204_19/in_0[1] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_state_204_19/in_0[0] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_state_204_19/in_1[3] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_state_204_19/in_1[2] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_state_204_19/in_1[1] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_state_204_19/in_1[0] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_state_204_19/in_2[3] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_state_204_19/in_2[1] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_state_204_19/in_3[3] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_state_204_19/in_3[2] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_state_204_19/in_3[1] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_state_204_19/in_3[0] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_state_204_19/in_4[3] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_state_204_19/in_4[2] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_state_204_19/in_4[1] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_state_204_19/in_4[0] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_state_204_19/in_5[3] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_state_204_19/in_5[1] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_state_204_19/in_5[0] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_state_204_19/in_6[3] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_state_204_19/in_6[2] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_state_204_19/in_6[1] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_state_204_19/in_6[0] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_state_204_19/in_7[3] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_state_204_19/in_7[2] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_state_204_19/in_7[1] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_state_204_19/in_7[0] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_state_204_19/in_8[0] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_state_204_19/in_9[3] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_state_204_19/in_9[2] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_state_204_19/in_9[1] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_state_204_19/in_9[0] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_y_out[0]_204_19/in_0[7] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_y_out[0]_204_19/in_0[6] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_y_out[0]_204_19/in_0[5] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_y_out[0]_204_19/in_0[4] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_y_out[0]_204_19/in_0[3] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_y_out[0]_204_19/in_0[2] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_y_out[0]_204_19/in_0[1] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_y_out[0]_204_19/in_0[0] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_y_out[1]_204_19/in_0[7] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_y_out[1]_204_19/in_0[6] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_y_out[1]_204_19/in_0[5] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_y_out[1]_204_19/in_0[4] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_y_out[1]_204_19/in_0[3] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_y_out[1]_204_19/in_0[2] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_y_out[1]_204_19/in_0[1] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_y_out[1]_204_19/in_0[0] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_y_out[2]_204_19/in_0[7] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_y_out[2]_204_19/in_0[6] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_y_out[2]_204_19/in_0[5] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_y_out[2]_204_19/in_0[4] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_y_out[2]_204_19/in_0[3] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_y_out[2]_204_19/in_0[2] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_y_out[2]_204_19/in_0[1] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_y_out[2]_204_19/in_0[0] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_y_out[3]_204_19/in_0[7] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_y_out[3]_204_19/in_0[6] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_y_out[3]_204_19/in_0[5] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_y_out[3]_204_19/in_0[4] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_y_out[3]_204_19/in_0[3] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_y_out[3]_204_19/in_0[2] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_y_out[3]_204_19/in_0[1] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_y_out[3]_204_19/in_0[0] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_y_out[4]_204_19/in_0[7] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_y_out[4]_204_19/in_0[6] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_y_out[4]_204_19/in_0[5] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_y_out[4]_204_19/in_0[4] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_y_out[4]_204_19/in_0[3] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_y_out[4]_204_19/in_0[2] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_y_out[4]_204_19/in_0[1] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_y_out[4]_204_19/in_0[0] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_y_out[5]_204_19/in_0[7] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_y_out[5]_204_19/in_0[6] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_y_out[5]_204_19/in_0[5] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_y_out[5]_204_19/in_0[4] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_y_out[5]_204_19/in_0[3] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_y_out[5]_204_19/in_0[2] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_y_out[5]_204_19/in_0[1] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_y_out[5]_204_19/in_0[0] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_y_out[6]_204_19/in_0[7] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_y_out[6]_204_19/in_0[6] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_y_out[6]_204_19/in_0[5] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_y_out[6]_204_19/in_0[4] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_y_out[6]_204_19/in_0[3] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_y_out[6]_204_19/in_0[2] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_y_out[6]_204_19/in_0[1] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_y_out[6]_204_19/in_0[0] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_y_out[7]_204_19/in_0[7] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_y_out[7]_204_19/in_0[6] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_y_out[7]_204_19/in_0[5] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_y_out[7]_204_19/in_0[4] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_y_out[7]_204_19/in_0[3] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_y_out[7]_204_19/in_0[2] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_y_out[7]_204_19/in_0[1] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_y_out[7]_204_19/in_0[0] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_260_43/in_1[7] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_260_43/in_1[6] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_260_43/in_1[5] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_260_43/in_1[4] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_260_43/in_1[3] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_260_43/in_1[2] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_260_43/in_1[1] 	 (fanout : 1)
+hpin:ibert_rmsnorm/mux_260_43/in_1[0] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/eq_63_37/B 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/eq_90_29/B 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/sub_89_34/B 	 (fanout : 2)
+hpin:ibert_rmsnorm/u_div/mux_cnt_60_19/in_0[4] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_cnt_60_19/in_0[3] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_cnt_60_19/in_0[2] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_cnt_60_19/in_0[1] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_cnt_60_19/in_0[0] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_a_reg_60_19/in_1[0] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_q_reg_80_25/in_0 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_q_reg_80_25/in_1 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_q_reg_60_19/in_0[23] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_q_reg_60_19/in_0[22] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_q_reg_60_19/in_0[21] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_q_reg_60_19/in_0[20] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_q_reg_60_19/in_0[19] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_q_reg_60_19/in_0[18] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_q_reg_60_19/in_0[17] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_q_reg_60_19/in_0[16] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_q_reg_60_19/in_0[15] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_q_reg_60_19/in_0[14] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_q_reg_60_19/in_0[13] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_q_reg_60_19/in_0[12] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_q_reg_60_19/in_0[11] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_q_reg_60_19/in_0[10] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_q_reg_60_19/in_0[9] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_q_reg_60_19/in_0[8] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_q_reg_60_19/in_0[7] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_q_reg_60_19/in_0[6] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_q_reg_60_19/in_0[5] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_q_reg_60_19/in_0[4] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_q_reg_60_19/in_0[3] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_q_reg_60_19/in_0[2] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_q_reg_60_19/in_0[1] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_q_reg_60_19/in_0[0] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_remainder_60_19/in_0[23] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_remainder_60_19/in_0[22] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_remainder_60_19/in_0[21] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_remainder_60_19/in_0[20] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_remainder_60_19/in_0[19] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_remainder_60_19/in_0[18] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_remainder_60_19/in_0[17] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_remainder_60_19/in_0[16] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_remainder_60_19/in_0[15] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_remainder_60_19/in_0[14] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_remainder_60_19/in_0[13] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_remainder_60_19/in_0[12] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_remainder_60_19/in_0[11] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_remainder_60_19/in_0[10] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_remainder_60_19/in_0[9] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_remainder_60_19/in_0[8] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_remainder_60_19/in_0[7] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_remainder_60_19/in_0[6] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_remainder_60_19/in_0[5] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_remainder_60_19/in_0[4] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_remainder_60_19/in_0[3] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_remainder_60_19/in_0[2] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_remainder_60_19/in_0[1] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_remainder_60_19/in_0[0] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_quotient_60_19/in_0[23] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_quotient_60_19/in_0[22] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_quotient_60_19/in_0[21] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_quotient_60_19/in_0[20] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_quotient_60_19/in_0[19] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_quotient_60_19/in_0[18] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_quotient_60_19/in_0[17] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_quotient_60_19/in_0[16] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_quotient_60_19/in_0[15] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_quotient_60_19/in_0[14] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_quotient_60_19/in_0[13] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_quotient_60_19/in_0[12] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_quotient_60_19/in_0[11] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_quotient_60_19/in_0[10] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_quotient_60_19/in_0[9] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_quotient_60_19/in_0[8] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_quotient_60_19/in_0[7] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_quotient_60_19/in_0[6] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_quotient_60_19/in_0[5] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_quotient_60_19/in_0[4] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_quotient_60_19/in_0[3] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_quotient_60_19/in_0[2] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_quotient_60_19/in_0[1] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_quotient_60_19/in_0[0] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_valid_out_63_37/in_0 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_valid_out_63_37/in_1 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_valid_out_62_25/in_0 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_valid_out_60_19/in_1 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_valid_out_60_19/in_2 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_valid_out_60_19/in_3 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_busy_60_19/in_0 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_busy_60_19/in_1 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_state_60_19/in_0[1] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_state_60_19/in_0[0] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_state_60_19/in_1[1] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_state_60_19/in_1[0] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_state_60_19/in_2[1] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_state_60_19/in_2[0] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_r_reg_60_19/in_0[23] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_r_reg_60_19/in_0[22] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_r_reg_60_19/in_0[21] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_r_reg_60_19/in_0[20] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_r_reg_60_19/in_0[19] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_r_reg_60_19/in_0[18] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_r_reg_60_19/in_0[17] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_r_reg_60_19/in_0[16] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_r_reg_60_19/in_0[15] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_r_reg_60_19/in_0[14] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_r_reg_60_19/in_0[13] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_r_reg_60_19/in_0[12] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_r_reg_60_19/in_0[11] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_r_reg_60_19/in_0[10] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_r_reg_60_19/in_0[9] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_r_reg_60_19/in_0[8] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_r_reg_60_19/in_0[7] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_r_reg_60_19/in_0[6] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_r_reg_60_19/in_0[5] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_r_reg_60_19/in_0[4] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_r_reg_60_19/in_0[3] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_r_reg_60_19/in_0[2] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_r_reg_60_19/in_0[1] 	 (fanout : 1)
+hpin:ibert_rmsnorm/u_div/mux_r_reg_60_19/in_0[0] 	 (fanout : 1)
+Total number of constant hierarchical pins in design 'ibert_rmsnorm' : 342
+
+No constant connected ports in design 'ibert_rmsnorm'
+
+  Preserved instances(s)
+  ----------------
+No preserved combinational instance(s) in design 'ibert_rmsnorm'
+No preserved sequential instance(s) in design 'ibert_rmsnorm'
+No preserved hierarchical instance(s) in design 'ibert_rmsnorm'
+
+  Physical only instances(s)
+  ----------------
+No physical only instance(s) in design 'ibert_rmsnorm'
+
+  Logical only instance(s) and linked libcells
+    -----------------------------------------
+No logical only instance(s) in design 'ibert_rmsnorm'
+
+Libcells with no corresponding LEF
+----------------------------------
+No libcell(s) found.
+
+LEF cells with no corresponding libcell
+---------------------------------------
+
+No physical (LEF) cells found.
+
+ Summary
+ ------- 
+
+              Name                       Total
+----------------------------------------------
+Unresolved References                        0
+Empty Modules                                0
+Unloaded Port(s)                             0
+Unloaded Sequential Pin(s)                  25
+Unloaded Combinational Pin(s)                8
+Assigns                                     25
+Undriven Port(s)                             0
+Undriven Leaf Pin(s)                         0
+Undriven hierarchical pin(s)                 0
+Multidriven Port(s)                          0
+Multidriven Leaf Pin(s)                      0
+Multidriven hierarchical Pin(s)              0
+Multidriven unloaded net(s)                  0
+Constant Port(s)                             0
+Constant Leaf Pin(s)                         0
+Constant hierarchical Pin(s)               342
+Preserved leaf instance(s)                   0
+Preserved hierarchical instance(s)           0
+Feedthrough Modules(s)                       0
+Libcells with no LEF cell                    0
+Physical (LEF) cells with no libcell         0
+Subdesigns with long module name             0
+Physical only instance(s)                    0
+Logical only instance(s)                     0
+
+  Done Checking the design.
