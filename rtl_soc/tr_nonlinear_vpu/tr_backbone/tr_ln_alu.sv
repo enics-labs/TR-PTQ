@@ -34,6 +34,49 @@ module tr_ln_alu #(
     localparam int K1_W  = BITS + 2;             // e.g., 6 for B=4
     localparam int K_W   = AQ_W + BITS;          // e.g., 9 for W=16 | 10 for W=20
 
+    // ========================================================================
+    // MSB finder: balanced binary-search tree (NUM_LEVELS = MSB_W levels),
+    // not a linear bit-by-bit scan. A linear "for each bit, if set, msb=i"
+    // scan synthesizes as a WIDTH-deep chain of priority muxes (each level
+    // waiting on the previous), which was the dominant term in a measured
+    // FPGA timing violation on this exact path. xq is conceptually
+    // zero-padded up to WIDTH_P2 (the next power of two) so this works for
+    // any WIDTH, not just powers of two -- the padding bits are always 0 and
+    // can never win a group's OR, so they can't affect the real result.
+    // Each level halves the search range: nz[L][g] is whether ANY bit in
+    // that group's (2^L)-wide range is set, idx[L][g] is that group's own
+    // MSB position (0-based within the group), built by OR-ing in one more
+    // bit as we ascend (bit (L-1) set if the upper half won, clear if the
+    // lower half won). Same tree-reduction technique already used to fix the
+    // equivalent linear scans in ibert_rmsnorm.sv/ibert_softmax.sv.
+    // ========================================================================
+    localparam int WIDTH_P2   = 1 << MSB_W;   // next power of two >= WIDTH
+    localparam int NUM_LEVELS = MSB_W;        // == log2(WIDTH_P2)
+
+    logic             nz  [0:NUM_LEVELS][0:WIDTH_P2-1];
+    logic [MSB_W-1:0] idx [0:NUM_LEVELS][0:WIDTH_P2-1];
+
+    genvar gl, gj;
+    generate
+        for (gj = 0; gj < WIDTH_P2; gj++) begin : gen_leaf
+            assign nz[0][gj]  = (gj < WIDTH) ? xq[gj] : 1'b0;
+            assign idx[0][gj] = '0;
+        end
+
+        for (gl = 1; gl <= NUM_LEVELS; gl++) begin : gen_level
+            localparam int GROUPS = WIDTH_P2 >> gl;
+            for (gj = 0; gj < GROUPS; gj++) begin : gen_group
+                assign nz[gl][gj]  = nz[gl-1][2*gj+1] | nz[gl-1][2*gj];
+                assign idx[gl][gj] = nz[gl-1][2*gj+1]
+                                      ? (idx[gl-1][2*gj+1] | (MSB_W'(1) << (gl-1)))
+                                      : idx[gl-1][2*gj];
+            end
+        end
+    endgenerate
+
+    logic [MSB_W-1:0] msb_tree;
+    assign msb_tree = idx[NUM_LEVELS][0];
+
     logic [MSB_W-1:0]         msb;
     logic signed [AQ_W-1:0]   aq_full;
 
@@ -58,11 +101,9 @@ module tr_ln_alu #(
         if (xq == 0) begin
             yq_full = '0;
         end else begin
-            // 1. Find the MSB (log2 floor)
-            msb = '0;
-            for (int i = 0; i < WIDTH; i++) begin
-                if (xq[i]) msb = i;
-            end
+            // 1. Find the MSB (log2 floor) -- balanced tree (gen_level
+            // above), not a linear scan.
+            msb = msb_tree;
 
             // 2. Calculate aq = msb - BITS
             aq_full = $signed({1'b0, msb}) - $signed(AQ_W'(BITS));

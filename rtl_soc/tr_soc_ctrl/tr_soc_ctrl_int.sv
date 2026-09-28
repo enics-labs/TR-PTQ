@@ -12,7 +12,7 @@
  *           requantizer M/S), ADDR_MM_ROWS/ADDR_MM_CTILES (0x10/0x14,
  *           streaming-matmul tile counts for tr_matmul_ctrl).
  *
- *           Each command is a fixed sequence of states (GL_*/SM_*/RM_*)
+ *           Each command is a fixed sequence of states (GL_*, SM_*, RM_*)
  *           driving tr_nonlinear_vpu's crossbar-select/enable/mode outputs
  *           pass-by-pass, gated on that pass's own vpu_*_valid handshake
  *           (the VPU's submodules have no external ready signal, so each
