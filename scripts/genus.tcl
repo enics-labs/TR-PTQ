@@ -205,6 +205,7 @@ set post_synth_reports [list \
     report_design_rules \
     report_dp \
     report_qor \
+    report_power \
 ]
 foreach rpt $post_synth_reports {
     enics_message "$rpt" medium
