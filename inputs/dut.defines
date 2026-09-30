@@ -65,9 +65,14 @@ set design(MAX_TRANSITION)  0.35 ; # In ns for SDC (will appear in ps for get_db
 set design(workdir) $env(PWD)
 set design(project_root) "$env(PWD)/.."
 set design(inputs_dir) "$design(project_root)/inputs"
-set design(sourcecode_dir) "$design(project_root)/rtl"
-set design(hdl_search_paths) ". $design(sourcecode_dir)"
-set design(read_hdl_list) "$design(inputs_dir)/dut_src_list_$design(TOPLEVEL).txt"
+# RTL comes from the tr-vpu_rtl submodule (see .gitmodules) and is read
+# wholesale from these roots (see genus.tcl's "Read RTL" stage,
+# enics_glob_recursive in procedures.tcl) -- no per-block file manifest.
+# elaborate $design(TOPLEVEL) afterwards picks out just the target module.
+set design(rtl_dirs) [list \
+    "$design(project_root)/tr-vpu_rtl/rtl_soc" \
+    "$design(project_root)/tr-vpu_rtl/rtl_baseline" \
+]
 
 set design(scripts_dir) "$design(project_root)/scripts"
 set design(dbs_dir)     "$design(project_root)/dbs"

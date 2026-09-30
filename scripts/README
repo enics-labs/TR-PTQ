@@ -1,6 +1,20 @@
-This directory should have the scripts for running your flow, including:
-- Script for running logic simulation (simulation.tcl)
-- Script for running logic synthesis (genus.tcl)
-- Script for running place and route (innovus.tcl)
-- Basic Common UI procedures for use with Cadence tools (procedures.tcl)
+Scripts for the Genus synthesis flow (Cadence Genus, 65nm TSMC/ARM std cells).
+See the top-level README.md for exact run commands.
 
+  genus.tcl                  Main synthesis flow: read RTL -> elaborate ->
+                              synthesize -> export -> reports.
+  report_power.tcl           Vectorless power report on an already-
+                              synthesized design (reads back the exported .db).
+  report_power_activity.tcl  VCD-driven (real activity) power report.
+  run_sweep.tcl               Fmax sweep: walks clock period down (low
+                              effort) until timing/DRVs fail, then re-
+                              synthesizes the last passing period at full
+                              effort.
+  procedures.tcl              Shared helper procs (enics_*), sourced by the
+                              scripts above.
+  settings.tcl, simulation.tcl
+                              Currently unreferenced by anything in this
+                              flow (OCV/timing settings and a GLS VCD-probe
+                              helper, respectively, left over from an
+                              earlier iteration) -- not broken, just unused
+                              right now.

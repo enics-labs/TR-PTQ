@@ -1,6 +1,33 @@
 # This file has procedures for working with Stylus Common UI tools
 
 ##################################################
+#       enics_glob_recursive
+#       ---------------------
+#  Recursively collects every file matching $pattern under each directory
+#  in $dirs. Tcl's own [glob] has no recursive/** form, so this walks
+#  subdirectories by hand. Used by genus.tcl to read the whole RTL tree
+#  (rtl_soc/ + rtl_baseline/) without needing a per-block file manifest --
+#  elaborate $TOPLEVEL afterwards picks out just the one module that
+#  matters; unused modules sit unreferenced in the library.
+##################################################
+proc enics_glob_recursive {dirs pattern} {
+    set result {}
+    foreach dir $dirs {
+        if {![file isdirectory $dir]} {
+            continue
+        }
+        foreach f [glob -nocomplain -directory $dir *] {
+            if {[file isdirectory $f]} {
+                lappend result {*}[enics_glob_recursive [list $f] $pattern]
+            } elseif {[string match $pattern [file tail $f]]} {
+                lappend result $f
+            }
+        }
+    }
+    return $result
+}
+
+##################################################
 #       enics_message
 #       -------------
 #  This is a command for printing messages to the

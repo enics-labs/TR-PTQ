@@ -1,2 +1,0 @@
-../rtl_baseline/ibert_baseline/ibert_divider.sv
-../rtl_baseline/ibert_baseline/ibert_softmax.sv

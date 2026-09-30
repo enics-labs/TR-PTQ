@@ -74,9 +74,19 @@ if {$mmmc_or_simple=="mmmc"} {
 ##########################
 enics_start_stage "read_rtl"
 
-set_db init_hdl_search_path $design(hdl_search_paths)
 set_db hdl_language v2001 -quiet
-read_hdl -language sv -f $design(read_hdl_list)
+
+# Read every .sv under rtl_soc/ and rtl_baseline/ -- no per-block file
+# manifest to keep in sync. elaborate (below) picks out just $TOPLEVEL;
+# everything else sits unreferenced in the library.
+set rtl_files [enics_glob_recursive $design(rtl_dirs) "*.sv"]
+if {[llength $rtl_files] == 0} {
+    puts "ENICSINFO: ERROR -- no .sv files found under $design(rtl_dirs)."
+    puts "ENICSINFO: Is the RTL submodule/checkout present at the repo root?"
+    exit 1
+}
+enics_message "Reading [llength $rtl_files] RTL files from $design(rtl_dirs)" medium
+read_hdl -language sv $rtl_files
 
 ##########################
 # Elaborate

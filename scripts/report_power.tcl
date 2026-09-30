@@ -46,8 +46,11 @@ if {![file exists $pwr_db]} {
 read_db $pwr_db
 
 file mkdir "$design(synthesis_reports)/post_opt"
-report_power           > "$design(synthesis_reports)/post_opt/report_power.rpt"
-report_power -hierarchy > "$design(synthesis_reports)/post_opt/report_power_hierarchy.rpt"
+report_power > "$design(synthesis_reports)/post_opt/report_power.rpt"
+# report_power -hierarchy errors ("missing an argument for option
+# -hierarchy") -- confirmed while building report_power_activity.tcl; it
+# wants a value, not a bare flag, and the exact syntax isn't confirmed.
+# Dropped rather than guess.
 
 puts "ENICSINFO: power report written for $design(TOPLEVEL) -> $design(synthesis_reports)/post_opt/report_power.rpt"
 exit

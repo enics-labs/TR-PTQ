@@ -1,0 +1,4 @@
+[submodule "tr-vpu_rtl"]
+	path = tr-vpu_rtl
+	url = git@github.com:enics-labs/TR-PTQ.git
+	branch = tr-vpu_rtl
