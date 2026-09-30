@@ -10,7 +10,3 @@
 // simulation parameters
 -timescale 1ns/1ps
 -input ../scripts/simulation.tcl
-
-// DPI path
--dpi 
-../tb/dpi/dpi_functions.c

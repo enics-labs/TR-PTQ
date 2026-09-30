@@ -11,7 +11,7 @@
  *           {done,busy}; ADDR_MM_ROWS/ADDR_MM_CTILES set the streaming-
  *           matmul tile counts), but differs in two ways specific to the MX
  *           datapath: (1) every FSM output is double-buffered through an
- *           explicit nxt_*/"Control Pipeline Register" stage instead of
+ *           explicit nxt_* "Control Pipeline Register" stage instead of
  *           being driven straight from the combinational case block, adding
  *           one cycle of latency per state for MX's tighter timing closure;
  *           (2) it drives ctrl_enable_linear_shift (the MX dynamic

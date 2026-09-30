@@ -4,9 +4,9 @@
 // tr_soc_top_int through CMD=0x02 (GELU), the GL_P1..GL_P3 FSM in
 // tr_soc_ctrl_int.sv sharing the tr_nonlinear_vpu backbone.  This is the
 // module the firmware (tr_tensor.c's _xlr2_vpu(..., CMD_GELU, ...)) actually
-// exercises -- NOT tr_gelu.sv (tb_soc/tr_gelu/), which is dead code outside
-// tr_swiglu.sv (itself unused in the production ViT path), the same
-// dead-code trap tr_rmsnorm.sv turned out to be.
+// exercises -- NOT tr_gelu.sv (tb_baseline/tr_baseline/tr_gelu/), which is
+// unused in the production ViT path outside tr_swiglu.sv, the same trap
+// tr_rmsnorm.sv turned out to be.
 //
 // Isolates the GELU LUT/backbone itself (as opposed to tr_gelu_fused_int,
 // which additionally exercises the accumulator->requantize passthrough):

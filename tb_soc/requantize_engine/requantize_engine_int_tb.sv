@@ -1,5 +1,10 @@
 `timescale 1ns/1ps
 
+// File-I/O testbench for requantize_engine_int, matching the verify_block.py
+// convention (inputs.txt / hdl_out.txt) used by tr_exp/tr_gelu/etc.
+// Verifies against cpu_math_model.cpp's "quant" mode: Saturate((acc*mult +
+// bias) >>> shift), bias = shift>0 ? 1<<(shift-1) : 0.  N=4 to match the
+// existing requantize_engine_int_tb.sv parameterization.
 module requantize_engine_int_tb();
 
     localparam int N       = 4;
@@ -8,75 +13,56 @@ module requantize_engine_int_tb();
     localparam int SHIFT_W = 6;
     localparam int OUT_W   = 8;
 
-    logic clk, rst_n;
+    logic clk = 0, rst_n = 0;
     logic in_valid, in_ready;
     logic signed [ACC_W-1:0] acc_in [N];
     logic signed [MUL_W-1:0] multiplier;
     logic [SHIFT_W-1:0]      shift;
-    
     logic out_valid, out_ready;
     logic signed [OUT_W-1:0] out_vec [N];
 
-    // DUT
     requantize_engine_int #(
         .N(N), .ACC_W(ACC_W), .MUL_W(MUL_W), .SHIFT_W(SHIFT_W), .OUT_W(OUT_W)
     ) dut (.*);
 
-    // Clock
+    always #5 clk = ~clk;
+
+    int file_in, file_out, num_vecs, dummy;
+    longint acc_s[N]; int mult_s, shift_s;
+
     initial begin
-        clk = 0;
-        forever #5 clk = ~clk;
-    end
+        file_in  = $fopen("inputs.txt",  "r");
+        file_out = $fopen("hdl_out.txt", "w");
+        dummy    = $fscanf(file_in, "%0d\n", num_vecs);
 
-    // Test Sequence
-    initial begin
-        $display("Starting Requantization Tests...");
-        rst_n = 0;
-        in_valid = 0;
-        out_ready = 1;
-        
-        #20 rst_n = 1;
+        in_valid = 0; out_ready = 1;
+        for (int i = 0; i < N; i++) acc_in[i] = '0;
+        multiplier = '0; shift = '0;
+        #20; rst_n = 1;
         @(posedge clk);
 
-        // =========================================================
-        // Test Case: Scale = 0.00390625 (1/256)
-        // Multiplier = 1, Shift = 8
-        // Logic: (Acc * 1 + 128) >>> 8
-        // =========================================================
-        multiplier = 32'd1;
-        shift = 6'd8;
-        
-        // Data Setup:
-        // L0: 25600 -> 25600 / 256 = 100 (Clean scale)
-        // L1: 3968  -> 3968 / 256 = 15.5 -> Rounds up to 16 (Rounding test)
-        // L2: 80000 -> 80000 / 256 = 312.5 -> Clamps to 127 (Positive Outlier)
-        // L3: -90000-> -90000 / 256 = -351.5 -> Clamps to -128 (Negative Outlier)
-        
-        acc_in = '{32'd25600, 32'd3968, 32'd80000, -32'sd90000};
-        
-        in_valid = 1;
-        wait(in_ready);
-        @(posedge clk);
-        in_valid = 0;
+        for (int v = 0; v < num_vecs; v++) begin
+            dummy = $fscanf(file_in, "%d %d %d %d %d %d\n",
+                acc_s[0], acc_s[1], acc_s[2], acc_s[3], mult_s, shift_s);
 
-        // Wait 3 cycles for pipeline
-        wait(out_valid);
-        @(posedge clk);
+            for (int i = 0; i < N; i++) acc_in[i] = ACC_W'(acc_s[i]);
+            multiplier = MUL_W'(mult_s);
+            shift      = SHIFT_W'(shift_s);
 
-        $display("Results (Multiplier: %0d, Shift: %0d)", multiplier, shift);
-        $display("Lane 0 (Clean)    | Expected: 100  | Got: %0d", out_vec[0]);
-        $display("Lane 1 (Rounding) | Expected: 16   | Got: %0d", out_vec[1]);
-        $display("Lane 2 (Sat +)    | Expected: 127  | Got: %0d", out_vec[2]);
-        $display("Lane 3 (Sat -)    | Expected: -128 | Got: %0d", out_vec[3]);
+            @(negedge clk); in_valid = 1;
+            @(negedge clk); in_valid = 0;
+            while (!out_valid) @(posedge clk);
 
-        if (out_vec[0] === 8'd100 && out_vec[1] === 8'd16 && 
-            out_vec[2] === 8'd127 && out_vec[3] === -8'sd128) begin
-            $display("\n[PASS] Requantization pipeline executed flawlessly!");
-        end else begin
-            $error("\n[FAIL] Requantization logic mismatch.");
+            $fwrite(file_out, "%0d %0d %0d %0d\n",
+                $signed(out_vec[0]), $signed(out_vec[1]),
+                $signed(out_vec[2]), $signed(out_vec[3]));
+
+            @(posedge clk);
         end
 
-        #20 $finish;
+        $fclose(file_in);
+        $fclose(file_out);
+        $finish;
     end
 
 endmodule

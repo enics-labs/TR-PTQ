@@ -3,11 +3,12 @@
 // File-I/O testbench for the PRODUCTION SOFTMAX sequence: drives
 // tr_soc_top_int through CMD=0x01 (SOFTMAX), the SM_P1..SM_P4 FSM in
 // tr_soc_ctrl_int.sv sharing the tr_nonlinear_vpu backbone. This is the
-// module firmware actually exercises -- NOT tr_softmax.sv (tb_soc/tr_softmax/),
-// which is a separate, differently-architected module (explicit
-// reciprocal-via-exp instead of this FSM's log-sum-exp trick) not
-// instantiated anywhere in tr_soc_top_int.sv. Same dead-code trap
-// tr_gelu.sv/tr_rmsnorm.sv turned out to be -- see tr_gelu_int_tb.sv.
+// module firmware actually exercises -- NOT tr_softmax.sv
+// (tb_baseline/tr_baseline/tr_softmax/), which is a separate,
+// differently-architected module (explicit reciprocal-via-exp instead of
+// this FSM's log-sum-exp trick) not instantiated anywhere in
+// tr_soc_top_int.sv. Same trap tr_gelu.sv/tr_rmsnorm.sv turned out to be
+// -- see tr_gelu_int_tb.sv.
 //
 // Output is Q0.8 UNSIGNED (0..255, saturating) -- matches SM_P4's
 // vecmul_scale_mode==2'b11 path and cpu_math_model.cpp's "softmax" mode

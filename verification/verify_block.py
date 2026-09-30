@@ -6,24 +6,35 @@ import argparse
 def get_config(block_name):
     configs = {
         "exp":     {"f_file": "../tb_soc/tr_exp_alu/tr_exp_alu.f", "max_error": 0},
-        "ln":      {"f_file": "../tb_soc/tr_ln/tr_ln.f",           "max_error": 0},
+        "ln":      {"f_file": "../tb_soc/tr_ln_alu/tr_ln_alu.f",   "max_error": 0},
         # softmax: tr_softmax_int.f drives the REAL production SM_P1..SM_P4
         # sequence via tr_soc_top_int (CMD=0x01) -- tr_softmax.sv
-        # (tb_soc/tr_softmax/, the prior target) is a separate module not
-        # instantiated anywhere in tr_soc_top_int.sv. Same trap gelu/rmsnorm
-        # already fell into below.
+        # (tb_baseline/tr_baseline/tr_softmax/, the standalone baseline
+        # variant) is a separate module not instantiated anywhere in
+        # tr_soc_top_int.sv. Same trap gelu/rmsnorm below.
         "softmax": {"f_file": "../tb_soc/tr_softmax_int/tr_softmax_int.f", "max_error": 0},
-        "softmax_dead_module": {"f_file": "../tb_soc/tr_softmax/tr_softmax.f", "max_error": 0},
+        "softmax_baseline": {"f_file": "../tb_baseline/tr_baseline/tr_softmax/tr_softmax.f", "max_error": 0},
         # gelu: tr_gelu_int.f drives the REAL production GL_P1..GL_P3 sequence
-        # via tr_soc_top_int (CMD=0x02) -- tr_gelu.sv (tb_soc/tr_gelu/, the
-        # prior target) is dead code outside tr_swiglu.sv, unused in the
-        # production ViT path. Same trap tr_rmsnorm.sv turned out to be.
+        # via tr_soc_top_int (CMD=0x02) -- tr_gelu.sv
+        # (tb_baseline/tr_baseline/tr_gelu/, the standalone baseline variant)
+        # is unused in the production ViT path outside tr_swiglu.sv. Same
+        # trap tr_rmsnorm.sv turned out to be.
         "gelu":    {"f_file": "../tb_soc/tr_gelu_int/tr_gelu_int.f",  "max_error": 0},
-        "gelu_dead_module": {"f_file": "../tb_soc/tr_gelu/tr_gelu.f", "max_error": 0},
-        "swiglu":  {"f_file": "../tb_soc/tr_swiglu/tr_swiglu.f",   "max_error": 0},
-        "quant":   {"f_file": "../tb_soc/tr_quant/tr_quant.f",       "max_error": 0},
+        "gelu_baseline": {"f_file": "../tb_baseline/tr_baseline/tr_gelu/tr_gelu.f", "max_error": 0},
+        "swiglu":  {"f_file": "../tb_baseline/tr_baseline/tr_swiglu/tr_swiglu.f",   "max_error": 0},
+        "quant":   {"f_file": "../tb_soc/requantize_engine/requantize_engine_int.f", "max_error": 0},
         "matmul":  {"f_file": "../tb_soc/tr_matmul/tr_matmul.f",     "max_error": 0},
+        # rmsnorm_baseline: tr_rmsnorm.sv (tb_baseline/tr_baseline/tr_rmsnorm/)
+        # implements the SAME 4-pass sign-guarded algorithm as production
+        # RM_P1..RM_P4 (per its own header comment), so it reuses "rmsnorm"'s
+        # golden vectors -- unlike softmax_baseline, which needs its own
+        # model since it's a genuinely different algorithm. Note: the shared
+        # golden model itself doesn't implement the sign-guard fix (see
+        # rmsnorm_hw_model_signguard_fixed in tr_math_model.hpp) even though
+        # the real RTL does -- a pre-existing gap in "rmsnorm" too, not
+        # something new to rmsnorm_baseline.
         "rmsnorm": {"f_file": "../tb_soc/tr_rmsnorm_int/tr_rmsnorm_int.f", "max_error": 0},
+        "rmsnorm_baseline": {"f_file": "../tb_baseline/tr_baseline/tr_rmsnorm/tr_rmsnorm.f", "max_error": 0},
         "gelu_fused": {"f_file": "../tb_soc/tr_gelu_fused_int/tr_gelu_fused_int.f", "max_error": 0},
     }
     return configs.get(block_name.lower())
@@ -153,7 +164,7 @@ def run_verification():
         if row_has_error and failed_rows_logged < 10:
             print(f"  [MISMATCH] Row {idx+1} (Max Error in row: {row_max_delta})")
             print(f"    Input   : {in_line.strip()}")
-            if args.block in ["softmax", "softmax_dead_module", "gelu", "swiglu", "quant", "matmul", "rmsnorm", "gelu_fused"]:
+            if args.block in ["softmax", "softmax_baseline", "gelu", "gelu_baseline", "swiglu", "quant", "matmul", "rmsnorm", "rmsnorm_baseline", "gelu_fused"]:
                 print(f"    Expected: {exp_line.strip()}")
                 print(f"    HDL Got : {hdl_line.strip()}\n")
             else:

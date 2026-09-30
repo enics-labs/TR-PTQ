@@ -1,5 +1,8 @@
 xcelium.d
 
+# Internal restructuring task list -- not meant for the published repo.
+git_structure.md
+
 # ==================================================
 # drawio
 # ==================================================
@@ -34,7 +37,10 @@ genus.cmd
 # ==================================================
 # Genus
 # ==================================================
-workspace/
+# workspace/ is tracked as an empty directory (via .gitkeep) -- everything
+# actually run/generated inside it stays ignored.
+workspace/*
+!workspace/.gitkeep
 export/
 
 # ==================================================

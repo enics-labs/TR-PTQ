@@ -1,79 +1,54 @@
-# SOC requirements
-## External DRAM access (DDR)
+# TR-PTQ VPU — RTL
 
-Parameters / activations must fit in off-chip DRAM.
+RTL for a Taylor-Region (TR) Vector Processing Unit: a single shared, software-defined log/exp crossbar (`tr_nonlinear_vpu`) that implements GELU, Softmax, and RMSNorm for INT8 ViT inference, driven by an MMIO command FSM, alongside the linear (matmul) engine that feeds it. Includes I-BERT-style and standalone-TR baseline RTL for energy/area comparison.
 
-This dominates the rest of the architecture: you either
-a. hang on vendor DDR controller IP, or
-b. use an existing SoC framework that already does this.
+This is `tr-vpu_rtl`, the RTL-only branch of [TR-PTQ](https://github.com/enics-labs/TR-PTQ). The Genus (65nm) synthesis flow lives on the `tr-vpu_synthesis` branch instead.
 
-# On-chip SRAM 
-Cache for spatial locality.
+**Start here:** [docs/architecture.md](docs/architecture.md) for the design overview, or [docs/tr_soc_architecture.drawio](docs/tr_soc_architecture.drawio) for the block diagram.
 
-Software-managed SRAM (or accelerator-managed) to:
+## Directory structure
 
-* Load tiles / blocks from DRAM
+```
+rtl_soc/              Production RTL: tr_nonlinear_vpu (the shared crossbar),
+                       tr_soc_ctrl (the FSMs that sequence it), tr_soc_top_int/mx
+                       (top-level SoC integration), and the shared engines
+                       (mult_engines, dot_product_engine, requantize_engine,
+                       mx_modules) they're built from.
+rtl_baseline/          Standalone RTL kept for comparison, NOT instantiated by
+                       either SoC top: tr_baseline/ (dedicated TR modules) and
+                       ibert_baseline/ (I-BERT-style comparison point).
+tb_soc/                Testbenches for rtl_soc/, mirroring its structure 1:1.
+tb_baseline/            Testbenches for rtl_baseline/, same mirroring.
+verification/          verify_block.py -- the golden-vector verification flow.
+emulation/             cpu_math_model.cpp / tr_math_model.hpp -- the C++ golden
+                       models verify_block.py checks RTL against.
+scripts/               xrun config shared by every .f file.
+docs/                  Architecture, module reference, verification docs.
+workspace/              Run everything from here (xrun, verify_block.py).
+```
 
-* Reuse them heavily in compute engines (MAC arrays etc.)
+## Running things
 
-* Likely multi-bank SRAM attached closely to the accelerator.
+Every block has an `.f` file (an `xrun` file list). From `workspace/`:
 
-## DMA engine for burst transfers between DDR ? SRAM ? accelerator
+```sh
+cd workspace
+xrun -f ../tb_soc/<block>/<block>.f
+```
 
-Offload CPU from doing memcpy loops.
+For blocks verified against the C++ golden model instead of a self-checking testbench:
 
-DMA must:
+```sh
+cd workspace
+python3 ../verification/verify_block.py <block_name>
+```
 
-* Speak AXI (or similar) to DDR
+See [docs/verification.md](docs/verification.md) for the full block-name table and how the golden-vector flow works.
 
-* Offer linear / strided / 2D transfers
+## Docs
 
-* Possibly chainable descriptors.
-
-## Small controller CPU
-
-Role:
-
-* Program the DMA and accelerators.
-
-* Manage scheduling, tiling, command lists, maybe an RTOS.
-
-Requirements:
-
-* Does not need to be application-class.
-
-* Must have easy integration to AXI / interconnect.
-
-* Tooling must be sane (GCC, debug, etc.).
-
-## Small instruction memory for the controller
-
-Could be:
-
-* On-chip instruction TCM (ITCM) tightly coupled to CPU, or
-
-* Simple SRAM behind the interconnect.
-
-Size is modest (tens of KB to a few hundred KB).
-
-## Simple control ISA / software stack
-
-* Bare-metal C or tiny RTOS.
-
-* No need for Linux, MMU, or complex privilege levels.
-
-## Basic peripheral set
-UART:
-
-* For boot, debug, logging, maybe simple command protocol.
-
-SPI:
-
-* For low-speed off-chip devices (flash, sensors) or external control.
-
-Ethernet (nice-to-have but important):
-
-* For high-level control plane or streaming test data.
-
-* Great for a ?remote accelerator card? connected over the network.
-
+- [docs/architecture.md](docs/architecture.md) — design overview: the shared crossbar, INT vs MX datapath variants, where the baseline RTL fits in.
+- [docs/mx_format_operation.md](docs/mx_format_operation.md) — the MX (Microscaling shared-exponent) datapath in detail.
+- [docs/verification.md](docs/verification.md) — how to run and verify anything in this repo.
+- [docs/module_reference/](docs/module_reference/) — per-block port/parameter reference, one file per `rtl_soc/` subfolder.
+- [docs/tr_soc_architecture.drawio](docs/tr_soc_architecture.drawio) / [docs/research_diagrams.drawio](docs/research_diagrams.drawio) — diagram sources.

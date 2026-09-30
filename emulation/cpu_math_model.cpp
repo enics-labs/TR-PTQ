@@ -32,13 +32,13 @@ static bool run_eval_mode(const std::string& mode, const std::string& in_path,
         if (line.find_first_not_of(" \t\r\n") == std::string::npos) continue;
         std::istringstream iss(line);
 
-        if (mode == "rmsnorm") {
+        if (mode == "rmsnorm" || mode == "rmsnorm_baseline") {
             int8_t x[8], y[8];
             for (int i = 0; i < 8; i++) { int v; iss >> v; x[i] = (int8_t)v; }
             rmsnorm_hw_model(x, y);
             for (int i = 0; i < 8; i++) fout << (int)y[i] << (i == 7 ? "" : " ");
             fout << "\n";
-        } else if (mode == "gelu") {
+        } else if (mode == "gelu" || mode == "gelu_baseline") {
             int8_t x[8], y[8];
             for (int i = 0; i < 8; i++) { int v; iss >> v; x[i] = (int8_t)v; }
             gelu_hw_model(x, y);
@@ -97,7 +97,21 @@ int main(int argc, char* argv[]) {
         return -1;
     }
 
-    if (mode == "rmsnorm") {
+    if (mode == "rmsnorm" || mode == "rmsnorm_baseline") {
+        // rmsnorm_baseline (tr_rmsnorm.sv, tb_baseline/tr_baseline/tr_rmsnorm/)
+        // implements the identical 4-pass algorithm as production
+        // tr_soc_ctrl_int's RM_P1..RM_P4 (sign-guard/recip_lut included --
+        // see its own header comment), so it validates against the SAME
+        // golden vectors as "rmsnorm", unlike softmax_baseline below which
+        // is a genuinely different algorithm needing its own model.
+        //
+        // NOTE: rmsnorm_hw_model does NOT implement the sign-guard fix
+        // documented above rmsnorm_hw_model_signguard_fixed -- both this
+        // and the production RTL DO have that fix, so this golden model can
+        // mismatch real RTL specifically when ctrl_scalar goes positive
+        // (small Sum(x^2)). Left as-is for now (matches what "rmsnorm" has
+        // always tested against); see the write-up referenced above
+        // rmsnorm_hw_model_signguard_fixed if that gap starts mattering.
         const int N_VECS = 256;
         vec_file << N_VECS << "\n";
         srand(1337);
@@ -219,9 +233,9 @@ int main(int argc, char* argv[]) {
         }
         std::cout << "[C++ MODEL] Generated SOFTMAX (production tr_soc_top_int path) vectors." << std::endl;
     }
-    else if (mode == "softmax_dead_module") {
-        // The standalone tr_softmax.sv module (rtl_soc/tr_softmax/) -- NOT
-        // instantiated by tr_soc_top_int.sv, same dead-code trap gelu/rmsnorm
+    else if (mode == "softmax_baseline") {
+        // The standalone tr_softmax.sv module (tb_baseline/tr_baseline/tr_softmax/)
+        // -- NOT instantiated by tr_soc_top_int.sv, same trap gelu/rmsnorm
         // already fell into (see tr_gelu_int_tb.sv). Kept only so that module
         // can still be checked in isolation if anyone cares to.
         vec_file << "256\n";
@@ -319,7 +333,11 @@ int main(int argc, char* argv[]) {
         }
         std::cout << "[C++ MODEL] Generated SWIGLU vectors." << std::endl;
     }
-    else if (mode == "gelu") {
+    else if (mode == "gelu" || mode == "gelu_baseline") {
+        // gelu_baseline (tr_gelu.sv, tb_baseline/tr_baseline/tr_gelu/)
+        // implements the same GELU algorithm as production, so it reuses
+        // this same golden model -- unlike softmax_baseline above, which is
+        // a genuinely different algorithm needing its own.
         const int N_LANES = 8;
         const int N_VECS  = 256;
         vec_file << N_VECS << "\n";
