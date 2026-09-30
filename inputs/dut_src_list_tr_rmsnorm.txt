@@ -5,6 +5,6 @@
 ../rtl_soc/tr_nonlinear_vpu/tr_backbone/quadratic_divider.sv
 
 ../rtl_soc/tr_nonlinear_vpu/peripheral_modules/shared_lut_rom.sv
-../rtl_soc/tr_nonlinear_vpu/peripheral_modules/vec_mul.sv
+../rtl_baseline/tr_baseline/vec_mul.sv
 
-../rtl_soc/tr_rmsnorm/tr_rmsnorm.sv
+../rtl_baseline/tr_baseline/tr_rmsnorm.sv

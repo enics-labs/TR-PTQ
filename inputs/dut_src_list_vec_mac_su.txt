@@ -1,1 +1,0 @@
-../rtl/vec_mac/vec_mac_su.sv

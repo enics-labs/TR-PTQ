@@ -1,2 +1,2 @@
-../rtl_soc/ibert_baseline/ibert_divider.sv
-../rtl_soc/ibert_baseline/ibert_softmax.sv
+../rtl_baseline/ibert_baseline/ibert_divider.sv
+../rtl_baseline/ibert_baseline/ibert_softmax.sv

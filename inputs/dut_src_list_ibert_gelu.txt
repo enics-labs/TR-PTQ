@@ -1,1 +1,1 @@
-../rtl_soc/ibert_baseline/ibert_gelu.sv
+../rtl_baseline/ibert_baseline/ibert_gelu.sv
