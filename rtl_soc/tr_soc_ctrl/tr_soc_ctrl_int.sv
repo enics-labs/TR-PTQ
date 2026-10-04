@@ -7,21 +7,37 @@
  *           through the multi-pass GELU/Softmax/RMSNorm routes, or kicks off
  *           a streaming matmul via tr_matmul_ctrl.
  * @details  MMIO register map: ADDR_CMD (0x00, write triggers a command:
- *           1=Softmax, 2=GELU, 3=RMSNorm, 4=streaming matmul), ADDR_STATUS
- *           (0x04, {done,busy}), ADDR_REQ_MULT/ADDR_REQ_SHIFT (0x08/0x0C,
- *           requantizer M/S), ADDR_MM_ROWS/ADDR_MM_CTILES (0x10/0x14,
- *           streaming-matmul tile counts for tr_matmul_ctrl).
+ *           1=Softmax, 2=GELU, 3=RMSNorm, 4=streaming matmul, 5=SiLU
+ *           (SwiGLU pass 1/2), 6=gate-multiply (SwiGLU pass 2/2)),
+ *           ADDR_STATUS (0x04, {done,busy}), ADDR_REQ_MULT/ADDR_REQ_SHIFT
+ *           (0x08/0x0C, requantizer M/S), ADDR_MM_ROWS/ADDR_MM_CTILES
+ *           (0x10/0x14, streaming-matmul tile counts for tr_matmul_ctrl).
  *
- *           Each command is a fixed sequence of states (GL_*, SM_*, RM_*)
- *           driving tr_nonlinear_vpu's crossbar-select/enable/mode outputs
- *           pass-by-pass, gated on that pass's own vpu_*_valid handshake
- *           (the VPU's submodules have no external ready signal, so each
- *           pass waits out its producer's own valid pulse before advancing).
- *           scratch_a/scratch_b hold intermediate per-lane vectors between
- *           passes (e.g. GELU's exp(alpha(x)) and reciprocal-sigmoid
- *           results); reg_scalar_max/reg_scalar_log hold Softmax's row-max
- *           and log-sum-exp scalars, and RMSNorm's log(sum-of-squares)
- *           scalar, between their own passes.
+ *           Each command is a fixed sequence of states (GL_*, SM_*, RM_*,
+ *           SW_*) driving tr_nonlinear_vpu's crossbar-select/enable/mode
+ *           outputs pass-by-pass, gated on that pass's own vpu_*_valid
+ *           handshake (the VPU's submodules have no external ready signal,
+ *           so each pass waits out its producer's own valid pulse before
+ *           advancing). scratch_a/scratch_b hold intermediate per-lane
+ *           vectors between passes (e.g. GELU's exp(alpha(x)) and
+ *           reciprocal-sigmoid results); reg_scalar_max/reg_scalar_log hold
+ *           Softmax's row-max and log-sum-exp scalars, and RMSNorm's
+ *           log(sum-of-squares) scalar, between their own passes.
+ *
+ *           SwiGLU is split into two opcodes because it needs two
+ *           independent N-wide vectors at two different times (a gate
+ *           projection's output, then an up projection's) -- CMD=5 (SW_P1..
+ *           P3) mirrors GL_P1..GL_P3 bit-for-bit except: (a) alpha_flat_mode
+ *           is driven high, giving a true alpha=1 sigmoid slope instead of
+ *           GELU's tuned ~1.6875 approximation (see alpha_stabilizer.sv),
+ *           and (b) the final pass writes scratch_a (not ext_sram) so
+ *           CMD=6 can read it back as "silu" one or more host writes later.
+ *           CMD=6 (SW_P4) mirrors RM_P4's one-pass structure, but reads
+ *           scratch_a (not req_vec_out/ext_sram_b) for its "x" operand,
+ *           ext_sram_b (not scratch_b) for its "g" operand, uses SS mode
+ *           (not SU), and uses the new saturating vecmul_scale_mode=3'b100
+ *           (not the wrapping 3'b001) -- see docs/llama_fpga_plan.md changes
+ *           A/C for the full derivation and the measured accuracy tradeoffs.
  *
  *           RM_P3 includes a sign-guard fix (forces the log-domain argument
  *           non-positive before tr_nonlinear_vpu's shared exp backbone,
@@ -66,12 +82,13 @@ module tr_soc_ctrl_int #(
     output logic mac_clear_acc,
     output logic [1:0]              mac_op_mode,
     output logic [1:0]              vecmul_op_mode,
-    output logic [1:0]              vecmul_scale_mode,
+    output logic [2:0]              vecmul_scale_mode,
     output logic bb_shift_mode,
     output logic bb_bypass_ln,
     output logic bb_mode_pre_ln,
     output logic [1:0]              bb_mode_post_ln,
     output logic sym_mode_en,
+    output logic alpha_flat_mode,   // true alpha=1 sigmoid slope (SwiGLU's SiLU) -- see alpha_stabilizer.sv
     output logic signed [W-1:0]     ctrl_scalar_sub_val,
 
     // Datapath Routing
@@ -218,6 +235,11 @@ module tr_soc_ctrl_int #(
         RM_P2, RM_P2_W,
         RM_P3, RM_P3_W, RM_P3_MUL_W,
         RM_P4, RM_P4_W,
+        // SwiGLU: CMD=5 (SiLU, mirrors GL_P1..GL_P3) + CMD=6 (gate-multiply, mirrors RM_P4)
+        SW_P1, SW_P1_W, SW_P1_MUL_W,
+        SW_P2, SW_P2_W, SW_P2_MUL_W,
+        SW_P3, SW_P3_W,
+        SW_P4, SW_P4_W,
         DONE
     } state_t;
     
@@ -276,13 +298,14 @@ module tr_soc_ctrl_int #(
         mac_clear_acc       = 1'b0;
         mac_op_mode         = 2'd0;
         vecmul_op_mode      = 2'd0;
-        vecmul_scale_mode   = 2'b00;
+        vecmul_scale_mode   = 3'b000;
         bb_shift_mode       = 1'b0;
-        
+
         bb_bypass_ln        = 1'b0;
         bb_mode_pre_ln      = 1'b0;
         bb_mode_post_ln     = 2'b00;
         sym_mode_en         = 1'b0;
+        alpha_flat_mode     = 1'b0;
         ctrl_scalar_sub_val = '0;
         rm_offset_was_positive = 1'b0;
 
@@ -293,6 +316,8 @@ module tr_soc_ctrl_int #(
                 if (cmd_trigger == 8'h02) next_state = GL_P1;
                 if (cmd_trigger == 8'h03) next_state = RM_P1;
                 if (cmd_trigger == 8'h04) next_state = MM_START;
+                if (cmd_trigger == 8'h05) next_state = SW_P1;
+                if (cmd_trigger == 8'h06) next_state = SW_P4;
             end
 
             // =========================================================
@@ -310,10 +335,10 @@ module tr_soc_ctrl_int #(
             // GELU SEQUENCE (Grouped States prevent combinational drift)
             // =========================================================
             GL_P1, GL_P1_W, GL_P1_MUL_W: begin
-                bb_bypass_ln = 1'b1; 
+                bb_bypass_ln = 1'b1;
                 mux_bb_in_sel     = 3'b001;
                 vecmul_op_mode    = 2'd2;       // UU Mode for Exponential!
-                vecmul_scale_mode = 2'b10;      // Slice [15:8]
+                vecmul_scale_mode = 3'b010;      // Slice [15:8]
                 mux_vecmul_a_sel  = 2'b11;
                 mux_vecmul_b_sel  = 2'b10;
                 mux_vpu_out_sel   = 3'b000;
@@ -335,13 +360,13 @@ module tr_soc_ctrl_int #(
                 mux_bb_in_sel     = 3'b011; 
                 bb_mode_pre_ln    = 1'b1;
                 bb_mode_post_ln   = 2'b01;
-                vecmul_op_mode    = 2'd2; 
-                vecmul_scale_mode = 2'b10;
+                vecmul_op_mode    = 2'd2;
+                vecmul_scale_mode = 3'b010;
                 mux_vecmul_a_sel  = 2'b11;
                 mux_vecmul_b_sel  = 2'b10;
                 mux_vpu_out_sel   = 3'b000;
 
-                if (state == GL_P2) begin 
+                if (state == GL_P2) begin
                     en_bb_valid = 1'b1;
                     next_state  = GL_P2_W; 
                 end else if (state == GL_P2_W && vpu_bb_valid) begin 
@@ -356,9 +381,9 @@ module tr_soc_ctrl_int #(
             GL_P3, GL_P3_W: begin
                 src_sram_a_sel    = 1'b0;
                 src_sram_b_sel    = 1'b1;
-                sym_mode_en       = 1'b1; 
+                sym_mode_en       = 1'b1;
                 vecmul_op_mode    = 2'd1;       // SU Mode
-                vecmul_scale_mode = 2'b01;      // Slice [11:4]
+                vecmul_scale_mode = 3'b001;      // Slice [11:4]
                 mux_vecmul_a_sel  = 2'b00;
                 mux_vecmul_b_sel  = 2'b01;
                 mux_vpu_out_sel   = 3'b000;
@@ -413,7 +438,7 @@ module tr_soc_ctrl_int #(
                 else if (sub_val_wide < SUB_VAL_MIN) ctrl_scalar_sub_val = SUB_VAL_MIN[W-1:0];
                 else                                  ctrl_scalar_sub_val = sub_val_wide[W-1:0];
                 mux_bb_in_sel = 3'b010;
-                vecmul_op_mode = 2'd2; vecmul_scale_mode = 2'b11; // UU, Q0.8 unsigned (saturating)
+                vecmul_op_mode = 2'd2; vecmul_scale_mode = 3'b011; // UU, Q0.8 unsigned (saturating)
                 mux_vecmul_a_sel = 2'b11; mux_vecmul_b_sel = 2'b10;
                 mux_vpu_out_sel = 3'b000;
 
@@ -455,8 +480,8 @@ module tr_soc_ctrl_int #(
                 ctrl_scalar_sub_val = rm_offset_was_positive ? -rm_ctrl_scalar_raw : rm_ctrl_scalar_raw;
 
                 src_sram_a_sel = 1; // Force 0 by reading empty Scratch A
-                mux_bb_in_sel = 3'b100; 
-                vecmul_op_mode = 2'd2; vecmul_scale_mode = 2'b10; // UU [15:8]
+                mux_bb_in_sel = 3'b100;
+                vecmul_op_mode = 2'd2; vecmul_scale_mode = 3'b010; // UU [15:8]
                 mux_vecmul_a_sel = 2'b11; mux_vecmul_b_sel = 2'b10;
                 mux_vpu_out_sel = 3'b000;
 
@@ -467,14 +492,114 @@ module tr_soc_ctrl_int #(
 
             // NEW PASS 4: Multiply X * Scratch B (InvRMS)
             RM_P4, RM_P4_W: begin
-                src_sram_a_sel = 0; src_sram_b_sel = 1; 
+                src_sram_a_sel = 0; src_sram_b_sel = 1;
                 vecmul_op_mode = 2'd1; // SU (Signed X * Unsigned InvRMS)
-                vecmul_scale_mode = 2'b01; // Slice [11:4] for Q4.4 output
+                vecmul_scale_mode = 3'b001; // Slice [11:4] for Q4.4 output
                 mux_vecmul_a_sel = 2'b00; mux_vecmul_b_sel = 2'b00;
                 mux_vpu_out_sel = 3'b000;
 
                 if (state == RM_P4) begin en_vecmul_valid = 1; next_state = RM_P4_W; end
                 else if (state == RM_P4_W && vpu_vecmul_valid) begin write_ext_sram = 1; next_state = DONE; end
+            end
+
+            // =========================================================
+            // SWIGLU SEQUENCE, CMD=5 (SiLU): SW_P1..SW_P3 mirror
+            // GL_P1..GL_P3 EXACTLY (same mux selects/op modes), except:
+            //   (1) alpha_flat_mode=1 -- true alpha=1 sigmoid slope, not
+            //       GELU's tuned piecewise approximation (alpha_stabilizer.sv).
+            //   (2) SW_P3's final pass writes scratch_a (silu), not
+            //       ext_sram -- CMD=6 reads it back; this command ends in
+            //       DONE without ever asserting write_ext_sram.
+            // =========================================================
+            SW_P1, SW_P1_W, SW_P1_MUL_W: begin
+                alpha_flat_mode   = 1'b1;
+                bb_bypass_ln      = 1'b1;
+                mux_bb_in_sel     = 3'b001;
+                vecmul_op_mode    = 2'd2;
+                vecmul_scale_mode = 3'b010;      // Slice [15:8]
+                mux_vecmul_a_sel  = 2'b11;
+                mux_vecmul_b_sel  = 2'b10;
+                mux_vpu_out_sel   = 3'b000;
+
+                if (state == SW_P1) begin
+                    en_bb_valid = 1'b1;
+                    next_state  = SW_P1_W;
+                end else if (state == SW_P1_W && vpu_bb_valid) begin
+                    en_vecmul_valid = 1'b1;
+                    next_state      = SW_P1_MUL_W;
+                end else if (state == SW_P1_MUL_W && vpu_vecmul_valid) begin
+                    write_scratch_a = 1'b1;
+                    next_state      = SW_P2;
+                end
+            end
+
+            SW_P2, SW_P2_W, SW_P2_MUL_W: begin
+                alpha_flat_mode   = 1'b1;   // unused by this pass (dead signal here), kept high for consistency
+                src_sram_a_sel    = 1'b1;
+                mux_bb_in_sel     = 3'b011;
+                bb_mode_pre_ln    = 1'b1;
+                bb_mode_post_ln   = 2'b01;
+                vecmul_op_mode    = 2'd2;
+                vecmul_scale_mode = 3'b010;
+                mux_vecmul_a_sel  = 2'b11;
+                mux_vecmul_b_sel  = 2'b10;
+                mux_vpu_out_sel   = 3'b000;
+
+                if (state == SW_P2) begin
+                    en_bb_valid = 1'b1;
+                    next_state  = SW_P2_W;
+                end else if (state == SW_P2_W && vpu_bb_valid) begin
+                    en_vecmul_valid = 1'b1;
+                    next_state      = SW_P2_MUL_W;
+                end else if (state == SW_P2_MUL_W && vpu_vecmul_valid) begin
+                    write_scratch_b = 1'b1;
+                    next_state      = SW_P3;
+                end
+            end
+
+            SW_P3, SW_P3_W: begin
+                src_sram_a_sel    = 1'b0;
+                src_sram_b_sel    = 1'b1;
+                sym_mode_en       = 1'b1;
+                vecmul_op_mode    = 2'd1;        // SU
+                vecmul_scale_mode = 3'b001;      // Slice [11:4]
+                mux_vecmul_a_sel  = 2'b00;
+                mux_vecmul_b_sel  = 2'b01;
+                mux_vpu_out_sel   = 3'b000;
+
+                if (state == SW_P3) begin
+                    en_vecmul_valid = 1'b1;
+                    next_state      = SW_P3_W;
+                end else if (state == SW_P3_W && vpu_vecmul_valid) begin
+                    write_scratch_a = 1'b1;   // KEY DIFFERENCE vs GL_P3: scratch_a (silu), not write_ext_sram
+                    next_state      = DONE;
+                end
+            end
+
+            // =========================================================
+            // SWIGLU SEQUENCE, CMD=6 (gate-multiply): mirrors RM_P4's
+            // one-pass structure, but reads scratch_a ("silu", from CMD=5)
+            // instead of req_vec_out/ext_sram_b, ext_sram_b ("g") instead
+            // of scratch_b, SS mode instead of SU, and the new saturating
+            // vecmul_scale_mode=3'b100 instead of the wrapping 3'b001 --
+            // see docs/llama_fpga_plan.md changes A/C.
+            // =========================================================
+            SW_P4, SW_P4_W: begin
+                src_sram_a_sel    = 1'b1;   // read scratch_a (silu)
+                src_sram_b_sel    = 1'b0;   // read ext_sram_b (g)
+                vecmul_op_mode    = 2'd0;   // SS (signed silu * signed g)
+                vecmul_scale_mode = 3'b100; // saturating signed, Slice [11:4]
+                mux_vecmul_a_sel  = 2'b00;
+                mux_vecmul_b_sel  = 2'b00;
+                mux_vpu_out_sel   = 3'b000;
+
+                if (state == SW_P4) begin
+                    en_vecmul_valid = 1'b1;
+                    next_state      = SW_P4_W;
+                end else if (state == SW_P4_W && vpu_vecmul_valid) begin
+                    write_ext_sram = 1'b1;
+                    next_state     = DONE;
+                end
             end
 
             DONE: begin

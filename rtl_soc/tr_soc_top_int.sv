@@ -110,13 +110,14 @@ module tr_soc_top_int #(
     logic                           mac_clear_acc;
     logic [1:0]                     mac_op_mode;
     logic [1:0]                     vecmul_op_mode;
-    logic [1:0]                     vecmul_scale_mode;
-    
+    logic [2:0]                     vecmul_scale_mode;
+
     logic                           bb_shift_mode;
     logic                           bb_bypass_ln;
     logic                           bb_mode_pre_ln;
     logic [1:0]                     bb_mode_post_ln;
     logic                           sym_mode_en;
+    logic                           alpha_flat_mode;
     logic signed [W-1:0]            ctrl_scalar_sub_val;
     
     logic                           src_sram_a_sel;
@@ -177,8 +178,9 @@ module tr_soc_top_int #(
         .bb_mode_pre_ln      (bb_mode_pre_ln),
         .bb_mode_post_ln     (bb_mode_post_ln),
         .sym_mode_en         (sym_mode_en),
+        .alpha_flat_mode     (alpha_flat_mode),
         .ctrl_scalar_sub_val (ctrl_scalar_sub_val),
-        
+
         .src_sram_a_sel      (src_sram_a_sel),
         .src_sram_b_sel      (src_sram_b_sel),
         .write_ext_sram      (write_ext_sram),
@@ -355,7 +357,8 @@ module tr_soc_top_int #(
         .bb_mode_pre_ln      (bb_mode_pre_ln),
         .bb_mode_post_ln     (bb_mode_post_ln),
         .sym_mode_en         (sym_mode_en),
-        
+        .alpha_flat_mode     (alpha_flat_mode),
+
         .vpu_bb_valid_out    (vpu_bb_valid),
         .vpu_vecmul_valid_out(vpu_vecmul_valid),
         .vpu_mac_valid_out   (vpu_mac_valid),

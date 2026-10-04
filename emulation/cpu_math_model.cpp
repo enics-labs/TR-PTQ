@@ -284,7 +284,7 @@ int main(int argc, char* argv[]) {
         }
         std::cout << "[C++ MODEL] Generated SOFTMAX vectors using 2nd-order exp + exact division (Q0.8 unsigned output)." << std::endl;
     }
-    else if (mode == "swiglu") {
+    else if (mode == "swiglu_baseline") {
         const int N_LANES = 8;
         const int N_VECS  = 256;
         vec_file << N_VECS << "\n";
@@ -331,7 +331,37 @@ int main(int argc, char* argv[]) {
             }
             exp_file << "\n";
         }
-        std::cout << "[C++ MODEL] Generated SWIGLU vectors." << std::endl;
+        std::cout << "[C++ MODEL] Generated SWIGLU_BASELINE vectors." << std::endl;
+    }
+    else if (mode == "swiglu") {
+        // Golden vectors for the REAL tr_soc_ctrl_int CMD=5/6 opcode pair
+        // (SW_P1..P4) -- best-fit precision (change A: flat alpha=1, change
+        // C: saturating gate-multiply), via swiglu_hw_scalar_bestfit(), NOT
+        // the "swiglu_baseline" mode above (which models tr_swiglu.sv's own
+        // as-shipped, non-flat-alpha, wrapping precision). See
+        // docs/llama_fpga_plan.md.
+        const int N_LANES = 8;
+        const int N_VECS  = 256;
+        vec_file << N_VECS << "\n";
+        srand(2024);
+
+        for (int i = 0; i < N_VECS; i++) {
+            int x[N_LANES], g[N_LANES];
+
+            for (int j = 0; j < N_LANES; j++) x[j] = (rand() % 256) - 128;
+            for (int j = 0; j < N_LANES; j++) g[j] = (rand() % 256) - 128;
+
+            for (int j = 0; j < N_LANES; j++) vec_file << x[j] << " ";
+            for (int j = 0; j < N_LANES; j++) vec_file << g[j] << (j == N_LANES - 1 ? "" : " ");
+            vec_file << "\n";
+
+            for (int j = 0; j < N_LANES; j++) {
+                int8_t y = swiglu_hw_scalar_bestfit((int8_t)x[j], (int8_t)g[j]);
+                exp_file << (int)y << (j == N_LANES - 1 ? "" : " ");
+            }
+            exp_file << "\n";
+        }
+        std::cout << "[C++ MODEL] Generated SWIGLU (best-fit, CMD=5/6) vectors." << std::endl;
     }
     else if (mode == "gelu" || mode == "gelu_baseline") {
         // gelu_baseline (tr_gelu.sv, tb_baseline/tr_baseline/tr_gelu/)

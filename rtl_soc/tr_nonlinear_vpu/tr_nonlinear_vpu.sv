@@ -64,13 +64,18 @@ module tr_nonlinear_vpu #(
     input  logic mac_clear_acc,
     input  logic [1:0]  mac_op_mode,
     input  logic [1:0]  vecmul_op_mode,
-    input  logic [1:0]  vecmul_scale_mode, // 00:[N-1:0], 01:[11:4], 10:[15:8]
+    // 000:[N-1:0], 001:[11:4] (wrap), 010:[15:8], 011: softmax Q0.8 unsigned
+    // saturate, 100: [11:4] SIGNED SATURATE (SwiGLU gate-multiply -- see
+    // docs/llama_fpga_plan.md change C; 000-011 bit-identical to the old
+    // 2-bit encoding, just zero-extended).
+    input  logic [2:0]  vecmul_scale_mode,
     input  logic en_bb_valid,
     input  logic bb_bypass_ln,
     input  logic bb_shift_mode,     // 0: [23:8] (Softmax), 1: [19:4] (RMSNorm)
     input  logic bb_mode_pre_ln,
     input  logic [1:0]  bb_mode_post_ln,
     input  logic sym_mode_en,
+    input  logic alpha_flat_mode,   // true alpha=1 sigmoid slope (SwiGLU's SiLU), see alpha_stabilizer.sv
     output logic vpu_bb_valid_out,
     output logic vpu_vecmul_valid_out,
     output logic vpu_mac_valid_out,
@@ -222,7 +227,7 @@ module tr_nonlinear_vpu #(
     alpha_stabilizer #(
         .N(N), .W(W_VEC), .FRAC_W(FRAC_W)
     ) u_alpha (
-        .in_vec(sram_data_a), .out_vec(alpha_stab_out)
+        .in_vec(sram_data_a), .flat_mode(alpha_flat_mode), .out_vec(alpha_stab_out)
     );
 
     symmetry_modifier #(
@@ -280,10 +285,13 @@ module tr_nonlinear_vpu #(
         end
     end
 
+    localparam signed [W_VEC-1:0] VECMUL_SAT_MAX = (1 <<< (W_VEC-1)) - 1;
+    localparam signed [W_VEC-1:0] VECMUL_SAT_MIN = -(1 <<< (W_VEC-1));
+
     always_comb begin
         for(int i=0; i<N; i++) begin
             logic signed [ACC_W-1:0] shifted;
-            if (vecmul_scale_mode == 2'b11) begin
+            if (vecmul_scale_mode == 3'b011) begin
                 // Softmax Q0.8 UNSIGNED probability output: shift =
                 // anchor_q_bits(8, fixed for every FRAC_W<=8 format) +
                 // FRAC_W - 8 = FRAC_W. Saturate at 255 (~0.996) instead of
@@ -291,10 +299,23 @@ module tr_nonlinear_vpu #(
                 // exactly on 256).
                 shifted = vecmul_out_acc[i] >>> FRAC_W;
                 vecmul_out_trunc[i] = (shifted > 255) ? W_VEC'(255) : W_VEC'(shifted);
-            end else if (vecmul_scale_mode == 2'b10) begin
+            end else if (vecmul_scale_mode == 3'b100) begin
+                // SIGNED saturating variant of mode 001 (same FRAC_W shift),
+                // for SwiGLU's final gate-multiply (silu*g): that product
+                // routinely exceeds W_VEC's representable range (unlike
+                // GELU's/RMSNorm's own single-operand-scale products, which
+                // rarely do), and wrapping there is a correctness risk, not
+                // just added noise -- see docs/llama_fpga_plan.md's
+                // wraparound finding. Mirrors mode 011's saturating
+                // precedent, signed instead of unsigned.
+                shifted = vecmul_out_acc[i] >>> FRAC_W;
+                if (shifted > VECMUL_SAT_MAX) vecmul_out_trunc[i] = VECMUL_SAT_MAX;
+                else if (shifted < VECMUL_SAT_MIN) vecmul_out_trunc[i] = VECMUL_SAT_MIN;
+                else vecmul_out_trunc[i] = W_VEC'(shifted);
+            end else if (vecmul_scale_mode == 3'b010) begin
                 // anchor_q_bits fixed at 8 -- not FRAC_W-dependent.
                 vecmul_out_trunc[i] = W_VEC'(vecmul_out_acc[i] >>> 8);
-            end else if (vecmul_scale_mode == 2'b01) begin
+            end else if (vecmul_scale_mode == 3'b001) begin
                 vecmul_out_trunc[i] = W_VEC'(vecmul_out_acc[i] >>> FRAC_W);
             end else begin
                 vecmul_out_trunc[i] = W_VEC'(vecmul_out_acc[i]);

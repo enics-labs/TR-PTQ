@@ -120,7 +120,20 @@ inline int gelu_exp_q44(int8_t x) { return gelu_exp_q44_raw((int)x); }
 // scalar primitive below is the true unit and the 8-wide wrapper is just a
 // loop over it.
 // ============================================================================
-inline int8_t gelu_hw_scalar(int8_t x) {
+// silu_hw_scalar is the x*sigma(x) stage shared bit-for-bit by GELU's GL_P1-
+// P3 crossbar sequence and (per tr_swiglu.sv's own header comment, "Passes
+// 0-2 are identical to tr_gelu") tr_swiglu's passes 0-2 -- this is ONE
+// implementation, not two copies that could drift. Note sigma() here is
+// sigmoid(alpha_stabilizer(x)), NOT sigmoid(x): alpha_stabilizer is a
+// piecewise GELU-sigmoid-slope approximation (coefficients 27/26/25/24
+// sixteenths, tuned for GELU's ~1.702 constant), reused unmodified by
+// tr_swiglu.sv for what should be plain SiLU's sigmoid(x) (alpha=1). This is
+// a real, measured systematic bias (continuous-math RMSE ~0.095, max ~0.16
+// over |x|<6) baked into the existing, already-synthesized tr_swiglu.sv --
+// not something introduced here. See swiglu_exact()/silu_exact() in
+// tools/scripts/vpu_precision/tr_vpu_model.py for the true-SiLU fp32
+// reference this is measured against.
+inline int8_t silu_hw_scalar(int8_t x) {
     int8_t alpha = alpha_stabilizer_model(x);
     int    E     = gelu_exp_q44(alpha);
     int    pre_ln  = E + 16;
@@ -130,7 +143,13 @@ inline int8_t gelu_hw_scalar(int8_t x) {
     // register (512/512 match); the previous bits=8 + extra <<4/>>4 shuffle
     // was never independently RTL-verified (it was reverse-engineered from
     // tr_gelu.sv, the dead-code module -- see tr_gelu_int_tb.sv) and simply
-    // used the wrong LN precision.
+    // used the wrong LN precision. NOTE: this BITS=4 crossbar precision is
+    // deliberately lower than tr_swiglu.sv's own dedicated BITS=8 ln step
+    // (see tr_swiglu.sv lines ~53-62) -- 31/256 int8 inputs disagree by up
+    // to 2 LSB between the two. swiglu_hw_model() below is bit-exact to the
+    // SHARED CROSSBAR (GELU/future SwiGLU-opcode) precision, deliberately
+    // NOT to tr_swiglu.sv's standalone module -- that comparison is the
+    // point of the exercise, not a bug; see docs/llama_fpga_plan.md.
     int    ln_q44  = tr_new_ln_scalar(pre_ln, 4);
     int8_t neg_ln  = (int8_t)(-(int16_t)(int8_t)ln_q44);
     int    recip   = gelu_exp_q44(neg_ln);
@@ -139,8 +158,109 @@ inline int8_t gelu_hw_scalar(int8_t x) {
     return (int8_t)(product >> 4);
 }
 
+inline int8_t gelu_hw_scalar(int8_t x) { return silu_hw_scalar(x); }
+
 inline void gelu_hw_model(const int8_t x[8], int8_t out[8]) {
     for (int i = 0; i < 8; i++) out[i] = gelu_hw_scalar(x[i]);
+}
+
+// ============================================================================
+// SwiGLU (shared-crossbar precision) -- silu_hw_scalar (above) followed by
+// one SS multiply, [11:4] slice -- matches tr_soc_ctrl_int's planned
+// SW_P1..P3 (silu, mirroring GL_P1..GL_P3) + SW_P4 (gate-multiply, mirroring
+// RM_P4's SS-mode structure) opcode sequence bit-for-bit. Deliberately NOT
+// bit-exact to tr_swiglu.sv's standalone module (see silu_hw_scalar's
+// comment) -- this is the shared-datapath data point in the
+// shared-crossbar-vs-dedicated-module comparison.
+// ============================================================================
+inline int8_t swiglu_hw_scalar(int8_t x, int8_t g) {
+    int8_t silu = silu_hw_scalar(x);
+    int product = (int)silu * (int)g;
+    return (int8_t)(product >> 4);
+}
+
+inline void swiglu_hw_model(const int8_t x[8], const int8_t g[8], int8_t out[8]) {
+    for (int i = 0; i < 8; i++) out[i] = swiglu_hw_scalar(x[i], g[i]);
+}
+
+// ============================================================================
+// SwiGLU "best-fit" -- change A (flat alpha=1, true SiLU slope) + change C
+// (saturating gate-multiply), BOTH IMPLEMENTED IN REAL RTL (see
+// alpha_stabilizer.sv's flat_mode port and tr_nonlinear_vpu.sv's
+// vecmul_scale_mode==3'b100 branch), bit-exact to that RTL -- confirmed via
+// tb_soc/peripheral_modules/alpha_stabilizer/alpha_stabilizer_tb.sv (change
+// A, exhaustive 256/256) and tb_soc/tr_nonlinear_vpu/tr_nonlinear_vpu_tb.sv
+// TEST 4b (change C, directed). Change B (wider BITS=8 ln) was measured and
+// dropped -- see docs/llama_fpga_plan.md and
+// tools/scripts/vpu_precision/results/SWIGLU_SUMMARY.md.
+// ============================================================================
+inline int8_t alpha_stabilizer_model_flat(int8_t x) {
+    // coef=16 (1.0 in Q4.4): x*16, >>4 == x unchanged, still saturate+negate
+    // the same way the real RTL's flat_mode path does.
+    int16_t x_mult = (int16_t)x << 4;
+    int8_t x_scaled;
+    if      (x_mult >  2032) x_scaled =  127;
+    else if (x_mult < -2048) x_scaled = -128;
+    else                     x_scaled = (int8_t)(x_mult >> 4);
+    return (x_scaled > 0) ? (int8_t)(-x_scaled) : x_scaled;
+}
+
+inline int8_t silu_hw_scalar_bestfit(int8_t x) {
+    int8_t alpha = alpha_stabilizer_model_flat(x);
+    int    E     = gelu_exp_q44(alpha);
+    int    pre_ln  = E + 16;
+    int    ln_q44  = tr_new_ln_scalar(pre_ln, 4);   // still BITS=4 -- change B dropped
+    int8_t neg_ln  = (int8_t)(-(int16_t)(int8_t)ln_q44);
+    int    recip   = gelu_exp_q44(neg_ln);
+    int    sigma   = (x < 0) ? (16 - recip) : recip;
+    int    product = (int)x * (int8_t)sigma;
+    return (int8_t)(product >> 4);
+}
+
+inline int8_t swiglu_hw_scalar_bestfit(int8_t x, int8_t g) {
+    int8_t silu = silu_hw_scalar_bestfit(x);
+    int product = (int)silu * (int)g;
+    int shifted = product >> 4;
+    if (shifted > 127) return 127;
+    if (shifted < -128) return -128;
+    return (int8_t)shifted;
+}
+
+inline void swiglu_hw_model_bestfit(const int8_t x[8], const int8_t g[8], int8_t out[8]) {
+    for (int i = 0; i < 8; i++) out[i] = swiglu_hw_scalar_bestfit(x[i], g[i]);
+}
+
+// tr_swiglu.sv's OWN standalone precision (BITS=8 ln step, with explicit
+// widen-by-<<4 / round-narrow-by->>4 -- see tr_swiglu.sv lines ~53-62),
+// bit-exact to its RTL (confirmed via verify_block.py swiglu_baseline,
+// 2048/2048). Mirrors cpu_math_model.cpp's "swiglu_baseline" branch
+// exactly. This is a SEPARATE,
+// higher-precision sigma(alpha_stabilizer(x)) evaluation than
+// silu_hw_scalar's BITS=4 shared-crossbar path above -- the two disagree on
+// 31/256 int8 inputs (max 2 LSB); see silu_hw_scalar's comment.
+inline int8_t silu_hw_scalar_dedicated(int8_t x) {
+    int8_t alpha = alpha_stabilizer_model(x);
+    int    E     = gelu_exp_q44(alpha);
+    int    pre_ln = E + 16;
+    int    ln_yq8 = tr_new_ln_scalar(pre_ln << 4, 8);
+    if (ln_yq8 >  2047) ln_yq8 =  2047;
+    if (ln_yq8 < -2048) ln_yq8 = -2048;
+    int8_t ln_out_q44 = (int8_t)((ln_yq8 + 8) >> 4);
+    int8_t neg_ln = (int8_t)(-(int16_t)ln_out_q44);
+    int    recip  = gelu_exp_q44(neg_ln);
+    int    sigma  = (x < 0) ? (16 - recip) : recip;
+    int    product = (int)x * (int8_t)sigma;
+    return (int8_t)(product >> 4);
+}
+
+inline int8_t swiglu_hw_scalar_dedicated(int8_t x, int8_t g) {
+    int8_t silu = silu_hw_scalar_dedicated(x);
+    int product = (int)silu * (int)g;
+    return (int8_t)(product >> 4);
+}
+
+inline void swiglu_hw_model_dedicated(const int8_t x[8], const int8_t g[8], int8_t out[8]) {
+    for (int i = 0; i < 8; i++) out[i] = swiglu_hw_scalar_dedicated(x[i], g[i]);
 }
 
 // ============================================================================

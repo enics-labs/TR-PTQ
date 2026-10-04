@@ -49,6 +49,35 @@ void tr_hw_gelu_batch(const int8_t* x, int8_t* out, int32_t n) {
     for (int32_t i = 0; i < n; i++) out[i] = gelu_hw_scalar(x[i]);
 }
 
+// x, g, out: 8 int8 each. Bit-exact to the SHARED CROSSBAR precision (the
+// planned tr_soc_ctrl_int SW_P1..P4 opcode sequence), deliberately NOT to
+// tr_swiglu.sv's standalone module -- see swiglu_hw_model's comment in
+// tr_math_model.hpp.
+void tr_hw_swiglu(const int8_t* x, const int8_t* g, int8_t* out) {
+    swiglu_hw_model(x, g, out);
+}
+
+// Per-ELEMENT batch (matches tr_hw_gelu_batch's convention, not
+// tr_hw_rmsnorm_batch's n_groups-of-8 convention -- SwiGLU, like GELU, is
+// purely element-wise, no cross-lane coupling).
+void tr_hw_swiglu_batch(const int8_t* x, const int8_t* g, int8_t* out, int32_t n) {
+    for (int32_t i = 0; i < n; i++) out[i] = swiglu_hw_scalar(x[i], g[i]);
+}
+
+// tr_swiglu.sv's own standalone (BITS=8) precision -- see
+// swiglu_hw_model_dedicated's comment in tr_math_model.hpp.
+void tr_hw_swiglu_dedicated_batch(const int8_t* x, const int8_t* g, int8_t* out, int32_t n) {
+    for (int32_t i = 0; i < n; i++) out[i] = swiglu_hw_scalar_dedicated(x[i], g[i]);
+}
+
+// Best-fit (change A: flat alpha=1 + change C: saturating gate-multiply),
+// bit-exact to the REAL RTL (alpha_stabilizer.sv flat_mode,
+// tr_nonlinear_vpu.sv vecmul_scale_mode==3'b100) -- see
+// swiglu_hw_model_bestfit's comment in tr_math_model.hpp.
+void tr_hw_swiglu_bestfit_batch(const int8_t* x, const int8_t* g, int8_t* out, int32_t n) {
+    for (int32_t i = 0; i < n; i++) out[i] = swiglu_hw_scalar_bestfit(x[i], g[i]);
+}
+
 // Single-lane requantize: Saturate((acc*mult + bias) >>> shift).
 int8_t tr_hw_quant(int64_t acc, int32_t mult, int32_t shift) {
     return quant_model(acc, mult, shift);

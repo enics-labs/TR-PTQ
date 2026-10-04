@@ -21,7 +21,13 @@ def get_config(block_name):
         # trap tr_rmsnorm.sv turned out to be.
         "gelu":    {"f_file": "../tb_soc/tr_gelu_int/tr_gelu_int.f",  "max_error": 0},
         "gelu_baseline": {"f_file": "../tb_baseline/tr_baseline/tr_gelu/tr_gelu.f", "max_error": 0},
-        "swiglu":  {"f_file": "../tb_baseline/tr_baseline/tr_swiglu/tr_swiglu.f",   "max_error": 0},
+        # swiglu: drives the REAL production CMD=5 (SiLU)/CMD=6
+        # (gate-multiply) opcode pair via tr_soc_top_int -- the new
+        # control-path integration (docs/llama_fpga_plan.md changes A/C),
+        # NOT tr_swiglu.sv's own as-shipped precision (that's
+        # "swiglu_baseline" below). Golden reference: swiglu_hw_scalar_bestfit().
+        "swiglu":  {"f_file": "../tb_soc/tr_swiglu_int/tr_swiglu_int.f", "max_error": 0},
+        "swiglu_baseline": {"f_file": "../tb_baseline/tr_baseline/tr_swiglu/tr_swiglu.f", "max_error": 0},
         "quant":   {"f_file": "../tb_soc/requantize_engine/requantize_engine_int.f", "max_error": 0},
         "matmul":  {"f_file": "../tb_soc/tr_matmul/tr_matmul.f",     "max_error": 0},
         # rmsnorm_baseline: tr_rmsnorm.sv (tb_baseline/tr_baseline/tr_rmsnorm/)
@@ -164,7 +170,7 @@ def run_verification():
         if row_has_error and failed_rows_logged < 10:
             print(f"  [MISMATCH] Row {idx+1} (Max Error in row: {row_max_delta})")
             print(f"    Input   : {in_line.strip()}")
-            if args.block in ["softmax", "softmax_baseline", "gelu", "gelu_baseline", "swiglu", "quant", "matmul", "rmsnorm", "rmsnorm_baseline", "gelu_fused"]:
+            if args.block in ["softmax", "softmax_baseline", "gelu", "gelu_baseline", "swiglu", "swiglu_baseline", "quant", "matmul", "rmsnorm", "rmsnorm_baseline", "gelu_fused"]:
                 print(f"    Expected: {exp_line.strip()}")
                 print(f"    HDL Got : {hdl_line.strip()}\n")
             else:

@@ -13,6 +13,16 @@
  *           tr_exp_alu's Taylor polynomial expect, regardless of the
  *           original sign of x.
  *
+ *           `flat_mode` (new): forces the coefficient to exactly 1.0 for
+ *           every lane instead of the GELU-tuned piecewise table, giving a
+ *           true alpha=1 sigmoid slope -- needed for SwiGLU's SiLU, which
+ *           is NOT GELU's sigmoid(1.702x) approximation. Default 0 leaves
+ *           every existing caller (GELU, and tr_swiglu.sv's own reuse of
+ *           this same table) bit-for-bit unchanged; measured in Python
+ *           (tools/scripts/vpu_precision/swiglu_accuracy.py) to be the
+ *           dominant accuracy fix for a shared-crossbar SwiGLU opcode --
+ *           bigger than the ln-precision gap, see docs/llama_fpga_plan.md.
+ *
  * @param    N       Vector dimension.
  * @param    W       Word width of in_vec/out_vec.
  * @param    FRAC_W  Fractional bits (defines the |x|=1/2/3 region boundaries
@@ -24,6 +34,7 @@ module alpha_stabilizer #(
     parameter int FRAC_W = 4
 )(
     input  logic signed [W-1:0] in_vec [N],
+    input  logic                flat_mode,
     output logic signed [W-1:0] out_vec [N]
 );
 
@@ -36,6 +47,7 @@ module alpha_stabilizer #(
     localparam int COEF2 = 26 <<< (FRAC_W - 4);
     localparam int COEF3 = 25 <<< (FRAC_W - 4);
     localparam int COEF4 = 24 <<< (FRAC_W - 4);
+    localparam int COEF_FLAT = 1 <<< FRAC_W;  // real value 1.0 -- true SiLU slope
 
     localparam signed [W-1:0] MAX_OUT = (1 <<< (W-1)) - 1;
     localparam signed [W-1:0] MIN_OUT = -(1 <<< (W-1));
@@ -54,7 +66,8 @@ module alpha_stabilizer #(
                 abs_x = x_ext[EXT_W-1] ? -x_ext : x_ext;
 
                 // Region boundaries |x| = 1, 2, 3 (real), at this format's LSB
-                if (abs_x < (1 <<< FRAC_W))      coef_sel = EXT_W'(COEF1);
+                if (flat_mode)                   coef_sel = EXT_W'(COEF_FLAT);
+                else if (abs_x < (1 <<< FRAC_W))      coef_sel = EXT_W'(COEF1);
                 else if (abs_x < (2 <<< FRAC_W)) coef_sel = EXT_W'(COEF2);
                 else if (abs_x < (3 <<< FRAC_W)) coef_sel = EXT_W'(COEF3);
                 else                             coef_sel = EXT_W'(COEF4);
