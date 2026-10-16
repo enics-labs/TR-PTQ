@@ -265,7 +265,8 @@ inline void swiglu_hw_model(const int8_t x[8], const int8_t g[8], int8_t out[8])
 // the first SwiGLU opcode pair (CMD=5/6 via alpha_stabilizer flat_mode and vecmul_scale_mode 3'b100). Both RTL
 // features have been removed (replaced by the two-pass sigma-ROM flow, sw_* below); the functions are kept because
 // tools/models/llama32_1b.py and tools/scripts/llama32_1b/ablate.py use them as the "as shipped" SwiGLU baseline of
-// the accuracy study (RTL history: git tag tr-vpu_rtl-ISCAS-20261013 and the commits after it).
+// the accuracy study (RTL history: git tag tr-vpu_rtl-ISCAS-20261013 and the commits after it). It therefore keeps the
+// OLD shipped ln (tr_new_ln_scalar), not the PWL ln of the current RTL.
 // ============================================================================
 inline int8_t alpha_stabilizer_model_flat(int8_t x) {
     // coef=16 (1.0 in Q4.4): x*16, >>4 == x unchanged, still saturate+negate
@@ -282,7 +283,7 @@ inline int8_t silu_hw_scalar_bestfit(int8_t x) {
     int8_t alpha = alpha_stabilizer_model_flat(x);
     int    E     = gelu_exp_q44(alpha);
     int    pre_ln  = E + 16;
-    int    ln_q44  = tr_vpu_ln(pre_ln);   // still BITS=4 -- change B dropped
+    int    ln_q44  = tr_new_ln_scalar(pre_ln, 4);   // the OLD shipped ln (tr_math.cuh): this model is the pre-Llama baseline
     int8_t neg_ln  = (int8_t)(-(int16_t)(int8_t)ln_q44);
     int    recip   = gelu_exp_q44(neg_ln);
     int    sigma   = (x < 0) ? (16 - recip) : recip;

@@ -50,7 +50,8 @@ Evaluates `out_vec[i] = a[i]*b[i]` for each of the N lanes over a 3-stage pipeli
 | Parameter | Default | Description                        |
 |-----------|---------|-----------------------------------------|
 | `N`       | `16`    | Number of parallel lanes                 |
-| `W`       | `8`     | Input operand width (`a`/`b`)             |
+| `W`       | `8`     | Input operand width of `a` (and of `b` unless `WB` is set) |
+| `WB`      | `W`     | Input operand width of `b`. The VPU sets 12 so RMSNorm's wide `inv_rms` and SwiGLU's 12-bit silu can be the `b` operand |
 | `ACC_W`   | `32`    | Output width (`out_vec`)                  |
 
 ### Ports
@@ -61,7 +62,8 @@ Evaluates `out_vec[i] = a[i]*b[i]` for each of the N lanes over a 3-stage pipeli
 | `in_valid`  | input     | 1                | Input valid                                             |
 | `in_ready`  | output    | 1                | Ready to accept a new beat                              |
 | `op_mode`   | input     | 2                | 0: SS, 1: SU, 2: UU (signed/unsigned operand select)    |
-| `a`, `b`    | input     | `[W-1:0][N]`     | Per-lane operand vectors                                |
+| `a`         | input     | `[W-1:0][N]`     | Per-lane operand vector A                               |
+| `b`         | input     | `[WB-1:0][N]`    | Per-lane operand vector B                               |
 | `out_valid` | output    | 1                | Output valid                                             |
 | `out_ready` | input     | 1                | Downstream ready                                         |
 | `out_vec`   | output    | `[ACC_W-1:0][N]` | Per-lane product results                                 |

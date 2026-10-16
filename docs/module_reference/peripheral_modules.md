@@ -13,6 +13,8 @@ These modules live in [rtl_soc/tr_nonlinear_vpu/peripheral_modules/](../../rtl_s
 Finds the maximum signed value across `NUM_INPUTS` elements using a pipelined binary comparison tree. Inputs are fed into stage 0 of the tree; at each subsequent stage, pairs of values are compared and the larger is forwarded, reducing the element count by half per stage. The total latency is `STAGES = log2(NUM_INPUTS)` clock cycles. A valid shift-register tracks the pipeline so `valid_out` is asserted exactly `STAGES` cycles after `valid_in`.
 
 > **Constraint:** `NUM_INPUTS` must be a power of two.
+>
+> **Shared use:** `tr_nonlinear_vpu` instantiates it once at `DATA_WIDTH = WIDE_W` (20) behind an input mux (`mux_max_sel`): softmax's row max (sign-extended int8 lanes) and SwiGLU's max `|silu·up|` (non-negative wide products). The softmax result uses only the low 8 bits.
 
 ### Parameters
 

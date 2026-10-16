@@ -29,28 +29,29 @@ This does 4 things: (1) compiles `cpu_math_model.cpp`, (2) runs it in the given 
 | Block | Tests | Golden model source |
 |---|---|---|
 | `exp` | `tr_exp_alu` in isolation | `tr_approx_exp_scalar_2rd` |
-| `ln` | `tr_ln_alu` in isolation | `tr_new_ln_scalar` |
+| `ln` | `tr_ln_alu` (piecewise-linear) in isolation, exhaustive over the input width; `LN_CFG="WIDTH,BITS,SEGMENTS,COEF_BITS,OUT_WIDTH"` selects the configuration (default 16,4,2,8,8) | `tr_pwl_ln_scalar` |
 | `gelu` | Production GL_P1..GL_P3 via `tr_soc_top_int` (CMD=0x02) | `gelu_hw_model` |
 | `gelu_baseline` | Standalone `tr_gelu.sv` (`rtl_baseline/`) | Same `gelu_hw_model` — identical algorithm to production |
 | `gelu_fused` | Real firmware composition: raw accumulator → requantize → GELU | `gelu_hw_scalar(quant_model(...))` |
-| `softmax` | Production SM_P1..SM_P4 via `tr_soc_top_int` (CMD=0x01) | `softmax_hw_model` (log-sum-exp) |
+| `softmax` | Production SM_P1..SM_P4 via `tr_soc_top_int` (CMD=0x01); checks the 8 probabilities **and** the tile `z` (`ADDR_SM_Z`) on random, attention-like (masked lanes), fully masked, equal and z-clamping tiles | `softmax_hw_model_ex` (log-sum-exp) |
 | `softmax_baseline` | Standalone `tr_softmax.sv` (`rtl_baseline/`) | **Different** algorithm (explicit reciprocal-via-exp) — its own dedicated golden model |
-| `rmsnorm` | Production RM_P1..RM_P4 via `tr_soc_top_int` (CMD=0x03) | `rmsnorm_hw_model` |
-| `rmsnorm_baseline` | Standalone `tr_rmsnorm.sv` (`rtl_baseline/`) | Same `rmsnorm_hw_model` — identical, sign-guard included |
-| `swiglu` | Standalone `tr_swiglu.sv` (`rtl_baseline/`) | Inline model in `cpu_math_model.cpp` |
+| `rmsnorm` | Production **tiled** RMSNorm via `tr_soc_top_int` (cmds 0x07/0x08 per tile, 0x09, 0x0A per tile; rows of 8..2048 elements; compares `inv_rms` and the outputs) | `rms_acc_tile` / `rms_scale` / `rms_apply_tile` |
+| `rmsnorm_baseline` | Standalone `tr_rmsnorm.sv` (`rtl_baseline/`), the older single-tile algorithm | `rmsnorm_hw_model` (old single-tile model, kept for this block) |
+| `swiglu` | Production **two-pass** SwiGLU via `tr_soc_top_int` (cmds 0x05/0x06 per group, 0x0B, 0x05/0x0C per group; rows of 8..8192 elements; compares the row gain and the outputs) | `sw_silu` / `sw_abs_prod` / `sw_gain` / `sw_apply` |
+| `swiglu_baseline` | Standalone `tr_swiglu.sv` (`rtl_baseline/`) | Inline model in `cpu_math_model.cpp` |
 | `quant` | `requantize_engine_int` in isolation | `quant_model` |
 | `matmul` | `dot_product_engine` + `requantize_engine_int` | `matmul_model` |
 
 Only `softmax_baseline` needed a bespoke golden model — `tr_softmax.sv` is a genuinely different algorithm from the production log-sum-exp path (own "is_zero→255" anchor vs. the crossbar's "is_zero→128-doubling" trick). `gelu_baseline`/`rmsnorm_baseline` reuse their production counterparts' models directly since the standalone modules implement the identical algorithm, just wired without the SoC controller.
 
-**Known gap:** `rmsnorm_hw_model` (used by both `rmsnorm` and `rmsnorm_baseline`) does not implement the sign-guard fix that the real RTL has (see `rmsnorm_hw_model_signguard_fixed` in `tr_math_model.hpp`, currently unused dead code). Random `[-128,127]` stimulus rarely triggers the affected regime (small `Σx²`), so this has likely never surfaced as a test failure, but it means the golden model can disagree with correct RTL specifically in that regime.
+**Tooling notes.** Each production flow's golden is bit-exact to `tools/models/vpu_ops.py` (cross-checked on random and real Llama rows, see `docs/llama_hw_summary.md` §10). `rmsnorm` and `swiglu` rows are long (up to 2048 / 8192 elements), so a mismatch prints a whole row. The vec-mul / VPU / top-level testbenches (`tr_nonlinear_vpu_tb`, `tr_soc_top_int_tb`) are smoke tests of the crossbar and the opcode dispatch, not bit-exact regressions; `alpha_stabilizer_tb` is an exhaustive check.
 
 ## Energy characterization: `*_energy_tb.sv`
 
 Separate from correctness verification. Each of these instruments a **new, dedicated** testbench (never the correctness `_tb.sv`) that drives one representative 8-lane stimulus vector, counts clock cycles from stimulus-valid to result-valid, and captures a VCD over exactly that window:
 
 ```
-tb_soc/tr_nonlinear_vpu/tr_nonlinear_vpu_{gelu,softmax,rmsnorm}_energy.f
+tb_soc/tr_nonlinear_vpu/tr_nonlinear_vpu_{gelu,softmax,rmsnorm,swiglu}_energy.f
 tb_baseline/tr_baseline/tr_{gelu,softmax,rmsnorm}/tr_*_energy.f
 tb_baseline/ibert_baseline/ibert_{gelu,softmax,rmsnorm}/ibert_*_energy.f
 ```

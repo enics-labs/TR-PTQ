@@ -10,7 +10,7 @@ These modules live in [rtl_soc/tr_nonlinear_vpu/tr_backbone/](../../rtl_soc/tr_n
 
 ### Operation
 
-Chains `pre_ln_modifier` → `tr_ln_alu` → `post_ln_modifier` → `tr_exp_alu` into one purely combinational pipeline. Expects wide inputs and natively steps precision down through `tr_ln_alu`. This is the module `tr_nonlinear_vpu`'s crossbar routes every GL_P*/SM_P*/RM_P* pass's log-domain math through.
+Chains `pre_ln_modifier` → `tr_ln_alu` → `post_ln_modifier` → `tr_exp_alu` into one purely combinational pipeline. Expects wide inputs and natively steps precision down through `tr_ln_alu`. **One shared ln unit for every operator:** `tr_ln_alu` runs at `BITS = FRAC_W + LN_EXTRA` (6) with an `(WIDTH_IN + LN_EXTRA)`-bit input. Operators with `FRAC_W` fractional bits feed `x << LN_EXTRA` (`ln_pre_scaled = 0`); RMSNorm feeds its mean already at `FRAC_W + LN_EXTRA` bits (`ln_pre_scaled = 1`). The Q.6 result is rounded back to Q.`FRAC_W` and saturated to `WIDTH_OUT` (software model `tr_vpu_ln` in `tr_math_model.hpp`). This is the module `tr_nonlinear_vpu`'s crossbar routes every GL_P*/SM_P*/RM_P* pass's log-domain math through.
 
 ### Parameters
 
@@ -21,6 +21,7 @@ Chains `pre_ln_modifier` → `tr_ln_alu` → `post_ln_modifier` → `tr_exp_alu`
 | `WIDTH_OUT` | `8`     | Target operating width for exp/mantissa                  |
 | `FRAC_W`    | `4`     | Fractional bit width                                     |
 | `LUT_IDX_W` | `3`     | Width of the ROM index for the Taylor anchor              |
+| `LN_EXTRA`  | `2`     | Extra fractional bits of the shared ln unit (`BITS = FRAC_W + LN_EXTRA`) |
 
 ### Ports
 
@@ -31,7 +32,8 @@ Chains `pre_ln_modifier` → `tr_ln_alu` → `post_ln_modifier` → `tr_exp_alu`
 | `out_valid`    | output    | 1                                | Output valid                                    |
 | `bypass_ln`    | input     | 1                                | Skip `tr_ln_alu` (route straight to exp)        |
 | `mode_pre_ln`  | input     | 1                                | `pre_ln_modifier`'s +1.0 select                 |
-| `mode_post_ln` | input     | 2                                | `post_ln_modifier`'s bypass/÷/InvSqrt select    |
+| `mode_post_ln` | input     | 2                                | `post_ln_modifier`'s bypass / ÷ / InvSqrt (floor) / InvSqrt (rounded, RMSNorm) select |
+| `ln_pre_scaled`| input     | 1                                | 0: input has `FRAC_W` fractional bits (shifted up by `LN_EXTRA`); 1: already `FRAC_W+LN_EXTRA` (RMSNorm mean) |
 | `vec_in`       | input     | `[WIDTH_IN-1:0][N]`              | Input vector                                    |
 | `log_out`      | output    | `[WIDTH_OUT-1:0][N]`             | `tr_ln_alu`'s (post-conditioned) log output     |
 | `a_idx_out`    | output    | `[LUT_IDX_W-1:0][N]`             | Shared-LUT anchor index for `shared_lut_rom`    |
@@ -46,15 +48,17 @@ Chains `pre_ln_modifier` → `tr_ln_alu` → `post_ln_modifier` → `tr_exp_alu`
 
 ### Operation
 
-Integer natural-logarithm approximator via MSB-exponent + linear-mantissa log2 decomposition. Finds `xq`'s MSB (`floor(log2(xq))`) using a balanced binary-search tree (not a linear scan — this was a real critical-path fix, see the FPGA M2 timing results), normalizes `xq` so that bit sits at the top of the word, and takes its top bits as a linear mantissa term (`log2(1.f) ≈ f` over `[0,1)`). Combines the exponent and mantissa terms into `log2(xq)`, then converts to `ln` by multiplying by the fixed-point constant `≈ln(2)` (via shifts, no real multiplier), saturating to `OUT_WIDTH`. `xq==0` short-circuits to `yq=0`.
+Integer natural-logarithm approximator: MSB exponent + **piecewise-linear fit of `ln(1+f)`** over the mantissa fraction. Finds `xq`'s MSB (`floor(log2(xq))`) using a balanced binary-search tree (not a linear scan — this was a real critical-path fix, see the FPGA M2 timing results), normalizes `xq` so that bit sits at the top of the word, and takes the `BITS` bits below it as the mantissa fraction `fk`. The mantissa range is split into `SEGMENTS` equal segments (top `log2(SEGMENTS)` bits of `fk`), each with its own least-squares line, constants quantized to `COEF_BITS`: `aq = msb − BITS`, `yq = (aq·L·2^BITS + A[seg]·fk + B[seg]·2^BITS + 2^(COEF_BITS−1)) >>> COEF_BITS` with `L = round(ln2·2^COEF_BITS)`. All multiplies are by constants (shift-add trees, no general multiplier); the result is saturated to `OUT_WIDTH`. `xq==0` short-circuits to `yq=0`. Bit-exact to `tools/models/vpu_ops.py::_ln_core` and to `tr_pwl_ln_scalar` (verified exhaustively over the input width for 10 configurations via `verify_block.py ln` with `LN_CFG`). Supported constants: `SEGMENTS`∈{1,2,4} at `COEF_BITS=8`, {1,2} at 6, 2 at 10 (an unsupported pair stops elaboration).
 
 ### Parameters
 
 | Parameter   | Default | Description                                    |
 |-------------|---------|--------------------------------------------------|
 | `WIDTH`     | `16`    | Input width (`xq`)                              |
-| `BITS`      | `4`     | Fractional bits of `xq`                          |
+| `BITS`      | `4`     | Fractional bits of `xq` (the shared unit uses 6)  |
 | `OUT_WIDTH` | `8`     | Output width (`yq`), saturated                   |
+| `SEGMENTS`  | `2`     | Piecewise-linear segments (1, 2, 4)              |
+| `COEF_BITS` | `8`     | Fixed-point bits of the segment constants (6, 8, 10) |
 
 ### Ports
 
