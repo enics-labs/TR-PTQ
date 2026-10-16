@@ -30,7 +30,7 @@ module tr_nonlinear_vpu_tb();
 
     // Controller Registers
     logic signed [W_VEC-1:0] ctrl_scalar_sub_val;
-    logic signed [W_VEC-1:0] vpu_max_out;
+    logic signed [19:0]      vpu_max_out;      // WIDE_W: shared piped_max (softmax row max / SwiGLU max |prod|)
     logic signed [ACC_W-1:0] vpu_dot_out;
 
     // MUX Controls
@@ -38,7 +38,7 @@ module tr_nonlinear_vpu_tb();
     logic [1:0] mux_mac_a_sel;
     logic [1:0] mux_mac_b_sel;
     logic [1:0] mux_vecmul_a_sel;
-    logic [1:0] mux_vecmul_b_sel;
+    logic [2:0] mux_vecmul_b_sel;
     logic [LUT_IDX_W-1:0] mux_vpu_out_sel;
 
     // Enables & Modes
@@ -62,6 +62,17 @@ module tr_nonlinear_vpu_tb();
     logic       bb_mode_pre_ln;
     logic [1:0] bb_mode_post_ln;
     logic       sym_mode_en;
+
+    // Newer VPU ports (RMSNorm / SwiGLU / shared max); tied to their idle values in this crossbar test.
+    logic        bb_ln_pre_scaled;
+    logic        mux_max_sel;
+    logic        rms_growth;
+    logic [4:0]  rms_log2n;
+    logic [11:0] inv_rms_in;
+    logic signed [11:0] sw_silu_in [N];
+    logic signed [5:0]  sw_shift;
+    logic [11:0] vpu_inv_rms;
+    logic signed [19:0] vpu_wide_out [N];
 
     // ---------------------------------------------------------
     // DUT Instantiation
@@ -108,6 +119,13 @@ module tr_nonlinear_vpu_tb();
         bb_mode_pre_ln  = 0;
         bb_mode_post_ln = 0;
         sym_mode_en     = 0;
+        bb_ln_pre_scaled = 0;
+        mux_max_sel     = 0;
+        rms_growth      = 0;
+        rms_log2n       = 5'd3;
+        inv_rms_in      = '0;
+        sw_shift        = '0;
+        for (int i=0; i<N; i++) sw_silu_in[i] = '0;
 
         ctrl_scalar_sub_val = '0;
         for (int i=0; i<N; i++) begin

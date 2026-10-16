@@ -131,11 +131,17 @@ module tb_tr_softmax_int();
 
             // Softmax output is Q0.8 UNSIGNED (0..255, saturating) -- print
             // unsigned to match cpu_math_model.cpp's "softmax" mode.
-            $fwrite(file_out, "%0d %0d %0d %0d %0d %0d %0d %0d\n",
-                $unsigned(vpu_data_out[0]), $unsigned(vpu_data_out[1]),
-                $unsigned(vpu_data_out[2]), $unsigned(vpu_data_out[3]),
-                $unsigned(vpu_data_out[4]), $unsigned(vpu_data_out[5]),
-                $unsigned(vpu_data_out[6]), $unsigned(vpu_data_out[7]));
+            // Capture the probabilities first (vpu_data_out is only held while the command is DONE), then read the
+            // tile's z = sat8(max + ln(S)) from ADDR_SM_Z (0x20); z is the ninth value.
+            begin
+                logic [W-1:0] p [N];
+                logic signed [31:0] z_rd;
+                for (int i = 0; i < N; i++) p[i] = vpu_data_out[i];
+                @(posedge clk); mmio_addr = 8'h20; mmio_wen = 0; #1 z_rd = mmio_rdata;
+                $fwrite(file_out, "%0d %0d %0d %0d %0d %0d %0d %0d %0d\n",
+                    $unsigned(p[0]), $unsigned(p[1]), $unsigned(p[2]), $unsigned(p[3]),
+                    $unsigned(p[4]), $unsigned(p[5]), $unsigned(p[6]), $unsigned(p[7]), $signed(z_rd));
+            end
         end
 
         $fclose(file_in);

@@ -16,7 +16,8 @@
  *           (0x08/0x0C, requantizer M/S), ADDR_MM_ROWS/ADDR_MM_CTILES
  *           (0x10/0x14, streaming-matmul tile counts for tr_matmul_ctrl),
  *           ADDR_RMS_LOG2N (0x18, log2 of the RMSNorm row length, read by command 9),
- *           ADDR_SW_E (0x1C, read-only: SwiGLU row gain e, signed).
+ *           ADDR_SW_E (0x1C, read-only: SwiGLU row gain e, signed),
+ *           ADDR_SM_Z (0x20, read-only: softmax tile z = sat8(max + ln(S)), valid after command 1).
  *
  *           Each command is a fixed sequence of states (GL_*, SM_*, RM_*,
  *           SW_*) driving tr_nonlinear_vpu's crossbar-select/enable/mode
@@ -44,7 +45,7 @@
  *           mk = round(S >> (FRAC_W+log2N-2)), runs the shared ln at BITS=FRAC_W+2, halves with rounding,
  *           and evaluates exp through the sign-guarded backbone; the unsigned wide inv_rms (INV_W bits,
  *           FRAC_W+4 fractional bits) is latched in reg_inv_rms (decay: exp output; growth: 65536/E
- *           from recip_inv_rom). Software spec: tools/models/vpu_ops.py::rmsnorm.
+ *           from recip_rom in the VPU). Software spec: tools/models/vpu_ops.py::rmsnorm.
  *
  *           RM_P3 includes a sign-guard fix (forces the log-domain argument
  *           non-positive before tr_nonlinear_vpu's shared exp backbone,
@@ -103,6 +104,8 @@ module tr_soc_ctrl_int #(
     output logic        [4:0]       rms_log2n_out,     // RMSNorm row length log2 (ADDR_RMS_LOG2N)
     output logic        [INV_W-1:0] inv_rms_out,       // RMSNorm wide inv_rms (reg_inv_rms)
     output logic signed [5:0]       sw_shift_out,      // SwiGLU apply shift = 10 - e
+    output logic                    rms_growth_out,    // RMSNorm: sign-guard flip (selects the reciprocal path in the VPU)
+    output logic                    mux_max_sel,       // piped_max input select: 0 softmax x, 1 SwiGLU |prod|
 
     // Datapath Routing
     output logic src_sram_a_sel, 
@@ -114,9 +117,9 @@ module tr_soc_ctrl_int #(
     // VPU Status Inputs (Split Pipeline Valids)
     input  logic signed [W-1:0]     vpu_data_out [N],
     input  logic signed [WIDE_W-1:0] vpu_wide_out [N],      // full-width vecmul results (SwiGLU)
-    input  logic signed [W-1:0]     vpu_max_out,
+    input  logic signed [WIDE_W-1:0] vpu_max_out,
     input  logic signed [ACC_W-1:0] vpu_dot_out,
-    input  logic        [15:0]      vpu_exp_raw,      // vecmul lane-0 raw product (RMSNorm exp result)
+    input  logic        [INV_W-1:0] vpu_inv_rms,      // RMSNorm inv_rms computed by the VPU from the exp result (decay: E, growth: 1/E)
     input  logic vpu_bb_valid,
     input  logic vpu_vecmul_valid,
     input  logic vpu_mac_valid,
@@ -137,6 +140,7 @@ module tr_soc_ctrl_int #(
     localparam logic [N-1:0]          ADDR_MM_CTILES = 8'h14;  // matmul: contraction tiles
     localparam logic [N-1:0]          ADDR_RMS_LOG2N = 8'h18;  // RMSNorm: log2(row length)
     localparam logic [N-1:0]          ADDR_SW_E      = 8'h1C;  // SwiGLU: row gain e (read-only)
+    localparam logic [N-1:0]          ADDR_SM_Z      = 8'h20;  // softmax: tile z = sat8(max + ln(S)) (read-only)
     // Saturation bounds for the reg_scalar_max + reg_scalar_log add below --
     // each operand fits in W bits, but their sum needs W+1 to avoid wrapping.
     localparam logic signed [W:0]   SUB_VAL_MAX = (1 <<< (W-1)) - 1;
@@ -157,6 +161,7 @@ module tr_soc_ctrl_int #(
     logic signed [W-1:0]            scratch_b [N];
     logic signed [W-1:0]            reg_scalar_max;
     logic signed [W-1:0]            reg_scalar_log;
+    logic signed [W-1:0]            sm_z;             // softmax tile z = sat8(max + ln(S)), see below
     
     logic                           write_scratch_a;
     logic                           write_silu;       // SwiGLU: scratch_a <= sat12(round(wide >> 2))
@@ -181,6 +186,7 @@ module tr_soc_ctrl_int #(
     assign rms_log2n_out    = reg_rms_log2n;
     assign inv_rms_out      = reg_inv_rms;
     assign sw_shift_out     = 6'sd10 - 6'(reg_sw_e);
+    assign rms_growth_out   = rm_offset_was_positive;
 
     always_comb begin
         mmio_rdata = '0;
@@ -188,261 +194,20 @@ module tr_soc_ctrl_int #(
         if (mmio_addr == ADDR_REQ_MULT)  mmio_rdata = reg_req_mult;
         if (mmio_addr == ADDR_REQ_SHIFT) mmio_rdata = {26'd0, reg_req_shift};
         if (mmio_addr == ADDR_SW_E)      mmio_rdata = {{27{reg_sw_e[4]}}, reg_sw_e};
+        if (mmio_addr == ADDR_SM_Z)      mmio_rdata = {{24{sm_z[W-1]}}, sm_z};
     end
 
-    // Growth-branch reciprocal of RMSNorm's exp result: inv = round(2^16 / ew), ew = exp output at 8 fractional
-    // bits (0..240 reachable on this branch: sign-guarded argument is <= -1/16), capped at 12 bits. The cap
-    // (ew <= 16) needs mean(x^2) < ~0.004 real, unreachable for per-token-quantized inputs (max|x| = 127).
-    // Table = min(4095, (65536 + (ew>>1)) / max(ew,1)), checked against rms_scale() in tr_math_model.hpp.
-    function automatic logic [INV_W-1:0] recip_inv_rom(input logic [7:0] ew);
-        case (ew)
-            8'd0: recip_inv_rom = 12'd4095;
-            8'd1: recip_inv_rom = 12'd4095;
-            8'd2: recip_inv_rom = 12'd4095;
-            8'd3: recip_inv_rom = 12'd4095;
-            8'd4: recip_inv_rom = 12'd4095;
-            8'd5: recip_inv_rom = 12'd4095;
-            8'd6: recip_inv_rom = 12'd4095;
-            8'd7: recip_inv_rom = 12'd4095;
-            8'd8: recip_inv_rom = 12'd4095;
-            8'd9: recip_inv_rom = 12'd4095;
-            8'd10: recip_inv_rom = 12'd4095;
-            8'd11: recip_inv_rom = 12'd4095;
-            8'd12: recip_inv_rom = 12'd4095;
-            8'd13: recip_inv_rom = 12'd4095;
-            8'd14: recip_inv_rom = 12'd4095;
-            8'd15: recip_inv_rom = 12'd4095;
-            8'd16: recip_inv_rom = 12'd4095;
-            8'd17: recip_inv_rom = 12'd3855;
-            8'd18: recip_inv_rom = 12'd3641;
-            8'd19: recip_inv_rom = 12'd3449;
-            8'd20: recip_inv_rom = 12'd3277;
-            8'd21: recip_inv_rom = 12'd3121;
-            8'd22: recip_inv_rom = 12'd2979;
-            8'd23: recip_inv_rom = 12'd2849;
-            8'd24: recip_inv_rom = 12'd2731;
-            8'd25: recip_inv_rom = 12'd2621;
-            8'd26: recip_inv_rom = 12'd2521;
-            8'd27: recip_inv_rom = 12'd2427;
-            8'd28: recip_inv_rom = 12'd2341;
-            8'd29: recip_inv_rom = 12'd2260;
-            8'd30: recip_inv_rom = 12'd2185;
-            8'd31: recip_inv_rom = 12'd2114;
-            8'd32: recip_inv_rom = 12'd2048;
-            8'd33: recip_inv_rom = 12'd1986;
-            8'd34: recip_inv_rom = 12'd1928;
-            8'd35: recip_inv_rom = 12'd1872;
-            8'd36: recip_inv_rom = 12'd1820;
-            8'd37: recip_inv_rom = 12'd1771;
-            8'd38: recip_inv_rom = 12'd1725;
-            8'd39: recip_inv_rom = 12'd1680;
-            8'd40: recip_inv_rom = 12'd1638;
-            8'd41: recip_inv_rom = 12'd1598;
-            8'd42: recip_inv_rom = 12'd1560;
-            8'd43: recip_inv_rom = 12'd1524;
-            8'd44: recip_inv_rom = 12'd1489;
-            8'd45: recip_inv_rom = 12'd1456;
-            8'd46: recip_inv_rom = 12'd1425;
-            8'd47: recip_inv_rom = 12'd1394;
-            8'd48: recip_inv_rom = 12'd1365;
-            8'd49: recip_inv_rom = 12'd1337;
-            8'd50: recip_inv_rom = 12'd1311;
-            8'd51: recip_inv_rom = 12'd1285;
-            8'd52: recip_inv_rom = 12'd1260;
-            8'd53: recip_inv_rom = 12'd1237;
-            8'd54: recip_inv_rom = 12'd1214;
-            8'd55: recip_inv_rom = 12'd1192;
-            8'd56: recip_inv_rom = 12'd1170;
-            8'd57: recip_inv_rom = 12'd1150;
-            8'd58: recip_inv_rom = 12'd1130;
-            8'd59: recip_inv_rom = 12'd1111;
-            8'd60: recip_inv_rom = 12'd1092;
-            8'd61: recip_inv_rom = 12'd1074;
-            8'd62: recip_inv_rom = 12'd1057;
-            8'd63: recip_inv_rom = 12'd1040;
-            8'd64: recip_inv_rom = 12'd1024;
-            8'd65: recip_inv_rom = 12'd1008;
-            8'd66: recip_inv_rom = 12'd993;
-            8'd67: recip_inv_rom = 12'd978;
-            8'd68: recip_inv_rom = 12'd964;
-            8'd69: recip_inv_rom = 12'd950;
-            8'd70: recip_inv_rom = 12'd936;
-            8'd71: recip_inv_rom = 12'd923;
-            8'd72: recip_inv_rom = 12'd910;
-            8'd73: recip_inv_rom = 12'd898;
-            8'd74: recip_inv_rom = 12'd886;
-            8'd75: recip_inv_rom = 12'd874;
-            8'd76: recip_inv_rom = 12'd862;
-            8'd77: recip_inv_rom = 12'd851;
-            8'd78: recip_inv_rom = 12'd840;
-            8'd79: recip_inv_rom = 12'd830;
-            8'd80: recip_inv_rom = 12'd819;
-            8'd81: recip_inv_rom = 12'd809;
-            8'd82: recip_inv_rom = 12'd799;
-            8'd83: recip_inv_rom = 12'd790;
-            8'd84: recip_inv_rom = 12'd780;
-            8'd85: recip_inv_rom = 12'd771;
-            8'd86: recip_inv_rom = 12'd762;
-            8'd87: recip_inv_rom = 12'd753;
-            8'd88: recip_inv_rom = 12'd745;
-            8'd89: recip_inv_rom = 12'd736;
-            8'd90: recip_inv_rom = 12'd728;
-            8'd91: recip_inv_rom = 12'd720;
-            8'd92: recip_inv_rom = 12'd712;
-            8'd93: recip_inv_rom = 12'd705;
-            8'd94: recip_inv_rom = 12'd697;
-            8'd95: recip_inv_rom = 12'd690;
-            8'd96: recip_inv_rom = 12'd683;
-            8'd97: recip_inv_rom = 12'd676;
-            8'd98: recip_inv_rom = 12'd669;
-            8'd99: recip_inv_rom = 12'd662;
-            8'd100: recip_inv_rom = 12'd655;
-            8'd101: recip_inv_rom = 12'd649;
-            8'd102: recip_inv_rom = 12'd643;
-            8'd103: recip_inv_rom = 12'd636;
-            8'd104: recip_inv_rom = 12'd630;
-            8'd105: recip_inv_rom = 12'd624;
-            8'd106: recip_inv_rom = 12'd618;
-            8'd107: recip_inv_rom = 12'd612;
-            8'd108: recip_inv_rom = 12'd607;
-            8'd109: recip_inv_rom = 12'd601;
-            8'd110: recip_inv_rom = 12'd596;
-            8'd111: recip_inv_rom = 12'd590;
-            8'd112: recip_inv_rom = 12'd585;
-            8'd113: recip_inv_rom = 12'd580;
-            8'd114: recip_inv_rom = 12'd575;
-            8'd115: recip_inv_rom = 12'd570;
-            8'd116: recip_inv_rom = 12'd565;
-            8'd117: recip_inv_rom = 12'd560;
-            8'd118: recip_inv_rom = 12'd555;
-            8'd119: recip_inv_rom = 12'd551;
-            8'd120: recip_inv_rom = 12'd546;
-            8'd121: recip_inv_rom = 12'd542;
-            8'd122: recip_inv_rom = 12'd537;
-            8'd123: recip_inv_rom = 12'd533;
-            8'd124: recip_inv_rom = 12'd529;
-            8'd125: recip_inv_rom = 12'd524;
-            8'd126: recip_inv_rom = 12'd520;
-            8'd127: recip_inv_rom = 12'd516;
-            8'd128: recip_inv_rom = 12'd512;
-            8'd129: recip_inv_rom = 12'd508;
-            8'd130: recip_inv_rom = 12'd504;
-            8'd131: recip_inv_rom = 12'd500;
-            8'd132: recip_inv_rom = 12'd496;
-            8'd133: recip_inv_rom = 12'd493;
-            8'd134: recip_inv_rom = 12'd489;
-            8'd135: recip_inv_rom = 12'd485;
-            8'd136: recip_inv_rom = 12'd482;
-            8'd137: recip_inv_rom = 12'd478;
-            8'd138: recip_inv_rom = 12'd475;
-            8'd139: recip_inv_rom = 12'd471;
-            8'd140: recip_inv_rom = 12'd468;
-            8'd141: recip_inv_rom = 12'd465;
-            8'd142: recip_inv_rom = 12'd462;
-            8'd143: recip_inv_rom = 12'd458;
-            8'd144: recip_inv_rom = 12'd455;
-            8'd145: recip_inv_rom = 12'd452;
-            8'd146: recip_inv_rom = 12'd449;
-            8'd147: recip_inv_rom = 12'd446;
-            8'd148: recip_inv_rom = 12'd443;
-            8'd149: recip_inv_rom = 12'd440;
-            8'd150: recip_inv_rom = 12'd437;
-            8'd151: recip_inv_rom = 12'd434;
-            8'd152: recip_inv_rom = 12'd431;
-            8'd153: recip_inv_rom = 12'd428;
-            8'd154: recip_inv_rom = 12'd426;
-            8'd155: recip_inv_rom = 12'd423;
-            8'd156: recip_inv_rom = 12'd420;
-            8'd157: recip_inv_rom = 12'd417;
-            8'd158: recip_inv_rom = 12'd415;
-            8'd159: recip_inv_rom = 12'd412;
-            8'd160: recip_inv_rom = 12'd410;
-            8'd161: recip_inv_rom = 12'd407;
-            8'd162: recip_inv_rom = 12'd405;
-            8'd163: recip_inv_rom = 12'd402;
-            8'd164: recip_inv_rom = 12'd400;
-            8'd165: recip_inv_rom = 12'd397;
-            8'd166: recip_inv_rom = 12'd395;
-            8'd167: recip_inv_rom = 12'd392;
-            8'd168: recip_inv_rom = 12'd390;
-            8'd169: recip_inv_rom = 12'd388;
-            8'd170: recip_inv_rom = 12'd386;
-            8'd171: recip_inv_rom = 12'd383;
-            8'd172: recip_inv_rom = 12'd381;
-            8'd173: recip_inv_rom = 12'd379;
-            8'd174: recip_inv_rom = 12'd377;
-            8'd175: recip_inv_rom = 12'd374;
-            8'd176: recip_inv_rom = 12'd372;
-            8'd177: recip_inv_rom = 12'd370;
-            8'd178: recip_inv_rom = 12'd368;
-            8'd179: recip_inv_rom = 12'd366;
-            8'd180: recip_inv_rom = 12'd364;
-            8'd181: recip_inv_rom = 12'd362;
-            8'd182: recip_inv_rom = 12'd360;
-            8'd183: recip_inv_rom = 12'd358;
-            8'd184: recip_inv_rom = 12'd356;
-            8'd185: recip_inv_rom = 12'd354;
-            8'd186: recip_inv_rom = 12'd352;
-            8'd187: recip_inv_rom = 12'd350;
-            8'd188: recip_inv_rom = 12'd349;
-            8'd189: recip_inv_rom = 12'd347;
-            8'd190: recip_inv_rom = 12'd345;
-            8'd191: recip_inv_rom = 12'd343;
-            8'd192: recip_inv_rom = 12'd341;
-            8'd193: recip_inv_rom = 12'd340;
-            8'd194: recip_inv_rom = 12'd338;
-            8'd195: recip_inv_rom = 12'd336;
-            8'd196: recip_inv_rom = 12'd334;
-            8'd197: recip_inv_rom = 12'd333;
-            8'd198: recip_inv_rom = 12'd331;
-            8'd199: recip_inv_rom = 12'd329;
-            8'd200: recip_inv_rom = 12'd328;
-            8'd201: recip_inv_rom = 12'd326;
-            8'd202: recip_inv_rom = 12'd324;
-            8'd203: recip_inv_rom = 12'd323;
-            8'd204: recip_inv_rom = 12'd321;
-            8'd205: recip_inv_rom = 12'd320;
-            8'd206: recip_inv_rom = 12'd318;
-            8'd207: recip_inv_rom = 12'd317;
-            8'd208: recip_inv_rom = 12'd315;
-            8'd209: recip_inv_rom = 12'd314;
-            8'd210: recip_inv_rom = 12'd312;
-            8'd211: recip_inv_rom = 12'd311;
-            8'd212: recip_inv_rom = 12'd309;
-            8'd213: recip_inv_rom = 12'd308;
-            8'd214: recip_inv_rom = 12'd306;
-            8'd215: recip_inv_rom = 12'd305;
-            8'd216: recip_inv_rom = 12'd303;
-            8'd217: recip_inv_rom = 12'd302;
-            8'd218: recip_inv_rom = 12'd301;
-            8'd219: recip_inv_rom = 12'd299;
-            8'd220: recip_inv_rom = 12'd298;
-            8'd221: recip_inv_rom = 12'd297;
-            8'd222: recip_inv_rom = 12'd295;
-            8'd223: recip_inv_rom = 12'd294;
-            8'd224: recip_inv_rom = 12'd293;
-            8'd225: recip_inv_rom = 12'd291;
-            8'd226: recip_inv_rom = 12'd290;
-            8'd227: recip_inv_rom = 12'd289;
-            8'd228: recip_inv_rom = 12'd287;
-            8'd229: recip_inv_rom = 12'd286;
-            8'd230: recip_inv_rom = 12'd285;
-            8'd231: recip_inv_rom = 12'd284;
-            8'd232: recip_inv_rom = 12'd282;
-            8'd233: recip_inv_rom = 12'd281;
-            8'd234: recip_inv_rom = 12'd280;
-            8'd235: recip_inv_rom = 12'd279;
-            8'd236: recip_inv_rom = 12'd278;
-            8'd237: recip_inv_rom = 12'd277;
-            8'd238: recip_inv_rom = 12'd275;
-            8'd239: recip_inv_rom = 12'd274;
-            8'd240: recip_inv_rom = 12'd273;
-            default: recip_inv_rom = 12'd273;   // ew > 240 is unreachable here; 65536/240
-        endcase
-    endfunction
 
-    logic [11:0] rms_ew;            // exp output at 8 fractional bits
-    assign rms_ew = vpu_exp_raw[15:4];
+    // Softmax tile z = max + ln(S), saturated to W bits: exactly the offset SM_P4 subtracts (ctrl_scalar_sub_val),
+    // exposed so the CPU can combine tiles (logsumexp over z). reg_scalar_max / reg_scalar_log hold their values
+    // after the command, so this stays valid until the next softmax / RMSNorm command.
+    logic signed [W:0]   sm_z_wide;
+    always_comb begin
+        sm_z_wide = $signed({reg_scalar_max[W-1], reg_scalar_max}) + $signed({reg_scalar_log[W-1], reg_scalar_log});
+        if (sm_z_wide > SUB_VAL_MAX)      sm_z = SUB_VAL_MAX[W-1:0];
+        else if (sm_z_wide < SUB_VAL_MIN) sm_z = SUB_VAL_MIN[W-1:0];
+        else                              sm_z = sm_z_wide[W-1:0];
+    end
 
     // ---- SwiGLU helpers ----
     // silu_s = sat12((wide + 2) >> 2): drop the 2 low bits of x*sigma (Q.10) with rounding.
@@ -470,23 +235,12 @@ module tr_soc_ctrl_int #(
         sw_gain_fn = e;
     endfunction
 
-    // Largest |wide[i]| over the lanes (this group's contribution to the row max).
-    logic [WIDE_W-1:0] sw_group_max;
-    always_comb begin
-        sw_group_max = '0;
-        for (int i = 0; i < N; i++) begin
-            logic [WIDE_W-1:0] a;
-            a = vpu_wide_out[i][WIDE_W-1] ? WIDE_W'(-vpu_wide_out[i]) : WIDE_W'(vpu_wide_out[i]);
-            if (a > sw_group_max) sw_group_max = a;
-        end
-    end
-
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             reg_sw_max <= '0;
             reg_sw_e   <= '0;
         end else begin
-            if (latch_sw_max && sw_group_max > reg_sw_max) reg_sw_max <= sw_group_max;
+            if (latch_sw_max && vpu_max_out[WIDE_W-1:0] > reg_sw_max) reg_sw_max <= vpu_max_out[WIDE_W-1:0];   // piped_max of |prod|
             if (latch_sw_gain) begin
                 reg_sw_e   <= sw_gain_fn(reg_sw_max);
                 reg_sw_max <= '0;
@@ -498,8 +252,8 @@ module tr_soc_ctrl_int #(
         if (write_silu) for (int k = 0; k < N; k++) scratch_a[k] <= silu_round(vpu_wide_out[k]);
         if (write_scratch_a) for (int k = 0; k < N; k++) scratch_a[k] <= SA_W'(vpu_data_out[k]);
         if (write_scratch_b) scratch_b <= vpu_data_out;
-        if (latch_inv) reg_inv_rms <= rm_offset_was_positive ? recip_inv_rom(rms_ew[7:0]) : INV_W'(rms_ew);
-        if (latch_max)       reg_scalar_max <= vpu_max_out;
+        if (latch_inv) reg_inv_rms <= vpu_inv_rms;
+        if (latch_max)       reg_scalar_max <= vpu_max_out[W-1:0];
         if (latch_log)       reg_scalar_log <= vpu_data_out[0];
     end
 
@@ -524,7 +278,7 @@ module tr_soc_ctrl_int #(
         RM_P4, RM_P4_W,
         // SwiGLU: cmd 5 silu group, 6 max group, 0xB row gain, 0xC apply group
         SW_P1, SW_P1_W,
-        SW_P2, SW_P2_W,
+        SW_P2, SW_P2_W, SW_P2_M,
         SW_G,
         SW_P4, SW_P4_W,
         DONE
@@ -570,6 +324,7 @@ module tr_soc_ctrl_int #(
         latch_log           = 1'b0;
         write_silu          = 1'b0;
         latch_sw_max        = 1'b0;
+        mux_max_sel         = 1'b0;
         latch_sw_gain       = 1'b0;
         latch_inv           = 1'b0;
         
@@ -725,16 +480,8 @@ module tr_soc_ctrl_int #(
             end
             
             SM_P4, SM_P4_W, SM_P4_MUL_W: begin
-                logic signed [W:0] sub_val_wide;
                 bb_bypass_ln = 1'b1;
-                // Saturating add: max+log_sum can exceed the W-bit range even
-                // though each is individually valid (e.g. 125+3=128 would
-                // wrap to -128), so widen before clamping.
-                sub_val_wide = $signed({reg_scalar_max[W-1], reg_scalar_max}) +
-                               $signed({reg_scalar_log[W-1], reg_scalar_log});
-                if (sub_val_wide > SUB_VAL_MAX)      ctrl_scalar_sub_val = SUB_VAL_MAX[W-1:0];
-                else if (sub_val_wide < SUB_VAL_MIN) ctrl_scalar_sub_val = SUB_VAL_MIN[W-1:0];
-                else                                  ctrl_scalar_sub_val = sub_val_wide[W-1:0];
+                ctrl_scalar_sub_val = sm_z;   // saturating max + ln(S), see sm_z above
                 mux_bb_in_sel = 3'b010;
                 vecmul_op_mode = 2'd2; vecmul_scale_mode = 3'b011; // UU, Q0.8 unsigned (saturating)
                 mux_vecmul_a_sel = 2'b11; mux_vecmul_b_sel = 3'b010;
@@ -818,15 +565,21 @@ module tr_soc_ctrl_int #(
                 else if (vpu_vecmul_valid) begin write_silu = 1'b1; next_state = DONE; end
             end
 
-            // cmd 6 (pass 1): |silu_s * up| max-tracking; up signed, silu_s signed (SS).
-            SW_P2, SW_P2_W: begin
+            // cmd 6 (pass 1): |silu_s * up| max-tracking; up signed, silu_s signed (SS). The products go through the
+            // shared piped_max (|prod| select) and the group max is folded into reg_sw_max.
+            SW_P2, SW_P2_W, SW_P2_M: begin
                 src_sram_a_sel    = 1'b0;
                 vecmul_op_mode    = 2'd0;        // SS
                 mux_vecmul_a_sel  = 2'b00;
                 mux_vecmul_b_sel  = 3'b101;      // wide silu (scratch_a)
                 mux_vpu_out_sel   = 3'b000;
                 if (state == SW_P2) begin en_vecmul_valid = 1'b1; next_state = SW_P2_W; end
-                else if (vpu_vecmul_valid) begin latch_sw_max = 1'b1; next_state = DONE; end
+                else if (state == SW_P2_W && vpu_vecmul_valid) next_state = SW_P2_M;
+                else if (state == SW_P2_M) begin
+                    mux_max_sel  = 1'b1;
+                    en_piped_max = 1'b1;
+                    if (vpu_max_valid) begin latch_sw_max = 1'b1; next_state = DONE; end
+                end
             end
 
             // cmd 0xB: row gain e from the running max (consumes and clears it).

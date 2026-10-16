@@ -281,26 +281,37 @@ int main(int argc, char* argv[]) {
                   << " C=" << C << " OUT=" << O << ")." << std::endl;
     } 
     else if (mode == "softmax") {
-        // PRODUCTION path: tr_soc_top_int CMD=0x01 (SM_P1..SM_P4), bit-exact
-        // via softmax_hw_model -- see tr_softmax_int_tb.sv. Output is Q0.8
-        // UNSIGNED (0..255, saturating), not the Q4.4 this used to emit.
-        const int N_VECS = 256;
+        // PRODUCTION path: tr_soc_top_int CMD=0x01 (SM_P1..SM_P4), bit-exact via softmax_hw_model_ex. Output is
+        // Q0.8 UNSIGNED (0..255, saturating); expected line = 8 probabilities + the tile's z = sat8(max + ln(S))
+        // (read back via ADDR_SM_Z), which the CPU needs to combine tiles (logsumexp over z).
+        // Tile mix: full-range random (as before), attention-like tiles (scores around a head's range, some lanes
+        // masked at -128), fully masked tiles, equal-max tiles, near-saturating max (z clamps at 127).
+        const int N_VECS = 384;
         vec_file << N_VECS << "\n";
         srand(1337);
         for (int i = 0; i < N_VECS; i++) {
-            int8_t x[8]; uint8_t y[8];
+            int8_t x[8]; uint8_t y[8]; int8_t z;
+            int kind = i < 256 ? 0 : 1 + (i - 256) % 5;
             for (int j = 0; j < 8; j++) {
-                x[j] = (int8_t)((rand() % 256) - 128);
+                int v;
+                switch (kind) {
+                    case 0: v = (rand() % 256) - 128; break;                                       // uniform
+                    case 1: v = (rand() % 5 == 0) ? -128 : (rand() % 121) - 60; break;             // attention-like, some masked
+                    case 2: v = -128; break;                                                       // fully masked tile
+                    case 3: v = 20; break;                                                         // all equal
+                    case 4: v = 90 + (rand() % 38); break;                                         // high scores: z clamps
+                    default: v = (j < 1 + (i % 7)) ? (rand() % 80) - 40 : -128; break;             // causal-prefix tile
+                }
+                x[j] = (int8_t)v;
                 vec_file << (int)x[j] << (j == 7 ? "" : " ");
             }
             vec_file << "\n";
 
-            softmax_hw_model(x, y);
-            for (int j = 0; j < 8; j++)
-                exp_file << (int)y[j] << (j == 7 ? "" : " ");
-            exp_file << "\n";
+            softmax_hw_model_ex(x, y, &z);
+            for (int j = 0; j < 8; j++) exp_file << (int)y[j] << " ";
+            exp_file << (int)z << "\n";
         }
-        std::cout << "[C++ MODEL] Generated SOFTMAX (production tr_soc_top_int path) vectors." << std::endl;
+        std::cout << "[C++ MODEL] Generated SOFTMAX (production tr_soc_top_int path, probs + z) vectors." << std::endl;
     }
     else if (mode == "softmax_baseline") {
         // The standalone tr_softmax.sv module (tb_baseline/tr_baseline/tr_softmax/)

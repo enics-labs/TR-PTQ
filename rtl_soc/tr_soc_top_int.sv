@@ -132,9 +132,11 @@ module tr_soc_top_int #(
     // VPU Outputs
     logic signed [W-1:0]            vpu_sram_a_in [N];
     logic signed [W-1:0]            vpu_sram_b_in [N];
-    logic signed [W-1:0]            vpu_max_out;
+    logic signed [19:0]             vpu_max_out;
     logic signed [ACC_W-1:0]        vpu_dot_out;
-    logic        [15:0]             vpu_exp_raw;
+    logic                           rms_growth;
+    logic        [11:0]             vpu_inv_rms;
+    logic                           mux_max_sel;
     logic        [4:0]              rms_log2n;
     logic        [11:0]             inv_rms;
     logic signed [W-1:0]            vpu_raw_out [N];
@@ -195,7 +197,9 @@ module tr_soc_top_int #(
         .vpu_data_out        (vpu_raw_out),
         .vpu_max_out         (vpu_max_out),
         .vpu_dot_out         (vpu_dot_out),
-        .vpu_exp_raw         (vpu_exp_raw),
+        .vpu_inv_rms         (vpu_inv_rms),
+        .rms_growth_out      (rms_growth),
+        .mux_max_sel         (mux_max_sel),
         .rms_log2n_out       (rms_log2n),
         .inv_rms_out         (inv_rms),
         .sw_shift_out        (sw_shift),
@@ -344,7 +348,8 @@ module tr_soc_top_int #(
         .ctrl_scalar_sub_val (ctrl_scalar_sub_val),
         .vpu_max_out         (vpu_max_out),
         .vpu_dot_out         (vpu_dot_out),
-        .vpu_exp_raw         (vpu_exp_raw),
+        .rms_growth          (rms_growth),
+        .vpu_inv_rms         (vpu_inv_rms),
         .rms_log2n           (rms_log2n),
         .inv_rms_in          (inv_rms),
         .sw_silu_in          (ctrl_scratch_a),
@@ -359,6 +364,7 @@ module tr_soc_top_int #(
         .mux_vpu_out_sel     (mux_vpu_out_sel),
         
         .en_piped_max        (en_piped_max),
+        .mux_max_sel         (mux_max_sel),
         .en_mac_valid        (en_mac_valid),
         .en_vecmul_valid     (en_vecmul_valid),
         .en_bb_valid         (en_bb_valid),

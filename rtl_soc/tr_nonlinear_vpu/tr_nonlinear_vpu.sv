@@ -43,9 +43,10 @@ module tr_nonlinear_vpu #(
     input  logic signed [W_VEC-1:0] sram_data_b [N],
     output logic signed [W_VEC-1:0] vpu_data_out [N],
     input  logic signed [W_VEC-1:0] ctrl_scalar_sub_val, // For x - max or x - mu
-    output logic signed [W_VEC-1:0] vpu_max_out,         // To Controller Reg
+    output logic signed [WIDE_W-1:0] vpu_max_out,        // To Controller Reg (softmax row max, or SwiGLU max |prod|)
     output logic signed [ACC_W-1:0] vpu_dot_out,         // To Controller Reg
-    output logic        [15:0]      vpu_exp_raw,         // vecmul lane-0 raw product (e_a*mantissa), for RMSNorm inv_rms
+    input  logic                    rms_growth,          // RMSNorm: -0.5 ln(mean) was positive (sign-guarded) -> reciprocal path
+    output logic        [INV_W-1:0] vpu_inv_rms,         // RMSNorm: inv_rms from the exp result (controller latches it)
     input  logic        [4:0]       rms_log2n,           // RMSNorm: log2(row length), sets the mean shift
     input  logic        [INV_W-1:0] inv_rms_in,          // RMSNorm: wide inv_rms (broadcast vecmul b operand)
     input  logic signed [SA_W-1:0]  sw_silu_in [N],      // SwiGLU: wide silu intermediate (vecmul b operand, mux_vecmul_b_sel==3'b101)
@@ -74,6 +75,7 @@ module tr_nonlinear_vpu #(
     // Submodule Enables & Modes
     // =========================================================
     input  logic en_piped_max,
+    input  logic mux_max_sel,       // piped_max input: 0 = sram_data_a (softmax x), 1 = |vpu_wide_out| (SwiGLU max |prod|)
     input  logic en_mac_valid,
     input  logic en_vecmul_valid,
     input  logic mac_clear_acc,
@@ -241,11 +243,20 @@ module tr_nonlinear_vpu #(
     // =========================================================
     // SUBMODULE INSTANTIATIONS
     // =========================================================
+    // Shared max reduction: softmax's row max (sign-extended int8 lanes) and SwiGLU's max |silu*up| (wide, non-negative).
+    logic signed [WIDE_W-1:0] max_in [N];
+    always_comb begin
+        for (int i = 0; i < N; i++) begin
+            if (mux_max_sel) max_in[i] = vpu_wide_out[i][WIDE_W-1] ? -vpu_wide_out[i] : vpu_wide_out[i];
+            else             max_in[i] = WIDE_W'(sram_data_a[i]);
+        end
+    end
+
     piped_max #(
-        .NUM_INPUTS(N), .DATA_WIDTH(W_VEC)
+        .NUM_INPUTS(N), .DATA_WIDTH(WIDE_W)
     ) u_max (
         .clk(clk), .rst_n(rst_n), .valid_in(en_piped_max),
-        .in_data(sram_data_a), .max_out(vpu_max_out), .valid_out(int_max_valid)
+        .in_data(max_in), .max_out(vpu_max_out), .valid_out(int_max_valid)
     );
 
     scalar_sub #(
@@ -317,7 +328,12 @@ module tr_nonlinear_vpu #(
         end
     end
 
-    assign vpu_exp_raw = vecmul_out_acc[0][15:0];
+    // RMSNorm inv_rms: decay branch = exp result at 8 fractional bits; growth branch = its reciprocal (recip_rom).
+    logic [11:0]       rms_ew;
+    logic [INV_W-1:0]  rms_recip;
+    assign rms_ew = vecmul_out_acc[0][15:4];
+    recip_rom #(.INV_W(INV_W)) u_recip (.ew(rms_ew[7:0]), .inv(rms_recip));
+    assign vpu_inv_rms = rms_growth ? rms_recip : INV_W'(rms_ew);
     always_comb for (int i = 0; i < N; i++) vpu_wide_out[i] = vecmul_out_acc[i][WIDE_W-1:0];
 
     localparam signed [W_VEC-1:0] VECMUL_SAT_MAX = (1 <<< (W_VEC-1)) - 1;

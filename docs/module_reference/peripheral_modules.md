@@ -107,6 +107,29 @@ SwiGLU sigmoid lookup: `sigma(x/16)` in Q.6 for every int8 gate code `x` (256 en
 
 ---
 
+## `recip_rom`
+
+**File:** [rtl_soc/tr_nonlinear_vpu/peripheral_modules/recip_rom.sv](../../rtl_soc/tr_nonlinear_vpu/peripheral_modules/recip_rom.sv)
+
+### Operation
+
+Growth-branch reciprocal for RMSNorm's `inv_rms`: `inv = min(4095, round(2^16 / ew))`, where `ew` is the sign-guarded exp result at 8 fractional bits (0..240 on this branch). It replaces a divider: `exp(+t) = 1/exp(-t)`. `tr_nonlinear_vpu` selects between `ew` (decay branch) and this table (growth branch, flag `rms_growth` from the controller) and hands the result to the controller as `vpu_inv_rms`.
+
+### Parameters
+
+| Parameter | Default | Description              |
+|-----------|---------|--------------------------|
+| `INV_W`   | `12`    | Width of the reciprocal  |
+
+### Ports
+
+| Port  | Direction | Width        | Description                          |
+|-------|-----------|--------------|--------------------------------------|
+| `ew`  | input     | `[7:0]`      | Exp result, 8 fractional bits        |
+| `inv` | output    | `[INV_W-1:0]`| `min(4095, round(65536 / ew))`       |
+
+---
+
 ## `shared_lut_rom`
 
 **File:** [rtl_soc/tr_nonlinear_vpu/peripheral_modules/shared_lut_rom.sv](../../rtl_soc/tr_nonlinear_vpu/peripheral_modules/shared_lut_rom.sv)
