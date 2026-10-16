@@ -1,3 +1,5 @@
+#include <cstdlib>
+#include <cstdio>
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -197,19 +199,17 @@ int main(int argc, char* argv[]) {
         std::cout << "[C++ MODEL] Generated EXP test vectors." << std::endl;
     } 
     else if (mode == "ln") {
-        vec_file << "65536\n"; // Header for exhaustive 16-bit domain
-        for (int i = 0; i <= 65535; i++) {
-            int xq = i;
-            int expected_y = tr_new_ln_scalar(xq, 4);
-            
-            // Replicate the hardware's 8-bit physical saturation limits
-            if (expected_y > 127) expected_y = 127;
-            if (expected_y < -128) expected_y = -128;
-
+        // tr_ln_alu (PWL datapath), exhaustive over the WIDTH-bit input domain. Config via env
+        // LN_CFG="WIDTH,BITS,SEGMENTS,COEF_BITS,OUT_WIDTH" (default 16,4,2,8,8 = the TB defaults).
+        int W = 16, B = 4, S = 2, C = 8, O = 8;
+        if (const char* e = getenv("LN_CFG")) sscanf(e, "%d,%d,%d,%d,%d", &W, &B, &S, &C, &O);
+        vec_file << (1 << W) << "\n";
+        for (int xq = 0; xq < (1 << W); xq++) {
             vec_file << xq << "\n";
-            exp_file << xq << " " << expected_y << "\n";
+            exp_file << xq << " " << tr_pwl_ln_scalar(xq, B, S, C, O) << "\n";
         }
-        std::cout << "[C++ MODEL] Generated LN test vectors." << std::endl;
+        std::cout << "[C++ MODEL] Generated LN test vectors (W=" << W << " B=" << B << " SEG=" << S
+                  << " C=" << C << " OUT=" << O << ")." << std::endl;
     } 
     else if (mode == "softmax") {
         // PRODUCTION path: tr_soc_top_int CMD=0x01 (SM_P1..SM_P4), bit-exact
@@ -311,7 +311,7 @@ int main(int argc, char* argv[]) {
 
                 // Pass 1: recip = 1/(1+E) via exp(-ln(1+E))
                 int    pre_ln_q44  = E_q44 + 16;
-                int    ln_yq8      = tr_new_ln_scalar(pre_ln_q44 << 4, 8);
+                int    ln_yq8      = tr_hw_ln(pre_ln_q44 << 4, 8, 12);
                 if (ln_yq8 >  2047) ln_yq8 =  2047;
                 if (ln_yq8 < -2048) ln_yq8 = -2048;
                 int8_t ln_out_q44  = (int8_t)((ln_yq8 + 8) >> 4);

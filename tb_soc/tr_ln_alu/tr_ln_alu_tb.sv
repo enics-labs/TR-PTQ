@@ -3,9 +3,12 @@
 module tr_ln_alu_tb();
 
     // Hardware Parameters
-    localparam int WIDTH     = 16;
-    localparam int BITS      = 4;
-    localparam int OUT_WIDTH = 8;
+    // Defaults match cpu_math_model's LN_CFG default; verify_block.py overrides all five from $LN_CFG via -defparam.
+    parameter int WIDTH     = 16;
+    parameter int BITS      = 4;
+    parameter int OUT_WIDTH = 8;
+    parameter int SEGMENTS  = 2;
+    parameter int COEF_BITS = 8;
 
     // Interconnects
     logic [WIDTH-1:0]            xq;
@@ -13,7 +16,7 @@ module tr_ln_alu_tb();
 
     // Instantiate Unit Under Test
     tr_ln_alu #(
-        .WIDTH(WIDTH), .BITS(BITS), .OUT_WIDTH(OUT_WIDTH)
+        .WIDTH(WIDTH), .BITS(BITS), .OUT_WIDTH(OUT_WIDTH), .SEGMENTS(SEGMENTS), .COEF_BITS(COEF_BITS)
     ) u_ln (
         .xq(xq), .yq(yq)
     );

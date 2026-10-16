@@ -97,6 +97,11 @@ def run_verification():
     current_env["DISPLAY"] = "" 
     
     xrun_cmd = f"xrun -f {config['f_file']}"
+    # ln: LN_CFG="WIDTH,BITS,SEGMENTS,COEF_BITS,OUT_WIDTH" (also read by cpu_model) overrides the TB parameters
+    if args.block == "ln" and os.environ.get("LN_CFG"):
+        names = ["WIDTH", "BITS", "SEGMENTS", "COEF_BITS", "OUT_WIDTH"]
+        for n, v in zip(names, os.environ["LN_CFG"].split(",")):
+            xrun_cmd += f" -defparam tr_ln_alu_tb.{n}={v}"
     rtl_compile = subprocess.run(
         ["tcsh", "-i", "-c", xrun_cmd], 
         env=current_env,

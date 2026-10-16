@@ -1,26 +1,35 @@
 /*
  * @module   tr_ln_alu
- * @brief    Integer natural-logarithm approximator via MSB-exponent +
- *           linear-mantissa log2 decomposition.
+ * @brief    Integer natural-logarithm approximator: MSB-exponent +
+ *           piecewise-linear fit of ln(1+f) over the mantissa fraction.
  * @details  Finds the position of xq's MSB (floor(log2(xq))), normalizes xq
- *           so that bit sits at the top of the word, and takes its top
- *           BITS+1 bits as a linear mantissa term k1 (log2(1.f) ~= f over
- *           [0,1), the standard piecewise-linear log2 approximation).
- *           Combines that with the (fixed-point-scaled) exponent term
- *           k2=(msb-BITS-1)<<<BITS into a single log2(xq) estimate k=k1+k2,
- *           then converts log2->ln by multiplying by the fixed-point
- *           constant 0.6875 (~= ln(2), realized as k>>>1 + k>>>3 + k>>>4 to
- *           avoid a real multiplier), and saturates the result to
- *           OUT_WIDTH. xq==0 short-circuits to yq=0.
+ *           so that bit sits at the top of the word, and takes the BITS bits
+ *           below it as the mantissa fraction fk (f = fk / 2^BITS). The
+ *           mantissa range [0,1) is split into SEGMENTS equal segments
+ *           (segment = top log2(SEGMENTS) bits of fk), each with its own
+ *           least-squares line of ln(1+f), constants quantized to COEF_BITS:
+ *               aq = msb - BITS
+ *               yq = (aq*L*2^BITS + A[seg]*fk + B[seg]*2^BITS + 2^(COEF_BITS-1)) >>> COEF_BITS
+ *           with L=round(ln2*2^COEF_BITS), A/B=round(slope/intercept*2^COEF_BITS).
+ *           The result is ln(xq/2^BITS) in Q.BITS and is saturated to
+ *           OUT_WIDTH. xq==0 short-circuits to yq=0. All multiplies are by
+ *           constants (shift-add trees); there is no general multiplier.
+ *           Bit-exact to tools/models/vpu_ops.py::_ln_core (ln_mode="pwl");
+ *           the constant tables below are re-derived and asserted by
+ *           verification/ln_pwl/gen_ln_pwl.py.
  *
  * @param    WIDTH      Input width (xq).
- * @param    BITS       Fractional bits of xq (also the mantissa's linear-term width).
+ * @param    BITS       Fractional bits of xq (also the mantissa fraction width).
  * @param    OUT_WIDTH  Output width (yq), saturated.
+ * @param    SEGMENTS   Number of PWL segments (1, 2 or 4).
+ * @param    COEF_BITS  Fixed-point bits of the PWL constants (6, 8 or 10).
  */
 module tr_ln_alu #(
     parameter int WIDTH = 16,
     parameter int BITS  = 4,        // Fractional bits
-    parameter int OUT_WIDTH = 8     // Defaults to SoftMax/GELU 16->8 reduction
+    parameter int OUT_WIDTH = 8,    // Defaults to SoftMax/GELU 16->8 reduction
+    parameter int SEGMENTS  = 2,    // PWL segments (1, 2, 4)
+    parameter int COEF_BITS = 8     // PWL constant precision (6, 8, 10)
 )(
     input  logic [WIDTH-1:0]   xq,
     output logic signed [OUT_WIDTH-1:0] yq
@@ -31,8 +40,50 @@ module tr_ln_alu #(
     // ========================================================================
     localparam int MSB_W = $clog2(WIDTH);        // e.g., 4 for W=16 | 5 for W=20
     localparam int AQ_W  = MSB_W + 1;            // e.g., 5 for W=16 | 6 for W=20
-    localparam int K1_W  = BITS + 2;             // e.g., 6 for B=4
-    localparam int K_W   = AQ_W + BITS;          // e.g., 9 for W=16 | 10 for W=20
+    localparam int LG_SEG = (SEGMENTS > 1) ? $clog2(SEGMENTS) : 0;
+
+    // ========================================================================
+    // PWL constants. Key = SEGMENTS*64 + COEF_BITS.
+    // ========================================================================
+    function automatic int coef_a(input int segs, input int c, input int idx);
+        case (segs*64 + c)
+            1*64+8:  coef_a = 175;
+            2*64+8:  coef_a = (idx == 0) ? 206 : 147;
+            4*64+8:  case (idx) 0: coef_a = 228; 1: coef_a = 186; 2: coef_a = 158; default: coef_a = 137; endcase
+            1*64+6:  coef_a = 44;
+            2*64+6:  coef_a = (idx == 0) ? 52 : 37;
+            2*64+10: coef_a = (idx == 0) ? 826 : 588;
+            default: coef_a = 0;
+        endcase
+    endfunction
+
+    function automatic int coef_b(input int segs, input int c, input int idx);
+        case (segs*64 + c)
+            1*64+8:  coef_b = 12;
+            2*64+8:  coef_b = (idx == 0) ? 4 : 32;
+            4*64+8:  case (idx) 0: coef_b = 1; 1: coef_b = 11; 2: coef_b = 25; default: coef_b = 41; endcase
+            1*64+6:  coef_b = 3;
+            2*64+6:  coef_b = (idx == 0) ? 1 : 8;
+            2*64+10: coef_b = (idx == 0) ? 15 : 129;
+            default: coef_b = 0;
+        endcase
+    endfunction
+
+    function automatic int coef_l(input int c);   // round(ln2 * 2^c)
+        case (c)
+            6:  coef_l = 44;
+            8:  coef_l = 177;
+            10: coef_l = 710;
+            default: coef_l = 0;
+        endcase
+    endfunction
+
+    generate
+        if (coef_l(COEF_BITS) == 0 || coef_a(SEGMENTS, COEF_BITS, 0) == 0)
+            $error("tr_ln_alu: no PWL constants for SEGMENTS=%0d COEF_BITS=%0d", SEGMENTS, COEF_BITS);
+        if (BITS < LG_SEG)
+            $error("tr_ln_alu: BITS must be >= log2(SEGMENTS)");
+    endgenerate
 
     // ========================================================================
     // MSB finder: balanced binary-search tree (NUM_LEVELS = MSB_W levels),
@@ -79,47 +130,31 @@ module tr_ln_alu #(
 
     logic [MSB_W-1:0]         msb;
     logic signed [AQ_W-1:0]   aq_full;
-
-    logic signed [K1_W-1:0] k1_full;
-    logic signed [K_W-1:0] k2_full;
-    logic signed [K_W-1:0]   k_full;
-    logic signed [K_W-1:0]   yq_full;
-
-    logic [WIDTH-1:0]       normalized_x;
+    logic [WIDTH-1:0]         normalized_x;
+    logic [BITS-1:0]          fk;
+    logic [LG_SEG:0]          seg;      // spare bit keeps SEGMENTS=1 (LG_SEG=0) a legal range
+    logic signed [31:0]       yq_full;
 
     always_comb begin
-        // Defaults so every variable is assigned on all paths (no inferred
-        // latches; Quartus treats always_comb latch inference as a hard error).
+        // Defaults so every variable is assigned on all paths (no inferred latches).
         msb          = '0;
         aq_full      = '0;
         normalized_x = '0;
-        k1_full      = '0;
-        k2_full      = '0;
-        k_full       = '0;
+        fk           = '0;
+        seg          = '0;
         yq_full      = '0;
 
-        if (xq == 0) begin
-            yq_full = '0;
-        end else begin
-            // 1. Find the MSB (log2 floor) -- balanced tree (gen_level
-            // above), not a linear scan.
-            msb = msb_tree;
-
-            // 2. Calculate aq = msb - BITS
-            aq_full = $signed({1'b0, msb}) - $signed(AQ_W'(BITS));
-
-            // 3. Perform the shift
-            normalized_x = xq << (WIDTH - 1 - msb);
-            k1_full = $signed({1'b0, normalized_x[WIDTH-1 : WIDTH-1-BITS]});
-
-            // 4. Compute k2 = (aq - 1) * (1 << BITS)
-            k2_full = $signed(aq_full - 1) <<< BITS;
-
-            // 5. Sum them up (Safe signed addition)
-            k_full = k1_full + k2_full;
-
-            // 6. Final approximation: yq = (k/2) + (k/8) + (k/16)
-            yq_full = (k_full >>> 1) + (k_full >>> 3) + (k_full >>> 4);
+        if (xq != 0) begin
+            msb          = msb_tree;                                   // floor(log2 xq), balanced tree above
+            aq_full      = $signed({1'b0, msb}) - $signed(AQ_W'(BITS));
+            normalized_x = xq << (WIDTH - 1 - msb);                    // leading one at bit WIDTH-1
+            fk           = normalized_x[WIDTH-2 : WIDTH-1-BITS];       // mantissa fraction
+            seg          = (LG_SEG == 0) ? '0 : (LG_SEG+1)'(fk >> (BITS - LG_SEG));
+            yq_full      = ( (32'(aq_full) * coef_l(COEF_BITS)) <<< BITS )
+                         + ( coef_a(SEGMENTS, COEF_BITS, int'(seg)) * $signed({1'b0, fk}) )
+                         + ( coef_b(SEGMENTS, COEF_BITS, int'(seg)) <<< BITS )
+                         + (1 <<< (COEF_BITS-1));
+            yq_full      = yq_full >>> COEF_BITS;
         end
     end
 

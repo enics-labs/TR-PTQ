@@ -29,6 +29,71 @@ static const uint8_t EXP_LUT_CONST[9] = {0, 0, 1, 2, 5, 13, 35, 94, 255};
 
 #include "../emulation/stable_code/mrcp_quant/optimized_layers/common/tr_math.cuh"
 
+#include <cmath>
+#include <vector>
+
+// ============================================================================
+// tr_ln_alu golden model (piecewise-linear ln, replaces the shipped
+// (k>>1)+(k>>3)+(k>>4) datapath). Bit-exact to rtl_soc/.../tr_ln_alu.sv and
+// to the software reference tools/models/vpu_ops.py::_ln_core(ln_mode="pwl").
+//   fk  = the `bits` mantissa bits below the leading one, seg = top log2(segments) bits of fk
+//   aq  = msb - bits
+//   yq  = (aq*L*2^bits + A[seg]*fk + B[seg]*2^bits + 2^(c-1)) >> c      (arithmetic shift)
+// L=round(ln2*2^c); A/B = round(2^c * least-squares line of ln(1+g) over segment `seg`
+// of [0,1), fitted on 2000 grid points per segment -- same fit as vpu_ops._segments).
+// Result saturated to out_width signed bits. xq<=0 -> 0.
+// NOTE: tr_new_ln_scalar (tr_math.cuh) is the OLD datapath and is left untouched for the
+// CUDA kernels in stable_code; the RTL no longer matches it. Every RTL tr_ln_alu instance
+// (tr_backbone_wrapper and the rtl_baseline modules) uses the module defaults SEGMENTS=2,
+// COEF_BITS=8, so the models below call tr_hw_ln(), i.e. that default configuration.
+// ============================================================================
+struct TrLnPwlCoefs { int L; std::vector<int> A, B; };
+
+inline const TrLnPwlCoefs& tr_ln_pwl_coefs(int segments, int coef_bits) {
+    static std::vector<std::pair<int, TrLnPwlCoefs>> cache;
+    int key = segments * 64 + coef_bits;
+    for (auto& e : cache) if (e.first == key) return e.second;
+    TrLnPwlCoefs c;
+    c.L = (int)std::nearbyint(std::log(2.0) * (1 << coef_bits));
+    for (int sgi = 0; sgi < segments; sgi++) {
+        const int NPT = 2000;
+        double lo = (double)sgi / segments, hi = (double)(sgi + 1) / segments;
+        long double sx = 0, sy = 0, sxx = 0, sxy = 0;
+        for (int i = 0; i < NPT; i++) {
+            long double g = lo + (hi - lo) * i / NPT, y = std::log1p((double)g);
+            sx += g; sy += y; sxx += g * g; sxy += g * y;
+        }
+        long double slope = (NPT * sxy - sx * sy) / (NPT * sxx - sx * sx);
+        long double icept = (sy - slope * sx) / NPT;
+        c.A.push_back((int)std::nearbyint((double)(slope * (1 << coef_bits))));
+        c.B.push_back((int)std::nearbyint((double)(icept * (1 << coef_bits))));
+    }
+    cache.emplace_back(key, c);
+    return cache.back().second;
+}
+
+inline int tr_pwl_ln_scalar(int xq, int bits, int segments, int coef_bits, int out_width);
+
+// ln as instantiated in the RTL today: default tr_ln_alu parameters (2 segments, 8-bit constants).
+inline int tr_hw_ln(int xq, int bits, int out_width = 8) { return tr_pwl_ln_scalar(xq, bits, 2, 8, out_width); }
+
+inline int tr_pwl_ln_scalar(int xq, int bits, int segments, int coef_bits, int out_width) {
+    if (xq <= 0) return 0;
+    const TrLnPwlCoefs& c = tr_ln_pwl_coefs(segments, coef_bits);
+    int msb = 31 - __builtin_clz((unsigned)xq);
+    int aq  = msb - bits;
+    // mantissa fraction: the `bits` bits below the leading one (zero-padded when msb < bits)
+    int fk = (msb >= bits) ? (int)(((unsigned)xq >> (msb - bits)) & ((1u << bits) - 1u))
+                           : (int)(((unsigned)xq << (bits - msb)) & ((1u << bits) - 1u));
+    int lg  = (segments > 1) ? __builtin_ctz((unsigned)segments) : 0;
+    int seg = (lg > 0) ? (fk >> (bits - lg)) : 0;
+    long long acc = ((long long)aq * c.L << bits) + (long long)c.A[seg] * fk
+                  + ((long long)c.B[seg] << bits) + (1LL << (coef_bits - 1));
+    long long yq = acc >> coef_bits;                       // arithmetic shift (floor), as the RTL's >>>
+    long long hi = (1LL << (out_width - 1)) - 1, lo = -(1LL << (out_width - 1));
+    return (int)(yq > hi ? hi : (yq < lo ? lo : yq));
+}
+
 // ============================================================================
 // GELU helpers — bit-exact replicas of the RTL submodules.
 // ============================================================================
@@ -138,7 +203,7 @@ inline int8_t silu_hw_scalar(int8_t x) {
     int    E     = gelu_exp_q44(alpha);
     int    pre_ln  = E + 16;
     // bits=4 (matching FRAC_W=4 -- the same precision RMSNorm's verified
-    // tr_new_ln_scalar(s_shifted, 4) call uses), input NOT pre-shifted by
+    // tr_hw_ln(s_shifted, 4) call uses), input NOT pre-shifted by
     // <<4 -- confirmed bit-exact against tr_soc_top_int's actual bb_log
     // register (512/512 match); the previous bits=8 + extra <<4/>>4 shuffle
     // was never independently RTL-verified (it was reverse-engineered from
@@ -150,7 +215,7 @@ inline int8_t silu_hw_scalar(int8_t x) {
     // SHARED CROSSBAR (GELU/future SwiGLU-opcode) precision, deliberately
     // NOT to tr_swiglu.sv's standalone module -- that comparison is the
     // point of the exercise, not a bug; see docs/llama_fpga_plan.md.
-    int    ln_q44  = tr_new_ln_scalar(pre_ln, 4);
+    int    ln_q44  = tr_hw_ln(pre_ln, 4);
     int8_t neg_ln  = (int8_t)(-(int16_t)(int8_t)ln_q44);
     int    recip   = gelu_exp_q44(neg_ln);
     int    sigma   = (x < 0) ? (16 - recip) : recip;
@@ -209,7 +274,7 @@ inline int8_t silu_hw_scalar_bestfit(int8_t x) {
     int8_t alpha = alpha_stabilizer_model_flat(x);
     int    E     = gelu_exp_q44(alpha);
     int    pre_ln  = E + 16;
-    int    ln_q44  = tr_new_ln_scalar(pre_ln, 4);   // still BITS=4 -- change B dropped
+    int    ln_q44  = tr_hw_ln(pre_ln, 4);   // still BITS=4 -- change B dropped
     int8_t neg_ln  = (int8_t)(-(int16_t)(int8_t)ln_q44);
     int    recip   = gelu_exp_q44(neg_ln);
     int    sigma   = (x < 0) ? (16 - recip) : recip;
@@ -242,7 +307,7 @@ inline int8_t silu_hw_scalar_dedicated(int8_t x) {
     int8_t alpha = alpha_stabilizer_model(x);
     int    E     = gelu_exp_q44(alpha);
     int    pre_ln = E + 16;
-    int    ln_yq8 = tr_new_ln_scalar(pre_ln << 4, 8);
+    int    ln_yq8 = tr_hw_ln(pre_ln << 4, 8, 12);
     if (ln_yq8 >  2047) ln_yq8 =  2047;
     if (ln_yq8 < -2048) ln_yq8 = -2048;
     int8_t ln_out_q44 = (int8_t)((ln_yq8 + 8) >> 4);
@@ -266,7 +331,7 @@ inline void swiglu_hw_model_dedicated(const int8_t x[8], const int8_t g[8], int8
 // ============================================================================
 // RMSNorm — bit-exact replica of the tr_soc_ctrl_int RM_P1..RM_P4 FSM sequence.
 // Composed from the SAME primitives above rather than a third independent
-// port: Pass 2 (ln) -> tr_new_ln_scalar(xq,4); Pass 3 (exp) -> gelu_exp_q44.
+// port: Pass 2 (ln) -> tr_hw_ln(xq,4); Pass 3 (exp) -> gelu_exp_q44.
 // ============================================================================
 static const int RMSNORM_CONST_LN_SQRT_N = 17;   // 0.5*ln(8) in Q4.4, N=8
 
@@ -277,7 +342,7 @@ inline void rmsnorm_hw_model(const int8_t x[8], int8_t out[8]) {
 
     // Pass 2: log_s = ln(S[19:4]) in Q4.4
     int s_shifted = (S >> 4) & 0xFFFF;
-    int log_s = tr_new_ln_scalar(s_shifted, 4);
+    int log_s = tr_hw_ln(s_shifted, 4);
     if (log_s > 127) log_s = 127; if (log_s < -128) log_s = -128;
     int reg_scalar_log = -(log_s >> 1);
     if (reg_scalar_log > 127) reg_scalar_log = 127;
@@ -327,7 +392,7 @@ inline void rmsnorm_hw_model_signguard_fixed(const int8_t x[8], int8_t out[8]) {
     for (int i = 0; i < 8; i++) S += (int32_t)x[i] * (int32_t)x[i];
 
     int s_shifted = (S >> 4) & 0xFFFF;
-    int log_s = tr_new_ln_scalar(s_shifted, 4);
+    int log_s = tr_hw_ln(s_shifted, 4);
     if (log_s > 127) log_s = 127; if (log_s < -128) log_s = -128;
     int reg_scalar_log = -(log_s >> 1);
     if (reg_scalar_log > 127) reg_scalar_log = 127;
@@ -412,7 +477,7 @@ inline void softmax_hw_model_ex(const int8_t x[8], uint8_t out[8], int8_t* z_out
     // FRAC_W=4 -- same primitive GELU/RMSNorm already verify), saturated to
     // int8 (tr_ln_alu.sv itself saturates its OUT_WIDTH-bit output).
     int slice16 = (int)((uint32_t)S >> 8) & 0xFFFF;
-    int ln_S = tr_new_ln_scalar(slice16, 4);
+    int ln_S = tr_hw_ln(slice16, 4);
     if (ln_S > 127) ln_S = 127;
     if (ln_S < -128) ln_S = -128;
 
