@@ -227,12 +227,15 @@ module tr_soc_top_int_tb();
         // ---------------------------------------------------------
         // TEST 4: RMSNORM
         // ---------------------------------------------------------
-        $display("\n---> CPU Executing OP_RMSNORM (CMD = 0x03)");
+        $display("\n---> CPU Executing OP_RMSNORM (tiled: CMD = 0x07, 0x09, 0x0A; one 8-element tile, log2N = 3)");
         // Using inputs: {16, -16, 16, -16}
         // Squares should all be positive, mean squared should process correctly.
+        mmio_write(8'h18, 32'd3);                          // ADDR_RMS_LOG2N
         load_mac_vector(32'd16, -32'd16, 32'd16, -32'd16);
-        mmio_write(8'h00, 32'h03);
-        wait_for_done();
+        mmio_write(8'h00, 32'h07); wait_for_done();        // sum of squares (first tile)
+        mmio_write(8'h00, 32'h09); wait_for_done();        // scale -> inv_rms register
+        load_mac_vector(32'd16, -32'd16, 32'd16, -32'd16);
+        mmio_write(8'h00, 32'h0A); wait_for_done();        // apply
         print_vpu_results();
 
         // ---------------------------------------------------------
@@ -242,7 +245,7 @@ module tr_soc_top_int_tb();
         // harness's own SRAM routing leaves on the other 4 lanes at this
         // point -- not independently re-derived here) push Sum(x^2) deep
         // into the previously-broken small-Sum(x^2) regime. ctrl_scalar
-        // (reg_scalar_log + CONST_LN_SQRT_N) goes positive; before the
+        // (-0.5 ln(mean), rounded) goes positive; before the
         // sign-guard fix, tr_soc_ctrl_int.sv's RM_P3 fed that straight to
         // tr_nonlinear_vpu's decay-only exp backbone and InvRMS collapsed to
         // 0, giving an all-zero VPU result on every lane regardless of x --
@@ -255,10 +258,12 @@ module tr_soc_top_int_tb();
         // precise golden output the way tr_rmsnorm_tb.sv's dedicated,
         // fully-controlled 8-lane test already did (see that testbench and
         // docs/iscas_paper_support/ for exact-value verification).
-        $display("\n---> CPU Executing OP_RMSNORM (CMD = 0x03), sign-guard fix regression test");
+        $display("\n---> CPU Executing OP_RMSNORM (tiled CMD = 0x07, 0x09, 0x0A), sign-guard fix regression test");
         load_mac_vector(32'd3, -32'd3, 32'd3, -32'd3);
-        mmio_write(8'h00, 32'h03);
-        wait_for_done();
+        mmio_write(8'h00, 32'h07); wait_for_done();
+        mmio_write(8'h00, 32'h09); wait_for_done();
+        load_mac_vector(32'd3, -32'd3, 32'd3, -32'd3);
+        mmio_write(8'h00, 32'h0A); wait_for_done();
         print_vpu_results();
         begin : rmsnorm_signguard_check
             int unsigned fails;

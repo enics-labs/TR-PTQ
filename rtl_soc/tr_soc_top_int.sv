@@ -116,6 +116,7 @@ module tr_soc_top_int #(
     logic                           bb_bypass_ln;
     logic                           bb_mode_pre_ln;
     logic [1:0]                     bb_mode_post_ln;
+    logic                           bb_ln_pre_scaled;
     logic                           sym_mode_en;
     logic                           alpha_flat_mode;
     logic signed [W-1:0]            ctrl_scalar_sub_val;
@@ -132,6 +133,9 @@ module tr_soc_top_int #(
     logic signed [W-1:0]            vpu_sram_b_in [N];
     logic signed [W-1:0]            vpu_max_out;
     logic signed [ACC_W-1:0]        vpu_dot_out;
+    logic        [15:0]             vpu_exp_raw;
+    logic        [4:0]              rms_log2n;
+    logic        [11:0]             inv_rms;
     logic signed [W-1:0]            vpu_raw_out [N];
     logic                           vpu_bb_valid;
     logic                           vpu_vecmul_valid;
@@ -177,6 +181,7 @@ module tr_soc_top_int #(
         .bb_bypass_ln        (bb_bypass_ln),
         .bb_mode_pre_ln      (bb_mode_pre_ln),
         .bb_mode_post_ln     (bb_mode_post_ln),
+        .bb_ln_pre_scaled    (bb_ln_pre_scaled),
         .sym_mode_en         (sym_mode_en),
         .alpha_flat_mode     (alpha_flat_mode),
         .ctrl_scalar_sub_val (ctrl_scalar_sub_val),
@@ -190,6 +195,9 @@ module tr_soc_top_int #(
         .vpu_data_out        (vpu_raw_out),
         .vpu_max_out         (vpu_max_out),
         .vpu_dot_out         (vpu_dot_out),
+        .vpu_exp_raw         (vpu_exp_raw),
+        .rms_log2n_out       (rms_log2n),
+        .inv_rms_out         (inv_rms),
         
         .vpu_bb_valid        (vpu_bb_valid),
         .vpu_vecmul_valid    (vpu_vecmul_valid),
@@ -334,6 +342,9 @@ module tr_soc_top_int #(
         .ctrl_scalar_sub_val (ctrl_scalar_sub_val),
         .vpu_max_out         (vpu_max_out),
         .vpu_dot_out         (vpu_dot_out),
+        .vpu_exp_raw         (vpu_exp_raw),
+        .rms_log2n           (rms_log2n),
+        .inv_rms_in          (inv_rms),
         
         .mux_bb_in_sel       (mux_bb_in_sel),
         .mux_mac_a_sel       (mux_mac_a_sel),
@@ -356,6 +367,7 @@ module tr_soc_top_int #(
         .bb_bypass_ln        (bb_bypass_ln),
         .bb_mode_pre_ln      (bb_mode_pre_ln),
         .bb_mode_post_ln     (bb_mode_post_ln),
+        .bb_ln_pre_scaled    (bb_ln_pre_scaled),
         .sym_mode_en         (sym_mode_en),
         .alpha_flat_mode     (alpha_flat_mode),
 

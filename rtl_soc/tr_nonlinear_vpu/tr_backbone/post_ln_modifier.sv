@@ -5,7 +5,8 @@
  *           to avoid physical dividers.
  *           Mode 00: Bypass (x)
  *           Mode 01: Division (-1.0 * x)
- *           Mode 10: Inverse Square Root (-0.5 * x)
+ *           Mode 10: Inverse Square Root (-0.5 * x), floored halving (used by rtl_baseline)
+ *           Mode 11: Inverse Square Root, ROUNDED halving: -((x+1)>>>1) (tr_soc RMSNorm)
  *
  * @param    N      Vector dimension.
  * @param    W      Word width.
@@ -42,6 +43,13 @@ module post_ln_modifier #(
                     y_out[i]  = -shifted_x;
                 end
                 
+                2'b11: begin
+                    // Rounded -0.5 * x: -((x + 1) >>> 1), computed one bit wider so x=MAX does not wrap
+                    logic signed [W:0] x_ext;
+                    x_ext     = {x_in[i][W-1], x_in[i]} + 1;
+                    y_out[i]  = W'(-(x_ext >>> 1));
+                end
+
                 default: begin
                     y_out[i] = x_in[i];
                 end

@@ -15,12 +15,14 @@
  *           softmax probability scaling and GELU's final elementwise gate.
  *
  * @param    N      Number of parallel lanes.
- * @param    W      Input operand width (a/b).
+ * @param    W      Input operand width (a).
+ * @param    WB     Input operand width (b); defaults to W. RMSNorm's wide inv_rms uses WB > W.
  * @param    ACC_W  Output width (out_vec).
  */
 module vec_mul_array_engine #(
     parameter int N     = 16,
     parameter int W     = 8,
+    parameter int WB    = W,
     parameter int ACC_W = 32
 )(
     input  logic clk,
@@ -31,7 +33,7 @@ module vec_mul_array_engine #(
     output logic in_ready,
     input  logic [1:0]               op_mode,    // 0:SS, 1:SU, 2:UU
     input  logic [W-1:0]             a [N],
-    input  logic [W-1:0]             b [N],
+    input  logic [WB-1:0]            b [N],
 
     // Output stream
     output logic out_valid,
@@ -47,7 +49,7 @@ module vec_mul_array_engine #(
     // Stage 1: Input Registers
     // ============================================================
     logic [W-1:0] a_reg [N];
-    logic [W-1:0] b_reg [N];
+    logic [WB-1:0] b_reg [N];
     logic [1:0]   mode1_op;
     logic v1;
 
@@ -68,7 +70,7 @@ module vec_mul_array_engine #(
     // ============================================================
     // Stage 2: Registered Products
     // ============================================================
-    logic signed [(2*W+1):0] prod_reg [N];
+    logic signed [(W+WB+1):0] prod_reg [N];
     logic v2;
 
     always_ff @(posedge clk) begin

@@ -34,7 +34,20 @@ static bool run_eval_mode(const std::string& mode, const std::string& in_path,
         if (line.find_first_not_of(" \t\r\n") == std::string::npos) continue;
         std::istringstream iss(line);
 
-        if (mode == "rmsnorm" || mode == "rmsnorm_baseline") {
+        if (mode == "rmsnorm") {
+            // line: "log2n x0 .. x(N-1)" -> "inv_rms y0 .. y(N-1)"  (tiled flow, see rms_* in tr_math_model.hpp)
+            int log2n; iss >> log2n;
+            int n = 1 << log2n;
+            std::vector<int8_t> x(n), y(n);
+            for (int i = 0; i < n; i++) { int v; iss >> v; x[i] = (int8_t)v; }
+            int32_t acc = 0;
+            for (int t = 0; t < n / 8; t++) acc = rms_acc_tile(&x[8 * t], acc, t == 0);
+            uint32_t inv = rms_scale(acc, log2n);
+            for (int t = 0; t < n / 8; t++) rms_apply_tile(&x[8 * t], inv, &y[8 * t]);
+            fout << inv;
+            for (int i = 0; i < n; i++) fout << " " << (int)y[i];
+            fout << "\n";
+        } else if (mode == "rmsnorm_baseline") {
             int8_t x[8], y[8];
             for (int i = 0; i < 8; i++) { int v; iss >> v; x[i] = (int8_t)v; }
             rmsnorm_hw_model(x, y);
@@ -99,7 +112,50 @@ int main(int argc, char* argv[]) {
         return -1;
     }
 
-    if (mode == "rmsnorm" || mode == "rmsnorm_baseline") {
+    if (mode == "rmsnorm") {
+        // PRODUCTION tiled RMSNorm: one row per line. Input line "log2n x0 .. x(N-1)" (N = 1<<log2n),
+        // expected line "inv_rms y0 .. y(N-1)". The TB runs cmd 7/8 per tile (sum of squares), cmd 9
+        // once, cmd 0xA per tile; inv_rms is read from the controller register. Row mix: random
+        // full-range, heavy-tailed, outlier, tiny (growth branch), constant, and sparse rows, at
+        // N = 8 .. 2048. Most rows have max|x| = 127 (what the per-token quantizer produces).
+        const int N_ROWS = 160;
+        vec_file << N_ROWS << "\n";
+        srand(1337);
+        for (int r = 0; r < N_ROWS; r++) {
+            static const int L2[] = {3, 3, 4, 5, 6, 7, 8, 9, 10, 11};
+            int log2n = L2[r % 10];
+            int n = 1 << log2n;
+            int kind = (r / 10) % 8;
+            std::vector<int8_t> x(n), y(n);
+            for (int i = 0; i < n; i++) {
+                int v;
+                switch (kind) {
+                    case 0: v = (rand() % 256) - 128; break;                                   // uniform
+                    case 1: v = ((rand() % 41) - 20) + ((rand() % 41) - 20) + ((rand() % 41) - 20); break;  // bell
+                    case 2: v = (rand() % 7) - 3; break;                                       // tiny -> growth
+                    case 3: v = (rand() % 3) - 1; break;                                       // tinier
+                    case 4: v = 40; break;                                                     // constant
+                    case 5: v = (rand() % 50 == 0) ? ((rand() % 255) - 127) : ((rand() % 5) - 2); break;  // sparse
+                    case 6: v = (rand() % 2) ? 127 : -128; break;                              // saturated
+                    default: v = (rand() % 61) - 30; break;
+                }
+                x[i] = (int8_t)(v > 127 ? 127 : (v < -128 ? -128 : v));
+            }
+            if (kind == 1 || kind == 5 || kind == 7) x[rand() % n] = 127;                      // quantizer: max|x| = 127
+            vec_file << log2n;
+            for (int i = 0; i < n; i++) vec_file << " " << (int)x[i];
+            vec_file << "\n";
+            int32_t acc = 0;
+            for (int t = 0; t < n / 8; t++) acc = rms_acc_tile(&x[8 * t], acc, t == 0);
+            uint32_t inv = rms_scale(acc, log2n);
+            for (int t = 0; t < n / 8; t++) rms_apply_tile(&x[8 * t], inv, &y[8 * t]);
+            exp_file << inv;
+            for (int i = 0; i < n; i++) exp_file << " " << (int)y[i];
+            exp_file << "\n";
+        }
+        std::cout << "[C++ MODEL] Generated tiled RMSNORM test vectors." << std::endl;
+    }
+    else if (mode == "rmsnorm_baseline") {
         // rmsnorm_baseline (tr_rmsnorm.sv, tb_baseline/tr_baseline/tr_rmsnorm/)
         // implements the identical 4-pass algorithm as production
         // tr_soc_ctrl_int's RM_P1..RM_P4 (sign-guard/recip_lut included --

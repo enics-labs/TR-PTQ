@@ -130,7 +130,7 @@ void tr_hw_matmul(const int8_t* A_flat, const int8_t* b, const int32_t* c,
 // values don't need their own hand-port -- the correctness-critical path is
 // tr_hw_rmsnorm() above; these are for display only.
 int32_t tr_hw_ln4(int32_t xq) {
-    return tr_hw_ln(xq, 4);
+    return tr_vpu_ln(xq);
 }
 int32_t tr_hw_exp_backbone(int8_t x) {
     return gelu_exp_q44(x);

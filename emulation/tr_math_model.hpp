@@ -45,7 +45,8 @@ static const uint8_t EXP_LUT_CONST[9] = {0, 0, 1, 2, 5, 13, 35, 94, 255};
 // NOTE: tr_new_ln_scalar (tr_math.cuh) is the OLD datapath and is left untouched for the
 // CUDA kernels in stable_code; the RTL no longer matches it. Every RTL tr_ln_alu instance
 // (tr_backbone_wrapper and the rtl_baseline modules) uses the module defaults SEGMENTS=2,
-// COEF_BITS=8, so the models below call tr_hw_ln(), i.e. that default configuration.
+// COEF_BITS=8. tr_hw_ln() is the module-level unit (rtl_baseline modules instantiate it directly);
+// tr_vpu_ln() is what the tr_soc production path sees through tr_backbone_wrapper (shared B=6 unit).
 // ============================================================================
 struct TrLnPwlCoefs { int L; std::vector<int> A, B; };
 
@@ -76,6 +77,17 @@ inline int tr_pwl_ln_scalar(int xq, int bits, int segments, int coef_bits, int o
 
 // ln as instantiated in the RTL today: default tr_ln_alu parameters (2 segments, 8-bit constants).
 inline int tr_hw_ln(int xq, int bits, int out_width = 8) { return tr_pwl_ln_scalar(xq, bits, 2, 8, out_width); }
+
+// The ln as seen through tr_backbone_wrapper (tr_soc production path): ONE shared unit at
+// BITS = FRAC_W + 2 = 6 (2 segments, 8-bit constants, 10-bit output). Operators with FRAC_W=4
+// fractional bits feed x<<2 (pre_scaled=false); RMSNorm feeds its mean already at 6 fractional
+// bits (pre_scaled=true). The Q.6 result is rounded back to Q4.4 and saturated to int8.
+// Input is treated as unsigned (callers mask to the 16-bit backbone width).
+inline int tr_vpu_ln(int xq, bool pre_scaled = false) {
+    int y = tr_pwl_ln_scalar(pre_scaled ? xq : (xq << 2), 6, 2, 8, 10);
+    int r = (y + 2) >> 2;
+    return r > 127 ? 127 : (r < -128 ? -128 : r);
+}
 
 inline int tr_pwl_ln_scalar(int xq, int bits, int segments, int coef_bits, int out_width) {
     if (xq <= 0) return 0;
@@ -215,7 +227,7 @@ inline int8_t silu_hw_scalar(int8_t x) {
     // SHARED CROSSBAR (GELU/future SwiGLU-opcode) precision, deliberately
     // NOT to tr_swiglu.sv's standalone module -- that comparison is the
     // point of the exercise, not a bug; see docs/llama_fpga_plan.md.
-    int    ln_q44  = tr_hw_ln(pre_ln, 4);
+    int    ln_q44  = tr_vpu_ln(pre_ln);
     int8_t neg_ln  = (int8_t)(-(int16_t)(int8_t)ln_q44);
     int    recip   = gelu_exp_q44(neg_ln);
     int    sigma   = (x < 0) ? (16 - recip) : recip;
@@ -274,7 +286,7 @@ inline int8_t silu_hw_scalar_bestfit(int8_t x) {
     int8_t alpha = alpha_stabilizer_model_flat(x);
     int    E     = gelu_exp_q44(alpha);
     int    pre_ln  = E + 16;
-    int    ln_q44  = tr_hw_ln(pre_ln, 4);   // still BITS=4 -- change B dropped
+    int    ln_q44  = tr_vpu_ln(pre_ln);   // still BITS=4 -- change B dropped
     int8_t neg_ln  = (int8_t)(-(int16_t)(int8_t)ln_q44);
     int    recip   = gelu_exp_q44(neg_ln);
     int    sigma   = (x < 0) ? (16 - recip) : recip;
@@ -334,6 +346,54 @@ inline void swiglu_hw_model_dedicated(const int8_t x[8], const int8_t g[8], int8
 // port: Pass 2 (ln) -> tr_hw_ln(xq,4); Pass 3 (exp) -> gelu_exp_q44.
 // ============================================================================
 static const int RMSNORM_CONST_LN_SQRT_N = 17;   // 0.5*ln(8) in Q4.4, N=8
+
+// ----------------------------------------------------------------------------
+// RMSNorm, Llama-width (N = 8 * tiles) -- software spec is
+// tools/models/vpu_ops.py::rmsnorm (RECOMMENDED knobs: rms_k=2, rms_inv_bits=4, rounded shifts,
+// W_MAC=16, unified ln at BITS=FRAC_W+k). Decomposed exactly as the hardware will run it, one
+// opcode per step (host sequences the tiles):
+//   rms_acc_tile  : one MAC beat, S += sum(x[i]^2) over 8 lanes   (first tile clears S)
+//   rms_scale     : S -> mean-of-squares -> ln -> -0.5x -> exp -> wide inv_rms (once per row)
+//   rms_apply_tile: out[i] = sat8((x[i]*inv_rms + half) >> (FRAC_W+INV_BITS))   (per tile)
+// The old single-tile rmsnorm_hw_model below is kept only as the golden for the rtl_baseline
+// tr_rmsnorm.sv module.
+// ----------------------------------------------------------------------------
+static const int RMS_FRAC_W   = 4;
+static const int RMS_K        = 2;     // extra mean bits kept through the ln
+static const int RMS_INV_BITS = 4;     // extra inv_rms fractional bits (exp raw >> (8 - INV_BITS))
+static const int RMS_W_MAC    = 16;    // saturation width of the mean fed to the ln
+static const int RMS_INV_W    = 12;    // inv_rms register width (unsigned); growth branch capped at 2^12-1
+
+inline int32_t rms_acc_tile(const int8_t x[8], int32_t acc, bool clear) {
+    int32_t s = clear ? 0 : acc;
+    for (int i = 0; i < 8; i++) s += (int32_t)x[i] * (int32_t)x[i];
+    return s;
+}
+
+// returns the unsigned wide inv_rms (Q.(FRAC_W+INV_BITS), RMS_INV_W bits)
+inline uint32_t rms_scale(int32_t S, int log2n) {
+    const int shift = RMS_FRAC_W + log2n - RMS_K;                      // >= 1 for N >= 8
+    int64_t mk = ((int64_t)S + (1LL << (shift - 1))) >> shift;         // rounded mean, FRAC_W+k fractional bits
+    if (mk > (1LL << RMS_W_MAC) - 1) mk = (1LL << RMS_W_MAC) - 1;      // W_MAC saturation
+    int log_s  = tr_vpu_ln((int)mk, true);                             // shared ln, mk already at BITS=FRAC_W+k
+    int half   = -((log_s + 1) >> 1);                                  // -0.5 ln(mean), rounded
+    int ctrl   = half > 127 ? 127 : (half < -128 ? -128 : half);
+    bool growth = ctrl > 0;
+    int guarded = growth ? -ctrl : ctrl;                               // exp backbone is decay-only
+    int ew = tr_exp_alu_product_raw(guarded) >> (8 - RMS_INV_BITS);
+    if (!growth) return (uint32_t)ew;
+    int d = ew < 1 ? 1 : ew;
+    uint32_t inv = ((1u << (2 * RMS_FRAC_W + 2 * RMS_INV_BITS)) + (uint32_t)(d >> 1)) / (uint32_t)d;
+    return inv > (1u << RMS_INV_W) - 1 ? (1u << RMS_INV_W) - 1 : inv;   // cap: unreachable for max|x|=127 rows
+}
+
+inline void rms_apply_tile(const int8_t x[8], uint32_t inv, int8_t out[8]) {
+    const int sh = RMS_FRAC_W + RMS_INV_BITS;
+    for (int i = 0; i < 8; i++) {
+        int64_t y = ((int64_t)x[i] * (int64_t)inv + (1LL << (sh - 1))) >> sh;
+        out[i] = (int8_t)(y > 127 ? 127 : (y < -128 ? -128 : y));
+    }
+}
 
 inline void rmsnorm_hw_model(const int8_t x[8], int8_t out[8]) {
     // Pass 1: S = sum(x[i]^2), INT32
@@ -477,7 +537,7 @@ inline void softmax_hw_model_ex(const int8_t x[8], uint8_t out[8], int8_t* z_out
     // FRAC_W=4 -- same primitive GELU/RMSNorm already verify), saturated to
     // int8 (tr_ln_alu.sv itself saturates its OUT_WIDTH-bit output).
     int slice16 = (int)((uint32_t)S >> 8) & 0xFFFF;
-    int ln_S = tr_hw_ln(slice16, 4);
+    int ln_S = tr_vpu_ln(slice16);
     if (ln_S > 127) ln_S = 127;
     if (ln_S < -128) ln_S = -128;
 

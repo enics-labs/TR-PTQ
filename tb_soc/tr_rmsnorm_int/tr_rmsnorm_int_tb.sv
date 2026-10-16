@@ -1,9 +1,15 @@
 `timescale 1ns/1ps
 
-// File-I/O testbench for the PRODUCTION RMSNorm sequence: drives
-// tr_soc_top_int through CMD=0x03 (RMSNORM), the RM_P1..RM_P4 FSM in
-// tr_soc_ctrl_int.sv sharing the tr_nonlinear_vpu backbone.  This is the
-// module the firmware (tr_rmsnorm -> _xlr2_vpu) actually exercises.
+// File-I/O testbench for the PRODUCTION tiled RMSNorm: drives tr_soc_top_int
+// through the host-sequenced command set of tr_soc_ctrl_int.sv (RM_P1..RM_P4
+// sharing the tr_nonlinear_vpu backbone):
+//   write ADDR_RMS_LOG2N (0x18)
+//   per tile: stage x tile, CMD=7 (first) / CMD=8 (next)   -- S += sum(x^2)
+//   once:     CMD=9                                         -- inv_rms register
+//   per tile: stage x tile, CMD=0xA                         -- out = x * inv_rms
+// One row (N = 1<<log2n elements, N/8 tiles) per input line:
+//   inputs.txt:  "log2n x0 .. x(N-1)";  hdl_out.txt: "inv_rms y0 .. y(N-1)"
+// inv_rms is the controller's wide register (read hierarchically).
 //
 // (tr_rmsnorm.sv / tr_rmsnorm_tb.sv are NOT this -- confirmed by grep that
 // module is never instantiated in production RTL; do not use it as a
@@ -17,7 +23,7 @@
 // c_vec[0..3]=x[0..3], ext_sram_b[4..7]=x[4..7].
 //
 // Matches verify_block.py's convention (inputs.txt / hdl_out.txt) and
-// cpu_math_model.cpp's "rmsnorm" mode (8 int8 in, 8 int8 out per line).
+// cpu_math_model.cpp's "rmsnorm" mode.
 module tb_tr_rmsnorm_int();
 
     localparam int M = 4;
@@ -92,8 +98,8 @@ module tb_tr_rmsnorm_int();
         repeat (2) @(posedge clk);
     endtask
 
-    int file_in, file_out, num_vecs, dummy;
-    int x_s[N];
+    int file_in, file_out, num_rows, dummy;
+    int log2n, n, v_in;
 
     initial begin
         rst_n = 0; mmio_wen = 0; dot_in_valid = 0; clear_acc = 1;
@@ -105,7 +111,7 @@ module tb_tr_rmsnorm_int();
 
         file_in  = $fopen("inputs.txt",  "r");
         file_out = $fopen("hdl_out.txt", "w");
-        dummy    = $fscanf(file_in, "%0d\n", num_vecs);
+        dummy    = $fscanf(file_in, "%0d\n", num_rows);
 
         #22 rst_n = 1;
 
@@ -113,22 +119,44 @@ module tb_tr_rmsnorm_int();
         mmio_write(8'h08, 32'd1);   // REQ_MULT
         mmio_write(8'h0C, 32'd0);   // REQ_SHIFT
 
-        for (int v = 0; v < num_vecs; v++) begin
-            logic signed [W-1:0] x [N];
-            dummy = $fscanf(file_in, "%d %d %d %d %d %d %d %d\n",
-                x_s[0], x_s[1], x_s[2], x_s[3], x_s[4], x_s[5], x_s[6], x_s[7]);
-            for (int i = 0; i < N; i++) x[i] = W'(x_s[i]);
+        for (int r = 0; r < num_rows; r++) begin
+            logic signed [W-1:0] row [];
+            logic signed [W-1:0] tile [N];
+            logic signed [W-1:0] y [];
 
-            load_vector(x);
+            dummy = $fscanf(file_in, "%d", log2n);
+            n = 1 << log2n;
+            row = new[n];
+            y   = new[n];
+            for (int i = 0; i < n; i++) begin dummy = $fscanf(file_in, "%d", v_in); row[i] = W'(v_in); end
+            dummy = $fscanf(file_in, "\n");
 
-            mmio_write(8'h00, 32'h03);  // CMD = RMSNORM
+            mmio_write(8'h18, 32'(log2n));          // ADDR_RMS_LOG2N
+
+            // Pass 1: sum of squares over all tiles (cmd 7 first tile, cmd 8 the rest)
+            for (int t = 0; t < n / N; t++) begin
+                for (int i = 0; i < N; i++) tile[i] = row[t*N + i];
+                load_vector(tile);
+                mmio_write(8'h00, (t == 0) ? 32'h07 : 32'h08);
+                wait_for_done();
+            end
+
+            // Scale: inv_rms register
+            mmio_write(8'h00, 32'h09);
             wait_for_done();
+            $fwrite(file_out, "%0d", dut.inv_rms);
 
-            $fwrite(file_out, "%0d %0d %0d %0d %0d %0d %0d %0d\n",
-                $signed(vpu_data_out[0]), $signed(vpu_data_out[1]),
-                $signed(vpu_data_out[2]), $signed(vpu_data_out[3]),
-                $signed(vpu_data_out[4]), $signed(vpu_data_out[5]),
-                $signed(vpu_data_out[6]), $signed(vpu_data_out[7]));
+            // Apply per tile
+            for (int t = 0; t < n / N; t++) begin
+                for (int i = 0; i < N; i++) tile[i] = row[t*N + i];
+                load_vector(tile);
+                mmio_write(8'h00, 32'h0A);
+                wait_for_done();
+                for (int i = 0; i < N; i++) y[t*N + i] = vpu_data_out[i];
+            end
+
+            for (int i = 0; i < n; i++) $fwrite(file_out, " %0d", $signed(y[i]));
+            $fwrite(file_out, "\n");
         end
 
         $fclose(file_in);

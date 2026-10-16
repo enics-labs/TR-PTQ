@@ -5,18 +5,25 @@
  *           Purely combinational. Expects wide inputs and natively steps down 
  *           precision through the tr_ln_alu block.
  *
+ *           The ONE shared tr_ln_alu runs at BITS=FRAC_W+LN_EXTRA (Q.6) so every operator uses the
+ *           same unit: operators with FRAC_W fractional bits feed x<<LN_EXTRA (ln_pre_scaled=0),
+ *           RMSNorm feeds its mean already at FRAC_W+LN_EXTRA bits (ln_pre_scaled=1). The ln result
+ *           (Q.6, WIDTH_OUT+LN_EXTRA-ish bits) is rounded back to Q.FRAC_W and saturated to WIDTH_OUT.
+ *
  * @param    N           Vector dimension.
  * @param    WIDTH_IN    Incoming datapath width (e.g., 16-bit).
  * @param    WIDTH_OUT   Target operating width for EXP/Mantissa (e.g., 8-bit).
  * @param    FRAC_W      Fractional bit width.
  * @param    LUT_IDX_W   Width of the ROM index for the Taylor anchor.
+ * @param    LN_EXTRA    Extra fractional bits of the shared ln unit (BITS = FRAC_W + LN_EXTRA).
  */
 module tr_backbone_wrapper #(
     parameter int N         = 8,
     parameter int WIDTH_IN  = 16,
     parameter int WIDTH_OUT = 8,
     parameter int FRAC_W    = 4,
-    parameter int LUT_IDX_W = 3
+    parameter int LUT_IDX_W = 3,
+    parameter int LN_EXTRA  = 2
 )(
     input  logic clk,
     input  logic rst_n,
@@ -26,7 +33,8 @@ module tr_backbone_wrapper #(
     // Control Flags
     input  logic bypass_ln,
     input  logic mode_pre_ln,  // 0: Bypass, 1: Add +1.0
-    input  logic [1:0]              mode_post_ln, // 00: By, 01: -1.0x, 10: -0.5x
+    input  logic [1:0]              mode_post_ln, // 00: By, 01: -1.0x, 10: -0.5x (floor), 11: -0.5x (rounded)
+    input  logic ln_pre_scaled,  // 0: vec_in has FRAC_W frac bits (shifted up by LN_EXTRA), 1: already FRAC_W+LN_EXTRA
     
     // Datapath Input
     input  logic signed [WIDTH_IN-1:0]  vec_in [N],
@@ -45,6 +53,7 @@ module tr_backbone_wrapper #(
     logic                       s1_bypass_ln;
     logic                       s1_mode_pre_ln;
     logic [1:0]                 s1_mode_post_ln;
+    logic                       s1_ln_pre_scaled;
     logic                       s1_valid;
 
     always_ff @(posedge clk or negedge rst_n) begin
@@ -53,12 +62,14 @@ module tr_backbone_wrapper #(
             s1_bypass_ln <= 1'b0;
             s1_mode_pre_ln <= 1'b0;
             s1_mode_post_ln <= '0;
+            s1_ln_pre_scaled <= 1'b0;
             for(int i=0; i<N; i++) s1_vec_in[i] <= '0;
         end else begin
             s1_valid <= in_valid;
             s1_bypass_ln <= bypass_ln;
             s1_mode_pre_ln <= mode_pre_ln;
             s1_mode_post_ln <= mode_post_ln;
+            s1_ln_pre_scaled <= ln_pre_scaled;
             s1_vec_in <= vec_in;
         end
     end
@@ -80,19 +91,38 @@ module tr_backbone_wrapper #(
         .y_out        (pre_ln_out)
     );
 
+    localparam int LN_OUT_W = FRAC_W + LN_EXTRA + 4;   // ln unit output width (Q.(FRAC_W+LN_EXTRA), 4 integer bits)
+
     genvar i;
     generate
         for (i = 0; i < N; i++) begin : gen_tr_lanes
             
-            // TR-LN ALU (Steps down WIDTH_IN -> WIDTH_OUT)
+            // Shared TR-LN ALU, BITS = FRAC_W + LN_EXTRA. Input is zero-extended (the unit treats it as unsigned).
+            logic [WIDTH_IN+LN_EXTRA-1:0]      ln_xin;
+            logic signed [LN_OUT_W-1:0]        ln_y;
+            logic signed [LN_OUT_W:0]          ln_rnd;
+
+            assign ln_xin = s1_ln_pre_scaled ? {{LN_EXTRA{1'b0}}, pre_ln_out[i]}
+                                             : {pre_ln_out[i], {LN_EXTRA{1'b0}}};
+
             tr_ln_alu #(
-                .WIDTH(WIDTH_IN), 
-                .BITS(FRAC_W),          // Note: tr_ln_alu uses "BITS" for fractional width
-                .OUT_WIDTH(WIDTH_OUT)
+                .WIDTH(WIDTH_IN + LN_EXTRA),
+                .BITS(FRAC_W + LN_EXTRA),
+                .OUT_WIDTH(LN_OUT_W)
             ) u_tr_ln (
-                .xq (pre_ln_out[i]),    // Note: tr_ln_alu expects unsigned/positive input 'xq'
-                .yq (tr_ln_out[i])
+                .xq (ln_xin),
+                .yq (ln_y)
             );
+
+            // Round back to FRAC_W fractional bits, saturate to WIDTH_OUT.
+            assign ln_rnd = {ln_y[LN_OUT_W-1], ln_y} + (1 <<< (LN_EXTRA-1));
+            always_comb begin
+                logic signed [LN_OUT_W:0] r;
+                r = ln_rnd >>> LN_EXTRA;
+                if (r > (2**(WIDTH_OUT-1) - 1))      tr_ln_out[i] = (2**(WIDTH_OUT-1) - 1);
+                else if (r < -(2**(WIDTH_OUT-1)))    tr_ln_out[i] = -(2**(WIDTH_OUT-1));
+                else                                 tr_ln_out[i] = WIDTH_OUT'(r);
+            end
 
         end
     endgenerate
