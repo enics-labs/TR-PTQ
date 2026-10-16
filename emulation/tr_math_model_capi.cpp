@@ -70,10 +70,8 @@ void tr_hw_swiglu_dedicated_batch(const int8_t* x, const int8_t* g, int8_t* out,
     for (int32_t i = 0; i < n; i++) out[i] = swiglu_hw_scalar_dedicated(x[i], g[i]);
 }
 
-// Best-fit (change A: flat alpha=1 + change C: saturating gate-multiply),
-// bit-exact to the REAL RTL (alpha_stabilizer.sv flat_mode,
-// tr_nonlinear_vpu.sv vecmul_scale_mode==3'b100) -- see
-// swiglu_hw_model_bestfit's comment in tr_math_model.hpp.
+// Historical "best-fit" SwiGLU (flat alpha=1 + saturating gate-multiply): the model of the first CMD=5/6 opcode
+// pair, no longer in the RTL; kept as the "as shipped" baseline of the Llama accuracy study (see tr_math_model.hpp).
 void tr_hw_swiglu_bestfit_batch(const int8_t* x, const int8_t* g, int8_t* out, int32_t n) {
     for (int32_t i = 0; i < n; i++) out[i] = swiglu_hw_scalar_bestfit(x[i], g[i]);
 }

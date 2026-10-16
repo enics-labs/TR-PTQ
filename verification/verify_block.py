@@ -21,11 +21,10 @@ def get_config(block_name):
         # trap tr_rmsnorm.sv turned out to be.
         "gelu":    {"f_file": "../tb_soc/tr_gelu_int/tr_gelu_int.f",  "max_error": 0},
         "gelu_baseline": {"f_file": "../tb_baseline/tr_baseline/tr_gelu/tr_gelu.f", "max_error": 0},
-        # swiglu: drives the REAL production CMD=5 (SiLU)/CMD=6
-        # (gate-multiply) opcode pair via tr_soc_top_int -- the new
-        # control-path integration (docs/llama_fpga_plan.md changes A/C),
-        # NOT tr_swiglu.sv's own as-shipped precision (that's
-        # "swiglu_baseline" below). Golden reference: swiglu_hw_scalar_bestfit().
+        # swiglu: drives the REAL production two-pass SwiGLU (cmds 5/6/0xB/0xC, host-sequenced in
+        # 8-lane groups, sigma ROM + wide silu + per-row gain) via tr_soc_top_int, NOT tr_swiglu.sv's
+        # own as-shipped precision (that's "swiglu_baseline" below). Golden reference: sw_* in
+        # tr_math_model.hpp, bit-exact to tools/models/vpu_ops.py::swiglu.
         "swiglu":  {"f_file": "../tb_soc/tr_swiglu_int/tr_swiglu_int.f", "max_error": 0},
         "swiglu_baseline": {"f_file": "../tb_baseline/tr_baseline/tr_swiglu/tr_swiglu.f", "max_error": 0},
         "quant":   {"f_file": "../tb_soc/requantize_engine/requantize_engine_int.f", "max_error": 0},

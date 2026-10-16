@@ -62,7 +62,6 @@ module tr_nonlinear_vpu_tb();
     logic       bb_mode_pre_ln;
     logic [1:0] bb_mode_post_ln;
     logic       sym_mode_en;
-    logic       alpha_flat_mode;  // true alpha=1 sigmoid slope (SwiGLU's SiLU); unused by TEST1-5 below, defaults 0
 
     // ---------------------------------------------------------
     // DUT Instantiation
@@ -109,7 +108,6 @@ module tr_nonlinear_vpu_tb();
         bb_mode_pre_ln  = 0;
         bb_mode_post_ln = 0;
         sym_mode_en     = 0;
-        alpha_flat_mode = 0;
 
         ctrl_scalar_sub_val = '0;
         for (int i=0; i<N; i++) begin
@@ -518,58 +516,6 @@ module tr_nonlinear_vpu_tb();
             $display("  -> [PASS] Complex GELU Symmetry routing successful.");
         else
             $error("  -> [FAIL] GELU routing failed. L0: %0d, L1: %0d", vpu_data_out[0], vpu_data_out[1]);
-
-        // ====================================================================
-        // TEST 4b: Saturating signed gate-multiply, vecmul_scale_mode=3'b100
-        // (change C -- see docs/llama_fpga_plan.md). Lane 0: in-range
-        // product (16*32=512, >>4=32, fits in int8 -- must equal mode 001's
-        // own wrap result exactly, since no overflow occurs). Lane 1:
-        // overflowing product (120*120=14400, >>4=900, does NOT fit in
-        // int8) -- mode 100 must SATURATE to 127, where mode 001 would wrap
-        // to a garbage negative value (confirmed separately: -124).
-        // ====================================================================
-        $display("\n[TEST 4b] Saturating signed gate-multiply (vecmul_scale_mode=3'b100)");
-        clear_crossbar();
-
-        mux_vecmul_a_sel  = 2'b00;
-        mux_vecmul_b_sel  = 2'b00;
-        vecmul_op_mode    = 2'd0;   // SS
-        vecmul_scale_mode = 3'b100; // new saturating signed mode
-        mux_vpu_out_sel   = 3'b000;
-
-        @(posedge clk);
-        en_vecmul_valid = 1;
-        sram_data_a = '{8'sd16, 8'sd120, 8'sd0, 8'sd0, 8'sd0, 8'sd0, 8'sd0, 8'sd0};
-        sram_data_b = '{8'sd32, 8'sd120, 8'sd0, 8'sd0, 8'sd0, 8'sd0, 8'sd0, 8'sd0};
-
-        @(posedge clk); en_vecmul_valid = 0;
-        repeat(4) @(posedge clk);
-
-        if (vpu_data_out[0] === 8'sd32 && vpu_data_out[1] === 8'sd127)
-            $display("  -> [PASS] In-range lane exact (32), overflowing lane saturated to 127 (not wrapped).");
-        else
-            $error("  -> [FAIL] Saturating gate-multiply failed. L0: %0d (exp 32), L1: %0d (exp 127)", vpu_data_out[0], vpu_data_out[1]);
-
-        // Negative-overflow case: -120*120 >>4 = -900, must saturate to -128.
-        clear_crossbar();
-        mux_vecmul_a_sel  = 2'b00;
-        mux_vecmul_b_sel  = 2'b00;
-        vecmul_op_mode    = 2'd0;
-        vecmul_scale_mode = 3'b100;
-        mux_vpu_out_sel   = 3'b000;
-
-        @(posedge clk);
-        en_vecmul_valid = 1;
-        sram_data_a = '{-8'sd120, 8'sd0, 8'sd0, 8'sd0, 8'sd0, 8'sd0, 8'sd0, 8'sd0};
-        sram_data_b = '{8'sd120, 8'sd0, 8'sd0, 8'sd0, 8'sd0, 8'sd0, 8'sd0, 8'sd0};
-
-        @(posedge clk); en_vecmul_valid = 0;
-        repeat(4) @(posedge clk);
-
-        if (vpu_data_out[0] === -8'sd128)
-            $display("  -> [PASS] Negative-overflow lane saturated to -128.");
-        else
-            $error("  -> [FAIL] Negative saturation failed. L0: %0d (exp -128)", vpu_data_out[0]);
 
         end // W_VEC==8 && FRAC_W==4
 

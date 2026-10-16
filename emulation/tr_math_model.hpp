@@ -261,15 +261,11 @@ inline void swiglu_hw_model(const int8_t x[8], const int8_t g[8], int8_t out[8])
 }
 
 // ============================================================================
-// SwiGLU "best-fit" -- change A (flat alpha=1, true SiLU slope) + change C
-// (saturating gate-multiply), BOTH IMPLEMENTED IN REAL RTL (see
-// alpha_stabilizer.sv's flat_mode port and tr_nonlinear_vpu.sv's
-// vecmul_scale_mode==3'b100 branch), bit-exact to that RTL -- confirmed via
-// tb_soc/peripheral_modules/alpha_stabilizer/alpha_stabilizer_tb.sv (change
-// A, exhaustive 256/256) and tb_soc/tr_nonlinear_vpu/tr_nonlinear_vpu_tb.sv
-// TEST 4b (change C, directed). Change B (wider BITS=8 ln) was measured and
-// dropped -- see docs/llama_fpga_plan.md and
-// tools/scripts/vpu_precision/results/SWIGLU_SUMMARY.md.
+// SwiGLU "best-fit" (flat alpha=1 + saturating gate-multiply) -- HISTORICAL REFERENCE ONLY. This was the model of
+// the first SwiGLU opcode pair (CMD=5/6 via alpha_stabilizer flat_mode and vecmul_scale_mode 3'b100). Both RTL
+// features have been removed (replaced by the two-pass sigma-ROM flow, sw_* below); the functions are kept because
+// tools/models/llama32_1b.py and tools/scripts/llama32_1b/ablate.py use them as the "as shipped" SwiGLU baseline of
+// the accuracy study (RTL history: git tag tr-vpu_rtl-ISCAS-20261013 and the commits after it).
 // ============================================================================
 inline int8_t alpha_stabilizer_model_flat(int8_t x) {
     // coef=16 (1.0 in Q4.4): x*16, >>4 == x unchanged, still saturate+negate

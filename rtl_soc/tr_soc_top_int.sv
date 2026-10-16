@@ -118,7 +118,6 @@ module tr_soc_top_int #(
     logic [1:0]                     bb_mode_post_ln;
     logic                           bb_ln_pre_scaled;
     logic                           sym_mode_en;
-    logic                           alpha_flat_mode;
     logic signed [W-1:0]            ctrl_scalar_sub_val;
     
     logic                           src_sram_a_sel;
@@ -185,7 +184,6 @@ module tr_soc_top_int #(
         .bb_mode_post_ln     (bb_mode_post_ln),
         .bb_ln_pre_scaled    (bb_ln_pre_scaled),
         .sym_mode_en         (sym_mode_en),
-        .alpha_flat_mode     (alpha_flat_mode),
         .ctrl_scalar_sub_val (ctrl_scalar_sub_val),
 
         .src_sram_a_sel      (src_sram_a_sel),
@@ -376,7 +374,6 @@ module tr_soc_top_int #(
         .bb_mode_post_ln     (bb_mode_post_ln),
         .bb_ln_pre_scaled    (bb_ln_pre_scaled),
         .sym_mode_en         (sym_mode_en),
-        .alpha_flat_mode     (alpha_flat_mode),
 
         .vpu_bb_valid_out    (vpu_bb_valid),
         .vpu_vecmul_valid_out(vpu_vecmul_valid),

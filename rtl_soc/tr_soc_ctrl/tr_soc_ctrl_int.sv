@@ -99,7 +99,6 @@ module tr_soc_ctrl_int #(
     output logic [1:0]              bb_mode_post_ln,
     output logic bb_ln_pre_scaled,  // 1: ln input already has FRAC_W+2 fractional bits (RMSNorm mean)
     output logic sym_mode_en,
-    output logic alpha_flat_mode,   // true alpha=1 sigmoid slope (SwiGLU's SiLU) -- see alpha_stabilizer.sv
     output logic signed [W-1:0]     ctrl_scalar_sub_val,
     output logic        [4:0]       rms_log2n_out,     // RMSNorm row length log2 (ADDR_RMS_LOG2N)
     output logic        [INV_W-1:0] inv_rms_out,       // RMSNorm wide inv_rms (reg_inv_rms)
@@ -600,7 +599,6 @@ module tr_soc_ctrl_int #(
         bb_mode_post_ln     = 2'b00;
         bb_ln_pre_scaled    = 1'b0;
         sym_mode_en         = 1'b0;
-        alpha_flat_mode     = 1'b0;
         ctrl_scalar_sub_val = '0;
         rm_offset_was_positive = 1'b0;
 
