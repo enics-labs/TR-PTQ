@@ -99,7 +99,7 @@ module tr_soc_top_int #(
     logic [1:0]                     mux_mac_a_sel;
     logic [1:0]                     mux_mac_b_sel;
     logic [1:0]                     mux_vecmul_a_sel;
-    logic [1:0]                     mux_vecmul_b_sel;
+    logic [2:0]                     mux_vecmul_b_sel;
     logic [2:0]                     mux_vpu_out_sel;
     
     logic                           en_piped_max;
@@ -125,7 +125,9 @@ module tr_soc_top_int #(
     logic                           src_sram_b_sel;
     logic                           write_ext_sram;
 
-    logic signed [W-1:0]            ctrl_scratch_a [N];
+    logic signed [11:0]             ctrl_scratch_a [N];     // SwiGLU wide silu (GELU uses the low 8 bits)
+    logic signed [19:0]             vpu_wide_out [N];
+    logic signed [5:0]              sw_shift;
     logic signed [W-1:0]            ctrl_scratch_b [N];
 
     // VPU Outputs
@@ -198,6 +200,8 @@ module tr_soc_top_int #(
         .vpu_exp_raw         (vpu_exp_raw),
         .rms_log2n_out       (rms_log2n),
         .inv_rms_out         (inv_rms),
+        .sw_shift_out        (sw_shift),
+        .vpu_wide_out        (vpu_wide_out),
         
         .vpu_bb_valid        (vpu_bb_valid),
         .vpu_vecmul_valid    (vpu_vecmul_valid),
@@ -314,7 +318,7 @@ module tr_soc_top_int #(
     always_comb begin
         for(int i = 0; i < N; i++) begin
             if (src_sram_a_sel) begin
-                vpu_sram_a_in[i] = ctrl_scratch_a[i];
+                vpu_sram_a_in[i] = ctrl_scratch_a[i][W-1:0];
             end else if (i < M) begin
                 vpu_sram_a_in[i] = req_vec_out[i];
             end else begin
@@ -345,6 +349,9 @@ module tr_soc_top_int #(
         .vpu_exp_raw         (vpu_exp_raw),
         .rms_log2n           (rms_log2n),
         .inv_rms_in          (inv_rms),
+        .sw_silu_in          (ctrl_scratch_a),
+        .sw_shift            (sw_shift),
+        .vpu_wide_out        (vpu_wide_out),
         
         .mux_bb_in_sel       (mux_bb_in_sel),
         .mux_mac_a_sel       (mux_mac_a_sel),

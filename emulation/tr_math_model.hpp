@@ -348,6 +348,68 @@ inline void swiglu_hw_model_dedicated(const int8_t x[8], const int8_t g[8], int8
 static const int RMSNORM_CONST_LN_SQRT_N = 17;   // 0.5*ln(8) in Q4.4, N=8
 
 // ----------------------------------------------------------------------------
+// SwiGLU, Llama-width (ffn_h = silu(gate) * up over rows of N = 8*groups), host-sequenced in 8-lane groups.
+// Software spec: tools/models/vpu_ops.py::swiglu (RECOMMENDED, sw_gain="dynamic", two-pass realization).
+//   sw_silu_group : silu_s[i] = sat12((x[i]*SIGMA[x[i]] + 2) >> 2)   (sigma ROM, x = gate code, Q4.4)
+//   sw_max_group  : running max of |silu_s[i]*up[i]| over the row         (pass 1, per group)
+//   sw_gain       : e = clip(floor(log2(127*2^10 / (4*max))), -8, 12)      (once per row; consumes the max)
+//   sw_apply_group: y[i] = sat8(round_shift(4*silu_s[i]*up[i], 10 - e))    (pass 2, per group)
+// SIGMA[x+128] = sigmoid(x/16) in Q.6 as produced by the alpha->exp->+1->ln->neg->exp chain at FRAC_W=6 with the
+// unified ln (flat alpha, x<0: 64-recip); a 256x6-bit ROM in the VPU replaces the three chain passes.
+// ----------------------------------------------------------------------------
+static const uint8_t SW_SIGMA[256] = {
+     1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,
+     1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,
+     1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,
+     1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  2,  2,  2,
+     2,  2,  2,  2,  2,  2,  2,  2,  3,  3,  3,  3,  3,  3,  3,  3,
+     3,  3,  3,  3,  4,  4,  4,  4,  5,  5,  6,  6,  6,  7,  7,  7,
+     7,  8,  8,  9, 10, 10, 11, 11, 11, 12, 13, 14, 14, 14, 15, 17,
+    17, 17, 19, 20, 21, 21, 22, 22, 24, 24, 27, 28, 29, 30, 31, 32,
+    31, 32, 33, 34, 35, 36, 37, 40, 40, 42, 42, 43, 43, 44, 45, 47,
+    47, 47, 49, 50, 50, 50, 51, 52, 53, 53, 53, 54, 54, 55, 56, 56,
+    57, 57, 57, 57, 58, 58, 58, 59, 59, 60, 60, 60, 60, 61, 61, 61,
+    61, 61, 61, 61, 61, 61, 61, 61, 61, 62, 62, 62, 62, 62, 62, 62,
+    62, 62, 62, 62, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63,
+    63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63,
+    63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63,
+    63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63, 63,
+};
+static const int SW_FRAC_W = 6;
+static const int SW_TOTAL  = SW_FRAC_W + 4;   // prod = silu * up has FRAC_W+4 fractional bits
+static const int SW_DROP   = 2;               // silu_w (14 bit) -> silu_s (12 bit)
+
+inline int32_t sw_silu(int8_t x) {
+    int32_t w = (int32_t)x * (int32_t)SW_SIGMA[(int)x + 128];
+    int32_t s = (w + (1 << (SW_DROP - 1))) >> SW_DROP;
+    return s > 2047 ? 2047 : (s < -2048 ? -2048 : s);
+}
+
+inline int32_t sw_abs_prod(int32_t silu_s, int8_t up) {   // |silu_s * up| (unscaled by the <<SW_DROP)
+    int32_t p = silu_s * (int32_t)up;
+    return p < 0 ? -p : p;
+}
+
+inline int sw_gain(int32_t max_abs_p) {
+    int64_t mx = (int64_t)max_abs_p << SW_DROP;
+    if (mx < 1) mx = 1;
+    const int64_t R = 127LL << SW_TOTAL;
+    int e = -8;
+    for (int k = -8; k <= 12; k++) {                       // largest k with mx * 2^k <= R
+        bool ok = k >= 0 ? ((mx << k) <= R) : (mx <= (R << -k));
+        if (ok) e = k;
+    }
+    return e;
+}
+
+inline int8_t sw_apply(int32_t silu_s, int8_t up, int e) {
+    int64_t prod = ((int64_t)silu_s * (int64_t)up) << SW_DROP;
+    int sh = SW_TOTAL - e;                                 // negative: left shift (tiny rows)
+    int64_t y = sh > 0 ? ((prod + (1LL << (sh - 1))) >> sh) : (prod << -sh);
+    return (int8_t)(y > 127 ? 127 : (y < -128 ? -128 : y));
+}
+
+// ----------------------------------------------------------------------------
 // RMSNorm, Llama-width (N = 8 * tiles) -- software spec is
 // tools/models/vpu_ops.py::rmsnorm (RECOMMENDED knobs: rms_k=2, rms_inv_bits=4, rounded shifts,
 // W_MAC=16, unified ln at BITS=FRAC_W+k). Decomposed exactly as the hardware will run it, one

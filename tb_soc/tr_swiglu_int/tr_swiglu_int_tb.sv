@@ -1,24 +1,20 @@
 `timescale 1ns/1ps
 
-// File-I/O testbench for the PRODUCTION SwiGLU opcode PAIR: drives
-// tr_soc_top_int through CMD=0x05 (SiLU, SW_P1..P3) then CMD=0x06
-// (gate-multiply, SW_P4) -- the real control-path integration added per
-// docs/llama_fpga_plan.md's changes A (alpha_stabilizer flat_mode) and C
-// (tr_nonlinear_vpu.sv's saturating vecmul_scale_mode=3'b100). Modeled
-// directly on tr_gelu_int_tb.sv's load_vector()/mmio_write() pattern --
-// CMD=5 needs "x" staged exactly like GELU's input (c_vec[0..3] via the
-// requantizer passthrough, ext_sram_b[4..7] directly); CMD=6 needs "g"
-// staged differently: ALL 8 lanes via ext_sram_b directly (SW_P4 reads
-// sram_b with src_sram_b_sel=0, which routes every lane from ext_sram_b,
-// unlike sram_a's req_vec_out/ext_sram_b M-lane split) -- no dot-product
-// injection needed for g.
+// File-I/O testbench for the PRODUCTION two-pass SwiGLU: drives tr_soc_top_int through the host-sequenced
+// command set of tr_soc_ctrl_int.sv (cmd 5 silu group, 6 max group, 0xB row gain, 0xC apply group):
+//   pass 1, per 8-lane group: stage gate x, CMD=5;  stage up u, CMD=6
+//   once per row:             CMD=0xB, then read the gain e at ADDR_SW_E (0x1C)
+//   pass 2, per group:        stage x, CMD=5;  stage u, CMD=0xC  -> int8 result
+// One row (n elements) per input line: inputs.txt "n g0..g(n-1) u0..u(n-1)"; hdl_out.txt "e y0..y(n-1)".
+// Golden: cpu_math_model.cpp "swiglu" (sw_* in tr_math_model.hpp), bit-exact to tools/models/vpu_ops.py::swiglu.
 //
-// Golden reference: swiglu_hw_scalar_bestfit() via cpu_math_model.cpp's
-// "swiglu" mode (tr_math_model.hpp) -- bit-exact to what these two
-// opcodes are DESIGNED to compute, confirmed independently against the
-// compiled ctypes model and the Python model earlier in this work (0/20000
-// mismatches). This is deliberately NOT tr_swiglu.sv's own precision (the
-// "swiglu_baseline" mode/block) -- see docs/llama_fpga_plan.md for why.
+// The VPU's 8-wide input is composed of two paths (see tr_soc_top_int.sv):
+//   lanes 0..M-1 (0..3): requantizer output, fed via c_vec passthrough
+//                        (a_mat=0, b_vec=0, mult=1, shift=0 => output = c_vec)
+//   lanes M..N-1 (4..7): ext_sram_b, driven directly
+// So an arbitrary 8-element RMSNorm input x[0..7] is supplied as
+// c_vec[0..3]=x[0..3], ext_sram_b[4..7]=x[4..7].
+//
 module tb_tr_swiglu_int();
 
     localparam int M = 4;
@@ -78,11 +74,9 @@ module tb_tr_swiglu_int();
         end while ((status & 32'h2) == 0);
     endtask
 
-    // Stages "x": c_vec[0..3] + ext_sram_b[4..7], via the identity-requantizer
-    // passthrough -- exactly tr_gelu_int_tb.sv's load_vector(), needed because
-    // CMD=5's SW_P1 and SW_P3 both read x via req_vec_out/ext_sram_b
-    // (src_sram_a_sel=0).
-    task automatic load_x(input logic signed [W-1:0] x [N]);
+    // Fires the passthrough MAC (c_vec[0..3] + ext_sram_b[4..7]) and waits for
+    // the requantizer, exactly as tr_soc_top_int_tb.sv's load_mac_vector does.
+    task automatic load_vector(input logic signed [W-1:0] x [N]);
         @(posedge clk);
         dot_in_valid = 1;
         clear_acc    = 1;
@@ -95,16 +89,14 @@ module tb_tr_swiglu_int();
         repeat (2) @(posedge clk);
     endtask
 
-    // Stages "g": ALL N lanes directly via ext_sram_b -- CMD=6's SW_P4 reads
-    // sram_b with src_sram_b_sel=0, which has no M-lane split (unlike
-    // sram_a), so no dot-product injection is needed here at all.
-    task automatic load_g(input logic signed [W-1:0] g [N]);
-        for (int i = 0; i < N; i++) ext_sram_b[i] = g[i];
-        @(posedge clk);
-    endtask
+    int file_in, file_out, num_rows, dummy;
+    int n, v_in;
 
-    int file_in, file_out, num_vecs, dummy;
-    int x_s[N], g_s[N];
+    task automatic stage_group(input logic signed [W-1:0] row [], input int base);
+        logic signed [W-1:0] tile [N];
+        for (int i = 0; i < N; i++) tile[i] = row[base + i];
+        load_vector(tile);
+    endtask
 
     initial begin
         rst_n = 0; mmio_wen = 0; dot_in_valid = 0; clear_acc = 1;
@@ -116,37 +108,48 @@ module tb_tr_swiglu_int();
 
         file_in  = $fopen("inputs.txt",  "r");
         file_out = $fopen("hdl_out.txt", "w");
-        dummy    = $fscanf(file_in, "%0d\n", num_vecs);
+        dummy    = $fscanf(file_in, "%0d\n", num_rows);
 
         #22 rst_n = 1;
 
-        // Requantizer pass-through: mult=1, shift=0 => c_vec passes unchanged
-        // (needed for x's lanes 0..3 via the dot-product injection trick).
+        // Requantizer pass-through: mult=1, shift=0 => c_vec passes unchanged.
         mmio_write(8'h08, 32'd1);   // REQ_MULT
         mmio_write(8'h0C, 32'd0);   // REQ_SHIFT
 
-        for (int v = 0; v < num_vecs; v++) begin
-            logic signed [W-1:0] x [N];
-            logic signed [W-1:0] g [N];
-            dummy = $fscanf(file_in, "%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d\n",
-                x_s[0], x_s[1], x_s[2], x_s[3], x_s[4], x_s[5], x_s[6], x_s[7],
-                g_s[0], g_s[1], g_s[2], g_s[3], g_s[4], g_s[5], g_s[6], g_s[7]);
-            for (int i = 0; i < N; i++) x[i] = W'(x_s[i]);
-            for (int i = 0; i < N; i++) g[i] = W'(g_s[i]);
+        for (int r = 0; r < num_rows; r++) begin
+            logic signed [W-1:0] gate [];
+            logic signed [W-1:0] up   [];
+            logic signed [W-1:0] y    [];
 
-            load_x(x);
-            mmio_write(8'h00, 32'h05);  // CMD = SiLU (SwiGLU pass 1/2)
-            wait_for_done();
+            dummy = $fscanf(file_in, "%d", n);
+            gate = new[n]; up = new[n]; y = new[n];
+            for (int i = 0; i < n; i++) begin dummy = $fscanf(file_in, "%d", v_in); gate[i] = W'(v_in); end
+            for (int i = 0; i < n; i++) begin dummy = $fscanf(file_in, "%d", v_in); up[i]   = W'(v_in); end
+            dummy = $fscanf(file_in, "\n");
 
-            load_g(g);
-            mmio_write(8'h00, 32'h06);  // CMD = gate-multiply (SwiGLU pass 2/2)
-            wait_for_done();
+            // Pass 1: running max of |silu * up|
+            for (int g = 0; g < n / N; g++) begin
+                stage_group(gate, g*N); mmio_write(8'h00, 32'h05); wait_for_done();
+                stage_group(up,   g*N); mmio_write(8'h00, 32'h06); wait_for_done();
+            end
 
-            $fwrite(file_out, "%0d %0d %0d %0d %0d %0d %0d %0d\n",
-                $signed(vpu_data_out[0]), $signed(vpu_data_out[1]),
-                $signed(vpu_data_out[2]), $signed(vpu_data_out[3]),
-                $signed(vpu_data_out[4]), $signed(vpu_data_out[5]),
-                $signed(vpu_data_out[6]), $signed(vpu_data_out[7]));
+            // Row gain
+            mmio_write(8'h00, 32'h0B); wait_for_done();
+            begin
+                logic signed [31:0] e_rd;
+                @(posedge clk); mmio_addr = 8'h1C; mmio_wen = 0; #1 e_rd = mmio_rdata;
+                $fwrite(file_out, "%0d", $signed(e_rd));
+            end
+
+            // Pass 2: requantize with the row gain
+            for (int g = 0; g < n / N; g++) begin
+                stage_group(gate, g*N); mmio_write(8'h00, 32'h05); wait_for_done();
+                stage_group(up,   g*N); mmio_write(8'h00, 32'h0C); wait_for_done();
+                for (int i = 0; i < N; i++) y[g*N + i] = vpu_data_out[i];
+            end
+
+            for (int i = 0; i < n; i++) $fwrite(file_out, " %0d", $signed(y[i]));
+            $fwrite(file_out, "\n");
         end
 
         $fclose(file_in);

@@ -47,6 +47,19 @@ static bool run_eval_mode(const std::string& mode, const std::string& in_path,
             fout << inv;
             for (int i = 0; i < n; i++) fout << " " << (int)y[i];
             fout << "\n";
+        } else if (mode == "swiglu") {
+            // line: "n g0..g(n-1) u0..u(n-1)" -> "e y0..y(n-1)"  (two-pass SwiGLU row, see sw_* in tr_math_model.hpp)
+            int n; iss >> n;
+            std::vector<int8_t> g(n), u(n), y(n);
+            for (int i = 0; i < n; i++) { int v; iss >> v; g[i] = (int8_t)v; }
+            for (int i = 0; i < n; i++) { int v; iss >> v; u[i] = (int8_t)v; }
+            int32_t mx = 0;
+            for (int i = 0; i < n; i++) { int32_t a = sw_abs_prod(sw_silu(g[i]), u[i]); if (a > mx) mx = a; }
+            int e = sw_gain(mx);
+            for (int i = 0; i < n; i++) y[i] = sw_apply(sw_silu(g[i]), u[i], e);
+            fout << e;
+            for (int i = 0; i < n; i++) fout << " " << (int)y[i];
+            fout << "\n";
         } else if (mode == "rmsnorm_baseline") {
             int8_t x[8], y[8];
             for (int i = 0; i < 8; i++) { int v; iss >> v; x[i] = (int8_t)v; }
@@ -390,34 +403,52 @@ int main(int argc, char* argv[]) {
         std::cout << "[C++ MODEL] Generated SWIGLU_BASELINE vectors." << std::endl;
     }
     else if (mode == "swiglu") {
-        // Golden vectors for the REAL tr_soc_ctrl_int CMD=5/6 opcode pair
-        // (SW_P1..P4) -- best-fit precision (change A: flat alpha=1, change
-        // C: saturating gate-multiply), via swiglu_hw_scalar_bestfit(), NOT
-        // the "swiglu_baseline" mode above (which models tr_swiglu.sv's own
-        // as-shipped, non-flat-alpha, wrapping precision). See
-        // docs/llama_fpga_plan.md.
-        const int N_LANES = 8;
-        const int N_VECS  = 256;
-        vec_file << N_VECS << "\n";
+        // PRODUCTION two-pass SwiGLU (cmds 5/6/0xB/0xC, host-sequenced in 8-lane groups). One row per line:
+        // input "n g0..g(n-1) u0..u(n-1)" (gate / up int8 codes), expected "e y0..y(n-1)" with e the row gain
+        // read back from the controller. Row mix: heavy-tailed gate/up (what the FFN produces), gate outliers
+        // at the int8 limits, an all-zero up row (e = 12, left-shift path), a tiny-product row, saturating rows;
+        // n = 8 .. 8192 (Llama-3.2-1B intermediate size).
+        static const int NS[] = {8, 8, 16, 64, 256, 256, 1024, 1024, 8192, 8192};
+        const int N_ROWS = 40;
+        vec_file << N_ROWS << "\n";
         srand(2024);
-
-        for (int i = 0; i < N_VECS; i++) {
-            int x[N_LANES], g[N_LANES];
-
-            for (int j = 0; j < N_LANES; j++) x[j] = (rand() % 256) - 128;
-            for (int j = 0; j < N_LANES; j++) g[j] = (rand() % 256) - 128;
-
-            for (int j = 0; j < N_LANES; j++) vec_file << x[j] << " ";
-            for (int j = 0; j < N_LANES; j++) vec_file << g[j] << (j == N_LANES - 1 ? "" : " ");
-            vec_file << "\n";
-
-            for (int j = 0; j < N_LANES; j++) {
-                int8_t y = swiglu_hw_scalar_bestfit((int8_t)x[j], (int8_t)g[j]);
-                exp_file << (int)y << (j == N_LANES - 1 ? "" : " ");
+        auto tdist = [](double scale) {                       // heavy-tailed int8 sample
+            double a = (rand() / (double)RAND_MAX - 0.5) * 2, b = (rand() / (double)RAND_MAX - 0.5) * 2;
+            double v = (a * a * a + 0.5 * b) * scale;
+            int r = (int)(v < 0 ? v - 0.5 : v + 0.5);
+            return r > 127 ? 127 : (r < -128 ? -128 : r);
+        };
+        for (int r = 0; r < N_ROWS; r++) {
+            int n = NS[r % 10];
+            int kind = (r / 10) % 4 + (r % 7 == 0 ? 4 : 0);
+            std::vector<int8_t> g(n), u(n), y(n);
+            for (int i = 0; i < n; i++) {
+                int gv, uv;
+                switch (kind) {
+                    case 0: gv = tdist(40);  uv = tdist(60);  break;
+                    case 1: gv = tdist(100); uv = tdist(100); break;
+                    case 2: gv = (rand() % 256) - 128; uv = (rand() % 256) - 128; break;   // uniform
+                    case 3: gv = tdist(8);   uv = tdist(6);   break;                        // small
+                    case 4: gv = -128 + (rand() % 8); uv = (rand() % 5) - 2; break;          // tiny products (gate ~ -8)
+                    case 5: gv = (rand() % 8 == 0) ? 127 : tdist(30); uv = 127; break;       // saturating
+                    case 6: gv = tdist(60);  uv = 0;          break;                        // all-zero up -> e = 12
+                    default: gv = tdist(20); uv = (rand() % 3) - 1; break;
+                }
+                g[i] = (int8_t)gv; u[i] = (int8_t)uv;
             }
+            vec_file << n;
+            for (int i = 0; i < n; i++) vec_file << " " << (int)g[i];
+            for (int i = 0; i < n; i++) vec_file << " " << (int)u[i];
+            vec_file << "\n";
+            int32_t mx = 0;
+            for (int i = 0; i < n; i++) { int32_t a = sw_abs_prod(sw_silu(g[i]), u[i]); if (a > mx) mx = a; }
+            int e = sw_gain(mx);
+            for (int i = 0; i < n; i++) y[i] = sw_apply(sw_silu(g[i]), u[i], e);
+            exp_file << e;
+            for (int i = 0; i < n; i++) exp_file << " " << (int)y[i];
             exp_file << "\n";
         }
-        std::cout << "[C++ MODEL] Generated SWIGLU (best-fit, CMD=5/6) vectors." << std::endl;
+        std::cout << "[C++ MODEL] Generated two-pass SWIGLU test vectors." << std::endl;
     }
     else if (mode == "gelu" || mode == "gelu_baseline") {
         // gelu_baseline (tr_gelu.sv, tb_baseline/tr_baseline/tr_gelu/)
