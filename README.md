@@ -4,18 +4,18 @@ Cadence Genus synthesis flow (65 nm TSMC/ARM standard cells) for the TR-PTQ VPU 
 This is `tr-vpu_synthesis`, the synthesis-only branch of [TR-PTQ](https://github.com/enics-labs/TR-PTQ).
 The RTL lives on the `tr-vpu_rtl` branch and is pulled in here as the `tr-vpu_rtl/` submodule.
 
-Reports of the paper-era designs (I-BERT and standalone TR baselines, MX top, bit-width sweeps) are not kept
+Reports of the paper-era designs (I-BERT and standalone TR baselines, MX top, GELU build, bit-width sweeps) are not kept
 in this branch; they are preserved at the tag `tr-vpu_synthesis-ISCAS-20261013`.
 
 ## Current results
 
-Default build (no GELU), clock 3.3 ns, `ss_typical_max_0p90v_125c`. Cell area in library units.
+Clock 3.3 ns, `ss_typical_max_0p90v_125c`. Cell area in library units.
 
 | Top level | RTL commit | Timing | Cell area | Notes |
 |---|---|---|---|---|
 | `tr_soc_top_int` | `56c819e` | met, 0 violating paths | 178,000 | `u_vpu` 46,706; power 33.3 mW (vectorless) |
 | `tr_nonlinear_vpu` (standalone) | `e65eb37` | in2reg -10 ps | 56,721 | the violating path is an input-delay artifact of standalone runs |
-| `tr_backbone_wrapper` (standalone) | `2c7ce3a` | met | 26,760 | before the GELU-free default; includes all 8 ln lanes |
+| `tr_backbone_wrapper` (standalone) | `2c7ce3a` | met | 26,760 | before the removal of the ln units on lanes 1 to 7; includes all 8 ln lanes |
 
 Raw reports: `reports/<top level>/synthesis/`. Analysis and history: `docs/llama/synthesis-results.md`
 in the [integration repository](https://github.com/YoniP31/tr-ptq-ddp23).
@@ -24,7 +24,7 @@ in the [integration repository](https://github.com/YoniP31/tr-ptq-ddp23).
 
 | Path | Content |
 |---|---|
-| `tr-vpu_rtl/` | submodule: the RTL (only `rtl_soc/` and `rtl_baseline/` are read) |
+| `tr-vpu_rtl/` | submodule: the RTL (only `rtl_soc/` is read) |
 | `inputs/dut.defines`, `inputs/dut.sdc` | technology, clock period (3.3 ns), I/O delays, DRV limits, path layout, RTL roots |
 | `libraries/` | TSMC65LP / ARM65LP standard-cell, SRAM and IO library configuration |
 | `scripts/` | `genus.tcl` (main flow), `report_power.tcl`, `report_power_activity.tcl`, `run_sweep.tcl`, `procedures.tcl` |
@@ -48,9 +48,9 @@ cd workspace
 genus -execute \"set TOPLEVEL <module>\" -f ../scripts/genus.tcl -log <module>_synth
 ```
 
-- `<module>` is any module under `tr-vpu_rtl/rtl_soc/` or `tr-vpu_rtl/rtl_baseline/`
+- `<module>` is any module under `tr-vpu_rtl/rtl_soc/`
   (typically `tr_soc_top_int`, `tr_nonlinear_vpu`, `tr_backbone_wrapper`).
-  `genus.tcl` reads every `.sv` file in both trees and elaborates only the module you name.
+  `genus.tcl` reads every `.sv` file under that tree and elaborates only the module you name.
 - The escaped quotes are required for `-execute` in this environment.
 - The flow reads the libraries and RTL, synthesizes (generic, mapped, optimized) at high effort, exports the
   design to `export/<module>/post_synth/`, and then writes the reports.
@@ -58,12 +58,6 @@ genus -execute \"set TOPLEVEL <module>\" -f ../scripts/genus.tcl -log <module>_s
   overrides `-execute`; run `unsetenv TOPLEVEL` before starting a new run.
 - Reports are named by top level only, so a second run of the same module overwrites the first.
   Rename `reports/<module>/synthesis` before re-running if you want to keep it.
-
-### Build flavors
-
-The RTL has a compile-time `GELU_EN` switch. The default build has no GELU (the Llama configuration). To synthesize
-the GELU build, add `-define GELU_ENABLE` to the `read_hdl` call in `genus.tcl`, or elaborate a standalone block
-with `-parameters {{GELU_EN 1}}`. See the RTL branch documentation for what the switch removes.
 
 ### Power
 

@@ -6,7 +6,7 @@
 #  Recursively collects every file matching $pattern under each directory
 #  in $dirs. Tcl's own [glob] has no recursive/** form, so this walks
 #  subdirectories by hand. Used by genus.tcl to read the whole RTL tree
-#  (rtl_soc/ + rtl_baseline/) without needing a per-block file manifest --
+#  (rtl_soc/) without needing a per-block file manifest --
 #  elaborate $TOPLEVEL afterwards picks out just the one module that
 #  matters; unused modules sit unreferenced in the library.
 ##################################################

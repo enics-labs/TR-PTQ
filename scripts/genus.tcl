@@ -76,7 +76,7 @@ enics_start_stage "read_rtl"
 
 set_db hdl_language v2001 -quiet
 
-# Read every .sv under rtl_soc/ and rtl_baseline/ -- no per-block file
+# Read every .sv under rtl_soc/ -- no per-block file
 # manifest to keep in sync. elaborate (below) picks out just $TOPLEVEL;
 # everything else sits unreferenced in the library.
 set rtl_files [enics_glob_recursive $design(rtl_dirs) "*.sv"]

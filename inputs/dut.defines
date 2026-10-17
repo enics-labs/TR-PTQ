@@ -71,7 +71,6 @@ set design(inputs_dir) "$design(project_root)/inputs"
 # elaborate $design(TOPLEVEL) afterwards picks out just the target module.
 set design(rtl_dirs) [list \
     "$design(project_root)/tr-vpu_rtl/rtl_soc" \
-    "$design(project_root)/tr-vpu_rtl/rtl_baseline" \
 ]
 
 set design(scripts_dir) "$design(project_root)/scripts"
