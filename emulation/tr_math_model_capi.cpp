@@ -38,17 +38,6 @@ void tr_hw_rmsnorm_signguard_fixed_batch(const int8_t* x, int8_t* out, int32_t n
         rmsnorm_hw_model_signguard_fixed(x + g * 8, out + g * 8);
 }
 
-// x, out: 8 int8 each.
-void tr_hw_gelu(const int8_t* x, int8_t* out) {
-    gelu_hw_model(x, out);
-}
-
-// Batched GELU: n independent elements (no grouping needed -- see
-// gelu_hw_scalar's comment) in one call.
-void tr_hw_gelu_batch(const int8_t* x, int8_t* out, int32_t n) {
-    for (int32_t i = 0; i < n; i++) out[i] = gelu_hw_scalar(x[i]);
-}
-
 // x, g, out: 8 int8 each. Bit-exact to the SHARED CROSSBAR precision (the
 // planned tr_soc_ctrl_int SW_P1..P4 opcode sequence), deliberately NOT to
 // tr_swiglu.sv's standalone module -- see swiglu_hw_model's comment in

@@ -7,7 +7,7 @@
 #include <string>
 
 // Single source of truth for all the bit-exact hardware math models
-// (alpha_stabilizer_model, gelu_exp_q44, gelu_hw_model, rmsnorm_hw_model,
+// (exp/ln primitives, rmsnorm_hw_model,
 // quant_model, matmul_model) and the tr_math.cuh exp/ln primitives — shared
 // with the ctypes-callable library (tr_math_model_capi.cpp /
 // tools/infra/tr_math_hw.py) so there is exactly one implementation of each op.
@@ -59,18 +59,6 @@ static bool run_eval_mode(const std::string& mode, const std::string& in_path,
             for (int i = 0; i < n; i++) y[i] = sw_apply(sw_silu(g[i]), u[i], e);
             fout << e;
             for (int i = 0; i < n; i++) fout << " " << (int)y[i];
-            fout << "\n";
-        } else if (mode == "rmsnorm_baseline") {
-            int8_t x[8], y[8];
-            for (int i = 0; i < 8; i++) { int v; iss >> v; x[i] = (int8_t)v; }
-            rmsnorm_hw_model(x, y);
-            for (int i = 0; i < 8; i++) fout << (int)y[i] << (i == 7 ? "" : " ");
-            fout << "\n";
-        } else if (mode == "gelu" || mode == "gelu_baseline") {
-            int8_t x[8], y[8];
-            for (int i = 0; i < 8; i++) { int v; iss >> v; x[i] = (int8_t)v; }
-            gelu_hw_model(x, y);
-            for (int i = 0; i < 8; i++) fout << (int)y[i] << (i == 7 ? "" : " ");
             fout << "\n";
         } else if (mode == "quant") {
             int64_t acc[4]; int32_t mult; int shift; int8_t y[4];
@@ -167,37 +155,6 @@ int main(int argc, char* argv[]) {
             exp_file << "\n";
         }
         std::cout << "[C++ MODEL] Generated tiled RMSNORM test vectors." << std::endl;
-    }
-    else if (mode == "rmsnorm_baseline") {
-        // rmsnorm_baseline (tr_rmsnorm.sv, tb_baseline/tr_baseline/tr_rmsnorm/)
-        // implements the identical 4-pass algorithm as production
-        // tr_soc_ctrl_int's RM_P1..RM_P4 (sign-guard/recip_lut included --
-        // see its own header comment), so it validates against the SAME
-        // golden vectors as "rmsnorm", unlike softmax_baseline below which
-        // is a genuinely different algorithm needing its own model.
-        //
-        // NOTE: rmsnorm_hw_model does NOT implement the sign-guard fix
-        // documented above rmsnorm_hw_model_signguard_fixed -- both this
-        // and the production RTL DO have that fix, so this golden model can
-        // mismatch real RTL specifically when ctrl_scalar goes positive
-        // (small Sum(x^2)). Left as-is for now (matches what "rmsnorm" has
-        // always tested against); see the write-up referenced above
-        // rmsnorm_hw_model_signguard_fixed if that gap starts mattering.
-        const int N_VECS = 256;
-        vec_file << N_VECS << "\n";
-        srand(1337);
-        for (int i = 0; i < N_VECS; i++) {
-            int8_t x[8], y[8];
-            for (int j = 0; j < 8; j++) {
-                x[j] = (int8_t)((rand() % 256) - 128);
-                vec_file << (int)x[j] << (j == 7 ? "" : " ");
-            }
-            vec_file << "\n";
-            rmsnorm_hw_model(x, y);
-            for (int j = 0; j < 8; j++) exp_file << (int)y[j] << (j == 7 ? "" : " ");
-            exp_file << "\n";
-        }
-        std::cout << "[C++ MODEL] Generated RMSNORM test vectors." << std::endl;
     }
     else if (mode == "quant") {
         // Realistic (mult, shift) pairs map SOME expected max accumulator range
@@ -313,106 +270,6 @@ int main(int argc, char* argv[]) {
         }
         std::cout << "[C++ MODEL] Generated SOFTMAX (production tr_soc_top_int path, probs + z) vectors." << std::endl;
     }
-    else if (mode == "softmax_baseline") {
-        // The standalone tr_softmax.sv module (tb_baseline/tr_baseline/tr_softmax/)
-        // -- NOT instantiated by tr_soc_top_int.sv, same trap gelu/rmsnorm
-        // already fell into (see tr_gelu_int_tb.sv). Kept only so that module
-        // can still be checked in isolation if anyone cares to.
-        vec_file << "256\n";
-        srand(1337);
-
-        for (int i = 0; i < 256; i++) {
-            int x[8];
-            int row_max = -128; // Simulating INT_MIN for Q4.4 8-bit limits
-            
-            // 1. Generate Row and Find Max (Mirrors CUDA Pass 1)
-            for (int j = 0; j < 8; j++) {
-                x[j] = (rand() % 256) - 128;
-                if (x[j] > row_max) row_max = x[j];
-                vec_file << x[j] << (j == 7 ? "" : " ");
-            }
-            vec_file << "\n";
-
-            // 2. Compute Sum of Exponents (Mirrors CUDA Pass 2)
-            // Uses 2nd-order Taylor approximation matching HDL tr_exp_alu ITER=2.
-            int local_sum = 0;
-            for (int j = 0; j < 8; j++) {
-                int z = x[j] - row_max;
-                local_sum += tr_approx_exp_scalar_2rd(z);
-            }
-
-            int denom = local_sum;
-            if (denom < 1) denom = 1;
-
-            // 3. Compute Final Output with Division (Mirrors CUDA Pass 3)
-            for (int j = 0; j < 8; j++) {
-                int z = x[j] - row_max;
-                int e = tr_approx_exp_scalar_2rd(z);
-
-                // CUDA logic (Q0.8, scale 256): softmax output is always in
-                // [0,1], so keep it as an UNSIGNED Q0.8 value instead of
-                // shifting down to Q4.4 (scale 16) -- Q4.4 spent 4 bits on an
-                // integer range this value never uses. Saturate at 255
-                // (~0.996) rather than wrap (e.g. a single dominant logit
-                // drives e == denom, giving exactly 256 before saturation).
-                int y_q08 = (e << 8) / denom;
-                if (y_q08 > 255) y_q08 = 255;
-
-                exp_file << y_q08 << (j == 7 ? "" : " ");
-            }
-            exp_file << "\n";
-        }
-        std::cout << "[C++ MODEL] Generated SOFTMAX vectors using 2nd-order exp + exact division (Q0.8 unsigned output)." << std::endl;
-    }
-    else if (mode == "swiglu_baseline") {
-        const int N_LANES = 8;
-        const int N_VECS  = 256;
-        vec_file << N_VECS << "\n";
-        srand(1337);
-
-        for (int i = 0; i < N_VECS; i++) {
-            int x[N_LANES], g[N_LANES];
-
-            for (int j = 0; j < N_LANES; j++) x[j] = (rand() % 256) - 128;
-            for (int j = 0; j < N_LANES; j++) g[j] = (rand() % 256) - 128;
-
-            // Write x[0..7] g[0..7] on one line
-            for (int j = 0; j < N_LANES; j++) vec_file << x[j] << " ";
-            for (int j = 0; j < N_LANES; j++) vec_file << g[j] << (j == N_LANES - 1 ? "" : " ");
-            vec_file << "\n";
-
-            for (int j = 0; j < N_LANES; j++) {
-                int8_t xq = (int8_t)x[j];
-                int8_t gq = (int8_t)g[j];
-
-                // Pass 0: E = exp(-alpha|x|)
-                int8_t alpha_q44 = alpha_stabilizer_model(xq);
-                int    E_q44     = gelu_exp_q44(alpha_q44);
-
-                // Pass 1: recip = 1/(1+E) via exp(-ln(1+E))
-                int    pre_ln_q44  = E_q44 + 16;
-                int    ln_yq8      = tr_hw_ln(pre_ln_q44 << 4, 8, 12);
-                if (ln_yq8 >  2047) ln_yq8 =  2047;
-                if (ln_yq8 < -2048) ln_yq8 = -2048;
-                int8_t ln_out_q44  = (int8_t)((ln_yq8 + 8) >> 4);
-                int8_t neg_ln_q44  = (int8_t)(-(int16_t)ln_out_q44);
-                int    recip_q44   = gelu_exp_q44(neg_ln_q44);
-
-                // Pass 2: silu = x * sigma(x)  [mirrors SU multiply → [11:4]]
-                int sigma_q44  = (xq < 0) ? (16 - recip_q44) : recip_q44;
-                int silu_prod  = (int32_t)(int8_t)xq * (int32_t)(uint8_t)sigma_q44;
-                int8_t silu_q44 = (int8_t)(silu_prod >> 4);
-
-                // Pass 3: y = silu * g  [SS multiply → [11:4]]
-                int32_t final_prod = (int32_t)(int8_t)silu_q44 * (int32_t)(int8_t)gq;
-                int8_t  y_q44      = (int8_t)(final_prod >> 4);
-
-                exp_file << (int)y_q44 << (j == N_LANES - 1 ? "" : " ");
-            }
-            exp_file << "\n";
-        }
-        std::cout << "[C++ MODEL] Generated SWIGLU_BASELINE vectors." << std::endl;
-    }
     else if (mode == "swiglu") {
         // PRODUCTION two-pass SwiGLU (cmds 5/6/0xB/0xC, host-sequenced in 8-lane groups). One row per line:
         // input "n g0..g(n-1) u0..u(n-1)" (gate / up int8 codes), expected "e y0..y(n-1)" with e the row gain
@@ -460,59 +317,6 @@ int main(int argc, char* argv[]) {
             exp_file << "\n";
         }
         std::cout << "[C++ MODEL] Generated two-pass SWIGLU test vectors." << std::endl;
-    }
-    else if (mode == "gelu" || mode == "gelu_baseline") {
-        // gelu_baseline (tr_gelu.sv, tb_baseline/tr_baseline/tr_gelu/)
-        // implements the same GELU algorithm as production, so it reuses
-        // this same golden model -- unlike softmax_baseline above, which is
-        // a genuinely different algorithm needing its own.
-        const int N_LANES = 8;
-        const int N_VECS  = 256;
-        vec_file << N_VECS << "\n";
-        srand(1337);
-
-        for (int i = 0; i < N_VECS; i++) {
-            int8_t x[N_LANES], y[N_LANES];
-            for (int j = 0; j < N_LANES; j++) {
-                x[j] = (int8_t)((rand() % 256) - 128);
-                vec_file << (int)x[j] << (j == N_LANES - 1 ? "" : " ");
-            }
-            vec_file << "\n";
-
-            gelu_hw_model(x, y);
-            for (int j = 0; j < N_LANES; j++)
-                exp_file << (int)y[j] << (j == N_LANES - 1 ? "" : " ");
-            exp_file << "\n";
-        }
-        std::cout << "[C++ MODEL] Generated GELU vectors." << std::endl;
-    }
-    else if (mode == "gelu_fused") {
-        // Exercises the SAME composition the firmware's fused
-        // _xlr2_vpu(acc, CMD_GELU, mult, shift, out) call uses: raw INT32
-        // accumulator -> requantize (mult,shift) -> GELU LUT, in one
-        // hardware pass. Model = gelu_hw_scalar(quant_model(acc,mult,shift))
-        // per lane (M=4, matching TR_M) -- if RTL disagrees with this
-        // composition, the bug is in how the two verified primitives fuse
-        // in hardware, not in either primitive alone.
-        const int N_VECS = 256;
-        vec_file << N_VECS << "\n";
-        srand(1337);
-        for (int i = 0; i < N_VECS; i++) {
-            int shift = 4 + (rand() % 14);            // 4..17
-            int32_t mult = 50 + (rand() % 200);       // 50..249
-            double boundary = (double)((int64_t)1 << shift) * 127.0 / (double)mult;
-            int64_t acc[4]; int8_t y[4];
-            for (int j = 0; j < 4; j++) {
-                double frac = ((rand() % 2600) - 500) / 1000.0;   // -0.5 .. 2.1
-                acc[j] = (int64_t)(frac * boundary);
-                vec_file << acc[j] << " ";
-            }
-            vec_file << mult << " " << shift << "\n";
-            for (int j = 0; j < 4; j++) y[j] = gelu_hw_scalar(quant_model(acc[j], mult, shift));
-            for (int j = 0; j < 4; j++) exp_file << (int)y[j] << (j == 3 ? "" : " ");
-            exp_file << "\n";
-        }
-        std::cout << "[C++ MODEL] Generated GELU_FUSED test vectors." << std::endl;
     }
     else {
         std::cerr << "[ERROR] Unknown mode: " << mode << std::endl;

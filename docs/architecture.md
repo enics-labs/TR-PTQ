@@ -17,7 +17,7 @@ local vector/MAC engines:
 | `vec_mul_array_engine` + `vecmul_out_cast` | element-wise products and their scaling / rounding / saturation | [mult_engines.md](module_reference/mult_engines.md) |
 | `piped_max` | softmax row max and SwiGLU maximum of `|silu * up|` | [peripheral_modules.md](module_reference/peripheral_modules.md) |
 | `sigma_rom`, `recip_rom` | SwiGLU sigmoid table, RMSNorm growth-branch reciprocal | [peripheral_modules.md](module_reference/peripheral_modules.md) |
-| `scalar_sub`, `alpha_stabilizer`, `symmetry_modifier` | softmax `x - max`; GELU only | [peripheral_modules.md](module_reference/peripheral_modules.md) |
+| `scalar_sub` | softmax `x - max` | [peripheral_modules.md](module_reference/peripheral_modules.md) |
 
 One `tr_ln_alu` (piecewise-linear, BITS = 6) serves every operator that needs a logarithm.
 
@@ -30,7 +30,6 @@ sequence that drives the crossbar pass by pass, gated on each pass's own valid h
 | Command | Operation | Granularity |
 |---|---|---|
 | `0x01` | softmax tile with `z = max + ln S` readout | one 8-lane tile |
-| `0x02` | GELU (GELU build only) | one 8-lane vector |
 | `0x04` | streaming matmul | tile counts in registers |
 | `0x07` / `0x08` | RMSNorm sum-of-squares, first tile / next tile | one tile |
 | `0x09` | RMSNorm scale (mean, ln, exp, `inv_rms` register) | once per row |
@@ -44,25 +43,16 @@ RMSNorm and SwiGLU rows are longer than 8 elements, so the host sequences them o
 state sequences: [tr_soc_ctrl.md](module_reference/tr_soc_ctrl.md). Numerical specification and accuracy study of the
 Llama configuration live in the integration repository (`docs/llama/`).
 
-## Build flavors
+## Scope
 
-`GELU_EN` is a compile-time parameter carried by `tr_soc_top_int`, `tr_soc_ctrl_int`, `tr_nonlinear_vpu`,
-`tr_backbone_wrapper` and `vecmul_out_cast`. Its default comes from the macro `GELU_ENABLE`.
-
-| Build | `GELU_EN` | Content |
-|---|---|---|
-| default (Llama) | 0 | no GELU; command `0x02` is ignored |
-| GELU | 1 | adds GELU support for ViT-style models |
-
-What the default build removes, and why it is safe: softmax and RMSNorm read the ln result of lane 0 only, and every
-other use of the backbone bypasses the ln. So the build drops the ln unit on lanes 1 to 7, `pre_ln_modifier` (its
-"+1.0" mode is GELU-only), the post-ln modes other than bypass and the rounded `-0.5x` on lane 0, `alpha_stabilizer`,
-`symmetry_modifier`, `scratch_b`, the vec-mul cast modes `001` and `010`, and the GELU controls.
+This branch is Llama-only. GELU, the ViT firmware and the paper-era baselines (`tr_baseline`, `ibert_baseline`) were removed;
+they live in the tag `tr-vpu_rtl-ISCAS-20261013`. Softmax and RMSNorm read the ln result of lane 0 only, and every other use of
+the backbone bypasses the ln, so only lane 0 has an ln unit and the post-ln stage supports bypass and the rounded `-0.5x`.
 
 ## Timing structure
 
-The backbone is a three-register-stage pipeline: input registers; `pre_ln` and `tr_ln_alu`; round-back, saturation
-and `post_ln`; `tr_exp_alu` combinational to the outputs (three cycles from `in_valid` to `out_valid`). The register
+The backbone is a three-register-stage pipeline: input registers; `tr_ln_alu`; round-back, saturation
+and the post-ln mode; `tr_exp_alu` combinational to the outputs (three cycles from `in_valid` to `out_valid`). The register
 after the ln closes the 3.3 ns clock. Rounding in the wide shifters is written shifter-first
 (`((2x >>> s) + 1) >>> 1`), which removes a subtract and an adder from the path and gives identical results.
 
@@ -81,9 +71,3 @@ set above. See [mx_format_operation.md](mx_format_operation.md).
 
 `dot_product_engine` computes `Out[i] = sum(A[i] * B) + C[i]` with M parallel `mac_array_engine` lanes sharing one
 broadcast vector. `tr_matmul_ctrl` sequences it into a tiled matmul and is shared by both tops.
-
-## Baselines
-
-`rtl_baseline/` holds standalone RTL for comparison, not instantiated by either top: `tr_baseline/` (dedicated TR
-modules built from the same primitives) and `ibert_baseline/` (an I-BERT-style, divider-based implementation).
-See [module_reference/rtl_baseline.md](module_reference/rtl_baseline.md).

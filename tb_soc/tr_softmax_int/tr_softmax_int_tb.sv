@@ -2,18 +2,12 @@
 
 // File-I/O testbench for the PRODUCTION SOFTMAX sequence: drives
 // tr_soc_top_int through CMD=0x01 (SOFTMAX), the SM_P1..SM_P4 FSM in
-// tr_soc_ctrl_int.sv sharing the tr_nonlinear_vpu backbone. This is the
-// module firmware actually exercises -- NOT tr_softmax.sv
-// (tb_baseline/tr_baseline/tr_softmax/), which is a separate,
-// differently-architected module (explicit reciprocal-via-exp instead of
-// this FSM's log-sum-exp trick) not instantiated anywhere in
-// tr_soc_top_int.sv. Same trap tr_gelu.sv/tr_rmsnorm.sv turned out to be
-// -- see tr_gelu_int_tb.sv.
+// tr_soc_ctrl_int.sv sharing the tr_nonlinear_vpu backbone.
 //
 // Output is Q0.8 UNSIGNED (0..255, saturating) -- matches SM_P4's
 // vecmul_scale_mode==2'b11 path and cpu_math_model.cpp's "softmax" mode
-// (softmax_hw_model). Follows the same requantizer-passthrough convention
-// as tr_gelu_int_tb.sv / tr_rmsnorm_int_tb.sv: mult=1, shift=0 so c_vec
+// (softmax_hw_model). Uses the requantizer-passthrough convention of
+// tr_rmsnorm_int_tb.sv: mult=1, shift=0 so c_vec
 // passes through unchanged, x[0..3] via c_vec (lanes 0..M-1), x[4..7] via
 // ext_sram_b (lanes M..N-1).
 module tb_tr_softmax_int();
@@ -76,7 +70,7 @@ module tb_tr_softmax_int();
     endtask
 
     // Fires the passthrough MAC (c_vec[0..3] + ext_sram_b[4..7]) and waits for
-    // the requantizer, exactly as tr_gelu_int_tb.sv's load_vector does.
+    // the requantizer, exactly as tr_rmsnorm_int_tb.sv's load_vector does.
     task automatic load_vector(input logic signed [W-1:0] x [N]);
         @(posedge clk);
         dot_in_valid = 1;

@@ -109,7 +109,9 @@ inline int tr_pwl_ln_scalar(int xq, int bits, int segments, int coef_bits, int o
 }
 
 // ============================================================================
-// GELU helpers — bit-exact replicas of the RTL submodules.
+// Paper-era helpers (alpha_stabilizer, GELU exp/ln chain, dedicated SwiGLU). The RTL modules they replicated were removed
+// from this branch (see tag tr-vpu_rtl-ISCAS-20261013); the models stay as the "as shipped" baseline of the Llama accuracy study.
+// Bit-exact replicas of the former RTL submodules.
 // ============================================================================
 
 // Replicates alpha_stabilizer.sv: computes -|alpha_approx * x| in Q4.4.
@@ -235,12 +237,6 @@ inline int8_t silu_hw_scalar(int8_t x) {
     int    sigma   = (x < 0) ? (16 - recip) : recip;
     int    product = (int)x * (int8_t)sigma;
     return (int8_t)(product >> 4);
-}
-
-inline int8_t gelu_hw_scalar(int8_t x) { return silu_hw_scalar(x); }
-
-inline void gelu_hw_model(const int8_t x[8], int8_t out[8]) {
-    for (int i = 0; i < 8; i++) out[i] = gelu_hw_scalar(x[i]);
 }
 
 // ============================================================================

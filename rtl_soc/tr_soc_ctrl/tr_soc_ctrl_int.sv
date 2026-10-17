@@ -1,21 +1,13 @@
 `timescale 1ns/1ps
 
-`ifndef TR_GELU_EN_DEFAULT
-`ifdef GELU_ENABLE
-`define TR_GELU_EN_DEFAULT 1'b1   // opt-in: GELU support (ViT-style builds). Default: no GELU (GELU and SwiGLU never run together)
-`else
-`define TR_GELU_EN_DEFAULT 1'b0
-`endif
-`endif
-
 /*
  * @module   tr_soc_ctrl_int
  * @brief    MMIO-driven master FSM controller for the INT-datapath SoC: on
  *           an MMIO command write, sequences tr_nonlinear_vpu's crossbar
- *           through the multi-pass GELU/Softmax/RMSNorm routes, or kicks off
+ *           through the multi-pass Softmax/RMSNorm/SwiGLU routes, or kicks off
  *           a streaming matmul via tr_matmul_ctrl.
  * @details  MMIO register map: ADDR_CMD (0x00, write triggers a command:
- *           1=Softmax, 2=GELU, 4=streaming matmul, 5=SiLU group (SwiGLU),
+ *           1=Softmax, 4=streaming matmul, 5=SiLU group (SwiGLU),
  *           6=SwiGLU max-tracking group, 0xB=SwiGLU row gain, 0xC=SwiGLU apply group,
  *           7/8=RMSNorm sum-of-squares beat (7: first tile, clears the accumulator; 8: next tile,
  *           accumulates), 9=RMSNorm scale (once per row: mean -> ln -> exp -> wide inv_rms register),
@@ -27,14 +19,12 @@
  *           ADDR_SW_E (0x1C, read-only: SwiGLU row gain e, signed),
  *           ADDR_SM_Z (0x20, read-only: softmax tile z = sat8(max + ln(S)), valid after command 1).
  *
- *           Each command is a fixed sequence of states (GL_*, SM_*, RM_*,
- *           SW_*) driving tr_nonlinear_vpu's crossbar-select/enable/mode
+ *           Each command is a fixed sequence of states (SM_*, RM_*, SW_*) driving tr_nonlinear_vpu's crossbar-select/enable/mode
  *           outputs pass-by-pass, gated on that pass's own vpu_*_valid
  *           handshake (the VPU's submodules have no external ready signal,
  *           so each pass waits out its producer's own valid pulse before
- *           advancing). scratch_a/scratch_b hold intermediate per-lane
- *           vectors between passes (e.g. GELU's exp(alpha(x)) and
- *           reciprocal-sigmoid results); reg_scalar_max/reg_scalar_log hold
+ *           advancing). scratch_a holds the SwiGLU silu
+ *           intermediate between passes; reg_scalar_max/reg_scalar_log hold
  *           Softmax's row-max and log-sum-exp scalars, and RMSNorm's
  *           log(sum-of-squares) scalar, between their own passes.
  *
@@ -44,8 +34,7 @@
  *                                scratch_a), cmd 6 (up u: running max of |silu_s*u| into reg_sw_max)
  *             once per row:      cmd 0xB (gain e from reg_sw_max, clears the max; e readable at ADDR_SW_E)
  *             pass 2, per group: cmd 5 again, cmd 0xC (y = sat8(round_shift(4*silu_s*u, 10-e)) -> ext_sram)
- *           The sigma chain (alpha->exp->+1->ln->neg->exp) of earlier revisions is replaced by the 256x6-bit
- *           sigma ROM in tr_nonlinear_vpu (identical values at FRAC_W=6).
+ *           The sigmoid comes from a 256x6-bit sigma ROM in tr_nonlinear_vpu (equal to the exp-ln-exp chain at FRAC_W=6).
  *
  *           RMSNorm is a host-sequenced tile flow (the VPU is N=8 wide): the host issues command 7 for
  *           the first tile of a row and 8 for each further tile (the MAC accumulates S = sum x^2 across
@@ -63,11 +52,8 @@
  *           the full derivation; this mirrors the same fix in tr_rmsnorm.sv.
  *
  * @param    N      Vector dimension (lanes) of the driven VPU/datapath.
- * @param    W      Data word width (ctrl_scalar_sub_val, scratch_a/b, vpu_data_out).
+ * @param    W      Data word width (ctrl_scalar_sub_val, vpu_data_out).
  * @param    ACC_W  Accumulator width (req_mult_out, vpu_dot_out).
- * @param    GELU_EN  1: command 2 (GELU) is supported. 0 (default; macro GELU_ENABLE sets 1): command 2 is ignored and the GELU-only
- *                    outputs (write_scratch_b, sym_mode_en, bb_mode_pre_ln, post-ln modes other than bypass / rounded -0.5x)
- *                    are held constant so the GELU datapath and scratch_b are optimized away.
  */
 module tr_soc_ctrl_int #(
     parameter int N     = 8,
@@ -75,8 +61,7 @@ module tr_soc_ctrl_int #(
     parameter int ACC_W = 32,
     parameter int INV_W = 12,
     parameter int SA_W  = 12,   // width of the SwiGLU silu intermediate (scratch_a)
-    parameter int WIDE_W = 20,  // width of the VPU wide vecmul result bus
-    parameter bit GELU_EN = `TR_GELU_EN_DEFAULT
+    parameter int WIDE_W = 20   // width of the VPU wide vecmul result bus
 )(
     input  logic clk,
     input  logic rst_n,
@@ -108,10 +93,8 @@ module tr_soc_ctrl_int #(
     output logic [2:0]              vecmul_scale_mode,
     output logic bb_shift_mode,
     output logic bb_bypass_ln,
-    output logic bb_mode_pre_ln,
     output logic [1:0]              bb_mode_post_ln,
     output logic bb_ln_pre_scaled,  // 1: ln input already has FRAC_W+2 fractional bits (RMSNorm mean)
-    output logic sym_mode_en,
     output logic signed [W-1:0]     ctrl_scalar_sub_val,
     output logic        [4:0]       rms_log2n_out,     // RMSNorm row length log2 (ADDR_RMS_LOG2N)
     output logic        [INV_W-1:0] inv_rms_out,       // RMSNorm wide inv_rms (reg_inv_rms)
@@ -121,10 +104,8 @@ module tr_soc_ctrl_int #(
 
     // Datapath Routing
     output logic src_sram_a_sel, 
-    output logic src_sram_b_sel, 
     output logic write_ext_sram, 
     output logic signed [SA_W-1:0]  scratch_a_out [N],
-    output logic signed [W-1:0]     scratch_b_out [N],
     
     // VPU Status Inputs (Split Pipeline Valids)
     input  logic signed [W-1:0]     vpu_data_out [N],
@@ -170,7 +151,6 @@ module tr_soc_ctrl_int #(
     logic [N-1:0]                     cmd_trigger;
 
     logic signed [SA_W-1:0]         scratch_a [N];
-    logic signed [W-1:0]            scratch_b [N];
     logic signed [W-1:0]            reg_scalar_max;
     logic signed [W-1:0]            reg_scalar_log;
     logic signed [W-1:0]            sm_z;             // softmax tile z = sat8(max + ln(S)), see below
@@ -182,7 +162,6 @@ module tr_soc_ctrl_int #(
     logic [WIDE_W-1:0]              reg_sw_max;       // running max of |silu_s * up| over the row
     logic signed [4:0]              reg_sw_e;         // row gain
     logic signed [5:0]              reg_sw_shift;     // 10 - e, registered so the apply cast starts from a flop (timing)
-    logic                           write_scratch_b;
     logic                           latch_max;
     logic                           latch_log;
 
@@ -193,7 +172,6 @@ module tr_soc_ctrl_int #(
     assign req_mult_out     = reg_req_mult;
     assign req_shift_out    = reg_req_shift;
     assign scratch_a_out    = scratch_a;
-    assign scratch_b_out    = scratch_b;
     assign mm_num_row_tiles = reg_mm_rows;
     assign mm_num_ctiles    = reg_mm_ctiles;
     assign rms_log2n_out    = reg_rms_log2n;
@@ -267,7 +245,6 @@ module tr_soc_ctrl_int #(
     always_ff @(posedge clk) begin
         if (write_silu) for (int k = 0; k < N; k++) scratch_a[k] <= silu_round(vpu_wide_out[k]);
         if (write_scratch_a) for (int k = 0; k < N; k++) scratch_a[k] <= SA_W'(vpu_data_out[k]);
-        if (write_scratch_b) scratch_b <= vpu_data_out;
         if (latch_inv) reg_inv_rms <= vpu_inv_rms;
         if (latch_max)       reg_scalar_max <= vpu_max_out[W-1:0];
         if (latch_log)       reg_scalar_log <= vpu_data_out[0];
@@ -278,10 +255,6 @@ module tr_soc_ctrl_int #(
         IDLE,
         // Streaming matmul (CMD=0x04)
         MM_START, MM_WAIT,
-        // GELU
-        GL_P1, GL_P1_W, GL_P1_MUL_W,
-        GL_P2, GL_P2_W, GL_P2_MUL_W,
-        GL_P3, GL_P3_W,
         // Softmax
         SM_P1, SM_P1_W,
         SM_P2, SM_P2_W1, SM_P2_W2,
@@ -335,7 +308,6 @@ module tr_soc_ctrl_int #(
         
         write_ext_sram      = 1'b0;
         write_scratch_a     = 1'b0;
-        write_scratch_b     = 1'b0;
         latch_max           = 1'b0;
         latch_log           = 1'b0;
         write_silu          = 1'b0;
@@ -345,7 +317,6 @@ module tr_soc_ctrl_int #(
         latch_inv           = 1'b0;
         
         src_sram_a_sel      = 1'b0;
-        src_sram_b_sel      = 1'b0;
         
         mux_bb_in_sel       = 3'b011;
         mux_mac_a_sel       = 2'b00;
@@ -366,10 +337,8 @@ module tr_soc_ctrl_int #(
         bb_shift_mode       = 1'b0;
 
         bb_bypass_ln        = 1'b0;
-        bb_mode_pre_ln      = 1'b0;
         bb_mode_post_ln     = 2'b00;
         bb_ln_pre_scaled    = 1'b0;
-        sym_mode_en         = 1'b0;
         ctrl_scalar_sub_val = '0;
         rm_offset_was_positive = 1'b0;
 
@@ -377,7 +346,6 @@ module tr_soc_ctrl_int #(
             IDLE: begin
                 reg_busy = 1'b0;
                 if (cmd_trigger == 8'h01) next_state = SM_P1;
-                if (cmd_trigger == 8'h02 && GELU_EN) next_state = GL_P1;
                 if (cmd_trigger == 8'h07) next_state = RM_P1;     // RMSNorm sum-of-squares, first tile
                 if (cmd_trigger == 8'h08) next_state = RM_P1N;    // RMSNorm sum-of-squares, next tile
                 if (cmd_trigger == 8'h09) next_state = RM_P2;     // RMSNorm scale (once per row)
@@ -398,72 +366,6 @@ module tr_soc_ctrl_int #(
             end
             MM_WAIT: begin
                 if (mm_done) next_state = DONE;
-            end
-
-            // =========================================================
-            // GELU SEQUENCE (Grouped States prevent combinational drift)
-            // =========================================================
-            GL_P1, GL_P1_W, GL_P1_MUL_W: begin
-                bb_bypass_ln = 1'b1;
-                mux_bb_in_sel     = 3'b001;
-                vecmul_op_mode    = 2'd2;       // UU Mode for Exponential!
-                vecmul_scale_mode = 3'b010;      // Slice [15:8]
-                mux_vecmul_a_sel  = 2'b11;
-                mux_vecmul_b_sel  = 3'b010;
-                mux_vpu_out_sel   = 3'b000;
-
-                if (state == GL_P1) begin 
-                    en_bb_valid = 1'b1;
-                    next_state  = GL_P1_W; 
-                end else if (state == GL_P1_W && vpu_bb_valid) begin 
-                    en_vecmul_valid = 1'b1;
-                    next_state      = GL_P1_MUL_W; 
-                end else if (state == GL_P1_MUL_W && vpu_vecmul_valid) begin 
-                    write_scratch_a = 1'b1;
-                    next_state      = GL_P2; 
-                end
-            end
-
-            GL_P2, GL_P2_W, GL_P2_MUL_W: begin
-                src_sram_a_sel    = 1'b1;
-                mux_bb_in_sel     = 3'b011; 
-                bb_mode_pre_ln    = 1'b1;
-                bb_mode_post_ln   = 2'b01;
-                vecmul_op_mode    = 2'd2;
-                vecmul_scale_mode = 3'b010;
-                mux_vecmul_a_sel  = 2'b11;
-                mux_vecmul_b_sel  = 3'b010;
-                mux_vpu_out_sel   = 3'b000;
-
-                if (state == GL_P2) begin
-                    en_bb_valid = 1'b1;
-                    next_state  = GL_P2_W; 
-                end else if (state == GL_P2_W && vpu_bb_valid) begin 
-                    en_vecmul_valid = 1'b1;
-                    next_state      = GL_P2_MUL_W; 
-                end else if (state == GL_P2_MUL_W && vpu_vecmul_valid) begin 
-                    write_scratch_b = 1'b1;
-                    next_state      = GL_P3; 
-                end
-            end
-
-            GL_P3, GL_P3_W: begin
-                src_sram_a_sel    = 1'b0;
-                src_sram_b_sel    = 1'b1;
-                sym_mode_en       = 1'b1;
-                vecmul_op_mode    = 2'd1;       // SU Mode
-                vecmul_scale_mode = 3'b001;      // Slice [11:4]
-                mux_vecmul_a_sel  = 2'b00;
-                mux_vecmul_b_sel  = 3'b001;
-                mux_vpu_out_sel   = 3'b000;
-
-                if (state == GL_P3) begin 
-                    en_vecmul_valid = 1'b1;
-                    next_state      = GL_P3_W; 
-                end else if (state == GL_P3_W && vpu_vecmul_valid) begin 
-                    write_ext_sram = 1'b1;
-                    next_state     = DONE; 
-                end
             end
 
             // =========================================================
@@ -622,14 +524,5 @@ module tr_soc_ctrl_int #(
                 next_state = IDLE;
             end
         endcase
-
-        // No-GELU build: hold the GELU-only controls constant (GL_* states are unreachable anyway; this lets the tools drop
-        // scratch_b, the symmetry modifier control and the pre/post-ln GELU modes).
-        if (!GELU_EN) begin
-            write_scratch_b = 1'b0;
-            sym_mode_en     = 1'b0;
-            bb_mode_pre_ln  = 1'b0;
-            if (bb_mode_post_ln != 2'b11) bb_mode_post_ln = 2'b00;
-        end
     end
 endmodule

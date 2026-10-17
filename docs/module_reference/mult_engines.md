@@ -41,7 +41,7 @@ Evaluates `out_dot = SUM(a[i]*b[i]) + C` over a 4-stage pipeline: (1) register i
 
 **File:** [rtl_soc/mult_engines/vecmul_out_cast.sv](../../rtl_soc/mult_engines/vecmul_out_cast.sv)
 
-Combinational output stage of the VPU's vec-mul engine (split out of `tr_nonlinear_vpu` so synthesis reports its area on its own). `scale_mode`: `000` low bits, `001` `>>>FRAC_W` wrapping (GELU), `010` `>>>8` (GELU), `011` softmax probabilities (`>>>FRAC_W`, unsigned saturate at 255), `101` RMSNorm apply (rounded `>>>(FRAC_W+4)`, signed saturate), `110` SwiGLU apply (`round_shift(acc<<2, sw_shift)`, signed saturate). Parameters: `N`, `W` (output), `ACC_W` (20 in the VPU), `FRAC_W`, `GELU_EN` (modes `001`/`010` only when 1).
+Combinational output stage of the VPU's vec-mul engine (split out of `tr_nonlinear_vpu` so synthesis reports its area on its own). `scale_mode`: `000` low bits, `011` softmax probabilities (`>>>FRAC_W`, unsigned saturate at 255), `101` RMSNorm apply (rounded `>>>(FRAC_W+4)`, signed saturate), `110` SwiGLU apply (`round_shift(acc<<2, sw_shift)`, signed saturate). Parameters: `N`, `W` (output), `ACC_W` (20 in the VPU), `FRAC_W`.
 
 ---
 
@@ -51,7 +51,7 @@ Combinational output stage of the VPU's vec-mul engine (split out of `tr_nonline
 
 ### Operation
 
-Evaluates `out_vec[i] = a[i]*b[i]` for each of the N lanes over a 3-stage pipeline: (1) register inputs, (2) compute the N per-lane products (mode-selectable signed/unsigned operands, same convention as `mac_array_engine`), (3) register the products, sign-extended/cast to the output width. Used for Softmax probability scaling and GELU's final elementwise gate — this is `tr_nonlinear_vpu`'s crossbar "vecmul" engine.
+Evaluates `out_vec[i] = a[i]*b[i]` for each of the N lanes over a 3-stage pipeline: (1) register inputs, (2) compute the N per-lane products (mode-selectable signed/unsigned operands, same convention as `mac_array_engine`), (3) register the products, sign-extended/cast to the output width. Used for softmax probability scaling and the RMSNorm / SwiGLU apply steps — this is `tr_nonlinear_vpu`'s crossbar "vecmul" engine.
 
 ### Parameters
 

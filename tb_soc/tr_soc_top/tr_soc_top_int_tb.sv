@@ -204,17 +204,7 @@ module tr_soc_top_int_tb();
         $display("   [PASS] Linear Pipeline successfully handed off to VPU.");
 
         // ---------------------------------------------------------
-        // TEST 2: GELU
-        // ---------------------------------------------------------
-        $display("\n---> CPU Executing OP_GELU (CMD = 0x02)");
-        // Using inputs: {16 (1.0), -16 (-1.0), 0 (0.0), 32 (2.0)}
-        load_mac_vector(32'd16, -32'd16, 32'd0, 32'd32); 
-        mmio_write(8'h00, 32'h02); 
-        wait_for_done();
-        print_vpu_results();
-
-        // ---------------------------------------------------------
-        // TEST 3: SOFTMAX
+        // TEST 2: SOFTMAX
         // ---------------------------------------------------------
         $display("\n---> CPU Executing OP_SOFTMAX (CMD = 0x01)");
         // Using inputs: {10, 20, 30, 40} -> Max is 40.
@@ -225,7 +215,7 @@ module tr_soc_top_int_tb();
         print_vpu_results();
 
         // ---------------------------------------------------------
-        // TEST 4: RMSNORM
+        // TEST 3: RMSNORM
         // ---------------------------------------------------------
         $display("\n---> CPU Executing OP_RMSNORM (tiled: CMD = 0x07, 0x09, 0x0A; one 8-element tile, log2N = 3)");
         // Using inputs: {16, -16, 16, -16}

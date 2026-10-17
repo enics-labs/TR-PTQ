@@ -1,6 +1,6 @@
 # SoC Controllers — `rtl_soc`
 
-These modules live in [rtl_soc/tr_soc_ctrl/](../../rtl_soc/tr_soc_ctrl/) (plus [tr_matmul_ctrl.sv](../../rtl_soc/tr_matmul_ctrl.sv) at the `rtl_soc/` root, included here since it's driven by the same MMIO dispatch). They are the MMIO-driven master FSMs that sequence `tr_nonlinear_vpu`'s stateless crossbar pass-by-pass into a GELU/Softmax/RMSNorm operation, or kick off a streaming matmul.
+These modules live in [rtl_soc/tr_soc_ctrl/](../../rtl_soc/tr_soc_ctrl/) (plus [tr_matmul_ctrl.sv](../../rtl_soc/tr_matmul_ctrl.sv) at the `rtl_soc/` root, included here since it's driven by the same MMIO dispatch). They are the MMIO-driven master FSMs that sequence `tr_nonlinear_vpu`'s stateless crossbar pass-by-pass into a Softmax/RMSNorm/SwiGLU operation, or kick off a streaming matmul.
 
 ---
 
@@ -10,7 +10,7 @@ These modules live in [rtl_soc/tr_soc_ctrl/](../../rtl_soc/tr_soc_ctrl/) (plus [
 
 ### Operation
 
-On an MMIO command write, sequences `tr_nonlinear_vpu`'s crossbar through the multi-pass GELU/Softmax/RMSNorm routes, or kicks off a streaming matmul via `tr_matmul_ctrl`.
+On an MMIO command write, sequences `tr_nonlinear_vpu`'s crossbar through the multi-pass Softmax/RMSNorm/SwiGLU routes, or kicks off a streaming matmul via `tr_matmul_ctrl`.
 
 **MMIO register map:**
 
@@ -31,7 +31,6 @@ On an MMIO command write, sequences `tr_nonlinear_vpu`'s crossbar through the mu
 | Cmd | Operation | States |
 |-----|-----------|--------|
 | `0x01` | Softmax tile (N=8): probabilities (Q0.8) + `z` | `SM_P1..SM_P4` |
-| `0x02` | GELU | `GL_P1..GL_P3` |
 | `0x04` | Streaming matmul | `MM_START`, `MM_WAIT` |
 | `0x05` | SwiGLU silu group: `silu_s = sat12(round(x·σ >> 2))` into the 12-bit `scratch_a` | `SW_P1` |
 | `0x06` | SwiGLU max group: max `|silu_s·up|` via the shared `piped_max` into `reg_sw_max` | `SW_P2`, `SW_P2_M` |
@@ -41,30 +40,28 @@ On an MMIO command write, sequences `tr_nonlinear_vpu`'s crossbar through the mu
 | `0x0B` | SwiGLU row gain: `e` from `reg_sw_max` (consumes and clears it) | `SW_G` |
 | `0x0C` | SwiGLU apply group: `sat8(round_shift(4·silu_s·up, 10−e))` | `SW_P4` |
 
-**There is no command 3 any more** (the single-tile RMSNorm of earlier revisions). RMSNorm (rows of 8·tiles elements) and SwiGLU (rows of 8·groups elements) are **host-sequenced** in 8-lane groups: RMSNorm = `0x07`, `0x08`…, `0x09`, `0x0A` per tile; SwiGLU = pass 1 (`0x05`, `0x06` per group), `0x0B`, pass 2 (`0x05`, `0x0C` per group). See the header of `tr_soc_ctrl_int.sv` and `docs/llama/hardware-spec.md` §10; golden models are `rms_*` / `sw_*` in `emulation/tr_math_model.hpp`.
+There are no commands 2 (GELU) and 3 (single-tile RMSNorm); they exist only in the ISCAS tag. RMSNorm (rows of 8·tiles elements) and SwiGLU (rows of 8·groups elements) are **host-sequenced** in 8-lane groups: RMSNorm = `0x07`, `0x08`…, `0x09`, `0x0A` per tile; SwiGLU = pass 1 (`0x05`, `0x06` per group), `0x0B`, pass 2 (`0x05`, `0x0C` per group). See the header of `tr_soc_ctrl_int.sv` and `docs/llama/hardware-spec.md` (integration repository); golden models are `rms_*` / `sw_*` in `emulation/tr_math_model.hpp`.
 
 **Pass sequencing:** each command is a fixed sequence of states driving `tr_nonlinear_vpu`'s crossbar-select/enable/mode outputs pass-by-pass, gated on that pass's own `vpu_*_valid` handshake (the VPU's submodules have no external ready signal, so each pass waits out its producer's own valid pulse before advancing).
 
-- **GL_P1..GL_P3** (GELU): `E = exp(-α|x|)` → `recip = 1/(1+E)` → `y = x·σ(x)`.
 - **SM_P1..SM_P4** (Softmax): row max (shared `piped_max`) → `Σexp(x-max)` (via `mac_array_engine`) → `ln(Σ)` → `exp(x-max-ln(Σ))` (Q0.8 output). `z = sat8(max + ln Σ)` is the offset SM_P4 subtracts, exposed at `ADDR_SM_Z`.
 - **RM_P1..RM_P4** (RMSNorm): `S += Σx²` over tiles → `mk = round(S >> (FRAC_W + log2N − 2))` → shared ln at BITS = FRAC_W+2 → rounded `−0.5·ln` → `InvRMS = exp(...)` (sign-guarded, see below) → wide `inv_rms` register (12 bits, 8 fractional bits) → `y = round(x·inv_rms >> 8)`, int8 saturate.
 - **SW_P1, SW_P2, SW_G, SW_P4** (SwiGLU): σ ROM lookup and silu rounding → max `|silu·up|` → gain → apply with the per-row shift.
 
-`scratch_a` (12 bits per lane; GELU uses the low 8) and `scratch_b` hold intermediate per-lane vectors between passes. `reg_scalar_max`/`reg_scalar_log` hold Softmax's row-max and log-sum-exp scalars, and RMSNorm's `−0.5·ln(mean)` scalar, between their own passes. `reg_inv_rms` (RMSNorm) and `reg_sw_max`/`reg_sw_e` (SwiGLU) are the new cross-command registers.
+`scratch_a` (12 bits per lane) holds the SwiGLU silu intermediate between passes. `reg_scalar_max`/`reg_scalar_log` hold Softmax's row-max and log-sum-exp scalars, and RMSNorm's `−0.5·ln(mean)` scalar, between their own passes. `reg_inv_rms` (RMSNorm) and `reg_sw_max`/`reg_sw_e` (SwiGLU) are the new cross-command registers.
 
-**RM_P3 sign-guard:** `tr_nonlinear_vpu`'s shared exp backbone only supports the decay/negative-domain case, but RMSNorm's log-domain argument can legitimately go positive for a small mean. RM_P3 forces it non-positive before the backbone (`rms_growth` flag), and the VPU turns the result into `inv_rms` through the `recip_rom` reciprocal table when the true value was positive (`1/E`, capped at 4095). The standalone `tr_rmsnorm.sv` baseline module (`rtl_baseline/tr_baseline/`) keeps the older single-tile algorithm.
+**RM_P3 sign-guard:** `tr_nonlinear_vpu`'s shared exp backbone only supports the decay/negative-domain case, but RMSNorm's log-domain argument can legitimately go positive for a small mean. RM_P3 forces it non-positive before the backbone (`rms_growth` flag), and the VPU turns the result into `inv_rms` through the `recip_rom` reciprocal table when the true value was positive (`1/E`, capped at 4095).
 
 ### Parameters
 
 | Parameter | Default | Description                                                    |
 |-----------|---------|------------------------------------------------------------------|
 | `N`       | `8`     | Vector dimension (lanes) of the driven VPU/datapath                |
-| `W`       | `8`     | Data word width (`ctrl_scalar_sub_val`, `scratch_a`/`b`, `vpu_data_out`) |
+| `W`       | `8`     | Data word width (`ctrl_scalar_sub_val`, `vpu_data_out`) |
 | `ACC_W`   | `32`    | Accumulator width (`req_mult_out`, `vpu_dot_out`)                   |
 | `INV_W`   | `12`    | RMSNorm `inv_rms` register width                                    |
 | `SA_W`    | `12`    | SwiGLU silu intermediate width (`scratch_a`)                        |
 | `WIDE_W`  | `20`    | Width of the VPU's wide vecmul / shared-max bus                     |
-| `GELU_EN` | `0` (macro `GELU_ENABLE` → `1`) | 0 (default): command 2 (GELU) is ignored and the GELU-only controls (`write_scratch_b`, `sym_mode_en`, `bb_mode_pre_ln`, post-ln modes other than bypass / rounded −0.5×) are held constant so `scratch_b`, the symmetry modifier and the GELU datapath are optimized away |
 
 ---
 

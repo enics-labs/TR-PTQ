@@ -16,13 +16,12 @@ After the linear accumulation, the 32-bit wide accumulators must be compressed b
 - **Exponent Update:** The number of right-shifts is added to the base exponent, producing the final `mx_shared_exp`.
 
 ### 3. Non-Linear VPU Expansion
-Before the compressed 8-bit mantissas enter the non-linear VPU (which evaluates functions like GELU, Softmax, and RMSNorm), they pass through the `dynamic_shifter_mx`. 
-- **True-Value Restoration:** If a non-linear operation is scale-variant (like GELU or Softmax), the mantissas are shifted *left* by `mx_shared_exp`. This expands them into wider 16-bit registers (`VPU_W = 16`), restoring their "true" values within the Q12.4 fixed-point domain.
+Before the compressed 8-bit mantissas enter the non-linear VPU (which evaluates Softmax, RMSNorm and SwiGLU), they pass through the `dynamic_shifter_mx`. 
+- **True-Value Restoration:** If a non-linear operation is scale-variant (like Softmax), the mantissas are shifted *left* by `mx_shared_exp`. This expands them into wider 16-bit registers (`VPU_W = 16`), restoring their "true" values within the Q12.4 fixed-point domain.
 - **Scale-Invariant Bypass:** For operations like RMSNorm, which are inherently scale-invariant ($RMS(x) = x / RMS(x)$), this expansion is bypassed. The mantissas enter un-expanded to avoid arithmetic overflow when squared in the MAC engines.
 
 ### 4. Mathematical Execution (Fixed-Point)
 Inside the VPU, computations are resolved using Q12.4 fixed-point math:
-- **GELU:** Applies piece-wise combinations via the Symmetry Modifier and Backbone LUTs.
 - **Softmax:** Utilizes a multi-pass pipeline. 
   1. Finds the maximum of the expanded vector.
   2. Subtracts the max ($x_i - max$).

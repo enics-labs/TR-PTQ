@@ -34,9 +34,8 @@ module tr_nonlinear_vpu_rmsnorm_energy_tb();
     logic                  mac_clear_acc;
     logic [1:0]            mac_op_mode, vecmul_op_mode;
     logic [2:0]            vecmul_scale_mode;
-    logic                  en_bb_valid, bb_bypass_ln, bb_shift_mode, bb_mode_pre_ln;
+    logic                  en_bb_valid, bb_bypass_ln, bb_shift_mode;
     logic [1:0]            bb_mode_post_ln;
-    logic                  sym_mode_en;
     // Newer VPU ports (shared max select, RMSNorm inv_rms, SwiGLU); idle in this pilot unless the sequence uses them.
     logic                  bb_ln_pre_scaled, mux_max_sel, rms_growth;
     logic [4:0]            rms_log2n;
@@ -61,8 +60,7 @@ module tr_nonlinear_vpu_rmsnorm_energy_tb();
         .mac_clear_acc(mac_clear_acc), .mac_op_mode(mac_op_mode),
         .vecmul_op_mode(vecmul_op_mode), .vecmul_scale_mode(vecmul_scale_mode),
         .en_bb_valid(en_bb_valid), .bb_bypass_ln(bb_bypass_ln), .bb_shift_mode(bb_shift_mode),
-        .bb_mode_pre_ln(bb_mode_pre_ln), .bb_mode_post_ln(bb_mode_post_ln),
-        .sym_mode_en(sym_mode_en),
+        .bb_mode_post_ln(bb_mode_post_ln),
         .vpu_bb_valid_out(vpu_bb_valid_out), .vpu_vecmul_valid_out(vpu_vecmul_valid_out),
         .vpu_mac_valid_out(vpu_mac_valid_out), .vpu_max_valid_out(vpu_max_valid_out)
     );
@@ -87,9 +85,7 @@ module tr_nonlinear_vpu_rmsnorm_energy_tb();
         vecmul_scale_mode   = 3'b000;
         bb_shift_mode       = 1'b0;
         bb_bypass_ln        = 1'b0;
-        bb_mode_pre_ln      = 1'b0;
         bb_mode_post_ln     = 2'b00;
-        sym_mode_en         = 1'b0;
         bb_ln_pre_scaled    = 1'b0;
         mux_max_sel         = 1'b0;
         ctrl_scalar_sub_val = '0;
@@ -168,7 +164,7 @@ module tr_nonlinear_vpu_rmsnorm_energy_tb();
         rst_n = 0;
         en_piped_max = 0; en_mac_valid = 0; en_vecmul_valid = 0; en_bb_valid = 0;
         mac_clear_acc = 0; mac_op_mode = '0; vecmul_op_mode = '0; vecmul_scale_mode = '0;
-        bb_bypass_ln = 0; bb_shift_mode = 0; bb_mode_pre_ln = 0; bb_mode_post_ln = '0; sym_mode_en = 0;
+        bb_bypass_ln = 0; bb_shift_mode = 0; bb_mode_post_ln = '0;
         mux_bb_in_sel = '0; mux_mac_a_sel = '0; mux_mac_b_sel = '0;
         mux_vecmul_a_sel = '0; mux_vecmul_b_sel = '0; mux_vpu_out_sel = '0;
         ctrl_scalar_sub_val = '0;

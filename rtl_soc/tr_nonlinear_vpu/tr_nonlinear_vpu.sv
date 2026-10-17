@@ -1,11 +1,3 @@
-`ifndef TR_GELU_EN_DEFAULT
-`ifdef GELU_ENABLE
-`define TR_GELU_EN_DEFAULT 1'b1   // opt-in: GELU support (ViT-style builds). Default: no GELU (GELU and SwiGLU never run together)
-`else
-`define TR_GELU_EN_DEFAULT 1'b0
-`endif
-`endif
-
 /*
  * @module   tr_nonlinear_vpu
  * @brief    Software-Defined Vector Processing Unit.
@@ -26,8 +18,6 @@
  * @param    INV_W      Width of RMSNorm's wide inv_rms (unsigned, FRAC_W+INV_BITS fractional bits);
  *                        feeds the vecmul b operand through mux_vecmul_b_sel==3'b011.
  * @param    RMS_K      Extra fractional bits kept on RMSNorm's mean-of-squares (= tr_backbone_wrapper LN_EXTRA).
- * @param    GELU_EN    1: GELU supported. 0 (default; macro GELU_ENABLE sets 1): alpha_stabilizer, symmetry_modifier, the GELU-only vec-mul
- *                        scale modes (001/010) and the backbone's GELU-only logic are not built.
  * @param    SA_W       Width of SwiGLU's wide silu intermediate (controller scratch_a), fed back through sw_silu_in.
  * @param    WIDE_W     Width of the wide vecmul result bus vpu_wide_out (SwiGLU: 12-bit silu x 8-bit up = 20 bits).
  */
@@ -41,7 +31,6 @@ module tr_nonlinear_vpu #(
     parameter int INV_W     = 12,
     parameter int RMS_K     = 2,
     parameter int SA_W      = 12,
-    parameter bit GELU_EN   = `TR_GELU_EN_DEFAULT,
     parameter int WIDE_W    = 20
 )(
     input  logic clk,
@@ -79,7 +68,7 @@ module tr_nonlinear_vpu #(
     input  logic [1:0]  mux_mac_a_sel,   // MAC Input A MUX
     input  logic [1:0]  mux_mac_b_sel,   // MAC Input B MUX
     input  logic [1:0]  mux_vecmul_a_sel,// VecMul Input A MUX
-    input  logic [2:0]  mux_vecmul_b_sel,// VecMul Input B MUX (000 sram_b, 001 sym, 010 mantissa, 011 inv_rms, 100 sigma ROM, 101 sw_silu_in)
+    input  logic [2:0]  mux_vecmul_b_sel,// VecMul Input B MUX (000 sram_b, 010 mantissa, 011 inv_rms, 100 sigma ROM, 101 sw_silu_in)
     input  logic [LUT_IDX_W-1:0]  mux_vpu_out_sel, // Final Output MUX to SRAM
 
     // =========================================================
@@ -92,19 +81,14 @@ module tr_nonlinear_vpu #(
     input  logic mac_clear_acc,
     input  logic [1:0]  mac_op_mode,
     input  logic [1:0]  vecmul_op_mode,
-    // 000:[N-1:0], 001:[11:4] (wrap), 010:[15:8], 011: softmax Q0.8 unsigned
-    // saturate, (100 unused), 110: SwiGLU apply, round_shift(acc<<2, sw_shift) signed saturate, 101: ROUNDED >>(FRAC_W+4) signed saturate (RMSNorm apply),
-    // 100: [11:4] SIGNED SATURATE (SwiGLU gate-multiply -- see
-    // docs/llama/overview.md change C; 000-011 bit-identical to the old
-    // 2-bit encoding, just zero-extended).
+    // 000: low bits, 011: softmax Q0.8 unsigned saturate, 101: RMSNorm apply (ROUNDED >>(FRAC_W+4), signed saturate),
+    // 110: SwiGLU apply, round_shift(acc<<2, sw_shift) signed saturate (see vecmul_out_cast)
     input  logic [2:0]  vecmul_scale_mode,
     input  logic en_bb_valid,
     input  logic bb_bypass_ln,
     input  logic bb_shift_mode,     // 0: [23:8] (Softmax), 1: [19:4] (RMSNorm)
-    input  logic bb_mode_pre_ln,
     input  logic [1:0]  bb_mode_post_ln,
     input  logic bb_ln_pre_scaled,  // 0: ln input has FRAC_W frac bits, 1: FRAC_W+2 (RMSNorm mean)
-    input  logic sym_mode_en,
     output logic vpu_bb_valid_out,
     output logic vpu_vecmul_valid_out,
     output logic vpu_mac_valid_out,
@@ -116,8 +100,6 @@ module tr_nonlinear_vpu #(
     // =========================================================
     // Modifiers
     logic signed [W_VEC-1:0] scalar_sub_out [N];
-    logic signed [W_VEC-1:0] alpha_stab_out [N];
-    logic signed [W_VEC-1:0] sym_mod_out [N];
 
     // Backbone & ROM
     logic signed [W_MAC-1:0]     bb_mux_out [N]; // Output from the MUX
@@ -179,7 +161,6 @@ module tr_nonlinear_vpu #(
                 // FRAC_W scale for the ln backbone (== the old [23:8] slice
                 // at ANCHOR_Q_BITS=8, without baking the 8 in).
                 3'b000: bb_mux_out[i] = bb_shift_mode ? rms_s_sat : W_MAC'(vpu_dot_out >>> ANCHOR_Q_BITS);
-                3'b001: bb_mux_out[i] = W_MAC'(alpha_stab_out[i]);   // GELU stabilized
                 3'b010: bb_mux_out[i] = W_MAC'(scalar_sub_out[i]);   // Softmax (x - max)
                 3'b011: bb_mux_out[i] = W_MAC'(sram_data_a[i]);      // Raw pass-through
                 3'b100: bb_mux_out[i] = W_MAC'(ctrl_scalar_sub_val); // Direct Scalar Injection
@@ -189,7 +170,7 @@ module tr_nonlinear_vpu #(
             // MUX 2: VPU MAC Input A
             case (mux_mac_a_sel)
                 2'b00: mac_in_a[i] = sram_data_a[i];           // Standard (x_i)
-                2'b01: mac_in_a[i] = bb_is_zero[i] ? 8'd128 : $signed(rom_e_a[i]); // Softmax/GELU (e_a) -> Explicit Cast
+                2'b01: mac_in_a[i] = bb_is_zero[i] ? 8'd128 : $signed(rom_e_a[i]); // Softmax (e_a) -> Explicit Cast
                 2'b10: mac_in_a[i] = scalar_sub_out[i];        // Variance (x - mu)
                 default: mac_in_a[i] = sram_data_a[i];
             endcase
@@ -197,7 +178,7 @@ module tr_nonlinear_vpu #(
             // MUX 3: VPU MAC Input B
             case (mux_mac_b_sel)
                 2'b00: mac_in_b[i] = sram_data_b[i];            // Standard (x_i)
-                2'b01: mac_in_b[i] = bb_is_zero[i] ? ($signed(bb_mantisa[i]) << 1) : $signed(bb_mantisa[i]); // Softmax/GELU (e_frac) -> Explicit Cast
+                2'b01: mac_in_b[i] = bb_is_zero[i] ? ($signed(bb_mantisa[i]) << 1) : $signed(bb_mantisa[i]); // Softmax (e_frac) -> Explicit Cast
                 2'b10: mac_in_b[i] = sram_data_a[i];
                 default: mac_in_b[i] = sram_data_b[i];
             endcase
@@ -213,7 +194,6 @@ module tr_nonlinear_vpu #(
             // MUX 5: VecMul Input B
             case (mux_vecmul_b_sel)
                 3'b000: vecmul_b8[i] = sram_data_b[i];         // Standard
-                3'b001: vecmul_b8[i] = sym_mod_out[i];         // GELU Symmetry (sigma)
                 3'b010: vecmul_b8[i] = bb_is_zero[i] ? ($signed(bb_mantisa[i]) << 1) : $signed(bb_mantisa[i]);
                 default: vecmul_b8[i] = sram_data_b[i];
             endcase
@@ -249,7 +229,6 @@ module tr_nonlinear_vpu #(
                 case (mux_vpu_out_sel)
                     3'b000: vpu_data_out[i] <= vecmul_out_trunc[i];
                     3'b001: vpu_data_out[i] <= bb_log[i]; 
-                    3'b010: vpu_data_out[i] <= alpha_stab_out[i];
                     3'b011: vpu_data_out[i] <= scalar_sub_out[i];
                     default: vpu_data_out[i] <= vecmul_out_trunc[i];
                 endcase
@@ -282,39 +261,15 @@ module tr_nonlinear_vpu #(
         .in_data(sram_data_a), .sub_val(ctrl_scalar_sub_val), .out_data(scalar_sub_out)
     );
 
-    generate
-        if (GELU_EN) begin : gen_alpha
-            alpha_stabilizer #(
-                .N(N), .W(W_VEC), .FRAC_W(FRAC_W)
-            ) u_alpha (
-                .in_vec(sram_data_a), .out_vec(alpha_stab_out)
-            );
-        end else begin : gen_no_alpha
-            always_comb for (int i = 0; i < N; i++) alpha_stab_out[i] = '0;
-        end
-    endgenerate
-
     sigma_rom #(.N(N)) u_sigma (.x(sram_data_a), .sigma(sigma_q6));
-
-    generate
-        if (GELU_EN) begin : gen_sym
-            symmetry_modifier #(
-                .N(N), .WIDTH_X(W_VEC), .WIDTH_Y(W_VEC), .FRAC_W(FRAC_W)
-            ) u_sym (
-                .x_raw(sram_data_a), .y_sig(sram_data_b), .mode_en(sym_mode_en), .sig_corrected(sym_mod_out)
-            );
-        end else begin : gen_no_sym
-            always_comb for (int i = 0; i < N; i++) sym_mod_out[i] = '0;
-        end
-    endgenerate
 
     logic        [7:0]             rom_e_a_8bit [N];
 
     tr_backbone_wrapper #(
-        .N(N), .WIDTH_IN(W_MAC), .WIDTH_OUT(W_VEC), .FRAC_W(FRAC_W), .LUT_IDX_W(LUT_IDX_W), .GELU_EN(GELU_EN)
+        .N(N), .WIDTH_IN(W_MAC), .WIDTH_OUT(W_VEC), .FRAC_W(FRAC_W), .LUT_IDX_W(LUT_IDX_W)
     ) u_backbone (
         .clk(clk), .rst_n(rst_n), .in_valid(en_bb_valid), .out_valid(int_bb_valid),
-        .bypass_ln(bb_bypass_ln), .mode_pre_ln(bb_mode_pre_ln), .mode_post_ln(bb_mode_post_ln), .ln_pre_scaled(bb_ln_pre_scaled),
+        .bypass_ln(bb_bypass_ln), .mode_post_ln(bb_mode_post_ln), .ln_pre_scaled(bb_ln_pre_scaled),
         .vec_in(bb_in), // Conditionally shifted input!
         .log_out(bb_log), .a_idx_out(bb_a_idx), .mantisa_out(bb_mantisa), .is_zero_out(bb_is_zero)
     );
@@ -366,7 +321,7 @@ module tr_nonlinear_vpu #(
     always_comb for (int i = 0; i < N; i++) vpu_wide_out[i] = vecmul_out_acc[i];
 
     vecmul_out_cast #(
-        .N(N), .W(W_VEC), .ACC_W(WIDE_W), .FRAC_W(FRAC_W), .GELU_EN(GELU_EN)
+        .N(N), .W(W_VEC), .ACC_W(WIDE_W), .FRAC_W(FRAC_W)
     ) u_vecmul_cast (
         .acc(vecmul_out_acc), .scale_mode(vecmul_scale_mode), .sw_shift(sw_shift), .out(vecmul_out_trunc)
     );

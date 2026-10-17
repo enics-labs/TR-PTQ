@@ -1,19 +1,12 @@
-`ifndef TR_GELU_EN_DEFAULT
-`ifdef GELU_ENABLE
-`define TR_GELU_EN_DEFAULT 1'b1   // opt-in: GELU support (ViT-style builds). Default: no GELU (GELU and SwiGLU never run together)
-`else
-`define TR_GELU_EN_DEFAULT 1'b0
-`endif
-`endif
-
 /*
  * @module   tr_backbone_wrapper
  * @brief    Encapsulated Log-Domain Math Pipeline (Vectorized).
- * @details  Chains pre-LN modification, TR-ln, post-LN modification, and TR-exp.
+ * @details  Chains TR-ln, post-LN modification, and TR-exp. Only lane 0 has the ln unit (softmax SM_P3 and RMSNorm RM_P2 read
+ *           lane 0 only; every other use is bypass_ln), and post_ln only supports bypass and the rounded -0.5x (mode 11) on lane 0.
  *           Purely combinational. Expects wide inputs and natively steps down 
  *           precision through the tr_ln_alu block.
  *
- *           Pipeline (3 register stages, 3 cycles in_valid -> out_valid): input regs -> pre_ln + tr_ln_alu -> regs ->
+ *           Pipeline (3 register stages, 3 cycles in_valid -> out_valid): input regs -> tr_ln_alu -> regs ->
  *           round-back/saturate + post_ln -> regs -> tr_exp_alu (combinational to the outputs).
  *
  *           The ONE shared tr_ln_alu runs at BITS=FRAC_W+LN_EXTRA (Q.6) so every operator uses the
@@ -28,12 +21,8 @@
  * @param    LUT_IDX_W   Width of the ROM index for the Taylor anchor.
  * @param    LN_EXTRA    Extra fractional bits of the shared ln unit (BITS = FRAC_W + LN_EXTRA).
  * @param    LN_IN_W     Width of the shared ln unit's input. The largest reachable value is 4096 (RMSNorm mean, all codes -128):
- *                       softmax's slice x4 <= 512 and GELU's (E+16)x4 <= 128, so 13 bits suffice; anything larger is clamped to
+ *                       softmax's slice x4 <= 512, so 13 bits suffice; anything larger is clamped to
  *                       2^LN_IN_W-1 (unreachable with the shipped controller).
- * @param    GELU_EN     1: full backbone (GELU needs ln on all lanes, the +1.0 pre-conditioner and the negate post-mode).
- *                       0 (default; macro GELU_ENABLE sets 1): only lane 0 has the ln unit (softmax SM_P3 and RMSNorm RM_P2 read lane 0
- *                       only; every other use is bypass_ln), pre_ln_modifier is removed, and post_ln only supports
- *                       bypass and the rounded -0.5x (mode 11) on lane 0.
  */
 module tr_backbone_wrapper #(
     parameter int N         = 8,
@@ -42,7 +31,6 @@ module tr_backbone_wrapper #(
     parameter int FRAC_W    = 4,
     parameter int LUT_IDX_W = 3,
     parameter int LN_EXTRA  = 2,
-    parameter bit GELU_EN   = `TR_GELU_EN_DEFAULT,
     parameter int LN_IN_W   = 13   // width of the ln unit's input; every reachable input fits (max 4096), larger values are clamped
 )(
     input  logic clk,
@@ -52,8 +40,7 @@ module tr_backbone_wrapper #(
 
     // Control Flags
     input  logic bypass_ln,
-    input  logic mode_pre_ln,  // 0: Bypass, 1: Add +1.0
-    input  logic [1:0]              mode_post_ln, // 00: By, 01: -1.0x, 10: -0.5x (floor), 11: -0.5x (rounded)
+    input  logic [1:0]              mode_post_ln, // 00: bypass, 11: -0.5x (rounded, lane 0)
     input  logic ln_pre_scaled,  // 0: vec_in has FRAC_W frac bits (shifted up by LN_EXTRA), 1: already FRAC_W+LN_EXTRA
     
     // Datapath Input
@@ -71,7 +58,6 @@ module tr_backbone_wrapper #(
     // =========================================================
     logic signed [WIDTH_IN-1:0] s1_vec_in [N];
     logic                       s1_bypass_ln;
-    logic                       s1_mode_pre_ln;
     logic [1:0]                 s1_mode_post_ln;
     logic                       s1_ln_pre_scaled;
     logic                       s1_valid;
@@ -80,14 +66,12 @@ module tr_backbone_wrapper #(
         if (!rst_n) begin
             s1_valid <= 1'b0;
             s1_bypass_ln <= 1'b0;
-            s1_mode_pre_ln <= 1'b0;
             s1_mode_post_ln <= '0;
             s1_ln_pre_scaled <= 1'b0;
             for(int i=0; i<N; i++) s1_vec_in[i] <= '0;
         end else begin
             s1_valid <= in_valid;
             s1_bypass_ln <= bypass_ln;
-            s1_mode_pre_ln <= mode_pre_ln;
             s1_mode_post_ln <= mode_post_ln;
             s1_ln_pre_scaled <= ln_pre_scaled;
             s1_vec_in <= vec_in;
@@ -95,31 +79,14 @@ module tr_backbone_wrapper #(
     end
 
     // =========================================================
-    // STAGE 1: PRE-LN & TR-LN (Combinational) -> PIPELINE REGISTER 1b
+    // STAGE 1: TR-LN (Combinational) -> PIPELINE REGISTER 1b
     // =========================================================
     // The ln result is registered here, BEFORE the round-back / saturate / post-ln logic, to keep the stage within the
-    // clock period (synthesis: pre_ln + tr_ln_alu ends at ~2.9 ns of the 3.3 ns budget; round-back + saturate + post_ln
+    // clock period (synthesis: tr_ln_alu ends at ~2.9 ns of the 3.3 ns budget; round-back + saturate + post_ln
     // add another ~0.8 ns). The bypass path (bypass_ln) is merged into the same register as the saturated 8-bit value
     // shifted up by LN_EXTRA, so the stage-2 round-back returns it unchanged ((4b+2)>>>2 = b).
-    logic signed [WIDTH_IN-1:0]  pre_ln_out  [N];
     logic signed [WIDTH_OUT-1:0] tr_ln_out   [N];
     logic signed [WIDTH_OUT-1:0] post_ln_out [N];
-
-    generate
-        if (GELU_EN) begin : gen_pre_ln
-            pre_ln_modifier #(
-                .N(N), 
-                .WIDTH_IN(WIDTH_IN), 
-                .FRAC_W(FRAC_W)
-            ) u_pre_ln (
-                .x_in         (s1_vec_in),
-                .mode_add_one (s1_mode_pre_ln),
-                .y_out        (pre_ln_out)
-            );
-        end else begin : gen_no_pre_ln
-            assign pre_ln_out = s1_vec_in;     // the +1.0 mode only exists for GELU
-        end
-    endgenerate
 
     localparam int LN_OUT_W = FRAC_W + LN_EXTRA + 4;   // ln unit output width (Q.(FRAC_W+LN_EXTRA), 4 integer bits)
     localparam int MAX_VAL =  (1 << (WIDTH_OUT - 1)) - 1;   // e.g., for 8-bit: Max = 127, Min = -128
@@ -137,11 +104,11 @@ module tr_backbone_wrapper #(
             logic signed [LN_OUT_W-1:0]        ln_y;
             logic signed [WIDTH_OUT-1:0]       byp_sat;
 
-            assign ln_xin_full = s1_ln_pre_scaled ? {{LN_EXTRA{1'b0}}, pre_ln_out[i]}
-                                                  : {pre_ln_out[i], {LN_EXTRA{1'b0}}};
+            assign ln_xin_full = s1_ln_pre_scaled ? {{LN_EXTRA{1'b0}}, s1_vec_in[i]}
+                                                  : {s1_vec_in[i], {LN_EXTRA{1'b0}}};
             assign ln_xin = (ln_xin_full >> LN_IN_W) != 0 ? {LN_IN_W{1'b1}} : ln_xin_full[LN_IN_W-1:0];
 
-            if (GELU_EN || i == 0) begin : gen_ln
+            if (i == 0) begin : gen_ln
                 tr_ln_alu #(
                     .WIDTH(LN_IN_W),
                     .BITS(FRAC_W + LN_EXTRA),
@@ -151,17 +118,17 @@ module tr_backbone_wrapper #(
                     .yq (ln_y)
                 );
             end else begin : gen_no_ln
-                assign ln_y = '0;                  // lanes 1..N-1 of a no-GELU build only ever bypass the ln
+                assign ln_y = '0;                  // lanes 1..N-1 only ever bypass the ln
             end
 
             // Saturation clamp for the bypassed WIDTH_IN -> WIDTH_OUT cast
             always_comb begin
-                if (pre_ln_out[i] > MAX_VAL)       byp_sat = WIDTH_OUT'(MAX_VAL);
-                else if (pre_ln_out[i] < MIN_VAL)  byp_sat = WIDTH_OUT'(MIN_VAL);
-                else                               byp_sat = WIDTH_OUT'(pre_ln_out[i]);
+                if (s1_vec_in[i] > MAX_VAL)       byp_sat = WIDTH_OUT'(MAX_VAL);
+                else if (s1_vec_in[i] < MIN_VAL)  byp_sat = WIDTH_OUT'(MIN_VAL);
+                else                               byp_sat = WIDTH_OUT'(s1_vec_in[i]);
             end
 
-            assign s1_ln_y[i] = (s1_bypass_ln || !(GELU_EN || i == 0)) ? (LN_OUT_W'(byp_sat) <<< LN_EXTRA) : ln_y;
+            assign s1_ln_y[i] = (s1_bypass_ln || i != 0) ? (LN_OUT_W'(byp_sat) <<< LN_EXTRA) : ln_y;
 
         end
     endgenerate
@@ -201,27 +168,14 @@ module tr_backbone_wrapper #(
         end
     end
     
-    generate
-        if (GELU_EN) begin : gen_post_ln
-            post_ln_modifier #(
-                .N(N), 
-                .W(WIDTH_OUT)
-            ) u_post_ln (
-                .x_in     (ln_mux_out),
-                .mode_sel (s1b_mode_post_ln),
-                .y_out    (post_ln_out)
-            );
-        end else begin : gen_no_post_ln
-            // No-GELU build: lanes 1..N-1 are never read as a log (bypass only); lane 0 supports bypass (00) and
-            // RMSNorm's rounded -0.5x (11): -((x+1)>>>1), computed one bit wider so x=MAX does not wrap.
-            logic signed [WIDTH_OUT:0] half_x;
-            assign half_x = ($signed({ln_mux_out[0][WIDTH_OUT-1], ln_mux_out[0]}) + 1) >>> 1;
-            always_comb begin
-                for (int i = 0; i < N; i++) post_ln_out[i] = ln_mux_out[i];
-                if (s1b_mode_post_ln == 2'b11) post_ln_out[0] = WIDTH_OUT'(-half_x);
-            end
-        end
-    endgenerate
+    // Lanes 1..N-1 are never read as a log (bypass only); lane 0 supports bypass (00) and RMSNorm's rounded -0.5x (11):
+    // -((x+1)>>>1), computed one bit wider so x=MAX does not wrap.
+    logic signed [WIDTH_OUT:0] half_x;
+    assign half_x = ($signed({ln_mux_out[0][WIDTH_OUT-1], ln_mux_out[0]}) + 1) >>> 1;
+    always_comb begin
+        for (int i = 0; i < N; i++) post_ln_out[i] = ln_mux_out[i];
+        if (s1b_mode_post_ln == 2'b11) post_ln_out[0] = WIDTH_OUT'(-half_x);
+    end
 
     // --- PIPELINE REGISTER 2 ---
     logic signed [WIDTH_OUT-1:0] s2_post_ln_reg [N];

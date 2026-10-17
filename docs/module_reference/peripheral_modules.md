@@ -61,31 +61,6 @@ Combinationally subtracts a single scalar value (`sub_val`) from every element o
 
 ---
 
-## `alpha_stabilizer`
-
-**File:** [rtl_soc/tr_nonlinear_vpu/peripheral_modules/alpha_stabilizer.sv](../../rtl_soc/tr_nonlinear_vpu/peripheral_modules/alpha_stabilizer.sv)
-
-### Operation
-
-Piecewise-linear GELU sigmoid-slope scaler, forced into the negative domain `tr_exp_alu`'s Taylor-Region backbone supports. Scales `|x|` by one of four region-dependent coefficients (27, 26, 25, 24 sixteenths, re-scaled to `FRAC_W`), selected by which of the `|x|<1/2/3` real-valued bands `x` falls into — a piecewise refinement of the constant GELU sigmoid-slope factor (~1.702) for better accuracy across magnitude ranges. The result is saturated to the signed `W`-bit range, then unconditionally negated to non-positive (`out_vec = -|x_scaled|`) so it lands in the negative-only domain `shared_lut_rom`'s anchor table and `tr_exp_alu`'s Taylor polynomial expect, regardless of the original sign of `x`.
-
-### Parameters
-
-| Parameter | Default | Description                                                                 |
-|-----------|---------|-------------------------------------------------------------------------------|
-| `N`       | `8`     | Vector dimension                                                               |
-| `W`       | `8`     | Word width of `in_vec`/`out_vec`                                               |
-| `FRAC_W`  | `4`     | Fractional bits (defines the `|x|=1/2/3` region boundaries and coefficient scaling) |
-
-### Ports
-
-| Port      | Direction | Width           | Description                                  |
-|-----------|-----------|------------------|-----------------------------------------------|
-| `in_vec`  | input     | `[W-1:0][N]`      | Signed input vector (`x`)                     |
-| `out_vec` | output    | `[W-1:0][N]`      | Non-positive, saturated, scaled `-|x|` result |
-
----
-
 ## `sigma_rom`
 
 **File:** [rtl_soc/tr_nonlinear_vpu/peripheral_modules/sigma_rom.sv](../../rtl_soc/tr_nonlinear_vpu/peripheral_modules/sigma_rom.sv)
@@ -153,31 +128,3 @@ Growth-branch reciprocal for RMSNorm's `inv_rms`: `inv = min(4095, round(2^16 / 
 |---------|-----------|---------------------|--------------------------------------------------|
 | `a_idx` | input     | `[LUT_IDX_W-1:0][N]` | Indices requested by the ALUs                     |
 | `e_a`   | output    | `[7:0][N]`           | Anchors returned to the ALUs (Q0.8, format-independent) |
-
----
-
-## `symmetry_modifier`
-
-**File:** [rtl_soc/tr_nonlinear_vpu/peripheral_modules/symmetry_modifier.sv](../../rtl_soc/tr_nonlinear_vpu/peripheral_modules/symmetry_modifier.sv)
-
-### Operation
-
-GELU sigmoid symmetry logic (vectorized) — a combinational trick that executes `Out = (x_raw < 0) ? (1.0 - y_sig) : y_sig`. Used to restore the full GELU shape from the non-positive TR-EXP domain: since the shared backbone can only evaluate `exp` for non-positive arguments, GELU's sigmoid is evaluated on `|x|` and this module restores the correct value for negative `x` via `1 - sigmoid(|x|) = sigmoid(-|x|)`. Extracts the sign bit directly from the raw input vector.
-
-### Parameters
-
-| Parameter | Default | Description                                          |
-|-----------|---------|---------------------------------------------------------|
-| `N`       | `8`     | Vector dimension                                           |
-| `WIDTH_X` | `8`     | Word width of the raw input `x` (to check the sign bit)    |
-| `WIDTH_Y` | `8`     | Word width of the sigmoid input/output                     |
-| `FRAC_W`  | `4`     | Fractional bit width of `y` (defines the `1.0` constant)   |
-
-### Ports
-
-| Port            | Direction | Width               | Description                                  |
-|-----------------|-----------|---------------------|-------------------------------------------------|
-| `x_raw`         | input     | `[WIDTH_X-1:0][N]`   | Original (pre-`|x|`) signed input, for its sign  |
-| `y_sig`         | input     | `[WIDTH_Y-1:0][N]`   | Sigmoid value computed on `|x|`                  |
-| `mode_en`       | input     | 1                    | 1: apply symmetry correction, 0: bypass          |
-| `sig_corrected` | output    | `[WIDTH_Y-1:0][N]`   | Symmetry-corrected sigmoid result                |

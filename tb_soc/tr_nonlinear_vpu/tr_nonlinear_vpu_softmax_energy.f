@@ -8,22 +8,18 @@
 ../rtl_soc/mult_engines/vecmul_out_cast.sv
 
 // tr_backbone
-../rtl_soc/tr_nonlinear_vpu/tr_backbone/pre_ln_modifier.sv
 ../rtl_soc/tr_nonlinear_vpu/tr_backbone/tr_ln_alu.sv
-../rtl_soc/tr_nonlinear_vpu/tr_backbone/post_ln_modifier.sv
 ../rtl_soc/tr_nonlinear_vpu/tr_backbone/tr_exp_alu.sv
 ../rtl_soc/tr_nonlinear_vpu/tr_backbone/round.sv
 ../rtl_soc/tr_nonlinear_vpu/tr_backbone/quadratic_divider.sv
 ../rtl_soc/tr_nonlinear_vpu/tr_backbone/tr_backbone_wrapper.sv
 
 // peripheral_modules
-../rtl_soc/tr_nonlinear_vpu/peripheral_modules/alpha_stabilizer.sv
 ../rtl_soc/tr_nonlinear_vpu/peripheral_modules/sigma_rom.sv
 ../rtl_soc/tr_nonlinear_vpu/peripheral_modules/recip_rom.sv
 ../rtl_soc/tr_nonlinear_vpu/peripheral_modules/piped_max.sv
 ../rtl_soc/tr_nonlinear_vpu/peripheral_modules/scalar_sub.sv
 ../rtl_soc/tr_nonlinear_vpu/peripheral_modules/shared_lut_rom.sv
-../rtl_soc/tr_nonlinear_vpu/peripheral_modules/symmetry_modifier.sv
 
 // tr_nonlinear_vpu
 ../rtl_soc/tr_nonlinear_vpu/tr_nonlinear_vpu.sv

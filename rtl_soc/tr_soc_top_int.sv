@@ -1,13 +1,5 @@
 `timescale 1ns/1ps
 
-`ifndef TR_GELU_EN_DEFAULT
-`ifdef GELU_ENABLE
-`define TR_GELU_EN_DEFAULT 1'b1   // opt-in: GELU support (ViT-style builds). Default: no GELU (GELU and SwiGLU never run together)
-`else
-`define TR_GELU_EN_DEFAULT 1'b0
-`endif
-`endif
-
 /*
  * @module   tr_soc_top_int
  * @brief    Top-level INT-datapath SoC integration: wires the matmul/
@@ -18,7 +10,7 @@
  *           datapath as the legacy single-tile ports via a busy-gated mux),
  *           dot_product_engine (M-lane matrix-vector MAC), requantize_engine_int
  *           (Acc*M+Bias>>>S rescale back to W-bit), and tr_nonlinear_vpu (the
- *           GELU/Softmax/RMSNorm crossbar). SRAM-A routing lets the VPU see
+ *           Softmax/RMSNorm/SwiGLU crossbar). SRAM-A routing lets the VPU see
  *           either the controller's scratchpad (multi-pass intermediates) or
  *           the requantizer's fresh output for lanes 0..M-1 combined with
  *           externally-supplied ext_sram_b for lanes M..N-1 (so a full
@@ -31,14 +23,12 @@
  * @param    N      Vector dimension of the nonlinear VPU / contraction tile width.
  * @param    W      Data word width (a_mat/b_vec/ext_sram_b/vpu_data_out).
  * @param    ACC_W  Accumulator width (c_vec bias, dot_acc_out, vpu_dot_out).
- * @param    GELU_EN  1: GELU supported; 0 (default; macro GELU_ENABLE sets 1): GELU-only logic is not built (see tr_nonlinear_vpu).
  */
 module tr_soc_top_int #(
     parameter int M     = 4,   // Parallel Output Lanes
     parameter int N     = 8,   // Vector Dimension
     parameter int W     = 8,
-    parameter int ACC_W = 32,
-    parameter bit GELU_EN = `TR_GELU_EN_DEFAULT
+    parameter int ACC_W = 32
 )(
     input  logic clk,
     input  logic rst_n,
@@ -124,20 +114,16 @@ module tr_soc_top_int #(
 
     logic                           bb_shift_mode;
     logic                           bb_bypass_ln;
-    logic                           bb_mode_pre_ln;
     logic [1:0]                     bb_mode_post_ln;
     logic                           bb_ln_pre_scaled;
-    logic                           sym_mode_en;
     logic signed [W-1:0]            ctrl_scalar_sub_val;
     
     logic                           src_sram_a_sel;
-    logic                           src_sram_b_sel;
     logic                           write_ext_sram;
 
-    logic signed [11:0]             ctrl_scratch_a [N];     // SwiGLU wide silu (GELU uses the low 8 bits)
+    logic signed [11:0]             ctrl_scratch_a [N];     // SwiGLU wide silu
     logic signed [19:0]             vpu_wide_out [N];
     logic signed [5:0]              sw_shift;
-    logic signed [W-1:0]            ctrl_scratch_b [N];
 
     // VPU Outputs
     logic signed [W-1:0]            vpu_sram_a_in [N];
@@ -161,8 +147,7 @@ module tr_soc_top_int #(
     tr_soc_ctrl_int #(
         .N(N),
         .W(W),
-        .ACC_W(ACC_W),
-        .GELU_EN(GELU_EN)
+        .ACC_W(ACC_W)
     ) u_ctrl (
         .clk                 (clk),
         .rst_n               (rst_n),
@@ -193,17 +178,13 @@ module tr_soc_top_int #(
         
         .bb_shift_mode       (bb_shift_mode),
         .bb_bypass_ln        (bb_bypass_ln),
-        .bb_mode_pre_ln      (bb_mode_pre_ln),
         .bb_mode_post_ln     (bb_mode_post_ln),
         .bb_ln_pre_scaled    (bb_ln_pre_scaled),
-        .sym_mode_en         (sym_mode_en),
         .ctrl_scalar_sub_val (ctrl_scalar_sub_val),
 
         .src_sram_a_sel      (src_sram_a_sel),
-        .src_sram_b_sel      (src_sram_b_sel),
         .write_ext_sram      (write_ext_sram),
         .scratch_a_out       (ctrl_scratch_a),
-        .scratch_b_out       (ctrl_scratch_b),
         
         .vpu_data_out        (vpu_raw_out),
         .vpu_max_out         (vpu_max_out),
@@ -338,7 +319,7 @@ module tr_soc_top_int #(
                 vpu_sram_a_in[i] = ext_sram_b[i];
             end
 
-            vpu_sram_b_in[i] = (GELU_EN && src_sram_b_sel) ? ctrl_scratch_b[i] : ext_sram_b[i];
+            vpu_sram_b_in[i] = ext_sram_b[i];
         end
     end
 
@@ -348,8 +329,7 @@ module tr_soc_top_int #(
         .W_MAC(16),
         .ACC_W(ACC_W),
         .FRAC_W(4),
-        .LUT_IDX_W(3),
-        .GELU_EN(GELU_EN)
+        .LUT_IDX_W(3)
     ) u_vpu (
         .clk                 (clk),
         .rst_n               (rst_n),
@@ -388,10 +368,8 @@ module tr_soc_top_int #(
         
         .bb_shift_mode       (bb_shift_mode),
         .bb_bypass_ln        (bb_bypass_ln),
-        .bb_mode_pre_ln      (bb_mode_pre_ln),
         .bb_mode_post_ln     (bb_mode_post_ln),
         .bb_ln_pre_scaled    (bb_ln_pre_scaled),
-        .sym_mode_en         (sym_mode_en),
 
         .vpu_bb_valid_out    (vpu_bb_valid),
         .vpu_vecmul_valid_out(vpu_vecmul_valid),

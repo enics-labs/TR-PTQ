@@ -27,7 +27,7 @@
 module tr_ln_alu #(
     parameter int WIDTH = 16,
     parameter int BITS  = 4,        // Fractional bits
-    parameter int OUT_WIDTH = 8,    // Defaults to SoftMax/GELU 16->8 reduction
+    parameter int OUT_WIDTH = 8,    // Defaults to the Softmax 16->8 reduction
     parameter int SEGMENTS  = 2,    // PWL segments (1, 2, 4)
     parameter int COEF_BITS = 8     // PWL constant precision (6, 8, 10)
 )(

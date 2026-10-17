@@ -2,7 +2,7 @@
 // MODULE: vec_mul_array_engine (Element-wise Multiplier)
 // ===================================================================================
 // Evaluates: Out[i] = a[i] * b[i]
-// Used for: SoftMax probability scaling, GELU final gating.
+// Used for: softmax probability scaling, RMSNorm and SwiGLU apply.
 // ===================================================================================
 /*
  * @module   vec_mul_array_engine
@@ -12,7 +12,7 @@
  *           per-lane products (mode-selectable signed/unsigned operands via
  *           op_mode, same convention as mac_array_engine), (3) register the
  *           products, sign-extended/cast to the output width -- used for
- *           softmax probability scaling and GELU's final elementwise gate.
+ *           softmax probability scaling and the RMSNorm / SwiGLU apply steps.
  *
  * @param    N      Number of parallel lanes.
  * @param    W      Input operand width (a).

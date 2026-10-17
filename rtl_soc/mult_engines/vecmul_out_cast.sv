@@ -1,18 +1,8 @@
-`ifndef TR_GELU_EN_DEFAULT
-`ifdef GELU_ENABLE
-`define TR_GELU_EN_DEFAULT 1'b1   // opt-in: GELU support (ViT-style builds). Default: no GELU (GELU and SwiGLU never run together)
-`else
-`define TR_GELU_EN_DEFAULT 1'b0
-`endif
-`endif
-
 /*
  * @module   vecmul_out_cast
  * @brief    Output stage of tr_nonlinear_vpu's vec-mul engine: scales / rounds / saturates the N wide products to W bits.
  * @details  Combinational. vecmul_scale_mode selects the cast (these are the encodings the controller drives):
  *             000  low W bits, no scaling
- *             001  >>> FRAC_W, wrapping                       (GELU only)
- *             010  >>> 8                                      (GELU only; anchor Q0.8)
  *             011  softmax probabilities: >>> FRAC_W, unsigned saturate at 255
  *             101  RMSNorm apply: ROUNDED >>> (FRAC_W+4), signed saturate
  *             110  SwiGLU apply: round_shift(acc << 2, sw_shift) with sw_shift >= 0, signed saturate
@@ -22,14 +12,12 @@
  * @param    W        Output width.
  * @param    ACC_W    Width of the engine's result (acc); the VPU passes 20 (the largest result is 20 signed bits).
  * @param    FRAC_W   Fractional bits of the Q-format.
- * @param    GELU_EN  0 (default; macro GELU_ENABLE sets 1): modes 001 / 010 are not built.
  */
 module vecmul_out_cast #(
     parameter int N       = 8,
     parameter int W       = 8,
     parameter int ACC_W   = 32,
-    parameter int FRAC_W  = 4,
-    parameter bit GELU_EN = `TR_GELU_EN_DEFAULT
+    parameter int FRAC_W  = 4
 )(
     input  logic signed [ACC_W-1:0] acc [N],
     input  logic [2:0]              scale_mode,
@@ -69,10 +57,6 @@ module vecmul_out_cast #(
                 if (shifted > SAT_MAX)       out[i] = SAT_MAX;
                 else if (shifted < SAT_MIN)  out[i] = SAT_MIN;
                 else                         out[i] = W'(shifted);
-            end else if (GELU_EN && scale_mode == 3'b010) begin
-                out[i] = W'(acc[i] >>> 8);
-            end else if (GELU_EN && scale_mode == 3'b001) begin
-                out[i] = W'(acc[i] >>> FRAC_W);
             end else begin
                 out[i] = W'(acc[i]);
             end
