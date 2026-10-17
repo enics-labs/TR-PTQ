@@ -137,10 +137,14 @@ module tr_nonlinear_vpu #(
     localparam int S_SAT_MAX = (1 << W_MAC) - 1;
     logic [5:0]              rms_sh;
     logic signed [ACC_W:0]   rms_s_shifted;
+    logic signed [ACC_W+1:0] rms_s2x;
     logic        [W_MAC-1:0] rms_s_sat;
     always_comb begin
         rms_sh        = 6'(FRAC_W) + 6'(rms_log2n) - 6'(RMS_K);
-        rms_s_shifted = ($signed({vpu_dot_out[ACC_W-1], vpu_dot_out}) + ((rms_sh == 0) ? 0 : (1 <<< (rms_sh - 1)))) >>> rms_sh;
+        // round_shift(S, sh) = ((2S >>> sh) + 1) >>> 1: shifter first, +1 on the shifted value (no sh-1 subtract / wide adder
+        // in front of the shifter; identical to (S + 2^(sh-1)) >>> sh, and to S for sh = 0).
+        rms_s2x       = $signed({vpu_dot_out[ACC_W-1], vpu_dot_out, 1'b0}) >>> rms_sh;
+        rms_s_shifted = (rms_s2x + 1) >>> 1;
         rms_s_sat     = (rms_s_shifted > S_SAT_MAX) ? '1 : W_MAC'(rms_s_shifted);
     end
 
