@@ -95,7 +95,7 @@ module tr_nonlinear_vpu #(
     // 000:[N-1:0], 001:[11:4] (wrap), 010:[15:8], 011: softmax Q0.8 unsigned
     // saturate, (100 unused), 110: SwiGLU apply, round_shift(acc<<2, sw_shift) signed saturate, 101: ROUNDED >>(FRAC_W+4) signed saturate (RMSNorm apply),
     // 100: [11:4] SIGNED SATURATE (SwiGLU gate-multiply -- see
-    // docs/llama_fpga_plan.md change C; 000-011 bit-identical to the old
+    // docs/llama/overview.md change C; 000-011 bit-identical to the old
     // 2-bit encoding, just zero-extended).
     input  logic [2:0]  vecmul_scale_mode,
     input  logic en_bb_valid,

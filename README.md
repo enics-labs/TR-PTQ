@@ -1,54 +1,58 @@
-# TR-PTQ VPU — RTL
+# TR-PTQ VPU: RTL
 
-RTL for a Taylor-Region (TR) Vector Processing Unit: a single shared, software-defined log/exp crossbar (`tr_nonlinear_vpu`) that implements GELU, Softmax, and RMSNorm for INT8 ViT inference, driven by an MMIO command FSM, alongside the linear (matmul) engine that feeds it. Includes I-BERT-style and standalone-TR baseline RTL for energy/area comparison.
+RTL for a Taylor-Region (TR) vector processing unit: one shared, software-defined log/exp crossbar
+(`tr_nonlinear_vpu`) that implements the nonlinear operators of INT8 transformer inference, sequenced by an MMIO
+command FSM and fed by an INT8 matmul engine.
 
-This is `tr-vpu_rtl`, the RTL-only branch of [TR-PTQ](https://github.com/enics-labs/TR-PTQ). The Genus (65nm) synthesis flow lives on the `tr-vpu_synthesis` branch instead.
+| Operator | Used by | Where it runs |
+|---|---|---|
+| RMSNorm (rows up to thousands of elements, host-sequenced in 8-lane tiles) | Llama | VPU |
+| SwiGLU (silu x up, two-pass per-row gain, rows up to 8192) | Llama | VPU |
+| Softmax (one N=8 tile with its `z = max + ln S`; flash-attention orchestration on the CPU) | Llama, ViT | VPU |
+| GELU | ViT | VPU, opt-in build (`GELU_ENABLE`) |
 
-**Start here:** [docs/architecture.md](docs/architecture.md) for the design overview, or [docs/tr_soc_architecture.drawio](docs/tr_soc_architecture.drawio) for the block diagram.
+This is `tr-vpu_rtl`, the RTL-only branch of [TR-PTQ](https://github.com/enics-labs/TR-PTQ).
+The Genus synthesis flow is on the `tr-vpu_synthesis` branch. The paper-era design (ViT, single-tile RMSNorm, GELU
+always built) is frozen at the tag `tr-vpu_rtl-ISCAS-20261013`.
 
-## Directory structure
+Start with [docs/architecture.md](docs/architecture.md).
 
-```
-rtl_soc/              Production RTL: tr_nonlinear_vpu (the shared crossbar),
-                       tr_soc_ctrl (the FSMs that sequence it), tr_soc_top_int/mx
-                       (top-level SoC integration), and the shared engines
-                       (mult_engines, dot_product_engine, requantize_engine,
-                       mx_modules) they're built from.
-rtl_baseline/          Standalone RTL kept for comparison, NOT instantiated by
-                       either SoC top: tr_baseline/ (dedicated TR modules) and
-                       ibert_baseline/ (I-BERT-style comparison point).
-tb_soc/                Testbenches for rtl_soc/, mirroring its structure 1:1.
-tb_baseline/            Testbenches for rtl_baseline/, same mirroring.
-verification/          verify_block.py -- the golden-vector verification flow.
-emulation/             cpu_math_model.cpp / tr_math_model.hpp -- the C++ golden
-                       models verify_block.py checks RTL against.
-scripts/               xrun config shared by every .f file.
-docs/                  Architecture, module reference, verification docs.
-workspace/              Run everything from here (xrun, verify_block.py).
-```
+## Layout
 
-## Running things
+| Path | Content |
+|---|---|
+| `rtl_soc/` | production RTL: `tr_nonlinear_vpu` (the crossbar), `tr_soc_ctrl` (command FSMs), `tr_soc_top_int` / `tr_soc_top_mx` (integration), and the shared engines |
+| `rtl_baseline/` | standalone RTL for comparison, not instantiated by either top: `tr_baseline/` and `ibert_baseline/` |
+| `tb_soc/`, `tb_baseline/` | testbenches, mirroring the RTL trees one to one |
+| `verification/` | `verify_block.py`, the golden-vector regression flow |
+| `emulation/` | C++ golden models (`tr_math_model.hpp`, `cpu_math_model.cpp`) and the ctypes wrapper source |
+| `scripts/` | `xrun` configuration shared by all file lists |
+| `docs/` | architecture, verification, per-module reference |
+| `workspace/` | run everything from here |
 
-Every block has an `.f` file (an `xrun` file list). From `workspace/`:
+## Build flavors
+
+The default build has no GELU: `GELU_EN = 0`, which removes the GELU-only logic (about a quarter of the VPU).
+Define the macro `GELU_ENABLE` (or override the parameter) for the GELU build. The GELU testbench file lists add
+the macro themselves. Details: [docs/architecture.md](docs/architecture.md#build-flavors).
+
+## Running
 
 ```sh
 cd workspace
-xrun -f ../tb_soc/<block>/<block>.f
+xrun -f ../tb_soc/<block>/<block>.f                      # self-checking testbench
+python3 ../verification/verify_block.py <block>          # RTL against the C++ golden model
+RTL_DEFINES=GELU_ENABLE python3 ../verification/verify_block.py <block>    # GELU build
 ```
 
-For blocks verified against the C++ golden model instead of a self-checking testbench:
+[docs/verification.md](docs/verification.md) lists every block, its golden model and the energy pilots.
 
-```sh
-cd workspace
-python3 ../verification/verify_block.py <block_name>
-```
+## Documentation
 
-See [docs/verification.md](docs/verification.md) for the full block-name table and how the golden-vector flow works.
-
-## Docs
-
-- [docs/architecture.md](docs/architecture.md) — design overview: the shared crossbar, INT vs MX datapath variants, where the baseline RTL fits in.
-- [docs/mx_format_operation.md](docs/mx_format_operation.md) — the MX (Microscaling shared-exponent) datapath in detail.
-- [docs/verification.md](docs/verification.md) — how to run and verify anything in this repo.
-- [docs/module_reference/](docs/module_reference/) — per-block port/parameter reference, one file per `rtl_soc/` subfolder.
-- [docs/tr_soc_architecture.drawio](docs/tr_soc_architecture.drawio) / [docs/research_diagrams.drawio](docs/research_diagrams.drawio) — diagram sources.
+| Page | Content |
+|---|---|
+| [docs/architecture.md](docs/architecture.md) | shared crossbar, command set, build flavors, INT and MX variants, baselines |
+| [docs/verification.md](docs/verification.md) | regression flows, golden models, energy pilots |
+| [docs/module_reference/](docs/module_reference/) | ports and parameters, one file per `rtl_soc/` subfolder |
+| [docs/mx_format_operation.md](docs/mx_format_operation.md) | the MX (shared-exponent) datapath |
+| `docs/*.drawio` | block diagram sources |

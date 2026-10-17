@@ -41,7 +41,7 @@ On an MMIO command write, sequences `tr_nonlinear_vpu`'s crossbar through the mu
 | `0x0B` | SwiGLU row gain: `e` from `reg_sw_max` (consumes and clears it) | `SW_G` |
 | `0x0C` | SwiGLU apply group: `sat8(round_shift(4·silu_s·up, 10−e))` | `SW_P4` |
 
-**There is no command 3 any more** (the single-tile RMSNorm of earlier revisions). RMSNorm (rows of 8·tiles elements) and SwiGLU (rows of 8·groups elements) are **host-sequenced** in 8-lane groups: RMSNorm = `0x07`, `0x08`…, `0x09`, `0x0A` per tile; SwiGLU = pass 1 (`0x05`, `0x06` per group), `0x0B`, pass 2 (`0x05`, `0x0C` per group). See the header of `tr_soc_ctrl_int.sv` and `docs/llama_hw_summary.md` §10; golden models are `rms_*` / `sw_*` in `emulation/tr_math_model.hpp`.
+**There is no command 3 any more** (the single-tile RMSNorm of earlier revisions). RMSNorm (rows of 8·tiles elements) and SwiGLU (rows of 8·groups elements) are **host-sequenced** in 8-lane groups: RMSNorm = `0x07`, `0x08`…, `0x09`, `0x0A` per tile; SwiGLU = pass 1 (`0x05`, `0x06` per group), `0x0B`, pass 2 (`0x05`, `0x0C` per group). See the header of `tr_soc_ctrl_int.sv` and `docs/llama/hardware-spec.md` §10; golden models are `rms_*` / `sw_*` in `emulation/tr_math_model.hpp`.
 
 **Pass sequencing:** each command is a fixed sequence of states driving `tr_nonlinear_vpu`'s crossbar-select/enable/mode outputs pass-by-pass, gated on that pass's own `vpu_*_valid` handshake (the VPU's submodules have no external ready signal, so each pass waits out its producer's own valid pulse before advancing).
 

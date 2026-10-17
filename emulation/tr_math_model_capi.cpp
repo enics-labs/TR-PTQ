@@ -3,7 +3,7 @@
 // tools/infra/tr_math_hw.py, so Python calls the SAME RTL-verified functions
 // cpu_math_model.cpp uses for verify_block.py -- one implementation, two
 // callers, instead of parallel Python/C++ ports that can drift (see
-// docs/known_issues.md).
+// docs/platform/known_issues.md).
 //
 // Build (also done automatically by tools/infra/tr_math_hw.py on first import):
 //   g++ -O2 -std=c++17 -shared -fPIC \

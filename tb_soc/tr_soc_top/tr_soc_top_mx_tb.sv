@@ -220,7 +220,7 @@ module tr_soc_top_mx_tb();
         // TEST 5: RMSNORM SIGN-GUARD FIX (small Sum(x^2), previously broken)
         // ---------------------------------------------------------
         // Same regression as tr_soc_top_int_tb.sv's TEST 5 (see that file
-        // and docs/iscas_paper_support/ for the full derivation): mantissas
+        // and docs/vit/iscas_paper_support/ for the full derivation): mantissas
         // {3,-3,3,-3} push Sum(x^2) deep into the previously-broken small-
         // Sum(x^2) regime -- RMSNorm is scale-invariant, so the MX exponent
         // (kept at 0 here) doesn't change which regime this hits, only the

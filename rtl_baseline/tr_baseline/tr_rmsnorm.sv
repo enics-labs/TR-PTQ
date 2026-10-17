@@ -71,7 +71,7 @@ module tr_rmsnorm #(
     // go positive for small Sum(x^2), which would collapse InvRMS toward 0
     // instead of growing it. Force it non-positive here and remember the
     // flip; it's undone at the output stage via recip_lut below. See
-    // docs/iscas_paper_support/ for the numerical root-cause derivation.
+    // docs/vit/iscas_paper_support/ for the numerical root-cause derivation.
     logic                 offset_was_positive;
     logic signed [W-1:0]  offset_guarded;
 

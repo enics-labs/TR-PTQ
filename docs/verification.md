@@ -26,6 +26,8 @@ This does 4 things: (1) compiles `cpu_math_model.cpp`, (2) runs it in the given 
 
 ### Block name reference
 
+The `gelu`, `gelu_fused` and top-level GELU testbenches need the GELU build: their file lists add `+define+GELU_ENABLE`. Every other block runs on the default build; `RTL_DEFINES=GELU_ENABLE` selects the GELU build for them too.
+
 | Block | Tests | Golden model source |
 |---|---|---|
 | `exp` | `tr_exp_alu` in isolation | `tr_approx_exp_scalar_2rd` |
@@ -44,7 +46,7 @@ This does 4 things: (1) compiles `cpu_math_model.cpp`, (2) runs it in the given 
 
 Only `softmax_baseline` needed a bespoke golden model — `tr_softmax.sv` is a genuinely different algorithm from the production log-sum-exp path (own "is_zero→255" anchor vs. the crossbar's "is_zero→128-doubling" trick). `gelu_baseline`/`rmsnorm_baseline` reuse their production counterparts' models directly since the standalone modules implement the identical algorithm, just wired without the SoC controller.
 
-**Tooling notes.** Each production flow's golden is bit-exact to `tools/models/vpu_ops.py` (cross-checked on random and real Llama rows, see `docs/llama_hw_summary.md` §10). `rmsnorm` and `swiglu` rows are long (up to 2048 / 8192 elements), so a mismatch prints a whole row. The vec-mul / VPU / top-level testbenches (`tr_nonlinear_vpu_tb`, `tr_soc_top_int_tb`) are smoke tests of the crossbar and the opcode dispatch, not bit-exact regressions; `alpha_stabilizer_tb` is an exhaustive check.
+**Tooling notes.** Each production flow's golden is bit-exact to `tools/models/vpu_ops.py` (cross-checked on random and real Llama rows; see `docs/llama/hardware-spec.md` in the integration repository). `rmsnorm` and `swiglu` rows are long (up to 2048 / 8192 elements), so a mismatch prints a whole row. The vec-mul / VPU / top-level testbenches (`tr_nonlinear_vpu_tb`, `tr_soc_top_int_tb`) are smoke tests of the crossbar and the opcode dispatch, not bit-exact regressions; `alpha_stabilizer_tb` is an exhaustive check.
 
 ## Energy characterization: `*_energy_tb.sv`
 
@@ -56,7 +58,7 @@ tb_baseline/tr_baseline/tr_{gelu,softmax,rmsnorm}/tr_*_energy.f
 tb_baseline/ibert_baseline/ibert_{gelu,softmax,rmsnorm}/ibert_*_energy.f
 ```
 
-The VCD feeds Genus (65nm synthesis, on the `synthesis` branch family) via `read_vcd -vcd_scope <tb>/<dut> <file>.vcd` against the already-synthesized netlist, then `report_power`. `Energy = Total_Power(µW) × N_cycles × T_clock(ns)`. All nine designs above use the **same** representative stimulus vector for direct comparability. See `ENERGY_SUMMARY_Q4.4.md` (synthesis branch) for the resulting numbers.
+The VCD feeds Genus (65 nm synthesis, branch `tr-vpu_synthesis`) via `read_vcd -vcd_scope <tb>/<dut> <file>.vcd` against the already-synthesized netlist, then `report_power`. `Energy = Total_Power(µW) × N_cycles × T_clock(ns)`. All nine designs above use the **same** representative stimulus vector for direct comparability. The paper-era numbers are in the tag `tr-vpu_synthesis-ISCAS-20261013` of the synthesis branch.
 
 `tr_nonlinear_vpu`'s own energy pilots are the trickiest of the nine: it has no single valid_in/valid_out handshake (a crossbar with 4 separate valid outputs), so each pilot replicates the controller's exact multi-pass sequence directly against the VPU, including two testbench pitfalls worth knowing about if you're writing a new one:
 

@@ -257,7 +257,7 @@ module tr_soc_top_int_tb();
         // independently know lanes 4-7's contents, so it can't derive the
         // precise golden output the way tr_rmsnorm_tb.sv's dedicated,
         // fully-controlled 8-lane test already did (see that testbench and
-        // docs/iscas_paper_support/ for exact-value verification).
+        // docs/vit/iscas_paper_support/ for exact-value verification).
         $display("\n---> CPU Executing OP_RMSNORM (tiled CMD = 0x07, 0x09, 0x0A), sign-guard fix regression test");
         load_mac_vector(32'd3, -32'd3, 32'd3, -32'd3);
         mmio_write(8'h00, 32'h07); wait_for_done();

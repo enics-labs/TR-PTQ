@@ -7,7 +7,7 @@
 //   - tr_math_model_capi.cpp (the extern "C" shared library Python calls
 //                              through ctypes — see tools/infra/tr_math_hw.py)
 // so there is exactly ONE implementation of each op, not parallel ports that
-// can silently drift (see docs/known_issues.md — this is what happened to the
+// can silently drift (see docs/platform/known_issues.md — this is what happened to the
 // old Python gelu_int8 approximation).
 //
 // All functions are RTL-verified via verify_block.py: exp/ln/softmax/swiglu
@@ -228,7 +228,7 @@ inline int8_t silu_hw_scalar(int8_t x) {
     // to 2 LSB between the two. swiglu_hw_model() below is bit-exact to the
     // SHARED CROSSBAR (GELU/future SwiGLU-opcode) precision, deliberately
     // NOT to tr_swiglu.sv's standalone module -- that comparison is the
-    // point of the exercise, not a bug; see docs/llama_fpga_plan.md.
+    // point of the exercise, not a bug; see docs/llama/overview.md.
     int    ln_q44  = tr_vpu_ln(pre_ln);
     int8_t neg_ln  = (int8_t)(-(int16_t)(int8_t)ln_q44);
     int    recip   = gelu_exp_q44(neg_ln);
@@ -572,7 +572,7 @@ inline int8_t softmax_sat8_sub(int a, int b) {
 // this fixed-N=8 primitive -- softmax_hw_model() itself is unchanged RTL
 // behavior; this is an additive, backward-compatible parameter (existing
 // callers passing NULL, including the original signature below, are
-// bit-identical to before). See docs/vit_inference_completion_plan.md /
+// bit-identical to before). See docs/vit/accuracy-findings.md /
 // tools/scripts/vpu_precision_archive/hw_function_accuracy.py's streaming_softmax_sweep() for why: exp(z_out) is
 // exactly this tile's own absolute exp-sum (Sum_i exp(x_i)), so combining
 // per-tile z_out values via a running logsumexp, using the SAME shared

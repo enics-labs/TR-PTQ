@@ -1,42 +1,89 @@
-# Architecture Overview
+# Architecture
 
-This branch (`tr-vpu_rtl`) contains the RTL for a Taylor-Region (TR) Vector Processing Unit: a shared, software-defined log/exp datapath that implements GELU, Softmax, and RMSNorm on top of one reusable crossbar, plus a linear (matmul) engine that feeds it. See [tr_soc_architecture.drawio](tr_soc_architecture.drawio) for the full block diagram.
+This branch (`tr-vpu_rtl`) contains the RTL of a Taylor-Region (TR) vector processing unit: a shared, software-defined
+log/exp datapath that implements the nonlinear operators of INT8 transformer inference on one reusable crossbar, plus
+the linear (matmul) engine that feeds it. Block diagram: [tr_soc_architecture.drawio](tr_soc_architecture.drawio).
 
-## The core idea: one shared nonlinear crossbar
+## One shared nonlinear crossbar
 
-`tr_nonlinear_vpu` ([rtl_soc/tr_nonlinear_vpu/tr_nonlinear_vpu.sv](../rtl_soc/tr_nonlinear_vpu/tr_nonlinear_vpu.sv)) is a purely combinational/pipelined crossbar with **zero internal state**. It routes SRAM data through isolated math modifiers (`alpha_stabilizer`, `scalar_sub`, `symmetry_modifier`, `piped_max` — see [module_reference/peripheral_modules.md](module_reference/peripheral_modules.md)), a shared log-domain backbone (`tr_backbone_wrapper` — see [module_reference/tr_backbone.md](module_reference/tr_backbone.md)), and local vector/MAC engines ([module_reference/mult_engines.md](module_reference/mult_engines.md)).
+`tr_nonlinear_vpu` ([rtl_soc/tr_nonlinear_vpu/tr_nonlinear_vpu.sv](../rtl_soc/tr_nonlinear_vpu/tr_nonlinear_vpu.sv))
+is a stateless, N=8 lane crossbar. It routes SRAM data through small math modifiers, a shared log-domain backbone and
+local vector/MAC engines:
 
-Because it has no state of its own, a single GELU, Softmax, or RMSNorm operation isn't one shot through the crossbar — it's a **sequence of passes**, each reconfiguring the crossbar's mux selects/enables and reading back the previous pass's result. That sequencing is owned entirely by the controller, not the VPU itself:
+| Block | Role | Reference |
+|---|---|---|
+| `tr_backbone_wrapper` | pre-conditioner, shared `tr_ln_alu`, post-conditioner, `tr_exp_alu` | [tr_backbone.md](module_reference/tr_backbone.md) |
+| `mac_array_engine` | sum of squares, softmax sum | [mult_engines.md](module_reference/mult_engines.md) |
+| `vec_mul_array_engine` + `vecmul_out_cast` | element-wise products and their scaling / rounding / saturation | [mult_engines.md](module_reference/mult_engines.md) |
+| `piped_max` | softmax row max and SwiGLU maximum of `|silu * up|` | [peripheral_modules.md](module_reference/peripheral_modules.md) |
+| `sigma_rom`, `recip_rom` | SwiGLU sigmoid table, RMSNorm growth-branch reciprocal | [peripheral_modules.md](module_reference/peripheral_modules.md) |
+| `scalar_sub`, `alpha_stabilizer`, `symmetry_modifier` | softmax `x - max`; GELU only | [peripheral_modules.md](module_reference/peripheral_modules.md) |
 
-- **`tr_soc_ctrl_int`** / **`tr_soc_ctrl_mx`** ([module_reference/tr_soc_ctrl.md](module_reference/tr_soc_ctrl.md)) are the MMIO-driven master FSMs. An MMIO command write kicks off a fixed state sequence that drives the crossbar pass-by-pass, gated on each pass's own valid handshake, holding intermediate results in scratch registers between passes. GELU, Softmax (one N=8 tile, with its `z = max + ln S` exposed) and the streaming matmul are single commands. **RMSNorm and SwiGLU are host-sequenced** over 8-lane tiles/groups (RMSNorm: sum-of-squares per tile, one scale step, apply per tile; SwiGLU: two passes with a per-row gain), so rows of 2048 / 8192 elements run on the N=8 datapath. One shared `tr_ln_alu` (piecewise-linear, BITS=6) serves all operators; SwiGLU's sigmoid is a 256-entry ROM (`sigma_rom`) and RMSNorm's growth-branch reciprocal a 241-entry ROM (`recip_rom`) — see `docs/llama_hw_summary.md` in the parent repo (section 10) for the as-built list. The `tr_soc_ctrl_mx` / MX top have **not** been updated for these changes yet.
+One `tr_ln_alu` (piecewise-linear, BITS = 6) serves every operator that needs a logarithm.
 
-This shared-crossbar design is the central area/energy trade-off of the whole project: one physical netlist does all three nonlinear ops (plus the log/exp math both matmul-adjacent RMSNorm and Softmax need), at the cost of multi-pass latency per operation instead of a single-shot dedicated pipeline. See `ENERGY_SUMMARY_Q4.4.md` (on the synthesis branch) for where that trade actually pays off and where it doesn't.
+Because the crossbar has no state, an operation is a sequence of passes. The sequencing is owned by the controller
+`tr_soc_ctrl_int` ([tr_soc_ctrl.md](module_reference/tr_soc_ctrl.md)): an MMIO command write starts a fixed state
+sequence that drives the crossbar pass by pass, gated on each pass's own valid handshake.
 
-## Two datapath variants: INT vs MX
+## Commands
 
-The repo ships two parallel top-level integrations that differ only in how they rescale data between the linear and nonlinear stages:
+| Command | Operation | Granularity |
+|---|---|---|
+| `0x01` | softmax tile with `z = max + ln S` readout | one 8-lane tile |
+| `0x02` | GELU (GELU build only) | one 8-lane vector |
+| `0x04` | streaming matmul | tile counts in registers |
+| `0x07` / `0x08` | RMSNorm sum-of-squares, first tile / next tile | one tile |
+| `0x09` | RMSNorm scale (mean, ln, exp, `inv_rms` register) | once per row |
+| `0x0A` | RMSNorm apply | one tile |
+| `0x05` | SwiGLU silu group | one 8-lane group |
+| `0x06` | SwiGLU running maximum of `|silu * up|` | one group |
+| `0x0B` | SwiGLU row gain | once per row |
+| `0x0C` | SwiGLU apply | one group |
+
+RMSNorm and SwiGLU rows are longer than 8 elements, so the host sequences them over tiles or groups. Register map and
+state sequences: [tr_soc_ctrl.md](module_reference/tr_soc_ctrl.md). Numerical specification and accuracy study of the
+Llama configuration live in the integration repository (`docs/llama/`).
+
+## Build flavors
+
+`GELU_EN` is a compile-time parameter carried by `tr_soc_top_int`, `tr_soc_ctrl_int`, `tr_nonlinear_vpu`,
+`tr_backbone_wrapper` and `vecmul_out_cast`. Its default comes from the macro `GELU_ENABLE`.
+
+| Build | `GELU_EN` | Content |
+|---|---|---|
+| default (Llama) | 0 | no GELU; command `0x02` is ignored |
+| GELU | 1 | adds GELU support for ViT-style models |
+
+What the default build removes, and why it is safe: softmax and RMSNorm read the ln result of lane 0 only, and every
+other use of the backbone bypasses the ln. So the build drops the ln unit on lanes 1 to 7, `pre_ln_modifier` (its
+"+1.0" mode is GELU-only), the post-ln modes other than bypass and the rounded `-0.5x` on lane 0, `alpha_stabilizer`,
+`symmetry_modifier`, `scratch_b`, the vec-mul cast modes `001` and `010`, and the GELU controls.
+
+## Timing structure
+
+The backbone is a three-register-stage pipeline: input registers; `pre_ln` and `tr_ln_alu`; round-back, saturation
+and `post_ln`; `tr_exp_alu` combinational to the outputs (three cycles from `in_valid` to `out_valid`). The register
+after the ln closes the 3.3 ns clock. Rounding in the wide shifters is written shifter-first
+(`((2x >>> s) + 1) >>> 1`), which removes a subtract and an adder from the path and gives identical results.
+
+## INT and MX variants
 
 | | `tr_soc_top_int` | `tr_soc_top_mx` |
 |---|---|---|
 | Controller | `tr_soc_ctrl_int` | `tr_soc_ctrl_mx` |
-| Rescaling | `requantize_engine_int`: explicit fixed-point `Acc·M>>>S` requantizer | `requantize_engine_mx` + `dynamic_shifter_mx` + `formatter_mx`: shared-exponent (Microscaling) format |
-| VPU operating width | narrow (`W_VEC`) with a separate wider internal backbone (`W_MAC`) | runs at one wide `VPU_W` throughout (no separate narrow SRAM format) |
+| Rescaling | `requantize_engine_int`: explicit `acc * M >>> S` | `requantize_engine_mx` + `dynamic_shifter_mx` + `formatter_mx`: shared exponent |
+| VPU width | narrow (`W_VEC`) with a wider internal backbone | one wide `VPU_W` throughout |
 
-Both instantiate the exact same `tr_nonlinear_vpu` and `dot_product_engine` — only the glue between linear and nonlinear stages changes. See [mx_format_operation.md](mx_format_operation.md) for the full MX dataflow (matmul → requantize → dynamic-shift-expand → VPU → formatter-compress).
+Both use the same `tr_nonlinear_vpu` and `dot_product_engine`. The MX variant has not been brought up to the command
+set above. See [mx_format_operation.md](mx_format_operation.md).
 
-## The linear side
+## Linear side
 
-`dot_product_engine` ([module_reference/mult_engines.md](module_reference/mult_engines.md) covers its underlying `mac_array_engine` lanes) computes `Out[i] = Σ(A[i]·B) + C[i]` — M parallel `mac_array_engine` lanes sharing one broadcast activation vector. `tr_matmul_ctrl` ([module_reference/tr_soc_ctrl.md](module_reference/tr_soc_ctrl.md)) sequences it into a full tiled matmul; the same sequencer is reused by both the INT and MX tops since it only drives handshakes, not data.
+`dot_product_engine` computes `Out[i] = sum(A[i] * B) + C[i]` with M parallel `mac_array_engine` lanes sharing one
+broadcast vector. `tr_matmul_ctrl` sequences it into a tiled matmul and is shared by both tops.
 
-## Baseline comparisons
+## Baselines
 
-`rtl_baseline/` holds two families of standalone RTL kept purely for comparison, **not** instantiated by either SoC top:
-
-- `tr_baseline/` — standalone `tr_gelu`/`tr_softmax`/`tr_rmsnorm`/`tr_swiglu` modules built from the same shared backbone primitives, but wired directly rather than through the SoC controller/crossbar. Useful for isolating the backbone's own behavior, or (for `tr_rmsnorm`) numerically identical to the production RM_P1..RM_P4 sequence — see [verification.md](verification.md). Shares one helper module, `vec_mul` (see [module_reference/rtl_baseline.md](module_reference/rtl_baseline.md)).
-- `ibert_baseline/` — an independent I-BERT-style implementation (iterative divider-based) used as the paper's baseline comparison point for energy/area.
-
-## Where to go next
-
-- [module_reference/](module_reference/) — per-block port/parameter reference, one file per `rtl_soc/` subfolder.
-- [verification.md](verification.md) — how to actually run any of this (`verify_block.py`, the `*_energy_tb.sv` convention).
-- [mx_format_operation.md](mx_format_operation.md) — the MX datapath in detail.
+`rtl_baseline/` holds standalone RTL for comparison, not instantiated by either top: `tr_baseline/` (dedicated TR
+modules built from the same primitives) and `ibert_baseline/` (an I-BERT-style, divider-based implementation).
+See [module_reference/rtl_baseline.md](module_reference/rtl_baseline.md).
