@@ -181,6 +181,7 @@ module tr_soc_ctrl_int #(
     logic                           latch_sw_gain;
     logic [WIDE_W-1:0]              reg_sw_max;       // running max of |silu_s * up| over the row
     logic signed [4:0]              reg_sw_e;         // row gain
+    logic signed [5:0]              reg_sw_shift;     // 10 - e, registered so the apply cast starts from a flop (timing)
     logic                           write_scratch_b;
     logic                           latch_max;
     logic                           latch_log;
@@ -197,7 +198,7 @@ module tr_soc_ctrl_int #(
     assign mm_num_ctiles    = reg_mm_ctiles;
     assign rms_log2n_out    = reg_rms_log2n;
     assign inv_rms_out      = reg_inv_rms;
-    assign sw_shift_out     = 6'sd10 - 6'(reg_sw_e);
+    assign sw_shift_out     = reg_sw_shift;
     assign rms_growth_out   = rm_offset_was_positive;
 
     always_comb begin
@@ -252,10 +253,12 @@ module tr_soc_ctrl_int #(
         if (!rst_n) begin
             reg_sw_max <= '0;
             reg_sw_e   <= '0;
+            reg_sw_shift <= 6'sd10;
         end else begin
             if (latch_sw_max && vpu_max_out[WIDE_W-1:0] > reg_sw_max) reg_sw_max <= vpu_max_out[WIDE_W-1:0];   // piped_max of |prod|
             if (latch_sw_gain) begin
                 reg_sw_e   <= sw_gain_fn(reg_sw_max);
+                reg_sw_shift <= 6'sd10 - 6'(sw_gain_fn(reg_sw_max));
                 reg_sw_max <= '0;
             end
         end

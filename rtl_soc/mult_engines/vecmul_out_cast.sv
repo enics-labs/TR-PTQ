@@ -50,13 +50,19 @@ module vecmul_out_cast #(
                 out[i] = (shifted > 255) ? W'(255) : W'(shifted);
             end else if (scale_mode == 3'b110) begin
                 // SwiGLU apply: prod = acc << 2 (silu was stored with 2 dropped bits), requantized with the per-row
-                // gain: rounded right shift by sw_shift (always >= 0: the gain is capped at 10), signed saturate.
-                logic signed [ACC_W+3:0] pr;       // acc<<2 (+1 rounding bit): ACC_W+4 is enough
-                pr = $signed({{4{acc[i][ACC_W-1]}}, acc[i]}) <<< 2;
-                if (sw_shift > 0)       pr = (pr + ((ACC_W+4)'(1) <<< (sw_shift - 1))) >>> sw_shift;
-                if (pr > SAT_MAX)       out[i] = SAT_MAX;
-                else if (pr < SAT_MIN)  out[i] = SAT_MIN;
-                else                    out[i] = W'(pr);
+                // gain: ROUNDED right shift by sw_shift (always >= 0: the gain is capped at 10), signed saturate.
+                // round_shift(p, s) = ((2p >>> s) + 1) >>> 1 (round half up, identical to (p + 2^(s-1)) >>> s and to p for
+                // s = 0), so the shifter comes first and the +1 acts on the shifted value: no (s-1) subtract and no
+                // wide adder in front of the shifter (timing).
+                logic signed [ACC_W+2:0] p2;       // 2 * (acc << 2) = acc << 3
+                logic signed [ACC_W+2:0] z;
+                logic signed [ACC_W+2:0] r;
+                p2 = $signed({{3{acc[i][ACC_W-1]}}, acc[i]}) <<< 3;
+                z  = p2 >>> sw_shift[4:0];
+                r  = (z + 1) >>> 1;
+                if (r > SAT_MAX)        out[i] = SAT_MAX;
+                else if (r < SAT_MIN)   out[i] = SAT_MIN;
+                else                    out[i] = W'(r);
             end else if (scale_mode == 3'b101) begin
                 // RMSNorm apply: x * inv_rms (inv_rms has FRAC_W+4 fractional bits) -> Q.FRAC_W, ROUNDED, signed saturate.
                 shifted = (acc[i] + (1 <<< (FRAC_W + 3))) >>> (FRAC_W + 4);
