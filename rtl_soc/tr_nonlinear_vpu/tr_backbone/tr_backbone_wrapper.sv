@@ -5,6 +5,9 @@
  *           Purely combinational. Expects wide inputs and natively steps down 
  *           precision through the tr_ln_alu block.
  *
+ *           Pipeline (3 register stages, 3 cycles in_valid -> out_valid): input regs -> pre_ln + tr_ln_alu -> regs ->
+ *           round-back/saturate + post_ln -> regs -> tr_exp_alu (combinational to the outputs).
+ *
  *           The ONE shared tr_ln_alu runs at BITS=FRAC_W+LN_EXTRA (Q.6) so every operator uses the
  *           same unit: operators with FRAC_W fractional bits feed x<<LN_EXTRA (ln_pre_scaled=0),
  *           RMSNorm feeds its mean already at FRAC_W+LN_EXTRA bits (ln_pre_scaled=1). The ln result
@@ -75,8 +78,12 @@ module tr_backbone_wrapper #(
     end
 
     // =========================================================
-    // STAGE 1: PRE-LN, TR-LN, & POST-LN (Combinational)
+    // STAGE 1: PRE-LN & TR-LN (Combinational) -> PIPELINE REGISTER 1b
     // =========================================================
+    // The ln result is registered here, BEFORE the round-back / saturate / post-ln logic, to keep the stage within the
+    // clock period (synthesis: pre_ln + tr_ln_alu ends at ~2.9 ns of the 3.3 ns budget; round-back + saturate + post_ln
+    // add another ~0.8 ns). The bypass path (bypass_ln) is merged into the same register as the saturated 8-bit value
+    // shifted up by LN_EXTRA, so the stage-2 round-back returns it unchanged ((4b+2)>>>2 = b).
     logic signed [WIDTH_IN-1:0]  pre_ln_out  [N];
     logic signed [WIDTH_OUT-1:0] tr_ln_out   [N];
     logic signed [WIDTH_OUT-1:0] post_ln_out [N];
@@ -92,6 +99,10 @@ module tr_backbone_wrapper #(
     );
 
     localparam int LN_OUT_W = FRAC_W + LN_EXTRA + 4;   // ln unit output width (Q.(FRAC_W+LN_EXTRA), 4 integer bits)
+    localparam int MAX_VAL =  (1 << (WIDTH_OUT - 1)) - 1;   // e.g., for 8-bit: Max = 127, Min = -128
+    localparam int MIN_VAL = -(1 << (WIDTH_OUT - 1));
+
+    logic signed [LN_OUT_W-1:0] s1_ln_y [N];            // stage-1 result per lane: ln output, or the bypassed value << LN_EXTRA
 
     genvar i;
     generate
@@ -100,7 +111,7 @@ module tr_backbone_wrapper #(
             // Shared TR-LN ALU, BITS = FRAC_W + LN_EXTRA. Input is zero-extended (the unit treats it as unsigned).
             logic [WIDTH_IN+LN_EXTRA-1:0]      ln_xin;
             logic signed [LN_OUT_W-1:0]        ln_y;
-            logic signed [LN_OUT_W:0]          ln_rnd;
+            logic signed [WIDTH_OUT-1:0]       byp_sat;
 
             assign ln_xin = s1_ln_pre_scaled ? {{LN_EXTRA{1'b0}}, pre_ln_out[i]}
                                              : {pre_ln_out[i], {LN_EXTRA{1'b0}}};
@@ -114,39 +125,50 @@ module tr_backbone_wrapper #(
                 .yq (ln_y)
             );
 
-            // Round back to FRAC_W fractional bits, saturate to WIDTH_OUT.
-            assign ln_rnd = {ln_y[LN_OUT_W-1], ln_y} + (1 <<< (LN_EXTRA-1));
+            // Saturation clamp for the bypassed WIDTH_IN -> WIDTH_OUT cast
             always_comb begin
-                logic signed [LN_OUT_W:0] r;
-                r = ln_rnd >>> LN_EXTRA;
-                if (r > (2**(WIDTH_OUT-1) - 1))      tr_ln_out[i] = (2**(WIDTH_OUT-1) - 1);
-                else if (r < -(2**(WIDTH_OUT-1)))    tr_ln_out[i] = -(2**(WIDTH_OUT-1));
-                else                                 tr_ln_out[i] = WIDTH_OUT'(r);
+                if (pre_ln_out[i] > MAX_VAL)       byp_sat = WIDTH_OUT'(MAX_VAL);
+                else if (pre_ln_out[i] < MIN_VAL)  byp_sat = WIDTH_OUT'(MIN_VAL);
+                else                               byp_sat = WIDTH_OUT'(pre_ln_out[i]);
             end
+
+            assign s1_ln_y[i] = s1_bypass_ln ? (LN_OUT_W'(byp_sat) <<< LN_EXTRA) : ln_y;
 
         end
     endgenerate
 
+    // --- PIPELINE REGISTER 1b ---
+    logic signed [LN_OUT_W-1:0] s1b_ln_y [N];
+    logic [1:0]                 s1b_mode_post_ln;
+    logic                       s1b_valid;
+
+    always_ff @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            s1b_valid <= 1'b0;
+            s1b_mode_post_ln <= '0;
+            for(int j=0; j<N; j++) s1b_ln_y[j] <= '0;
+        end else begin
+            s1b_valid <= s1_valid;
+            s1b_mode_post_ln <= s1_mode_post_ln;
+            s1b_ln_y <= s1_ln_y;
+        end
+    end
+
+    // =========================================================
+    // STAGE 2: ROUND-BACK / SATURATE & POST-LN (Combinational)
+    // =========================================================
     logic signed [WIDTH_OUT-1:0] ln_mux_out [N];
-    // Calculate dynamic bounds based on WIDTH_OUT (e.g., for 8-bit: Max = 127, Min = -128)
-    localparam int MAX_VAL =  (1 << (WIDTH_OUT - 1)) - 1;
-    localparam int MIN_VAL = -(1 << (WIDTH_OUT - 1));
 
     always_comb begin
-        for(int i=0; i<N; i++) begin
-            if (s1_bypass_ln) begin
-                // Saturation Clamp for bypassed 16-bit to 8-bit cast
-                if (pre_ln_out[i] > MAX_VAL) begin
-                    ln_mux_out[i] = WIDTH_OUT'(MAX_VAL);
-                end else if (pre_ln_out[i] < MIN_VAL) begin
-                    ln_mux_out[i] = WIDTH_OUT'(MIN_VAL);
-                end else begin
-                    ln_mux_out[i] = WIDTH_OUT'(pre_ln_out[i]);
-                end
-            end else begin
-                // Log ALU output is already scaled to WIDTH_OUT
-                ln_mux_out[i] = tr_ln_out[i];
-            end
+        for (int i = 0; i < N; i++) begin
+            logic signed [LN_OUT_W:0] rnd;
+            logic signed [LN_OUT_W:0] r;
+            // Round back to FRAC_W fractional bits, saturate to WIDTH_OUT.
+            rnd = {s1b_ln_y[i][LN_OUT_W-1], s1b_ln_y[i]} + (1 <<< (LN_EXTRA-1));
+            r   = rnd >>> LN_EXTRA;
+            if (r > MAX_VAL)       ln_mux_out[i] = WIDTH_OUT'(MAX_VAL);
+            else if (r < MIN_VAL)  ln_mux_out[i] = WIDTH_OUT'(MIN_VAL);
+            else                   ln_mux_out[i] = WIDTH_OUT'(r);
         end
     end
     
@@ -155,7 +177,7 @@ module tr_backbone_wrapper #(
         .W(WIDTH_OUT)
     ) u_post_ln (
         .x_in     (ln_mux_out),
-        .mode_sel (s1_mode_post_ln),
+        .mode_sel (s1b_mode_post_ln),
         .y_out    (post_ln_out)
     );
 
@@ -168,7 +190,7 @@ module tr_backbone_wrapper #(
             s2_valid <= 1'b0;
             for(int j=0; j<N; j++) s2_post_ln_reg[j] <= '0;
         end else begin
-            s2_valid <= s1_valid;
+            s2_valid <= s1b_valid;
             s2_post_ln_reg <= post_ln_out;
         end
     end
