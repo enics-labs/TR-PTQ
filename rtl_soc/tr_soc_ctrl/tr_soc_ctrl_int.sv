@@ -1,5 +1,13 @@
 `timescale 1ns/1ps
 
+`ifndef TR_GELU_EN_DEFAULT
+`ifdef GELU_ENABLE
+`define TR_GELU_EN_DEFAULT 1'b1   // opt-in: GELU support (ViT-style builds). Default: no GELU (GELU and SwiGLU never run together)
+`else
+`define TR_GELU_EN_DEFAULT 1'b0
+`endif
+`endif
+
 /*
  * @module   tr_soc_ctrl_int
  * @brief    MMIO-driven master FSM controller for the INT-datapath SoC: on
@@ -57,6 +65,9 @@
  * @param    N      Vector dimension (lanes) of the driven VPU/datapath.
  * @param    W      Data word width (ctrl_scalar_sub_val, scratch_a/b, vpu_data_out).
  * @param    ACC_W  Accumulator width (req_mult_out, vpu_dot_out).
+ * @param    GELU_EN  1: command 2 (GELU) is supported. 0 (default; macro GELU_ENABLE sets 1): command 2 is ignored and the GELU-only
+ *                    outputs (write_scratch_b, sym_mode_en, bb_mode_pre_ln, post-ln modes other than bypass / rounded -0.5x)
+ *                    are held constant so the GELU datapath and scratch_b are optimized away.
  */
 module tr_soc_ctrl_int #(
     parameter int N     = 8,
@@ -64,7 +75,8 @@ module tr_soc_ctrl_int #(
     parameter int ACC_W = 32,
     parameter int INV_W = 12,
     parameter int SA_W  = 12,   // width of the SwiGLU silu intermediate (scratch_a)
-    parameter int WIDE_W = 20   // width of the VPU wide vecmul result bus
+    parameter int WIDE_W = 20,  // width of the VPU wide vecmul result bus
+    parameter bit GELU_EN = `TR_GELU_EN_DEFAULT
 )(
     input  logic clk,
     input  logic rst_n,
@@ -219,7 +231,8 @@ module tr_soc_ctrl_int #(
         else                                 silu_round = SA_W'(r);
     endfunction
 
-    // Row gain: largest e in [-8,12] with (4*max) * 2^e <= 127*2^10, i.e. floor(log2(127*2^10 / (4*max))).
+    // Row gain: largest e in [-8,10] with (4*max) * 2^e <= 127*2^10, i.e. floor(log2(127*2^10 / (4*max))). The cap at 10 keeps
+    // the apply shift (10 - e) non-negative: no left shift in the cast (real rows have e in [-3, 2]).
     function automatic logic signed [4:0] sw_gain_fn(input logic [WIDE_W-1:0] maxp);
         logic [47:0] mx;
         logic [47:0] lim;
@@ -227,7 +240,7 @@ module tr_soc_ctrl_int #(
         mx = {maxp, 2'b00};
         if (mx == 0) mx = 1;
         e = -5'sd8;
-        for (int k = -8; k <= 12; k++) begin
+        for (int k = -8; k <= 10; k++) begin
             lim = 48'd130048;                            // 127 << 10
             if (k >= 0) begin if ((mx << k) <= lim)  e = 5'(k); end
             else        begin if (mx <= (lim << (-k))) e = 5'(k); end
@@ -361,7 +374,7 @@ module tr_soc_ctrl_int #(
             IDLE: begin
                 reg_busy = 1'b0;
                 if (cmd_trigger == 8'h01) next_state = SM_P1;
-                if (cmd_trigger == 8'h02) next_state = GL_P1;
+                if (cmd_trigger == 8'h02 && GELU_EN) next_state = GL_P1;
                 if (cmd_trigger == 8'h07) next_state = RM_P1;     // RMSNorm sum-of-squares, first tile
                 if (cmd_trigger == 8'h08) next_state = RM_P1N;    // RMSNorm sum-of-squares, next tile
                 if (cmd_trigger == 8'h09) next_state = RM_P2;     // RMSNorm scale (once per row)
@@ -606,5 +619,14 @@ module tr_soc_ctrl_int #(
                 next_state = IDLE;
             end
         endcase
+
+        // No-GELU build: hold the GELU-only controls constant (GL_* states are unreachable anyway; this lets the tools drop
+        // scratch_b, the symmetry modifier control and the pre/post-ln GELU modes).
+        if (!GELU_EN) begin
+            write_scratch_b = 1'b0;
+            sym_mode_en     = 1'b0;
+            bb_mode_pre_ln  = 1'b0;
+            if (bb_mode_post_ln != 2'b11) bb_mode_post_ln = 2'b00;
+        end
     end
 endmodule

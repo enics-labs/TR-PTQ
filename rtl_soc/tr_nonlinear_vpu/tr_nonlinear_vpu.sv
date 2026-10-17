@@ -1,3 +1,11 @@
+`ifndef TR_GELU_EN_DEFAULT
+`ifdef GELU_ENABLE
+`define TR_GELU_EN_DEFAULT 1'b1   // opt-in: GELU support (ViT-style builds). Default: no GELU (GELU and SwiGLU never run together)
+`else
+`define TR_GELU_EN_DEFAULT 1'b0
+`endif
+`endif
+
 /*
  * @module   tr_nonlinear_vpu
  * @brief    Software-Defined Vector Processing Unit.
@@ -18,6 +26,8 @@
  * @param    INV_W      Width of RMSNorm's wide inv_rms (unsigned, FRAC_W+INV_BITS fractional bits);
  *                        feeds the vecmul b operand through mux_vecmul_b_sel==3'b011.
  * @param    RMS_K      Extra fractional bits kept on RMSNorm's mean-of-squares (= tr_backbone_wrapper LN_EXTRA).
+ * @param    GELU_EN    1: GELU supported. 0 (default; macro GELU_ENABLE sets 1): alpha_stabilizer, symmetry_modifier, the GELU-only vec-mul
+ *                        scale modes (001/010) and the backbone's GELU-only logic are not built.
  * @param    SA_W       Width of SwiGLU's wide silu intermediate (controller scratch_a), fed back through sw_silu_in.
  * @param    WIDE_W     Width of the wide vecmul result bus vpu_wide_out (SwiGLU: 12-bit silu x 8-bit up = 20 bits).
  */
@@ -31,6 +41,7 @@ module tr_nonlinear_vpu #(
     parameter int INV_W     = 12,
     parameter int RMS_K     = 2,
     parameter int SA_W      = 12,
+    parameter bit GELU_EN   = `TR_GELU_EN_DEFAULT,
     parameter int WIDE_W    = 20
 )(
     input  logic clk,
@@ -138,7 +149,9 @@ module tr_nonlinear_vpu #(
     logic        [W_VEC-1:0] vecmul_in_a [N];
     logic        [INV_W-1:0] vecmul_in_b [N];
     logic        [W_VEC-1:0] vecmul_b8   [N];   // narrow b sources, extended per op_mode below
-    logic signed [ACC_W-1:0] vecmul_out_acc [N];
+    // Vec-mul results never exceed 20 signed bits (RMSNorm apply 127*4095, SwiGLU silu*up 2048*128, exp products < 2^13), so the
+    // engine / cast run at WIDE_W (20) bits instead of ACC_W.
+    logic signed [WIDE_W-1:0] vecmul_out_acc [N];
     logic signed [W_VEC-1:0] vecmul_out_trunc [N]; // Truncated to W_VEC for SRAM
 
     logic int_bb_valid;
@@ -265,24 +278,36 @@ module tr_nonlinear_vpu #(
         .in_data(sram_data_a), .sub_val(ctrl_scalar_sub_val), .out_data(scalar_sub_out)
     );
 
-    alpha_stabilizer #(
-        .N(N), .W(W_VEC), .FRAC_W(FRAC_W)
-    ) u_alpha (
-        .in_vec(sram_data_a), .out_vec(alpha_stab_out)
-    );
+    generate
+        if (GELU_EN) begin : gen_alpha
+            alpha_stabilizer #(
+                .N(N), .W(W_VEC), .FRAC_W(FRAC_W)
+            ) u_alpha (
+                .in_vec(sram_data_a), .out_vec(alpha_stab_out)
+            );
+        end else begin : gen_no_alpha
+            always_comb for (int i = 0; i < N; i++) alpha_stab_out[i] = '0;
+        end
+    endgenerate
 
     sigma_rom #(.N(N)) u_sigma (.x(sram_data_a), .sigma(sigma_q6));
 
-    symmetry_modifier #(
-        .N(N), .WIDTH_X(W_VEC), .WIDTH_Y(W_VEC), .FRAC_W(FRAC_W)
-    ) u_sym (
-        .x_raw(sram_data_a), .y_sig(sram_data_b), .mode_en(sym_mode_en), .sig_corrected(sym_mod_out)
-    );
+    generate
+        if (GELU_EN) begin : gen_sym
+            symmetry_modifier #(
+                .N(N), .WIDTH_X(W_VEC), .WIDTH_Y(W_VEC), .FRAC_W(FRAC_W)
+            ) u_sym (
+                .x_raw(sram_data_a), .y_sig(sram_data_b), .mode_en(sym_mode_en), .sig_corrected(sym_mod_out)
+            );
+        end else begin : gen_no_sym
+            always_comb for (int i = 0; i < N; i++) sym_mod_out[i] = '0;
+        end
+    endgenerate
 
     logic        [7:0]             rom_e_a_8bit [N];
 
     tr_backbone_wrapper #(
-        .N(N), .WIDTH_IN(W_MAC), .WIDTH_OUT(W_VEC), .FRAC_W(FRAC_W), .LUT_IDX_W(LUT_IDX_W)
+        .N(N), .WIDTH_IN(W_MAC), .WIDTH_OUT(W_VEC), .FRAC_W(FRAC_W), .LUT_IDX_W(LUT_IDX_W), .GELU_EN(GELU_EN)
     ) u_backbone (
         .clk(clk), .rst_n(rst_n), .in_valid(en_bb_valid), .out_valid(int_bb_valid),
         .bypass_ln(bb_bypass_ln), .mode_pre_ln(bb_mode_pre_ln), .mode_post_ln(bb_mode_post_ln), .ln_pre_scaled(bb_ln_pre_scaled),
@@ -307,7 +332,7 @@ module tr_nonlinear_vpu #(
     );
 
     vec_mul_array_engine #(
-        .N(N), .W(W_VEC), .WB(INV_W), .ACC_W(ACC_W)
+        .N(N), .W(W_VEC), .WB(INV_W), .ACC_W(WIDE_W)
     ) u_vecmul (
         .clk(clk), .rst_n(rst_n), .in_valid(en_vecmul_valid), .in_ready(),
         .op_mode(vecmul_op_mode), .a(vecmul_in_a), .b(vecmul_in_b),
@@ -334,48 +359,12 @@ module tr_nonlinear_vpu #(
     assign rms_ew = vecmul_out_acc[0][15:4];
     recip_rom #(.INV_W(INV_W)) u_recip (.ew(rms_ew[7:0]), .inv(rms_recip));
     assign vpu_inv_rms = rms_growth ? rms_recip : INV_W'(rms_ew);
-    always_comb for (int i = 0; i < N; i++) vpu_wide_out[i] = vecmul_out_acc[i][WIDE_W-1:0];
+    always_comb for (int i = 0; i < N; i++) vpu_wide_out[i] = vecmul_out_acc[i];
 
-    localparam signed [W_VEC-1:0] VECMUL_SAT_MAX = (1 <<< (W_VEC-1)) - 1;
-    localparam signed [W_VEC-1:0] VECMUL_SAT_MIN = -(1 <<< (W_VEC-1));
-
-    always_comb begin
-        for(int i=0; i<N; i++) begin
-            logic signed [ACC_W-1:0] shifted;
-            if (vecmul_scale_mode == 3'b011) begin
-                // Softmax Q0.8 UNSIGNED probability output: shift =
-                // anchor_q_bits(8, fixed for every FRAC_W<=8 format) +
-                // FRAC_W - 8 = FRAC_W. Saturate at 255 (~0.996) instead of
-                // wrapping (e.g. the single-dominant-logit case can land
-                // exactly on 256).
-                shifted = vecmul_out_acc[i] >>> FRAC_W;
-                vecmul_out_trunc[i] = (shifted > 255) ? W_VEC'(255) : W_VEC'(shifted);
-            end else if (vecmul_scale_mode == 3'b110) begin
-                // SwiGLU apply: prod = acc << 2 (silu was stored with 2 dropped bits), requantized with the per-row
-                // gain: rounded right shift by sw_shift (negative = left shift), signed saturate.
-                logic signed [ACC_W+8:0] pr;
-                pr = $signed({{9{vecmul_out_acc[i][ACC_W-1]}}, vecmul_out_acc[i]}) <<< 2;
-                if (sw_shift > 0)       pr = (pr + (1 <<< (sw_shift - 1))) >>> sw_shift;
-                else if (sw_shift < 0)  pr = pr <<< (-sw_shift);
-                if (pr > VECMUL_SAT_MAX) vecmul_out_trunc[i] = VECMUL_SAT_MAX;
-                else if (pr < VECMUL_SAT_MIN) vecmul_out_trunc[i] = VECMUL_SAT_MIN;
-                else vecmul_out_trunc[i] = W_VEC'(pr);
-            end else if (vecmul_scale_mode == 3'b101) begin
-                // RMSNorm apply: x * inv_rms (inv_rms has FRAC_W+4 fractional bits) -> Q.FRAC_W, ROUNDED,
-                // signed saturate. Rounding adds half an output LSB before the shift.
-                shifted = (vecmul_out_acc[i] + (1 <<< (FRAC_W + 3))) >>> (FRAC_W + 4);
-                if (shifted > VECMUL_SAT_MAX) vecmul_out_trunc[i] = VECMUL_SAT_MAX;
-                else if (shifted < VECMUL_SAT_MIN) vecmul_out_trunc[i] = VECMUL_SAT_MIN;
-                else vecmul_out_trunc[i] = W_VEC'(shifted);
-            end else if (vecmul_scale_mode == 3'b010) begin
-                // anchor_q_bits fixed at 8 -- not FRAC_W-dependent.
-                vecmul_out_trunc[i] = W_VEC'(vecmul_out_acc[i] >>> 8);
-            end else if (vecmul_scale_mode == 3'b001) begin
-                vecmul_out_trunc[i] = W_VEC'(vecmul_out_acc[i] >>> FRAC_W);
-            end else begin
-                vecmul_out_trunc[i] = W_VEC'(vecmul_out_acc[i]);
-            end
-        end
-    end
+    vecmul_out_cast #(
+        .N(N), .W(W_VEC), .ACC_W(WIDE_W), .FRAC_W(FRAC_W), .GELU_EN(GELU_EN)
+    ) u_vecmul_cast (
+        .acc(vecmul_out_acc), .scale_mode(vecmul_scale_mode), .sw_shift(sw_shift), .out(vecmul_out_trunc)
+    );
 
 endmodule

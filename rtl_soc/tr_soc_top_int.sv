@@ -1,5 +1,13 @@
 `timescale 1ns/1ps
 
+`ifndef TR_GELU_EN_DEFAULT
+`ifdef GELU_ENABLE
+`define TR_GELU_EN_DEFAULT 1'b1   // opt-in: GELU support (ViT-style builds). Default: no GELU (GELU and SwiGLU never run together)
+`else
+`define TR_GELU_EN_DEFAULT 1'b0
+`endif
+`endif
+
 /*
  * @module   tr_soc_top_int
  * @brief    Top-level INT-datapath SoC integration: wires the matmul/
@@ -23,12 +31,14 @@
  * @param    N      Vector dimension of the nonlinear VPU / contraction tile width.
  * @param    W      Data word width (a_mat/b_vec/ext_sram_b/vpu_data_out).
  * @param    ACC_W  Accumulator width (c_vec bias, dot_acc_out, vpu_dot_out).
+ * @param    GELU_EN  1: GELU supported; 0 (default; macro GELU_ENABLE sets 1): GELU-only logic is not built (see tr_nonlinear_vpu).
  */
 module tr_soc_top_int #(
     parameter int M     = 4,   // Parallel Output Lanes
     parameter int N     = 8,   // Vector Dimension
     parameter int W     = 8,
-    parameter int ACC_W = 32
+    parameter int ACC_W = 32,
+    parameter bit GELU_EN = `TR_GELU_EN_DEFAULT
 )(
     input  logic clk,
     input  logic rst_n,
@@ -151,7 +161,8 @@ module tr_soc_top_int #(
     tr_soc_ctrl_int #(
         .N(N),
         .W(W),
-        .ACC_W(ACC_W)
+        .ACC_W(ACC_W),
+        .GELU_EN(GELU_EN)
     ) u_ctrl (
         .clk                 (clk),
         .rst_n               (rst_n),
@@ -327,7 +338,7 @@ module tr_soc_top_int #(
                 vpu_sram_a_in[i] = ext_sram_b[i];
             end
 
-            vpu_sram_b_in[i] = (src_sram_b_sel) ? ctrl_scratch_b[i] : ext_sram_b[i];
+            vpu_sram_b_in[i] = (GELU_EN && src_sram_b_sel) ? ctrl_scratch_b[i] : ext_sram_b[i];
         end
     end
 
@@ -337,7 +348,8 @@ module tr_soc_top_int #(
         .W_MAC(16),
         .ACC_W(ACC_W),
         .FRAC_W(4),
-        .LUT_IDX_W(3)
+        .LUT_IDX_W(3),
+        .GELU_EN(GELU_EN)
     ) u_vpu (
         .clk                 (clk),
         .rst_n               (rst_n),

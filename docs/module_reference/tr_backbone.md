@@ -10,7 +10,7 @@ These modules live in [rtl_soc/tr_nonlinear_vpu/tr_backbone/](../../rtl_soc/tr_n
 
 ### Operation
 
-Chains `pre_ln_modifier` → `tr_ln_alu` → `post_ln_modifier` → `tr_exp_alu` into one purely combinational pipeline. Expects wide inputs and natively steps precision down through `tr_ln_alu`. **One shared ln unit for every operator:** `tr_ln_alu` runs at `BITS = FRAC_W + LN_EXTRA` (6) with an `(WIDTH_IN + LN_EXTRA)`-bit input. Operators with `FRAC_W` fractional bits feed `x << LN_EXTRA` (`ln_pre_scaled = 0`); RMSNorm feeds its mean already at `FRAC_W + LN_EXTRA` bits (`ln_pre_scaled = 1`). The Q.6 result is rounded back to Q.`FRAC_W` and saturated to `WIDTH_OUT` (software model `tr_vpu_ln` in `tr_math_model.hpp`). This is the module `tr_nonlinear_vpu`'s crossbar routes every GL_P*/SM_P*/RM_P* pass's log-domain math through.
+Chains `pre_ln_modifier` → `tr_ln_alu` → `post_ln_modifier` → `tr_exp_alu` into a three-register-stage pipeline (input regs; pre_ln + `tr_ln_alu` → regs; round-back/saturate + post_ln → regs; `tr_exp_alu` combinational to the outputs — the extra register after the ln closes timing at 3.3 ns, 3 cycles `in_valid` → `out_valid`). Expects wide inputs and natively steps precision down through `tr_ln_alu`. **One shared ln unit for every operator:** `tr_ln_alu` runs at `BITS = FRAC_W + LN_EXTRA` (6) with an `(WIDTH_IN + LN_EXTRA)`-bit input. Operators with `FRAC_W` fractional bits feed `x << LN_EXTRA` (`ln_pre_scaled = 0`); RMSNorm feeds its mean already at `FRAC_W + LN_EXTRA` bits (`ln_pre_scaled = 1`). The Q.6 result is rounded back to Q.`FRAC_W` and saturated to `WIDTH_OUT` (software model `tr_vpu_ln` in `tr_math_model.hpp`). This is the module `tr_nonlinear_vpu`'s crossbar routes every GL_P*/SM_P*/RM_P* pass's log-domain math through.
 
 ### Parameters
 
@@ -22,6 +22,8 @@ Chains `pre_ln_modifier` → `tr_ln_alu` → `post_ln_modifier` → `tr_exp_alu`
 | `FRAC_W`    | `4`     | Fractional bit width                                     |
 | `LUT_IDX_W` | `3`     | Width of the ROM index for the Taylor anchor              |
 | `LN_EXTRA`  | `2`     | Extra fractional bits of the shared ln unit (`BITS = FRAC_W + LN_EXTRA`) |
+| `GELU_EN`   | `0` (macro `GELU_ENABLE` → `1`) | 1: full backbone (GELU). 0 (default, Llama build) — only lane 0 has the ln unit (softmax SM_P3 and RMSNorm RM_P2 read lane 0 only, every other use is `bypass_ln`), `pre_ln_modifier` is removed, `post_ln` supports only bypass and the rounded −0.5× on lane 0 |
+| `LN_IN_W`   | `13`    | Width of the shared ln unit's input. The largest reachable value is 4096 (RMSNorm mean with all codes −128); larger inputs are clamped (unreachable with the shipped controller) |
 
 ### Ports
 

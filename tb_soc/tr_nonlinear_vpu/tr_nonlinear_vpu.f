@@ -1,9 +1,14 @@
 // global config
 -f ../scripts/xrun_config.f
 
+// GELU is opt-in in the RTL (GELU_EN defaults to 0): these testbenches exercise it
++define+GELU_ENABLE
+
 // mult_engine
 ../rtl_soc/mult_engines/mac_array_engine.sv
 ../rtl_soc/mult_engines/vec_mul_array_engine.sv
+
+../rtl_soc/mult_engines/vecmul_out_cast.sv
 
 // tr_backbone
 ../rtl_soc/tr_nonlinear_vpu/tr_backbone/pre_ln_modifier.sv

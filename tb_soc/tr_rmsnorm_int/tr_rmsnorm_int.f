@@ -5,6 +5,8 @@
 ../rtl_soc/mult_engines/mac_array_engine.sv
 ../rtl_soc/mult_engines/vec_mul_array_engine.sv
 
+../rtl_soc/mult_engines/vecmul_out_cast.sv
+
 // dot_product_engine
 ../rtl_soc/dot_product_engine/dot_product_engine.sv
 

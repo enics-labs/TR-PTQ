@@ -417,7 +417,7 @@ int main(int argc, char* argv[]) {
         // PRODUCTION two-pass SwiGLU (cmds 5/6/0xB/0xC, host-sequenced in 8-lane groups). One row per line:
         // input "n g0..g(n-1) u0..u(n-1)" (gate / up int8 codes), expected "e y0..y(n-1)" with e the row gain
         // read back from the controller. Row mix: heavy-tailed gate/up (what the FFN produces), gate outliers
-        // at the int8 limits, an all-zero up row (e = 12, left-shift path), a tiny-product row, saturating rows;
+        // at the int8 limits, an all-zero up row (e = 10, the gain cap), a tiny-product row, saturating rows;
         // n = 8 .. 8192 (Llama-3.2-1B intermediate size).
         static const int NS[] = {8, 8, 16, 64, 256, 256, 1024, 1024, 8192, 8192};
         const int N_ROWS = 40;
@@ -442,7 +442,7 @@ int main(int argc, char* argv[]) {
                     case 3: gv = tdist(8);   uv = tdist(6);   break;                        // small
                     case 4: gv = -128 + (rand() % 8); uv = (rand() % 5) - 2; break;          // tiny products (gate ~ -8)
                     case 5: gv = (rand() % 8 == 0) ? 127 : tdist(30); uv = 127; break;       // saturating
-                    case 6: gv = tdist(60);  uv = 0;          break;                        // all-zero up -> e = 12
+                    case 6: gv = tdist(60);  uv = 0;          break;                        // all-zero up -> e = 10 (cap)
                     default: gv = tdist(20); uv = (rand() % 3) - 1; break;
                 }
                 g[i] = (int8_t)gv; u[i] = (int8_t)uv;

@@ -114,14 +114,14 @@ module tr_nonlinear_vpu_swiglu_energy_tb();
         else                silu_round = 12'(r);
     endfunction
 
-    // Verbatim from tr_soc_ctrl_int.sv: largest e in [-8,12] with (4*max) * 2^e <= 127*2^10.
+    // Verbatim from tr_soc_ctrl_int.sv: largest e in [-8,10] with (4*max) * 2^e <= 127*2^10.
     function automatic logic signed [4:0] sw_gain_fn(input logic [19:0] maxp);
         logic [47:0] mx, lim;
         logic signed [4:0] e;
         mx = {maxp, 2'b00};
         if (mx == 0) mx = 1;
         e = -5'sd8;
-        for (int k = -8; k <= 12; k++) begin
+        for (int k = -8; k <= 10; k++) begin
             lim = 48'd130048;
             if (k >= 0) begin if ((mx << k) <= lim)  e = 5'(k); end
             else        begin if (mx <= (lim << (-k))) e = 5'(k); end

@@ -1,3 +1,11 @@
+`ifndef TR_GELU_EN_DEFAULT
+`ifdef GELU_ENABLE
+`define TR_GELU_EN_DEFAULT 1'b1   // opt-in: GELU support (ViT-style builds). Default: no GELU (GELU and SwiGLU never run together)
+`else
+`define TR_GELU_EN_DEFAULT 1'b0
+`endif
+`endif
+
 /*
  * @module   tr_backbone_wrapper
  * @brief    Encapsulated Log-Domain Math Pipeline (Vectorized).
@@ -19,6 +27,13 @@
  * @param    FRAC_W      Fractional bit width.
  * @param    LUT_IDX_W   Width of the ROM index for the Taylor anchor.
  * @param    LN_EXTRA    Extra fractional bits of the shared ln unit (BITS = FRAC_W + LN_EXTRA).
+ * @param    LN_IN_W     Width of the shared ln unit's input. The largest reachable value is 4096 (RMSNorm mean, all codes -128):
+ *                       softmax's slice x4 <= 512 and GELU's (E+16)x4 <= 128, so 13 bits suffice; anything larger is clamped to
+ *                       2^LN_IN_W-1 (unreachable with the shipped controller).
+ * @param    GELU_EN     1: full backbone (GELU needs ln on all lanes, the +1.0 pre-conditioner and the negate post-mode).
+ *                       0 (default; macro GELU_ENABLE sets 1): only lane 0 has the ln unit (softmax SM_P3 and RMSNorm RM_P2 read lane 0
+ *                       only; every other use is bypass_ln), pre_ln_modifier is removed, and post_ln only supports
+ *                       bypass and the rounded -0.5x (mode 11) on lane 0.
  */
 module tr_backbone_wrapper #(
     parameter int N         = 8,
@@ -26,7 +41,9 @@ module tr_backbone_wrapper #(
     parameter int WIDTH_OUT = 8,
     parameter int FRAC_W    = 4,
     parameter int LUT_IDX_W = 3,
-    parameter int LN_EXTRA  = 2
+    parameter int LN_EXTRA  = 2,
+    parameter bit GELU_EN   = `TR_GELU_EN_DEFAULT,
+    parameter int LN_IN_W   = 13   // width of the ln unit's input; every reachable input fits (max 4096), larger values are clamped
 )(
     input  logic clk,
     input  logic rst_n,
@@ -88,15 +105,21 @@ module tr_backbone_wrapper #(
     logic signed [WIDTH_OUT-1:0] tr_ln_out   [N];
     logic signed [WIDTH_OUT-1:0] post_ln_out [N];
 
-    pre_ln_modifier #(
-        .N(N), 
-        .WIDTH_IN(WIDTH_IN), 
-        .FRAC_W(FRAC_W)
-    ) u_pre_ln (
-        .x_in         (s1_vec_in),
-        .mode_add_one (s1_mode_pre_ln),
-        .y_out        (pre_ln_out)
-    );
+    generate
+        if (GELU_EN) begin : gen_pre_ln
+            pre_ln_modifier #(
+                .N(N), 
+                .WIDTH_IN(WIDTH_IN), 
+                .FRAC_W(FRAC_W)
+            ) u_pre_ln (
+                .x_in         (s1_vec_in),
+                .mode_add_one (s1_mode_pre_ln),
+                .y_out        (pre_ln_out)
+            );
+        end else begin : gen_no_pre_ln
+            assign pre_ln_out = s1_vec_in;     // the +1.0 mode only exists for GELU
+        end
+    endgenerate
 
     localparam int LN_OUT_W = FRAC_W + LN_EXTRA + 4;   // ln unit output width (Q.(FRAC_W+LN_EXTRA), 4 integer bits)
     localparam int MAX_VAL =  (1 << (WIDTH_OUT - 1)) - 1;   // e.g., for 8-bit: Max = 127, Min = -128
@@ -109,21 +132,27 @@ module tr_backbone_wrapper #(
         for (i = 0; i < N; i++) begin : gen_tr_lanes
             
             // Shared TR-LN ALU, BITS = FRAC_W + LN_EXTRA. Input is zero-extended (the unit treats it as unsigned).
-            logic [WIDTH_IN+LN_EXTRA-1:0]      ln_xin;
+            logic [WIDTH_IN+LN_EXTRA-1:0]      ln_xin_full;
+            logic [LN_IN_W-1:0]                ln_xin;
             logic signed [LN_OUT_W-1:0]        ln_y;
             logic signed [WIDTH_OUT-1:0]       byp_sat;
 
-            assign ln_xin = s1_ln_pre_scaled ? {{LN_EXTRA{1'b0}}, pre_ln_out[i]}
-                                             : {pre_ln_out[i], {LN_EXTRA{1'b0}}};
+            assign ln_xin_full = s1_ln_pre_scaled ? {{LN_EXTRA{1'b0}}, pre_ln_out[i]}
+                                                  : {pre_ln_out[i], {LN_EXTRA{1'b0}}};
+            assign ln_xin = (ln_xin_full >> LN_IN_W) != 0 ? {LN_IN_W{1'b1}} : ln_xin_full[LN_IN_W-1:0];
 
-            tr_ln_alu #(
-                .WIDTH(WIDTH_IN + LN_EXTRA),
-                .BITS(FRAC_W + LN_EXTRA),
-                .OUT_WIDTH(LN_OUT_W)
-            ) u_tr_ln (
-                .xq (ln_xin),
-                .yq (ln_y)
-            );
+            if (GELU_EN || i == 0) begin : gen_ln
+                tr_ln_alu #(
+                    .WIDTH(LN_IN_W),
+                    .BITS(FRAC_W + LN_EXTRA),
+                    .OUT_WIDTH(LN_OUT_W)
+                ) u_tr_ln (
+                    .xq (ln_xin),
+                    .yq (ln_y)
+                );
+            end else begin : gen_no_ln
+                assign ln_y = '0;                  // lanes 1..N-1 of a no-GELU build only ever bypass the ln
+            end
 
             // Saturation clamp for the bypassed WIDTH_IN -> WIDTH_OUT cast
             always_comb begin
@@ -132,7 +161,7 @@ module tr_backbone_wrapper #(
                 else                               byp_sat = WIDTH_OUT'(pre_ln_out[i]);
             end
 
-            assign s1_ln_y[i] = s1_bypass_ln ? (LN_OUT_W'(byp_sat) <<< LN_EXTRA) : ln_y;
+            assign s1_ln_y[i] = (s1_bypass_ln || !(GELU_EN || i == 0)) ? (LN_OUT_W'(byp_sat) <<< LN_EXTRA) : ln_y;
 
         end
     endgenerate
@@ -172,14 +201,27 @@ module tr_backbone_wrapper #(
         end
     end
     
-    post_ln_modifier #(
-        .N(N), 
-        .W(WIDTH_OUT)
-    ) u_post_ln (
-        .x_in     (ln_mux_out),
-        .mode_sel (s1b_mode_post_ln),
-        .y_out    (post_ln_out)
-    );
+    generate
+        if (GELU_EN) begin : gen_post_ln
+            post_ln_modifier #(
+                .N(N), 
+                .W(WIDTH_OUT)
+            ) u_post_ln (
+                .x_in     (ln_mux_out),
+                .mode_sel (s1b_mode_post_ln),
+                .y_out    (post_ln_out)
+            );
+        end else begin : gen_no_post_ln
+            // No-GELU build: lanes 1..N-1 are never read as a log (bypass only); lane 0 supports bypass (00) and
+            // RMSNorm's rounded -0.5x (11): -((x+1)>>>1), computed one bit wider so x=MAX does not wrap.
+            logic signed [WIDTH_OUT:0] half_x;
+            assign half_x = ($signed({ln_mux_out[0][WIDTH_OUT-1], ln_mux_out[0]}) + 1) >>> 1;
+            always_comb begin
+                for (int i = 0; i < N; i++) post_ln_out[i] = ln_mux_out[i];
+                if (s1b_mode_post_ln == 2'b11) post_ln_out[0] = WIDTH_OUT'(-half_x);
+            end
+        end
+    endgenerate
 
     // --- PIPELINE REGISTER 2 ---
     logic signed [WIDTH_OUT-1:0] s2_post_ln_reg [N];

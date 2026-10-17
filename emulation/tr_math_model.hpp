@@ -82,9 +82,11 @@ inline int tr_hw_ln(int xq, int bits, int out_width = 8) { return tr_pwl_ln_scal
 // BITS = FRAC_W + 2 = 6 (2 segments, 8-bit constants, 10-bit output). Operators with FRAC_W=4
 // fractional bits feed x<<2 (pre_scaled=false); RMSNorm feeds its mean already at 6 fractional
 // bits (pre_scaled=true). The Q.6 result is rounded back to Q4.4 and saturated to int8.
-// Input is treated as unsigned (callers mask to the 16-bit backbone width).
+// Input is treated as unsigned (callers mask to the 16-bit backbone width) and clamped to the unit's 13-bit input.
 inline int tr_vpu_ln(int xq, bool pre_scaled = false) {
-    int y = tr_pwl_ln_scalar(pre_scaled ? xq : (xq << 2), 6, 2, 8, 10);
+    int xin = pre_scaled ? xq : (xq << 2);
+    if (xin > (1 << 13) - 1) xin = (1 << 13) - 1;     // LN_IN_W = 13: larger inputs are clamped (unreachable: max reachable is 4096)
+    int y = tr_pwl_ln_scalar(xin, 6, 2, 8, 10);
     int r = (y + 2) >> 2;
     return r > 127 ? 127 : (r < -128 ? -128 : r);
 }
@@ -349,7 +351,7 @@ static const int RMSNORM_CONST_LN_SQRT_N = 17;   // 0.5*ln(8) in Q4.4, N=8
 // Software spec: tools/models/vpu_ops.py::swiglu (RECOMMENDED, sw_gain="dynamic", two-pass realization).
 //   sw_silu_group : silu_s[i] = sat12((x[i]*SIGMA[x[i]] + 2) >> 2)   (sigma ROM, x = gate code, Q4.4)
 //   sw_max_group  : running max of |silu_s[i]*up[i]| over the row         (pass 1, per group)
-//   sw_gain       : e = clip(floor(log2(127*2^10 / (4*max))), -8, 12)      (once per row; consumes the max)
+//   sw_gain       : e = clip(floor(log2(127*2^10 / (4*max))), -8, 10)      (once per row; consumes the max)
 //   sw_apply_group: y[i] = sat8(round_shift(4*silu_s[i]*up[i], 10 - e))    (pass 2, per group)
 // SIGMA[x+128] = sigmoid(x/16) in Q.6 as produced by the alpha->exp->+1->ln->neg->exp chain at FRAC_W=6 with the
 // unified ln (flat alpha, x<0: 64-recip); a 256x6-bit ROM in the VPU replaces the three chain passes.
@@ -375,6 +377,7 @@ static const uint8_t SW_SIGMA[256] = {
 static const int SW_FRAC_W = 6;
 static const int SW_TOTAL  = SW_FRAC_W + 4;   // prod = silu * up has FRAC_W+4 fractional bits
 static const int SW_DROP   = 2;               // silu_w (14 bit) -> silu_s (12 bit)
+static const int SW_E_MAX  = SW_TOTAL;        // gain cap: shift = SW_TOTAL - e >= 0 (no left shift); real rows have e in [-3, 2]
 
 inline int32_t sw_silu(int8_t x) {
     int32_t w = (int32_t)x * (int32_t)SW_SIGMA[(int)x + 128];
@@ -392,7 +395,7 @@ inline int sw_gain(int32_t max_abs_p) {
     if (mx < 1) mx = 1;
     const int64_t R = 127LL << SW_TOTAL;
     int e = -8;
-    for (int k = -8; k <= 12; k++) {                       // largest k with mx * 2^k <= R
+    for (int k = -8; k <= SW_E_MAX; k++) {                 // largest k with mx * 2^k <= R
         bool ok = k >= 0 ? ((mx << k) <= R) : (mx <= (R << -k));
         if (ok) e = k;
     }
@@ -401,8 +404,8 @@ inline int sw_gain(int32_t max_abs_p) {
 
 inline int8_t sw_apply(int32_t silu_s, int8_t up, int e) {
     int64_t prod = ((int64_t)silu_s * (int64_t)up) << SW_DROP;
-    int sh = SW_TOTAL - e;                                 // negative: left shift (tiny rows)
-    int64_t y = sh > 0 ? ((prod + (1LL << (sh - 1))) >> sh) : (prod << -sh);
+    int sh = SW_TOTAL - e;                                 // >= 0 because e <= SW_E_MAX
+    int64_t y = sh > 0 ? ((prod + (1LL << (sh - 1))) >> sh) : prod;
     return (int8_t)(y > 127 ? 127 : (y < -128 ? -128 : y));
 }
 

@@ -5,6 +5,8 @@
 ../rtl_soc/mult_engines/mac_array_engine.sv
 ../rtl_soc/mult_engines/vec_mul_array_engine.sv
 
+../rtl_soc/mult_engines/vecmul_out_cast.sv
+
 // tr_backbone
 ../rtl_soc/tr_nonlinear_vpu/tr_backbone/pre_ln_modifier.sv
 ../rtl_soc/tr_nonlinear_vpu/tr_backbone/tr_ln_alu.sv

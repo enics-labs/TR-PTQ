@@ -37,6 +37,14 @@ Evaluates `out_dot = SUM(a[i]*b[i]) + C` over a 4-stage pipeline: (1) register i
 
 ---
 
+## `vecmul_out_cast`
+
+**File:** [rtl_soc/mult_engines/vecmul_out_cast.sv](../../rtl_soc/mult_engines/vecmul_out_cast.sv)
+
+Combinational output stage of the VPU's vec-mul engine (split out of `tr_nonlinear_vpu` so synthesis reports its area on its own). `scale_mode`: `000` low bits, `001` `>>>FRAC_W` wrapping (GELU), `010` `>>>8` (GELU), `011` softmax probabilities (`>>>FRAC_W`, unsigned saturate at 255), `101` RMSNorm apply (rounded `>>>(FRAC_W+4)`, signed saturate), `110` SwiGLU apply (`round_shift(acc<<2, sw_shift)`, signed saturate). Parameters: `N`, `W` (output), `ACC_W` (20 in the VPU), `FRAC_W`, `GELU_EN` (modes `001`/`010` only when 1).
+
+---
+
 ## `vec_mul_array_engine`
 
 **File:** [rtl_soc/mult_engines/vec_mul_array_engine.sv](../../rtl_soc/mult_engines/vec_mul_array_engine.sv)

@@ -96,6 +96,9 @@ def run_verification():
     current_env["DISPLAY"] = "" 
     
     xrun_cmd = f"xrun -f {config['f_file']}"
+    # RTL_DEFINES="GELU_ENABLE ..." builds the RTL with those macros (GELU is opt-in; the default build has no GELU)
+    for d in os.environ.get("RTL_DEFINES", "").split():
+        xrun_cmd += f" +define+{d}"
     # ln: LN_CFG="WIDTH,BITS,SEGMENTS,COEF_BITS,OUT_WIDTH" (also read by cpu_model) overrides the TB parameters
     if args.block == "ln" and os.environ.get("LN_CFG"):
         names = ["WIDTH", "BITS", "SEGMENTS", "COEF_BITS", "OUT_WIDTH"]

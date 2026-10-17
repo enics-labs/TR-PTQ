@@ -64,6 +64,7 @@ On an MMIO command write, sequences `tr_nonlinear_vpu`'s crossbar through the mu
 | `INV_W`   | `12`    | RMSNorm `inv_rms` register width                                    |
 | `SA_W`    | `12`    | SwiGLU silu intermediate width (`scratch_a`)                        |
 | `WIDE_W`  | `20`    | Width of the VPU's wide vecmul / shared-max bus                     |
+| `GELU_EN` | `0` (macro `GELU_ENABLE` → `1`) | 0 (default): command 2 (GELU) is ignored and the GELU-only controls (`write_scratch_b`, `sym_mode_en`, `bb_mode_pre_ln`, post-ln modes other than bypass / rounded −0.5×) are held constant so `scratch_b`, the symmetry modifier and the GELU datapath are optimized away |
 
 ---
 
