@@ -1,20 +1,9 @@
-Scripts for the Genus synthesis flow (Cadence Genus, 65nm TSMC/ARM std cells).
-See the top-level README.md for exact run commands.
+Genus scripts. Usage and conventions: see ../README.md.
 
-  genus.tcl                  Main synthesis flow: read RTL -> elaborate ->
-                              synthesize -> export -> reports.
-  report_power.tcl           Vectorless power report on an already-
-                              synthesized design (reads back the exported .db).
-  report_power_activity.tcl  VCD-driven (real activity) power report.
-  run_sweep.tcl               Fmax sweep: walks clock period down (low
-                              effort) until timing/DRVs fail, then re-
-                              synthesizes the last passing period at full
-                              effort.
-  procedures.tcl              Shared helper procs (enics_*), sourced by the
-                              scripts above.
-  settings.tcl, simulation.tcl
-                              Currently unreferenced by anything in this
-                              flow (OCV/timing settings and a GLS VCD-probe
-                              helper, respectively, left over from an
-                              earlier iteration) -- not broken, just unused
-                              right now.
+  genus.tcl                   main flow: read RTL -> elaborate -> synthesize -> export -> reports
+  run_sweep.tcl               clock-period (Fmax) sweep, then a full-effort run at the last passing period
+  report_power.tcl            vectorless power on an already-synthesized design
+  report_power_activity.tcl   VCD-driven power on an already-synthesized design
+  procedures.tcl              shared helper procs (enics_*)
+
+  settings.tcl, simulation.tcl   not used by the flow (OCV settings, gate-level VCD probing)
