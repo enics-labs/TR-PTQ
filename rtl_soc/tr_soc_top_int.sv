@@ -67,7 +67,8 @@ module tr_soc_top_int #(
     input  logic [W-1:0]            mm_b_tile [N],
     output logic                    mm_out_we,
     output logic [15:0]             mm_out_row,
-    output logic signed [W-1:0]     mm_out_data [M]
+    output logic signed [W-1:0]     mm_out_data [M],
+    output logic signed [ACC_W-1:0] mm_out_acc [M]      // raw accumulators of the same row-tile (before the requantizer)
 );
 
     // Interconnect Wires
@@ -231,6 +232,7 @@ module tr_soc_top_int #(
     );
     // Requantizer output is the accumulated dot on the capture cycle.
     assign mm_out_data = req_vec_out;
+    assign mm_out_acc  = dot_acc_out;
 
     // Route the linear engine to the matmul controller while it is busy,
     // otherwise to the legacy single-tile ports.
