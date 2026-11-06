@@ -34,29 +34,33 @@ static bool run_eval_mode(const std::string& mode, const std::string& in_path,
         if (line.find_first_not_of(" \t\r\n") == std::string::npos) continue;
         std::istringstream iss(line);
 
-        if (mode == "rmsnorm") {
+        if (mode == "rmsnorm" || mode == "rmsnorm2") {
+            const bool v2 = mode == "rmsnorm2";
             // line: "log2n x0 .. x(N-1)" -> "inv_rms y0 .. y(N-1)"  (tiled flow, see rms_* in tr_math_model.hpp)
             int log2n; iss >> log2n;
             int n = 1 << log2n;
             std::vector<int8_t> x(n), y(n);
+            std::vector<int16_t> y2(n);
             for (int i = 0; i < n; i++) { int v; iss >> v; x[i] = (int8_t)v; }
             int32_t acc = 0;
             for (int t = 0; t < n / 8; t++) acc = rms_acc_tile(&x[8 * t], acc, t == 0);
-            uint32_t inv = rms_scale(acc, log2n);
-            for (int t = 0; t < n / 8; t++) rms_apply_tile(&x[8 * t], inv, &y[8 * t]);
+            uint32_t inv = v2 ? rms2_scale(acc, log2n) : rms_scale(acc, log2n);
+            for (int t = 0; t < n / 8; t++) { if (v2) rms2_apply_tile(&x[8 * t], inv, &y2[8 * t]); else rms_apply_tile(&x[8 * t], inv, &y[8 * t]); }
             fout << inv;
-            for (int i = 0; i < n; i++) fout << " " << (int)y[i];
+            for (int i = 0; i < n; i++) fout << " " << (v2 ? (int)y2[i] : (int)y[i]);
             fout << "\n";
-        } else if (mode == "swiglu") {
+        } else if (mode == "swiglu" || mode == "swiglu2") {
+            const bool v2 = mode == "swiglu2";
             // line: "n g0..g(n-1) u0..u(n-1)" -> "e y0..y(n-1)"  (two-pass SwiGLU row, see sw_* in tr_math_model.hpp)
             int n; iss >> n;
-            std::vector<int8_t> g(n), u(n), y(n);
+            std::vector<int8_t> g(n), u(n);
+            std::vector<int16_t> y(n);
             for (int i = 0; i < n; i++) { int v; iss >> v; g[i] = (int8_t)v; }
             for (int i = 0; i < n; i++) { int v; iss >> v; u[i] = (int8_t)v; }
             int32_t mx = 0;
-            for (int i = 0; i < n; i++) { int32_t a = sw_abs_prod(sw_silu(g[i]), u[i]); if (a > mx) mx = a; }
-            int e = sw_gain(mx);
-            for (int i = 0; i < n; i++) y[i] = sw_apply(sw_silu(g[i]), u[i], e);
+            for (int i = 0; i < n; i++) { int32_t a = sw_abs_prod(v2 ? sw2_silu(g[i]) : sw_silu(g[i]), u[i]); if (a > mx) mx = a; }
+            int e = v2 ? sw2_gain(mx) : sw_gain(mx);
+            for (int i = 0; i < n; i++) y[i] = v2 ? sw2_apply(sw2_silu(g[i]), u[i], e) : (int16_t)sw_apply(sw_silu(g[i]), u[i], e);
             fout << e;
             for (int i = 0; i < n; i++) fout << " " << (int)y[i];
             fout << "\n";
@@ -113,7 +117,8 @@ int main(int argc, char* argv[]) {
         return -1;
     }
 
-    if (mode == "rmsnorm") {
+    if (mode == "rmsnorm" || mode == "rmsnorm2") {
+        const bool v2 = mode == "rmsnorm2";
         // PRODUCTION tiled RMSNorm: one row per line. Input line "log2n x0 .. x(N-1)" (N = 1<<log2n),
         // expected line "inv_rms y0 .. y(N-1)". The TB runs cmd 7/8 per tile (sum of squares), cmd 9
         // once, cmd 0xA per tile; inv_rms is read from the controller register. Row mix: random
@@ -148,10 +153,11 @@ int main(int argc, char* argv[]) {
             vec_file << "\n";
             int32_t acc = 0;
             for (int t = 0; t < n / 8; t++) acc = rms_acc_tile(&x[8 * t], acc, t == 0);
-            uint32_t inv = rms_scale(acc, log2n);
-            for (int t = 0; t < n / 8; t++) rms_apply_tile(&x[8 * t], inv, &y[8 * t]);
+            uint32_t inv = v2 ? rms2_scale(acc, log2n) : rms_scale(acc, log2n);
+            std::vector<int16_t> y2(n);
+            for (int t = 0; t < n / 8; t++) { if (v2) rms2_apply_tile(&x[8 * t], inv, &y2[8 * t]); else rms_apply_tile(&x[8 * t], inv, &y[8 * t]); }
             exp_file << inv;
-            for (int i = 0; i < n; i++) exp_file << " " << (int)y[i];
+            for (int i = 0; i < n; i++) exp_file << " " << (v2 ? (int)y2[i] : (int)y[i]);
             exp_file << "\n";
         }
         std::cout << "[C++ MODEL] Generated tiled RMSNORM test vectors." << std::endl;
@@ -270,7 +276,8 @@ int main(int argc, char* argv[]) {
         }
         std::cout << "[C++ MODEL] Generated SOFTMAX (production tr_soc_top_int path, probs + z) vectors." << std::endl;
     }
-    else if (mode == "swiglu") {
+    else if (mode == "swiglu" || mode == "swiglu2") {
+        const bool v2 = mode == "swiglu2";
         // PRODUCTION two-pass SwiGLU (cmds 5/6/0xB/0xC, host-sequenced in 8-lane groups). One row per line:
         // input "n g0..g(n-1) u0..u(n-1)" (gate / up int8 codes), expected "e y0..y(n-1)" with e the row gain
         // read back from the controller. Row mix: heavy-tailed gate/up (what the FFN produces), gate outliers
@@ -289,7 +296,7 @@ int main(int argc, char* argv[]) {
         for (int r = 0; r < N_ROWS; r++) {
             int n = NS[r % 10];
             int kind = (r / 10) % 4 + (r % 7 == 0 ? 4 : 0);
-            std::vector<int8_t> g(n), u(n), y(n);
+            std::vector<int8_t> g(n), u(n); std::vector<int16_t> y(n);
             for (int i = 0; i < n; i++) {
                 int gv, uv;
                 switch (kind) {
@@ -309,9 +316,9 @@ int main(int argc, char* argv[]) {
             for (int i = 0; i < n; i++) vec_file << " " << (int)u[i];
             vec_file << "\n";
             int32_t mx = 0;
-            for (int i = 0; i < n; i++) { int32_t a = sw_abs_prod(sw_silu(g[i]), u[i]); if (a > mx) mx = a; }
-            int e = sw_gain(mx);
-            for (int i = 0; i < n; i++) y[i] = sw_apply(sw_silu(g[i]), u[i], e);
+            for (int i = 0; i < n; i++) { int32_t a = sw_abs_prod(v2 ? sw2_silu(g[i]) : sw_silu(g[i]), u[i]); if (a > mx) mx = a; }
+            int e = v2 ? sw2_gain(mx) : sw_gain(mx);
+            for (int i = 0; i < n; i++) y[i] = v2 ? sw2_apply(sw2_silu(g[i]), u[i], e) : (int16_t)sw_apply(sw_silu(g[i]), u[i], e);
             exp_file << e;
             for (int i = 0; i < n; i++) exp_file << " " << (int)y[i];
             exp_file << "\n";
