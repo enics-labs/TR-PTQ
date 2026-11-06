@@ -20,7 +20,7 @@ module tr_nonlinear_vpu_swiglu_energy_tb();
 
     logic signed [W_VEC-1:0] sram_data_a [N];
     logic signed [W_VEC-1:0] sram_data_b [N];
-    logic signed [W_VEC-1:0] vpu_data_out [N];
+    logic signed [11:0]    vpu_data_out [N];
     logic signed [W_VEC-1:0] ctrl_scalar_sub_val;
     logic signed [19:0]      vpu_max_out;   // WIDE_W: shared piped_max (softmax row max / SwiGLU max |prod|)
     logic signed [ACC_W-1:0] vpu_dot_out;
@@ -36,7 +36,7 @@ module tr_nonlinear_vpu_swiglu_energy_tb();
     logic                  en_bb_valid, bb_bypass_ln, bb_shift_mode;
     logic [1:0]            bb_mode_post_ln;
     // Newer VPU ports (shared max select, RMSNorm inv_rms, SwiGLU); idle in this pilot unless the sequence uses them.
-    logic                  bb_ln_pre_scaled, mux_max_sel, rms_growth;
+    logic                  bb_ln_pre_scaled, mux_max_sel;
     logic [4:0]            rms_log2n;
     logic [11:0]           inv_rms_in, vpu_inv_rms;
     logic signed [11:0]    sw_silu_in [N];
@@ -51,7 +51,7 @@ module tr_nonlinear_vpu_swiglu_energy_tb();
         .sram_data_a(sram_data_a), .sram_data_b(sram_data_b), .vpu_data_out(vpu_data_out),
         .ctrl_scalar_sub_val(ctrl_scalar_sub_val),
         .vpu_max_out(vpu_max_out), .vpu_dot_out(vpu_dot_out),
-        .rms_growth(rms_growth), .vpu_inv_rms(vpu_inv_rms), .rms_log2n(rms_log2n), .inv_rms_in(inv_rms_in),
+        .vpu_inv_rms(vpu_inv_rms), .rms_log2n(rms_log2n), .inv_rms_in(inv_rms_in),
         .sw_silu_in(sw_silu_in), .sw_shift(sw_shift), .vpu_wide_out(vpu_wide_out),
         .mux_bb_in_sel(mux_bb_in_sel), .mux_mac_a_sel(mux_mac_a_sel), .mux_mac_b_sel(mux_mac_b_sel),
         .mux_vecmul_a_sel(mux_vecmul_a_sel), .mux_vecmul_b_sel(mux_vecmul_b_sel), .mux_vpu_out_sel(mux_vpu_out_sel),
@@ -166,7 +166,7 @@ module tr_nonlinear_vpu_swiglu_energy_tb();
         mux_bb_in_sel = '0; mux_mac_a_sel = '0; mux_mac_b_sel = '0;
         mux_vecmul_a_sel = '0; mux_vecmul_b_sel = '0; mux_vpu_out_sel = '0;
         ctrl_scalar_sub_val = '0;
-        bb_ln_pre_scaled = 0; mux_max_sel = 0; rms_growth = 0; rms_log2n = 5'd3; inv_rms_in = '0; sw_shift = '0;
+        bb_ln_pre_scaled = 0; mux_max_sel = 0; rms_log2n = 5'd3; inv_rms_in = '0; sw_shift = '0;
         for (int i = 0; i < N; i++) begin sram_data_a[i] = '0; sram_data_b[i] = '0; sw_silu_in[i] = '0; end
 
         repeat(3) @(posedge clk);

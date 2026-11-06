@@ -1,8 +1,8 @@
 /*
  * @module   tr_backbone_wrapper
  * @brief    Encapsulated Log-Domain Math Pipeline (Vectorized).
- * @details  Chains TR-ln, post-LN modification, and TR-exp. Only lane 0 has the ln unit (softmax SM_P3 and RMSNorm RM_P2 read
- *           lane 0 only; every other use is bypass_ln), and post_ln only supports bypass and the rounded -0.5x (mode 11) on lane 0.
+ * @details  Chains TR-ln and TR-exp. Only lane 0 has the ln unit (softmax SM_P3 reads its ln result; RMSNorm RM_P2 reads only its leading-one
+ *           position and mantissa bits, ln_msb_out / ln_fk_out, for rsq_unit; every other use is bypass_ln).
  *           Purely combinational. Expects wide inputs and natively steps down 
  *           precision through the tr_ln_alu block.
  *
@@ -40,7 +40,7 @@ module tr_backbone_wrapper #(
 
     // Control Flags
     input  logic bypass_ln,
-    input  logic [1:0]              mode_post_ln, // 00: bypass, 11: -0.5x (rounded, lane 0)
+    input  logic [1:0]              mode_post_ln, // unused (the post-ln stage is a pass-through)
     input  logic ln_pre_scaled,  // 0: vec_in has FRAC_W frac bits (shifted up by LN_EXTRA), 1: already FRAC_W+LN_EXTRA
     
     // Datapath Input
@@ -50,7 +50,12 @@ module tr_backbone_wrapper #(
     output logic signed [WIDTH_OUT-1:0]   log_out [N],
     output logic [LUT_IDX_W-1:0]   a_idx_out [N],
     output logic [WIDTH_OUT-1:0]   mantisa_out [N],
-    output logic is_zero_out [N]
+    output logic is_zero_out [N],
+
+    // Lane 0's ln front end (leading-one position and mantissa bits of the ln input), aligned with out_valid. RMSNorm's reciprocal-sqrt
+    // unit (rsq_unit) reads these instead of the ln / exp result.
+    output logic [$clog2(LN_IN_W)-1:0]       ln_msb_out,
+    output logic [FRAC_W+LN_EXTRA-1:0]       ln_fk_out
 );
 
     // =========================================================
@@ -93,6 +98,8 @@ module tr_backbone_wrapper #(
     localparam int MIN_VAL = -(1 << (WIDTH_OUT - 1));
 
     logic signed [LN_OUT_W-1:0] s1_ln_y [N];            // stage-1 result per lane: ln output, or the bypassed value << LN_EXTRA
+    logic [$clog2(LN_IN_W)-1:0] ln0_msb;                // lane 0's ln front end (taps of tr_ln_alu)
+    logic [FRAC_W+LN_EXTRA-1:0] ln0_fk;
 
     genvar i;
     generate
@@ -115,7 +122,9 @@ module tr_backbone_wrapper #(
                     .OUT_WIDTH(LN_OUT_W)
                 ) u_tr_ln (
                     .xq (ln_xin),
-                    .yq (ln_y)
+                    .yq (ln_y),
+                    .msb_o (ln0_msb),
+                    .fk_o  (ln0_fk)
                 );
             end else begin : gen_no_ln
                 assign ln_y = '0;                  // lanes 1..N-1 only ever bypass the ln
@@ -137,15 +146,21 @@ module tr_backbone_wrapper #(
     logic signed [LN_OUT_W-1:0] s1b_ln_y [N];
     logic [1:0]                 s1b_mode_post_ln;
     logic                       s1b_valid;
+    logic [$clog2(LN_IN_W)-1:0] s1b_ln_msb;
+    logic [FRAC_W+LN_EXTRA-1:0] s1b_ln_fk;
 
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             s1b_valid <= 1'b0;
             s1b_mode_post_ln <= '0;
+            s1b_ln_msb <= '0;
+            s1b_ln_fk <= '0;
             for(int j=0; j<N; j++) s1b_ln_y[j] <= '0;
         end else begin
             s1b_valid <= s1_valid;
             s1b_mode_post_ln <= s1_mode_post_ln;
+            s1b_ln_msb <= ln0_msb;
+            s1b_ln_fk <= ln0_fk;
             s1b_ln_y <= s1_ln_y;
         end
     end
@@ -168,25 +183,28 @@ module tr_backbone_wrapper #(
         end
     end
     
-    // Lanes 1..N-1 are never read as a log (bypass only); lane 0 supports bypass (00) and RMSNorm's rounded -0.5x (11):
-    // -((x+1)>>>1), computed one bit wider so x=MAX does not wrap.
-    logic signed [WIDTH_OUT:0] half_x;
-    assign half_x = ($signed({ln_mux_out[0][WIDTH_OUT-1], ln_mux_out[0]}) + 1) >>> 1;
+    // The post-ln stage is a pass-through: RMSNorm no longer takes -0.5 ln(mean) through the exp (it reads the ln lane's leading-one position
+    // and mantissa, see ln_msb_out), so the rounded -0.5x of lane 0 is gone. mode_post_ln is kept for port compatibility and ignored.
     always_comb begin
         for (int i = 0; i < N; i++) post_ln_out[i] = ln_mux_out[i];
-        if (s1b_mode_post_ln == 2'b11) post_ln_out[0] = WIDTH_OUT'(-half_x);
     end
 
     // --- PIPELINE REGISTER 2 ---
     logic signed [WIDTH_OUT-1:0] s2_post_ln_reg [N];
     logic                        s2_valid;
+    logic [$clog2(LN_IN_W)-1:0]  s2_ln_msb;
+    logic [FRAC_W+LN_EXTRA-1:0]  s2_ln_fk;
 
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             s2_valid <= 1'b0;
+            s2_ln_msb <= '0;
+            s2_ln_fk <= '0;
             for(int j=0; j<N; j++) s2_post_ln_reg[j] <= '0;
         end else begin
             s2_valid <= s1b_valid;
+            s2_ln_msb <= s1b_ln_msb;
+            s2_ln_fk <= s1b_ln_fk;
             s2_post_ln_reg <= post_ln_out;
         end
     end
@@ -196,6 +214,8 @@ module tr_backbone_wrapper #(
     // =========================================================
     assign out_valid = s2_valid;
     assign log_out = s2_post_ln_reg;
+    assign ln_msb_out = s2_ln_msb;
+    assign ln_fk_out  = s2_ln_fk;
 
     generate
         for (i = 0; i < N; i++) begin : gen_tr_exp_lanes

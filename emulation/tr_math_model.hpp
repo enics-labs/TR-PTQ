@@ -472,10 +472,7 @@ static const uint16_t RSQ_TAB[2][1 << RSQ_T] = {   // [k & 1][i] = round(2^(RSQ_
 // sum of squares S of a row of 2^log2n codes -> unsigned inv_rms register (RMS_INV_W bits). The unit is fed by the rounded mean mk that the
 // ln lane receives (same shift, rounding and W_MAC saturation as rms_scale): mk = 2^k (1 + f); the table is indexed by k & 1 and the top RSQ_T bits of f
 // (the ln unit's leading-one finder and normalizer); inv = table * 2^(...) with one shift and one half-up rounding.
-inline uint32_t rms2_scale(int32_t S, int log2n) {
-    const int shift = RMS_FRAC_W + log2n - RMS_K;
-    int64_t mk = ((int64_t)S + (1LL << (shift - 1))) >> shift;
-    if (mk > (1LL << RMS_W_MAC) - 1) mk = (1LL << RMS_W_MAC) - 1;
+inline uint32_t rms2_inv_mk(int64_t mk) {
     uint64_t m = mk < 1 ? 1 : (uint64_t)mk;
     int k = 63 - __builtin_clzll(m);                                   // leading one
     int i = (int)(((m << RSQ_T) >> k) & ((1 << RSQ_T) - 1));           // top RSQ_T mantissa bits
@@ -484,6 +481,13 @@ inline uint32_t rms2_scale(int32_t S, int log2n) {
     int64_t v = RSQ_TAB[d & 1][i];
     int64_t inv = sh >= 0 ? (v << sh) : ((v + (1LL << (-sh - 1))) >> -sh);
     return (uint32_t)(inv > (1LL << RMS_INV_W) - 1 ? (1LL << RMS_INV_W) - 1 : inv);
+}
+
+inline uint32_t rms2_scale(int32_t S, int log2n) {
+    const int shift = RMS_FRAC_W + log2n - RMS_K;
+    int64_t mk = ((int64_t)S + (1LL << (shift - 1))) >> shift;
+    if (mk > (1LL << RMS_W_MAC) - 1) mk = (1LL << RMS_W_MAC) - 1;      // W_MAC saturation
+    return rms2_inv_mk(mk);
 }
 
 inline void rms2_apply_tile(const int8_t x[8], uint32_t inv, int16_t out[8]) {

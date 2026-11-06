@@ -4,20 +4,22 @@
  * @details  Combinational. vecmul_scale_mode selects the cast (these are the encodings the controller drives):
  *             000  low W bits, no scaling
  *             011  softmax probabilities: >>> FRAC_W, unsigned saturate at 255
- *             101  RMSNorm apply: ROUNDED >>> (FRAC_W+4), signed saturate
+ *             101  RMSNorm apply: ROUNDED >>> RMS_SHIFT, signed saturate (W bits; Q5.7 12-bit code with RMS_SHIFT = 5)
  *             110  SwiGLU apply: round_shift(acc << 2, sw_shift) with sw_shift >= 0, signed saturate
  *           Split out of tr_nonlinear_vpu so synthesis reports its area on its own.
  *
  * @param    N        Lanes.
- * @param    W        Output width.
+ * @param    W        Output width (12: RMSNorm and SwiGLU codes are 12-bit signed; softmax probabilities are 0..255 in the same bus).
  * @param    ACC_W    Width of the engine's result (acc); the VPU passes 20 (the largest result is 20 signed bits).
  * @param    FRAC_W   Fractional bits of the Q-format.
+ * @param    RMS_SHIFT  RMSNorm apply shift: x * inv_rms has FRAC_W + INV_BITS fractional bits (8) and the output code has 7 (Q5.7): 8 + 4 - 7 = 5.
  */
 module vecmul_out_cast #(
     parameter int N       = 8,
     parameter int W       = 8,
     parameter int ACC_W   = 32,
-    parameter int FRAC_W  = 4
+    parameter int FRAC_W  = 4,
+    parameter int RMS_SHIFT = 5
 )(
     input  logic signed [ACC_W-1:0] acc [N],
     input  logic [2:0]              scale_mode,
@@ -52,8 +54,8 @@ module vecmul_out_cast #(
                 else if (r < SAT_MIN)   out[i] = SAT_MIN;
                 else                    out[i] = W'(r);
             end else if (scale_mode == 3'b101) begin
-                // RMSNorm apply: x * inv_rms (inv_rms has FRAC_W+4 fractional bits) -> Q.FRAC_W, ROUNDED, signed saturate.
-                shifted = (acc[i] + (1 <<< (FRAC_W + 3))) >>> (FRAC_W + 4);
+                // RMSNorm apply: x * inv_rms (inv_rms has FRAC_W+4 fractional bits) -> 12-bit Q5.7 code, ROUNDED, signed saturate.
+                shifted = (acc[i] + (1 <<< (RMS_SHIFT - 1))) >>> RMS_SHIFT;
                 if (shifted > SAT_MAX)       out[i] = SAT_MAX;
                 else if (shifted < SAT_MIN)  out[i] = SAT_MIN;
                 else                         out[i] = W'(shifted);

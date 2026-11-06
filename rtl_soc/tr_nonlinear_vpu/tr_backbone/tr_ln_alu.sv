@@ -7,7 +7,7 @@
  *           below it as the mantissa fraction fk (f = fk / 2^BITS). The
  *           mantissa range [0,1) is split into SEGMENTS equal segments
  *           (segment = top log2(SEGMENTS) bits of fk), each with its own
- *           least-squares line of ln(1+f), constants quantized to COEF_BITS:
+ *           least-squares line of ln(1+f), constants quantized to COEF_BITS (msb_o / fk_o expose the leading-one position and fk):
  *               aq = msb - BITS
  *               yq = (aq*L*2^BITS + A[seg]*fk + B[seg]*2^BITS + 2^(COEF_BITS-1)) >>> COEF_BITS
  *           with L=round(ln2*2^COEF_BITS), A/B=round(slope/intercept*2^COEF_BITS).
@@ -32,7 +32,10 @@ module tr_ln_alu #(
     parameter int COEF_BITS = 8     // PWL constant precision (6, 8, 10)
 )(
     input  logic [WIDTH-1:0]   xq,
-    output logic signed [OUT_WIDTH-1:0] yq
+    output logic signed [OUT_WIDTH-1:0] yq,
+    // Taps for the reciprocal-sqrt unit (rsq_unit): the leading-one position and the BITS mantissa bits below it, before any arithmetic
+    output logic [$clog2(WIDTH)-1:0] msb_o,
+    output logic [BITS-1:0]          fk_o
 );
 
     // ========================================================================
@@ -157,6 +160,9 @@ module tr_ln_alu #(
             yq_full      = yq_full >>> COEF_BITS;
         end
     end
+
+    assign msb_o = msb;
+    assign fk_o  = fk;
 
     always_comb begin
         if (yq_full > (2**(OUT_WIDTH-1) - 1))

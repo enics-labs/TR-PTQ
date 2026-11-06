@@ -19,7 +19,6 @@
 
 // peripheral_modules
 ../rtl_soc/tr_nonlinear_vpu/peripheral_modules/sigma_rom.sv
-../rtl_soc/tr_nonlinear_vpu/peripheral_modules/recip_rom.sv
 ../rtl_soc/tr_nonlinear_vpu/peripheral_modules/piped_max.sv
 ../rtl_soc/tr_nonlinear_vpu/peripheral_modules/scalar_sub.sv
 ../rtl_soc/tr_nonlinear_vpu/peripheral_modules/shared_lut_rom.sv

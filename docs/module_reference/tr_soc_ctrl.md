@@ -35,22 +35,22 @@ On an MMIO command write, sequences `tr_nonlinear_vpu`'s crossbar through the mu
 | `0x05` | SwiGLU silu group: `silu_s = sat12(round(x·σ >> 2))` into the 12-bit `scratch_a` | `SW_P1` |
 | `0x06` | SwiGLU max group: max `|silu_s·up|` via the shared `piped_max` into `reg_sw_max` | `SW_P2`, `SW_P2_M` |
 | `0x07` / `0x08` | RMSNorm sum-of-squares beat, first tile (clears the accumulator) / next tile (accumulates) | `RM_P1` / `RM_P1N` |
-| `0x09` | RMSNorm scale (once per row): mean → ln → rounded −0.5× → sign-guarded exp → `reg_inv_rms` | `RM_P2`, `RM_P3` |
-| `0x0A` | RMSNorm apply (per tile): `sat8(round(x·inv_rms >> 8))` | `RM_P4` |
+| `0x09` | RMSNorm scale (once per row): mean `mk` → shared ln lane (leading one, mantissa) → reciprocal-sqrt unit → `reg_inv_rms` | `RM_P2` |
+| `0x0A` | RMSNorm apply (per tile): `sat12(round(x·inv_rms >> 5))` (Q5.7 code) | `RM_P4` |
 | `0x0B` | SwiGLU row gain: `e` from `reg_sw_max` (consumes and clears it) | `SW_G` |
-| `0x0C` | SwiGLU apply group: `sat8(round_shift(4·silu_s·up, 10−e))` | `SW_P4` |
+| `0x0C` | SwiGLU apply group: `sat12(round_shift(4·silu_s·up, 10−e))` (gain `e` chosen so that the largest `|prod|` fits 2047) | `SW_P4` |
 
 There are no commands 2 (GELU) and 3 (single-tile RMSNorm); they exist only in the ISCAS tag. RMSNorm (rows of 8·tiles elements) and SwiGLU (rows of 8·groups elements) are **host-sequenced** in 8-lane groups: RMSNorm = `0x07`, `0x08`…, `0x09`, `0x0A` per tile; SwiGLU = pass 1 (`0x05`, `0x06` per group), `0x0B`, pass 2 (`0x05`, `0x0C` per group). See the header of `tr_soc_ctrl_int.sv` and `docs/llama/hardware-spec.md` (integration repository); golden models are `rms_*` / `sw_*` in `emulation/tr_math_model.hpp`.
 
 **Pass sequencing:** each command is a fixed sequence of states driving `tr_nonlinear_vpu`'s crossbar-select/enable/mode outputs pass-by-pass, gated on that pass's own `vpu_*_valid` handshake (the VPU's submodules have no external ready signal, so each pass waits out its producer's own valid pulse before advancing).
 
 - **SM_P1..SM_P4** (Softmax): row max (shared `piped_max`) → `Σexp(x-max)` (via `mac_array_engine`) → `ln(Σ)` → `exp(x-max-ln(Σ))` (Q0.8 output). `z = sat8(max + ln Σ)` is the offset SM_P4 subtracts, exposed at `ADDR_SM_Z`.
-- **RM_P1..RM_P4** (RMSNorm): `S += Σx²` over tiles → `mk = round(S >> (FRAC_W + log2N − 2))` → shared ln at BITS = FRAC_W+2 → rounded `−0.5·ln` → `InvRMS = exp(...)` (sign-guarded, see below) → wide `inv_rms` register (12 bits, 8 fractional bits) → `y = round(x·inv_rms >> 8)`, int8 saturate.
+- **RM_P1..RM_P4** (RMSNorm): `S += Σx²` over tiles → `mk = round(S >> (FRAC_W + log2N − 2))` → the shared ln lane (BITS = FRAC_W+2) exposes its leading-one position and mantissa to the reciprocal-sqrt unit → wide `inv_rms` register (12 bits, 8 fractional bits) → `y = round(x·inv_rms >> 5)`, 12-bit saturate (Q5.7).
 - **SW_P1, SW_P2, SW_G, SW_P4** (SwiGLU): σ ROM lookup and silu rounding → max `|silu·up|` → gain → apply with the per-row shift.
 
 `scratch_a` (12 bits per lane) holds the SwiGLU silu intermediate between passes. `reg_scalar_max`/`reg_scalar_log` hold Softmax's row-max and log-sum-exp scalars, and RMSNorm's `−0.5·ln(mean)` scalar, between their own passes. `reg_inv_rms` (RMSNorm) and `reg_sw_max`/`reg_sw_e` (SwiGLU) are the new cross-command registers.
 
-**RM_P3 sign-guard:** `tr_nonlinear_vpu`'s shared exp backbone only supports the decay/negative-domain case, but RMSNorm's log-domain argument can legitimately go positive for a small mean. RM_P3 forces it non-positive before the backbone (`rms_growth` flag), and the VPU turns the result into `inv_rms` through the `recip_rom` reciprocal table when the true value was positive (`1/E`, capped at 4095).
+The ln / exp arithmetic is not used by RMSNorm any more (it needed a sign guard and a reciprocal table for small means and cost 3.0% perplexity from the Q4.4 interface alone); `vpu_data_out` is 12 bits wide (`OUT_W`) for the RMSNorm / SwiGLU codes.
 
 ### Parameters
 

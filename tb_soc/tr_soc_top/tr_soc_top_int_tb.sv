@@ -5,6 +5,7 @@ module tr_soc_top_int_tb();
     localparam int M = 4;
     localparam int N = 8;
     localparam int W = 8;
+    localparam int OUT_W = 12;
 
     logic clk, rst_n;
     logic [7:0]  mmio_addr;
@@ -20,7 +21,7 @@ module tr_soc_top_int_tb();
     logic signed [W-1:0] ext_sram_b [N];
     
     logic        vpu_out_valid;
-    logic signed [W-1:0] vpu_data_out [N];
+    logic signed [OUT_W-1:0] vpu_data_out [N];
 
     // Streaming matmul interface
     logic [15:0] mm_tile_row, mm_tile_col;
@@ -32,7 +33,7 @@ module tr_soc_top_int_tb();
     logic [15:0] mm_out_row;
     logic signed [W-1:0] mm_out_data [M];
 
-    tr_soc_top_int #(.M(M), .N(N), .W(W), .ACC_W(32)) dut (.*);
+    tr_soc_top_int #(.M(M), .N(N), .W(W), .OUT_W(OUT_W), .ACC_W(32)) dut (.*);
 
     // ── Streaming matmul memory model (combinational read) ──────────────
     localparam int MM_ROWS = 8, MM_COLS = 16;

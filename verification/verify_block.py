@@ -11,8 +11,12 @@ def get_config(block_name):
         # (softmax tile cmd 0x01; tiled RMSNorm cmds 0x07..0x0A; two-pass SwiGLU cmds 0x05/0x06/0x0B/0x0C).
         # Golden models: tr_math_model.hpp, bit-exact to tools/models/vpu_ops.py.
         "softmax": {"f_file": "../tb_soc/tr_softmax_int/tr_softmax_int.f", "max_error": 0},
-        "rmsnorm": {"f_file": "../tb_soc/tr_rmsnorm_int/tr_rmsnorm_int.f", "max_error": 0},
-        "swiglu":  {"f_file": "../tb_soc/tr_swiglu_int/tr_swiglu_int.f", "max_error": 0},
+        # "model": the cpu_math_model.cpp mode that generates the vectors (default: the block name). rmsnorm / swiglu run the HW2 flows
+        # (reciprocal-sqrt unit, symmetric sigma table, 12-bit output codes); the previous flows stay available as the C++ modes rmsnorm / swiglu.
+        "rmsnorm": {"f_file": "../tb_soc/tr_rmsnorm_int/tr_rmsnorm_int.f", "max_error": 0, "model": "rmsnorm2"},
+        "swiglu":  {"f_file": "../tb_soc/tr_swiglu_int/tr_swiglu_int.f", "max_error": 0, "model": "swiglu2"},
+        # reciprocal-sqrt unit of RMSNorm (HW2): tr_ln_alu taps + rsq_unit over every mean the ln lane can receive
+        "rsq":     {"f_file": "../tb_soc/tr_rsq_unit/tr_rsq_unit.f", "max_error": 0},
         "quant":   {"f_file": "../tb_soc/requantize_engine/requantize_engine_int.f", "max_error": 0},
         "matmul":  {"f_file": "../tb_soc/tr_matmul/tr_matmul.f",     "max_error": 0},
     }
@@ -61,7 +65,7 @@ def run_verification():
         sys.exit(1)
 
     print(f">> [2/4] Generating Vectors for {args.block.upper()}...")
-    subprocess.run(["./cpu_model", args.block])
+    subprocess.run(["./cpu_model", config.get("model", args.block)])
 
     print(f">> [3/4] Running RTL Simulation for {args.block.upper()}...")
     

@@ -8,6 +8,8 @@
  * @param    N          Vector dimension (lanes).
  * @param    W_VEC      SRAM/vector data width (sram_data_a/b, vpu_data_out,
  *                        modifier and math-engine operand width).
+ * @param    OUT_W      Width of vpu_data_out and the vec-mul cast: RMSNorm / SwiGLU codes are 12-bit signed (softmax probabilities 0..255 and the
+ *                        8-bit sources are sign-/zero-extended into it).
  * @param    W_MAC      Internal log/exp backbone working width (wider than
  *                        W_VEC, since ln/exp intermediates need headroom).
  * @param    ACC_W      MAC/vecmul accumulator width (vpu_dot_out, vecmul's
@@ -24,6 +26,7 @@
 module tr_nonlinear_vpu #(
     parameter int N         = 8,
     parameter int W_VEC     = 8,
+    parameter int OUT_W     = 12,
     parameter int W_MAC     = 16,
     parameter int ACC_W     = 32,
     parameter int FRAC_W    = 4,
@@ -41,12 +44,11 @@ module tr_nonlinear_vpu #(
     // =========================================================
     input  logic signed [W_VEC-1:0] sram_data_a [N],
     input  logic signed [W_VEC-1:0] sram_data_b [N],
-    output logic signed [W_VEC-1:0] vpu_data_out [N],
+    output logic signed [OUT_W-1:0] vpu_data_out [N],
     input  logic signed [W_VEC-1:0] ctrl_scalar_sub_val, // For x - max or x - mu
     output logic signed [WIDE_W-1:0] vpu_max_out,        // To Controller Reg (softmax row max, or SwiGLU max |prod|)
     output logic signed [ACC_W-1:0] vpu_dot_out,         // To Controller Reg
-    input  logic                    rms_growth,          // RMSNorm: -0.5 ln(mean) was positive (sign-guarded) -> reciprocal path
-    output logic        [INV_W-1:0] vpu_inv_rms,         // RMSNorm: inv_rms from the exp result (controller latches it)
+    output logic        [INV_W-1:0] vpu_inv_rms,         // RMSNorm: inv_rms from the reciprocal-sqrt unit (controller latches it)
     input  logic        [4:0]       rms_log2n,           // RMSNorm: log2(row length), sets the mean shift
     input  logic        [INV_W-1:0] inv_rms_in,          // RMSNorm: wide inv_rms (broadcast vecmul b operand)
     input  logic signed [SA_W-1:0]  sw_silu_in [N],      // SwiGLU: wide silu intermediate (vecmul b operand, mux_vecmul_b_sel==3'b101)
@@ -109,6 +111,9 @@ module tr_nonlinear_vpu #(
     logic        [W_VEC-1:0]     bb_mantisa [N];
     logic                        bb_is_zero [N];
     logic        [W_VEC-1:0]     rom_e_a [N];
+    localparam int LN_IN_W = 13;                     // width of the shared ln unit's input (tr_backbone_wrapper default; the largest reachable mean is 4096)
+    logic        [$clog2(LN_IN_W)-1:0] bb_ln_msb;   // lane 0's ln front end (see tr_backbone_wrapper)
+    logic        [FRAC_W+RMS_K-1:0]    bb_ln_fk;
 
     // Fractional bits of shared_lut_rom.sv's anchor entries (Q0.8, all formats).
     localparam int ANCHOR_Q_BITS = 8;
@@ -138,14 +143,14 @@ module tr_nonlinear_vpu #(
     // Vec-mul results never exceed 20 signed bits (RMSNorm apply 127*4095, SwiGLU silu*up 2048*128, exp products < 2^13), so the
     // engine / cast run at WIDE_W (20) bits instead of ACC_W.
     logic signed [WIDE_W-1:0] vecmul_out_acc [N];
-    logic signed [W_VEC-1:0] vecmul_out_trunc [N]; // Truncated to W_VEC for SRAM
+    logic signed [OUT_W-1:0] vecmul_out_trunc [N]; // Cast result (OUT_W bits)
 
     logic int_bb_valid;
     logic int_mac_valid;
     logic int_vecmul_valid;
     logic int_max_valid;
 
-    logic        [5:0]       sigma_q6 [N];   // SwiGLU sigmoid ROM output (peripheral_modules/sigma_rom.sv)
+    logic        [6:0]       sigma_q6 [N];   // SwiGLU sigmoid ROM output, Q.6, 0..64 (peripheral_modules/sigma_rom.sv)
 
     // =========================================================
     // CROSSBAR MUX NETWORK (Software-Defined Routing)
@@ -228,8 +233,8 @@ module tr_nonlinear_vpu #(
             for(int i=0; i<N; i++) begin
                 case (mux_vpu_out_sel)
                     3'b000: vpu_data_out[i] <= vecmul_out_trunc[i];
-                    3'b001: vpu_data_out[i] <= bb_log[i]; 
-                    3'b011: vpu_data_out[i] <= scalar_sub_out[i];
+                    3'b001: vpu_data_out[i] <= OUT_W'(bb_log[i]);
+                    3'b011: vpu_data_out[i] <= OUT_W'(scalar_sub_out[i]);
                     default: vpu_data_out[i] <= vecmul_out_trunc[i];
                 endcase
             end
@@ -266,12 +271,13 @@ module tr_nonlinear_vpu #(
     logic        [7:0]             rom_e_a_8bit [N];
 
     tr_backbone_wrapper #(
-        .N(N), .WIDTH_IN(W_MAC), .WIDTH_OUT(W_VEC), .FRAC_W(FRAC_W), .LUT_IDX_W(LUT_IDX_W)
+        .N(N), .WIDTH_IN(W_MAC), .WIDTH_OUT(W_VEC), .FRAC_W(FRAC_W), .LUT_IDX_W(LUT_IDX_W), .LN_EXTRA(RMS_K), .LN_IN_W(LN_IN_W)
     ) u_backbone (
         .clk(clk), .rst_n(rst_n), .in_valid(en_bb_valid), .out_valid(int_bb_valid),
         .bypass_ln(bb_bypass_ln), .mode_post_ln(bb_mode_post_ln), .ln_pre_scaled(bb_ln_pre_scaled),
         .vec_in(bb_in), // Conditionally shifted input!
-        .log_out(bb_log), .a_idx_out(bb_a_idx), .mantisa_out(bb_mantisa), .is_zero_out(bb_is_zero)
+        .log_out(bb_log), .a_idx_out(bb_a_idx), .mantisa_out(bb_mantisa), .is_zero_out(bb_is_zero),
+        .ln_msb_out(bb_ln_msb), .ln_fk_out(bb_ln_fk)
     );
 
     shared_lut_rom #(.N(N), .LUT_IDX_W(LUT_IDX_W)) u_rom (.a_idx(bb_a_idx), .e_a(rom_e_a_8bit));
@@ -312,16 +318,12 @@ module tr_nonlinear_vpu #(
         end
     end
 
-    // RMSNorm inv_rms: decay branch = exp result at 8 fractional bits; growth branch = its reciprocal (recip_rom).
-    logic [11:0]       rms_ew;
-    logic [INV_W-1:0]  rms_recip;
-    assign rms_ew = vecmul_out_acc[0][15:4];
-    recip_rom #(.INV_W(INV_W)) u_recip (.ew(rms_ew[7:0]), .inv(rms_recip));
-    assign vpu_inv_rms = rms_growth ? rms_recip : INV_W'(rms_ew);
+    // RMSNorm inv_rms: reciprocal-sqrt unit on the ln lane's leading-one position and mantissa (the mean mk is what the ln lane receives).
+    rsq_unit #(.MSB_W($clog2(LN_IN_W)), .BITS(FRAC_W + RMS_K), .INV_W(INV_W)) u_rsq (.msb(bb_ln_msb), .fk(bb_ln_fk), .inv(vpu_inv_rms));
     always_comb for (int i = 0; i < N; i++) vpu_wide_out[i] = vecmul_out_acc[i];
 
     vecmul_out_cast #(
-        .N(N), .W(W_VEC), .ACC_W(WIDE_W), .FRAC_W(FRAC_W)
+        .N(N), .W(OUT_W), .ACC_W(WIDE_W), .FRAC_W(FRAC_W)
     ) u_vecmul_cast (
         .acc(vecmul_out_acc), .scale_mode(vecmul_scale_mode), .sw_shift(sw_shift), .out(vecmul_out_trunc)
     );

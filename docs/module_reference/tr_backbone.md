@@ -1,6 +1,6 @@
 # TR Backbone — `tr_nonlinear_vpu`
 
-These modules live in [rtl_soc/tr_nonlinear_vpu/tr_backbone/](../../rtl_soc/tr_nonlinear_vpu/tr_backbone/). Together they form the shared log-domain math pipeline (`tr_backbone_wrapper`) that every Softmax/RMSNorm pass routes through: `tr_ln_alu` → post-conditioning (bypass or rounded −0.5×) → `tr_exp_alu` (+ its `round`/`quadratic_divider` helpers).
+These modules live in [rtl_soc/tr_nonlinear_vpu/tr_backbone/](../../rtl_soc/tr_nonlinear_vpu/tr_backbone/). Together they form the shared log-domain math pipeline (`tr_backbone_wrapper`) that every Softmax/RMSNorm pass routes through: `tr_ln_alu` → post-conditioning (pass-through) → `tr_exp_alu` (+ its `round`/`quadratic_divider` helpers).
 
 ---
 
@@ -32,13 +32,15 @@ Chains `tr_ln_alu` → post-ln mode → `tr_exp_alu` into a three-register-stage
 | `in_valid`     | input     | 1                                | Input valid                                     |
 | `out_valid`    | output    | 1                                | Output valid                                    |
 | `bypass_ln`    | input     | 1                                | Skip `tr_ln_alu` (route straight to exp)        |
-| `mode_post_ln` | input     | 2                                | `00`: bypass; `11`: rounded −0.5× on lane 0 (RMSNorm). Only lane 0 has an ln unit; lanes 1..N−1 only bypass |
+| `mode_post_ln` | input     | 2                                | Unused (the post-ln stage is a pass-through). Only lane 0 has an ln unit; lanes 1..N−1 only bypass |
 | `ln_pre_scaled`| input     | 1                                | 0: input has `FRAC_W` fractional bits (shifted up by `LN_EXTRA`); 1: already `FRAC_W+LN_EXTRA` (RMSNorm mean) |
 | `vec_in`       | input     | `[WIDTH_IN-1:0][N]`              | Input vector                                    |
 | `log_out`      | output    | `[WIDTH_OUT-1:0][N]`             | `tr_ln_alu`'s (post-conditioned) log output     |
 | `a_idx_out`    | output    | `[LUT_IDX_W-1:0][N]`             | Shared-LUT anchor index for `shared_lut_rom`    |
 | `mantisa_out`  | output    | `[WIDTH_OUT-1:0][N]`             | Taylor-mantissa term to multiply against `e_a`  |
 | `is_zero_out`  | output    | `[N]`                            | Whether this lane's `exp` result should be 0    |
+| `ln_msb_out`   | output    | `[$clog2(LN_IN_W)-1:0]`          | Lane 0's ln front end: leading-one position of the ln input, aligned with `out_valid` (RMSNorm's `rsq_unit`) |
+| `ln_fk_out`    | output    | `[FRAC_W+LN_EXTRA-1:0]`          | Mantissa bits below the leading one, aligned with `out_valid` |
 
 ---
 

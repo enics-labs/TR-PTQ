@@ -33,23 +33,17 @@
  *             pass 1, per group: cmd 5 (gate x -> sigma ROM -> silu_s = sat12(round(x*sigma >> 2)) into the wide
  *                                scratch_a), cmd 6 (up u: running max of |silu_s*u| into reg_sw_max)
  *             once per row:      cmd 0xB (gain e from reg_sw_max, clears the max; e readable at ADDR_SW_E)
- *             pass 2, per group: cmd 5 again, cmd 0xC (y = sat8(round_shift(4*silu_s*u, 10-e)) -> ext_sram)
- *           The sigmoid comes from a 256x6-bit sigma ROM in tr_nonlinear_vpu (equal to the exp-ln-exp chain at FRAC_W=6).
+ *             pass 2, per group: cmd 5 again, cmd 0xC (y = sat12(round_shift(4*silu_s*u, 10-e)) -> ext_sram)
+ *           The sigmoid comes from a 64-entry symmetric sigma ROM in tr_nonlinear_vpu; the apply output is a 12-bit code (gain e chosen
+ *           so that the largest |prod| fits 2047).
  *
  *           RMSNorm is a host-sequenced tile flow (the VPU is N=8 wide): the host issues command 7 for
  *           the first tile of a row and 8 for each further tile (the MAC accumulates S = sum x^2 across
- *           tiles), command 9 once, then command 0xA per tile. Command 9 (RM_P2, RM_P3) turns S into
- *           mk = round(S >> (FRAC_W+log2N-2)), runs the shared ln at BITS=FRAC_W+2, halves with rounding,
- *           and evaluates exp through the sign-guarded backbone; the unsigned wide inv_rms (INV_W bits,
- *           FRAC_W+4 fractional bits) is latched in reg_inv_rms (decay: exp output; growth: 65536/E
- *           from recip_rom in the VPU). Software spec: tools/models/vpu_ops.py::rmsnorm.
- *
- *           RM_P3 includes a sign-guard fix (forces the log-domain argument
- *           non-positive before tr_nonlinear_vpu's shared exp backbone,
- *           which only supports the decay/negative-domain case, then
- *           corrects the result back via recip_lut when the true value was
- *           positive) -- see the inline comment at rm_ctrl_scalar_raw for
- *           the full derivation; this mirrors the same fix in tr_rmsnorm.sv.
+ *           tiles), command 9 once, then command 0xA per tile. Command 9 (RM_P2) turns S into
+ *           mk = round(S >> (FRAC_W+log2N-2)), feeds it to the shared ln lane, and latches the unsigned wide inv_rms
+ *           (INV_W bits, FRAC_W+4 fractional bits) in reg_inv_rms, read from the reciprocal-sqrt unit (rsq_unit) in the VPU
+ *           from the ln lane's leading-one position and mantissa (no ln / exp arithmetic). The apply (command 0xA) is
+ *           round(x * inv_rms >> 5), a 12-bit Q5.7 code. Software spec: tools/models/vpu_ops.py (HW2, rsq_inv_mk).
  *
  * @param    N      Vector dimension (lanes) of the driven VPU/datapath.
  * @param    W      Data word width (ctrl_scalar_sub_val, vpu_data_out).
@@ -58,6 +52,7 @@
 module tr_soc_ctrl_int #(
     parameter int N     = 8,
     parameter int W     = 8,
+    parameter int OUT_W = 12,   // width of vpu_data_out (12-bit RMSNorm / SwiGLU codes)
     parameter int ACC_W = 32,
     parameter int INV_W = 12,
     parameter int SA_W  = 12,   // width of the SwiGLU silu intermediate (scratch_a)
@@ -99,7 +94,6 @@ module tr_soc_ctrl_int #(
     output logic        [4:0]       rms_log2n_out,     // RMSNorm row length log2 (ADDR_RMS_LOG2N)
     output logic        [INV_W-1:0] inv_rms_out,       // RMSNorm wide inv_rms (reg_inv_rms)
     output logic signed [5:0]       sw_shift_out,      // SwiGLU apply shift = 10 - e
-    output logic                    rms_growth_out,    // RMSNorm: sign-guard flip (selects the reciprocal path in the VPU)
     output logic                    mux_max_sel,       // piped_max input select: 0 softmax x, 1 SwiGLU |prod|
 
     // Datapath Routing
@@ -108,7 +102,7 @@ module tr_soc_ctrl_int #(
     output logic signed [SA_W-1:0]  scratch_a_out [N],
     
     // VPU Status Inputs (Split Pipeline Valids)
-    input  logic signed [W-1:0]     vpu_data_out [N],
+    input  logic signed [OUT_W-1:0] vpu_data_out [N],
     input  logic signed [WIDE_W-1:0] vpu_wide_out [N],      // full-width vecmul results (SwiGLU)
     input  logic signed [WIDE_W-1:0] vpu_max_out,
     input  logic signed [ACC_W-1:0] vpu_dot_out,
@@ -165,9 +159,6 @@ module tr_soc_ctrl_int #(
     logic                           latch_max;
     logic                           latch_log;
 
-    // RMSNorm Pass 3 sign-guard (see RM_P3 below): true only when
-    // ctrl_scalar came out positive during RM_P3/RM_P3_W/RM_P3_MUL_W.
-    logic                           rm_offset_was_positive;
 
     assign req_mult_out     = reg_req_mult;
     assign req_shift_out    = reg_req_shift;
@@ -177,7 +168,6 @@ module tr_soc_ctrl_int #(
     assign rms_log2n_out    = reg_rms_log2n;
     assign inv_rms_out      = reg_inv_rms;
     assign sw_shift_out     = reg_sw_shift;
-    assign rms_growth_out   = rm_offset_was_positive;
 
     always_comb begin
         mmio_rdata = '0;
@@ -220,7 +210,7 @@ module tr_soc_ctrl_int #(
         if (mx == 0) mx = 1;
         e = -5'sd8;
         for (int k = -8; k <= 10; k++) begin
-            lim = 48'd130048;                            // 127 << 10
+            lim = 48'd2096128;                           // 2047 << 10 (12-bit output code)
             if (k >= 0) begin if ((mx << k) <= lim)  e = 5'(k); end
             else        begin if (mx <= (lim << (-k))) e = 5'(k); end
         end
@@ -247,7 +237,7 @@ module tr_soc_ctrl_int #(
         if (write_scratch_a) for (int k = 0; k < N; k++) scratch_a[k] <= SA_W'(vpu_data_out[k]);
         if (latch_inv) reg_inv_rms <= vpu_inv_rms;
         if (latch_max)       reg_scalar_max <= vpu_max_out[W-1:0];
-        if (latch_log)       reg_scalar_log <= vpu_data_out[0];
+        if (latch_log)       reg_scalar_log <= W'(vpu_data_out[0]);
     end
 
     // Expanded FSM to handle chained pipelining (Backbone -> VecMul/MAC)
@@ -263,7 +253,6 @@ module tr_soc_ctrl_int #(
         // RMSNorm
         RM_P1, RM_P1_W, RM_P1N, RM_P1N_W,
         RM_P2, RM_P2_W,
-        RM_P3, RM_P3_W, RM_P3_MUL_W,
         RM_P4, RM_P4_W,
         // SwiGLU: cmd 5 silu group, 6 max group, 0xB row gain, 0xC apply group
         SW_P1, SW_P1_W,
@@ -340,7 +329,6 @@ module tr_soc_ctrl_int #(
         bb_mode_post_ln     = 2'b00;
         bb_ln_pre_scaled    = 1'b0;
         ctrl_scalar_sub_val = '0;
-        rm_offset_was_positive = 1'b0;
 
         case (state)
             IDLE: begin
@@ -423,38 +411,14 @@ module tr_soc_ctrl_int #(
                 else if (vpu_mac_valid) next_state = DONE;
             end
 
-            // mk = round(S >> (FRAC_W+log2N-2)) -> shared ln at BITS=FRAC_W+2 -> rounded -0.5x -> reg_scalar_log
+            // mk = round(S >> (FRAC_W+log2N-2)) -> shared ln lane (leading one and mantissa) -> reciprocal-sqrt unit -> reg_inv_rms.
+            // The ln / exp arithmetic is not used: the inverse rms is read from the rsq_unit table in the VPU.
             RM_P2, RM_P2_W: begin
                 bb_shift_mode = 1'b1;       // mean of squares (see tr_nonlinear_vpu rms_s_sat)
                 bb_ln_pre_scaled = 1'b1;    // mk already has FRAC_W+2 fractional bits
-                mux_bb_in_sel = 3'b000; bb_mode_post_ln = 2'b11; // rounded -0.5x
-                mux_vpu_out_sel = 3'b001;
+                mux_bb_in_sel = 3'b000;
                 if (state == RM_P2) begin en_bb_valid = 1; next_state = RM_P2_W; end
-                else if (state == RM_P2_W && vpu_bb_valid) begin latch_log = 1; next_state = RM_P3; end
-            end
-
-            // exp(reg_scalar_log) through the (decay-only) backbone, sign-guarded; the raw e_a*mantissa
-            // product is turned into the wide inv_rms register (reciprocal ROM on the growth branch).
-            RM_P3, RM_P3_W, RM_P3_MUL_W: begin
-                logic signed [W-1:0] rm_ctrl_scalar_raw;
-                bb_bypass_ln = 1'b1;
-
-                // Sign-guard: the shared exp backbone only supports non-positive inputs, but -0.5*ln(mean)
-                // goes positive for small mean(x^2). Force it non-positive and remember the flip in
-                // rm_offset_was_positive, which selects the reciprocal path at the latch_inv point.
-                rm_ctrl_scalar_raw = reg_scalar_log;
-                rm_offset_was_positive = ~rm_ctrl_scalar_raw[W-1] && (rm_ctrl_scalar_raw != '0);
-                ctrl_scalar_sub_val = rm_offset_was_positive ? -rm_ctrl_scalar_raw : rm_ctrl_scalar_raw;
-
-                src_sram_a_sel = 1; // Force 0 by reading empty Scratch A
-                mux_bb_in_sel = 3'b100;
-                vecmul_op_mode = 2'd2; vecmul_scale_mode = 3'b010; // UU; raw product is read from vpu_exp_raw
-                mux_vecmul_a_sel = 2'b11; mux_vecmul_b_sel = 3'b010;
-                mux_vpu_out_sel = 3'b000;
-
-                if (state == RM_P3) begin en_bb_valid = 1; next_state = RM_P3_W; end
-                else if (state == RM_P3_W && vpu_bb_valid) begin en_vecmul_valid = 1; next_state = RM_P3_MUL_W; end
-                else if (state == RM_P3_MUL_W && vpu_vecmul_valid) begin latch_inv = 1; next_state = DONE; end
+                else if (state == RM_P2_W && vpu_bb_valid) begin latch_inv = 1; next_state = DONE; end
             end
 
             // Apply: out = sat8(round(x * inv_rms >> (FRAC_W+4))), x from the requantizer path.

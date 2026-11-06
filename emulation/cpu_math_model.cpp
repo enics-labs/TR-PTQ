@@ -162,6 +162,17 @@ int main(int argc, char* argv[]) {
         }
         std::cout << "[C++ MODEL] Generated tiled RMSNORM test vectors." << std::endl;
     }
+    else if (mode == "rsq") {
+        // reciprocal-sqrt unit alone (tb_soc/tr_rsq_unit): one rounded mean mk per line, every value the ln lane can receive (0 .. 2^13 - 1);
+        // expected: the inverse-rms register
+        const int N_ROWS = 1 << 13;
+        vec_file << N_ROWS << "\n";
+        for (int mk = 0; mk < N_ROWS; mk++) {
+            vec_file << mk << "\n";
+            exp_file << rms2_inv_mk(mk) << "\n";
+        }
+        std::cout << "[C++ MODEL] Generated RSQ unit vectors." << std::endl;
+    }
     else if (mode == "quant") {
         // Realistic (mult, shift) pairs map SOME expected max accumulator range
         // to ~127 (as calibration does); acc is generated relative to that

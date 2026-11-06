@@ -21,13 +21,15 @@
  *                    tile height); also sized into the VPU's N-wide crossbar
  *                    for lanes 0..M-1.
  * @param    N      Vector dimension of the nonlinear VPU / contraction tile width.
- * @param    W      Data word width (a_mat/b_vec/ext_sram_b/vpu_data_out).
+ * @param    W      Data word width (a_mat/b_vec/ext_sram_b).
+ * @param    OUT_W  Width of vpu_data_out (12-bit signed; softmax probabilities 0..255 sit in the same bus).
  * @param    ACC_W  Accumulator width (c_vec bias, dot_acc_out, vpu_dot_out).
  */
 module tr_soc_top_int #(
     parameter int M     = 4,   // Parallel Output Lanes
     parameter int N     = 8,   // Vector Dimension
     parameter int W     = 8,
+    parameter int OUT_W = 12,  // vpu_data_out width: RMSNorm / SwiGLU codes are 12-bit signed
     parameter int ACC_W = 32
 )(
     input  logic clk,
@@ -54,7 +56,7 @@ module tr_soc_top_int #(
     // Non-Linear Engine Memory Interfaces
     input  logic signed [W-1:0]     ext_sram_b [N],
     output logic vpu_out_valid,
-    output logic signed [W-1:0]     vpu_data_out [N],
+    output logic signed [OUT_W-1:0] vpu_data_out [N],
 
     // Streaming matmul memory interface (CMD=0x04).  The wrapper supplies the
     // weight/activation tiles for (mm_tile_row, mm_tile_col) combinationally and
@@ -131,12 +133,11 @@ module tr_soc_top_int #(
     logic signed [W-1:0]            vpu_sram_b_in [N];
     logic signed [19:0]             vpu_max_out;
     logic signed [ACC_W-1:0]        vpu_dot_out;
-    logic                           rms_growth;
     logic        [11:0]             vpu_inv_rms;
     logic                           mux_max_sel;
     logic        [4:0]              rms_log2n;
     logic        [11:0]             inv_rms;
-    logic signed [W-1:0]            vpu_raw_out [N];
+    logic signed [OUT_W-1:0]        vpu_raw_out [N];
     logic                           vpu_bb_valid;
     logic                           vpu_vecmul_valid;
     logic                           vpu_mac_valid;
@@ -148,6 +149,7 @@ module tr_soc_top_int #(
     tr_soc_ctrl_int #(
         .N(N),
         .W(W),
+        .OUT_W(OUT_W),
         .ACC_W(ACC_W)
     ) u_ctrl (
         .clk                 (clk),
@@ -191,7 +193,6 @@ module tr_soc_top_int #(
         .vpu_max_out         (vpu_max_out),
         .vpu_dot_out         (vpu_dot_out),
         .vpu_inv_rms         (vpu_inv_rms),
-        .rms_growth_out      (rms_growth),
         .mux_max_sel         (mux_max_sel),
         .rms_log2n_out       (rms_log2n),
         .inv_rms_out         (inv_rms),
@@ -328,6 +329,7 @@ module tr_soc_top_int #(
     tr_nonlinear_vpu #(
         .N(N),
         .W_VEC(W),
+        .OUT_W(OUT_W),
         .W_MAC(16),
         .ACC_W(ACC_W),
         .FRAC_W(4),
@@ -342,7 +344,6 @@ module tr_soc_top_int #(
         .ctrl_scalar_sub_val (ctrl_scalar_sub_val),
         .vpu_max_out         (vpu_max_out),
         .vpu_dot_out         (vpu_dot_out),
-        .rms_growth          (rms_growth),
         .vpu_inv_rms         (vpu_inv_rms),
         .rms_log2n           (rms_log2n),
         .inv_rms_in          (inv_rms),

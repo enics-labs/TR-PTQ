@@ -16,7 +16,7 @@ local vector/MAC engines:
 | `mac_array_engine` | sum of squares, softmax sum | [mult_engines.md](module_reference/mult_engines.md) |
 | `vec_mul_array_engine` + `vecmul_out_cast` | element-wise products and their scaling / rounding / saturation | [mult_engines.md](module_reference/mult_engines.md) |
 | `piped_max` | softmax row max and SwiGLU maximum of `|silu * up|` | [peripheral_modules.md](module_reference/peripheral_modules.md) |
-| `sigma_rom`, `recip_rom` | SwiGLU sigmoid table, RMSNorm growth-branch reciprocal | [peripheral_modules.md](module_reference/peripheral_modules.md) |
+| `sigma_rom`, `rsq_unit` | SwiGLU sigmoid table (64 entries, symmetric), RMSNorm reciprocal-sqrt unit on the ln lane's leading-one position and mantissa | [peripheral_modules.md](module_reference/peripheral_modules.md) |
 | `scalar_sub` | softmax `x - max` | [peripheral_modules.md](module_reference/peripheral_modules.md) |
 
 One `tr_ln_alu` (piecewise-linear, BITS = 6) serves every operator that needs a logarithm.

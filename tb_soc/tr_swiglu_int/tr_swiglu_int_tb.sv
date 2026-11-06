@@ -20,6 +20,7 @@ module tb_tr_swiglu_int();
     localparam int M = 4;
     localparam int N = 8;
     localparam int W = 8;
+    localparam int OUT_W = 12;
 
     logic clk = 0, rst_n = 0;
 
@@ -36,7 +37,7 @@ module tb_tr_swiglu_int();
 
     logic signed [W-1:0] ext_sram_b [N];
     logic        vpu_out_valid;
-    logic signed [W-1:0] vpu_data_out [N];
+    logic signed [OUT_W-1:0] vpu_data_out [N];
 
     logic [15:0] mm_tile_row, mm_tile_col;
     logic        mm_mem_rd;
@@ -47,7 +48,7 @@ module tb_tr_swiglu_int();
     logic [15:0] mm_out_row;
     logic signed [W-1:0] mm_out_data [M];
 
-    tr_soc_top_int #(.M(M), .N(N), .W(W), .ACC_W(32)) dut (.*);
+    tr_soc_top_int #(.M(M), .N(N), .W(W), .OUT_W(OUT_W), .ACC_W(32)) dut (.*);
 
     assign mm_mem_valid = 1'b1;
     always_comb begin
@@ -119,7 +120,7 @@ module tb_tr_swiglu_int();
         for (int r = 0; r < num_rows; r++) begin
             logic signed [W-1:0] gate [];
             logic signed [W-1:0] up   [];
-            logic signed [W-1:0] y    [];
+            logic signed [OUT_W-1:0] y    [];
 
             dummy = $fscanf(file_in, "%d", n);
             gate = new[n]; up = new[n]; y = new[n];
