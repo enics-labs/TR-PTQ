@@ -455,26 +455,31 @@ inline void rms_apply_tile(const int8_t x[8], uint32_t inv, int8_t out[8]) {
 
 // ----------------------------------------------------------------------------
 // HW2 variants (software spec: tools/models/vpu_ops.py, HW2 preset; docs/llama/accuracy-study.md): the same SwiGLU / RMSNorm flows with
-//   - RMSNorm: dedicated reciprocal-sqrt unit instead of mean -> ln -> exp (rsq_inv): leading-one detector, 2 x 16-entry table of
-//     12-bit entries (index = parity of log2n - k, top 4 mantissa bits), one shift with one half-up rounding, cap 4095; apply shift
+//   - RMSNorm: reciprocal-sqrt unit instead of mean -> ln -> exp (rsq_inv_mk), fed by the ln lane's rounded mean: leading-one finder, 2 x 32-entry table of
+//     12-bit entries (index = parity of k, top 5 mantissa bits of mk), one shift with one half-up rounding, cap 4095; apply shift
 //     FRAC_W+INV_BITS+4-7 = 5 and a signed 12-bit output (Q5.7)
 //   - SwiGLU: 64-entry symmetric sigma table on |x| >> 1 (negative codes: 64 - entry; entries 0..64, 7 bits), gain chosen for the
 //     12-bit range (largest |prod| <= 2047), signed 12-bit output
 // ----------------------------------------------------------------------------
-static const int RSQ_T = 4;                    // mantissa index bits
+static const int RSQ_T = 5;                    // mantissa index bits
 static const int RSQ_W = 12;                   // entry width: one integer bit, RSQ_W-1 fractional bits
 static const int RMS2_OUT_FRAC = 7;
-static const uint16_t RSQ_TAB[2][1 << RSQ_T] = {
-    {2017, 1958, 1905, 1855, 1809, 1767, 1727, 1690, 1655, 1622, 1591, 1562, 1535, 1508, 1483, 1460},
-    {2852, 2769, 2694, 2624, 2559, 2499, 2442, 2390, 2341, 2294, 2251, 2209, 2170, 2133, 2098, 2064},
+static const uint16_t RSQ_TAB[2][1 << RSQ_T] = {   // [k & 1][i] = round(2^(RSQ_W-1) * c / sqrt(1 + (i + 1/2) / 2^RSQ_T)), c = 1 | sqrt(2)
+    {2032, 2002, 1972, 1944, 1918, 1892, 1867, 1843, 1820, 1798, 1777, 1757, 1737, 1718, 1699, 1681, 1664, 1647, 1630, 1614, 1599, 1584, 1569, 1555, 1541, 1528, 1515, 1502, 1489, 1477, 1465, 1454},
+    {2874, 2831, 2789, 2750, 2712, 2675, 2641, 2607, 2574, 2543, 2513, 2484, 2456, 2429, 2403, 2377, 2353, 2329, 2306, 2283, 2261, 2240, 2219, 2199, 2180, 2161, 2142, 2124, 2106, 2089, 2072, 2056},
 };
 
-// sum of squares S of a row of 2^log2n codes -> unsigned inv_rms register (RMS_INV_W bits)
+// sum of squares S of a row of 2^log2n codes -> unsigned inv_rms register (RMS_INV_W bits). The unit is fed by the rounded mean mk that the
+// ln lane receives (same shift, rounding and W_MAC saturation as rms_scale): mk = 2^k (1 + f); the table is indexed by k & 1 and the top RSQ_T bits of f
+// (the ln unit's leading-one finder and normalizer); inv = table * 2^(...) with one shift and one half-up rounding.
 inline uint32_t rms2_scale(int32_t S, int log2n) {
-    uint64_t s = S < 1 ? 1 : (uint64_t)S;
-    int k = 63 - __builtin_clzll(s);                                   // leading one
-    int i = (int)(((s << RSQ_T) >> k) & ((1 << RSQ_T) - 1));           // top RSQ_T mantissa bits
-    int d = log2n - k;
+    const int shift = RMS_FRAC_W + log2n - RMS_K;
+    int64_t mk = ((int64_t)S + (1LL << (shift - 1))) >> shift;
+    if (mk > (1LL << RMS_W_MAC) - 1) mk = (1LL << RMS_W_MAC) - 1;
+    uint64_t m = mk < 1 ? 1 : (uint64_t)mk;
+    int k = 63 - __builtin_clzll(m);                                   // leading one
+    int i = (int)(((m << RSQ_T) >> k) & ((1 << RSQ_T) - 1));           // top RSQ_T mantissa bits
+    int d = -(RMS_FRAC_W - RMS_K) - k;
     int sh = RMS_FRAC_W + RMS_INV_BITS + 4 + (d >> 1) - (RSQ_W - 1);   // d >> 1: floor (arithmetic shift)
     int64_t v = RSQ_TAB[d & 1][i];
     int64_t inv = sh >= 0 ? (v << sh) : ((v + (1LL << (-sh - 1))) >> -sh);
