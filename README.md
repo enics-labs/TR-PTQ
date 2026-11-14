@@ -24,7 +24,7 @@ in the [integration repository](https://github.com/YoniP31/tr-ptq-ddp23).
 
 | Path | Content |
 |---|---|
-| `tr-vpu_rtl/` | submodule: the RTL (only `rtl_soc/` is read) |
+| `tr-vpu_rtl/` | submodule: the RTL (`rtl_soc/` and `rtl_baseline/` are read) |
 | `inputs/dut.defines`, `inputs/dut.sdc` | technology, clock period (3.3 ns), I/O delays, DRV limits, path layout, RTL roots |
 | `libraries/` | TSMC65LP / ARM65LP standard-cell, SRAM and IO library configuration |
 | `scripts/` | `genus.tcl` (main flow), `report_power.tcl`, `report_power_activity.tcl`, `run_sweep.tcl`, `procedures.tcl` |
@@ -48,9 +48,10 @@ cd workspace
 genus -execute \"set TOPLEVEL <module>\" -f ../scripts/genus.tcl -log <module>_synth
 ```
 
-- `<module>` is any module under `tr-vpu_rtl/rtl_soc/`
-  (typically `tr_soc_top_int`, `tr_nonlinear_vpu`, `tr_backbone_wrapper`).
-  `genus.tcl` reads every `.sv` file under that tree and elaborates only the module you name.
+- Run Genus on `enicsnx01`: `ssh enicsnx01` first, then `cd` to `workspace/` and start it there.
+- `<module>` is any module under `tr-vpu_rtl/rtl_soc/` (typically `tr_soc_top_int`, `tr_nonlinear_vpu`, `tr_backbone_wrapper`)
+  or `tr-vpu_rtl/rtl_baseline/` (the standalone operator modules, e.g. `tr_rmsnorm`, `ibert_rmsnorm`).
+  `genus.tcl` reads every `.sv` file under both trees and elaborates only the module you name.
 - The escaped quotes are required for `-execute` in this environment.
 - The flow reads the libraries and RTL, synthesizes (generic, mapped, optimized) at high effort, exports the
   design to `export/<module>/post_synth/`, and then writes the reports.
