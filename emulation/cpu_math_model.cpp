@@ -34,8 +34,9 @@ static bool run_eval_mode(const std::string& mode, const std::string& in_path,
         if (line.find_first_not_of(" \t\r\n") == std::string::npos) continue;
         std::istringstream iss(line);
 
-        if (mode == "rmsnorm" || mode == "rmsnorm2") {
-            const bool v2 = mode == "rmsnorm2";
+        if (mode == "rmsnorm" || mode == "rmsnorm2" || mode == "ibert_rmsnorm") {
+            const bool vd = mode == "ibert_rmsnorm";
+            const bool v2 = mode == "rmsnorm2" || vd;
             // line: "log2n x0 .. x(N-1)" -> "inv_rms y0 .. y(N-1)"  (tiled flow, see rms_* in tr_math_model.hpp)
             int log2n; iss >> log2n;
             int n = 1 << log2n;
@@ -44,8 +45,8 @@ static bool run_eval_mode(const std::string& mode, const std::string& in_path,
             for (int i = 0; i < n; i++) { int v; iss >> v; x[i] = (int8_t)v; }
             int32_t acc = 0;
             for (int t = 0; t < n / 8; t++) acc = rms_acc_tile(&x[8 * t], acc, t == 0);
-            uint32_t inv = v2 ? rms2_scale(acc, log2n) : rms_scale(acc, log2n);
-            for (int t = 0; t < n / 8; t++) { if (v2) rms2_apply_tile(&x[8 * t], inv, &y2[8 * t]); else rms_apply_tile(&x[8 * t], inv, &y[8 * t]); }
+            uint32_t inv = vd ? ibert_rmsnorm_scale(acc, log2n) : v2 ? rms2_scale(acc, log2n) : rms_scale(acc, log2n);
+            for (int t = 0; t < n / 8; t++) { if (vd) ibert_rmsnorm_apply_tile(&x[8 * t], inv, &y2[8 * t]); else if (v2) rms2_apply_tile(&x[8 * t], inv, &y2[8 * t]); else rms_apply_tile(&x[8 * t], inv, &y[8 * t]); }
             fout << inv;
             for (int i = 0; i < n; i++) fout << " " << (v2 ? (int)y2[i] : (int)y[i]);
             fout << "\n";
@@ -117,8 +118,9 @@ int main(int argc, char* argv[]) {
         return -1;
     }
 
-    if (mode == "rmsnorm" || mode == "rmsnorm2") {
-        const bool v2 = mode == "rmsnorm2";
+    if (mode == "rmsnorm" || mode == "rmsnorm2" || mode == "ibert_rmsnorm") {
+        const bool vd = mode == "ibert_rmsnorm";
+        const bool v2 = mode == "rmsnorm2" || vd;
         // PRODUCTION tiled RMSNorm: one row per line. Input line "log2n x0 .. x(N-1)" (N = 1<<log2n),
         // expected line "inv_rms y0 .. y(N-1)". The TB runs cmd 7/8 per tile (sum of squares), cmd 9
         // once, cmd 0xA per tile; inv_rms is read from the controller register. Row mix: random
@@ -153,9 +155,9 @@ int main(int argc, char* argv[]) {
             vec_file << "\n";
             int32_t acc = 0;
             for (int t = 0; t < n / 8; t++) acc = rms_acc_tile(&x[8 * t], acc, t == 0);
-            uint32_t inv = v2 ? rms2_scale(acc, log2n) : rms_scale(acc, log2n);
+            uint32_t inv = vd ? ibert_rmsnorm_scale(acc, log2n) : v2 ? rms2_scale(acc, log2n) : rms_scale(acc, log2n);
             std::vector<int16_t> y2(n);
-            for (int t = 0; t < n / 8; t++) { if (v2) rms2_apply_tile(&x[8 * t], inv, &y2[8 * t]); else rms_apply_tile(&x[8 * t], inv, &y[8 * t]); }
+            for (int t = 0; t < n / 8; t++) { if (vd) ibert_rmsnorm_apply_tile(&x[8 * t], inv, &y2[8 * t]); else if (v2) rms2_apply_tile(&x[8 * t], inv, &y2[8 * t]); else rms_apply_tile(&x[8 * t], inv, &y[8 * t]); }
             exp_file << inv;
             for (int i = 0; i < n; i++) exp_file << " " << (v2 ? (int)y2[i] : (int)y[i]);
             exp_file << "\n";

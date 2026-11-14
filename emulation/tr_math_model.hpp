@@ -498,6 +498,42 @@ inline void rms2_apply_tile(const int8_t x[8], uint32_t inv, int16_t out[8]) {
     }
 }
 
+// ----------------------------------------------------------------------------
+// Divider-based RMSNorm (rtl_baseline/ibert_baseline/ibert_rmsnorm.sv): I-BERT Newton integer square root of the mean of squares and one integer
+// division per element, with a 12-bit Q5.7 output. Same phases as the standalone tr_rmsnorm (accumulate / scale / apply).
+//   msq = round(S * 4^F / N)                       mean of squares with 2F extra fractional bits (<= 2^24 for F = 5)
+//   R   = isqrt(msq)                               Newton: x0 = 2^ceil(bits/2), x <- (x + msq / x) >> 1 until it stops falling = rms code * 2^F
+//   y   = sign(x) * min(round_half_up(|x| * 2^(7+F) / R), 2047 | 2048)
+// ----------------------------------------------------------------------------
+static const int IBERT_RMSNORM_F = 5;
+
+inline uint32_t ibert_isqrt(uint32_t n) {
+    if (n == 0) return 0;
+    const int bits = 32 - __builtin_clz(n);
+    uint32_t x = 1u << ((bits + 1) >> 1);
+    for (;;) {
+        const uint32_t y = (x + n / x) >> 1;
+        if (y >= x) return x;
+        x = y;
+    }
+}
+
+inline uint32_t ibert_rmsnorm_scale(int32_t S, int log2n) {
+    const uint64_t msq = (((uint64_t)S << (2 * IBERT_RMSNORM_F)) + (1ULL << (log2n - 1))) >> log2n;
+    return ibert_isqrt((uint32_t)msq);
+}
+
+inline int16_t ibert_rmsnorm_apply_one(int8_t x, uint32_t R) {
+    const uint32_t a = x < 0 ? (uint32_t)(-(int)x) : (uint32_t)x;
+    const uint32_t d = R ? R : 1;
+    uint32_t q = ((a << (RMS2_OUT_FRAC + IBERT_RMSNORM_F)) + (R >> 1)) / d;
+    if (x < 0) { if (q > 2048) q = 2048; return (int16_t)(-(int)q); }
+    if (q > 2047) q = 2047;
+    return (int16_t)q;
+}
+
+inline void ibert_rmsnorm_apply_tile(const int8_t x[8], uint32_t R, int16_t out[8]) { for (int i = 0; i < 8; i++) out[i] = ibert_rmsnorm_apply_one(x[i], R); }
+
 static const uint8_t SW2_SIGMA[64] = {          // sigma((2b + 1/2) / 16) in Q.6, b = |x| >> 1 (b = 63 also for |x| = 128)
     32, 34, 36, 38, 40, 42, 44, 46, 47, 49, 50, 51, 53, 54, 55, 56,
     57, 57, 58, 59, 59, 60, 60, 61, 61, 61, 62, 62, 62, 62, 63, 63,
