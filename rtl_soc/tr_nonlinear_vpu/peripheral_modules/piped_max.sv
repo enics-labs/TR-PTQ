@@ -36,6 +36,9 @@ module piped_max #(
         end
     endgenerate
 
+    // Valid shift register: v_pipe[k] is the input valid delayed by k + 1 cycles. A stage loads only when its input is valid (clock-gated otherwise).
+    logic [STAGES-1:0] v_pipe;
+
     // --- 2. Data Logic ---
     generate
         // Connect inputs to the first stage
@@ -47,11 +50,18 @@ module piped_max #(
         for (s = 0; s < STAGES; s++) begin : tree_level
             localparam int NEXT_WIDTH = NUM_INPUTS >> (s + 1);
             
+            logic lvl_en;
+            if (s == 0) begin : en_in
+                assign lvl_en = valid_in;
+            end else begin : en_pipe
+                assign lvl_en = v_pipe[s-1];
+            end
+
             for (i = 0; i < NEXT_WIDTH; i++) begin : comp_block
                 always_ff @(posedge clk or negedge rst_n) begin
                     if (!rst_n) begin
                         stage_decl[s+1].data[i] <= '0;
-                    end else begin
+                    end else if (lvl_en) begin
                         // The actual hardware comparison
                         if (stage_decl[s].data[2*i] >= stage_decl[s].data[2*i+1])
                             stage_decl[s+1].data[i] <= stage_decl[s].data[2*i];
@@ -64,8 +74,6 @@ module piped_max #(
     endgenerate
 
     // --- 3. Valid Signal Pipeline (Shift Register) ---
-    logic [STAGES-1:0] v_pipe;
-
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             v_pipe <= '0;

@@ -76,10 +76,13 @@ module tr_backbone_wrapper #(
             for(int i=0; i<N; i++) s1_vec_in[i] <= '0;
         end else begin
             s1_valid <= in_valid;
-            s1_bypass_ln <= bypass_ln;
-            s1_mode_post_ln <= mode_post_ln;
-            s1_ln_pre_scaled <= ln_pre_scaled;
-            s1_vec_in <= vec_in;
+            // the data registers load only for a valid beat (their clock is gated otherwise)
+            if (in_valid) begin
+                s1_bypass_ln <= bypass_ln;
+                s1_mode_post_ln <= mode_post_ln;
+                s1_ln_pre_scaled <= ln_pre_scaled;
+                s1_vec_in <= vec_in;
+            end
         end
     end
 
@@ -158,10 +161,12 @@ module tr_backbone_wrapper #(
             for(int j=0; j<N; j++) s1b_ln_y[j] <= '0;
         end else begin
             s1b_valid <= s1_valid;
-            s1b_mode_post_ln <= s1_mode_post_ln;
-            s1b_ln_msb <= ln0_msb;
-            s1b_ln_fk <= ln0_fk;
-            s1b_ln_y <= s1_ln_y;
+            if (s1_valid) begin
+                s1b_mode_post_ln <= s1_mode_post_ln;
+                s1b_ln_msb <= ln0_msb;
+                s1b_ln_fk <= ln0_fk;
+                s1b_ln_y <= s1_ln_y;
+            end
         end
     end
 
@@ -203,9 +208,11 @@ module tr_backbone_wrapper #(
             for(int j=0; j<N; j++) s2_post_ln_reg[j] <= '0;
         end else begin
             s2_valid <= s1b_valid;
-            s2_ln_msb <= s1b_ln_msb;
-            s2_ln_fk <= s1b_ln_fk;
-            s2_post_ln_reg <= post_ln_out;
+            if (s1b_valid) begin
+                s2_ln_msb <= s1b_ln_msb;
+                s2_ln_fk <= s1b_ln_fk;
+                s2_post_ln_reg <= post_ln_out;
+            end
         end
     end
 

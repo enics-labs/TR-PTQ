@@ -66,12 +66,15 @@ module mac_array_engine #(
             c_reg1   <= '0;
         end else if (advance) begin
             v1       <= in_valid;
-            clr1     <= clear_acc;
-            mode1_op <= op_mode;
-            c_reg1   <= c; // Pipeline the +C bias
-            for (int i = 0; i < N; i++) begin
-                a_reg[i] <= a[i];
-                b_reg[i] <= b[i];
+            // the data registers load only for a valid beat (their clock is gated otherwise)
+            if (in_valid) begin
+                clr1     <= clear_acc;
+                mode1_op <= op_mode;
+                c_reg1   <= c; // Pipeline the +C bias
+                for (int i = 0; i < N; i++) begin
+                    a_reg[i] <= a[i];
+                    b_reg[i] <= b[i];
+                end
             end
         end
     end
@@ -90,15 +93,17 @@ module mac_array_engine #(
             c_reg2 <= '0;
         end else if (advance) begin
             v2     <= v1;
-            clr2   <= clr1;
-            c_reg2 <= c_reg1;
+            if (v1) begin
+                clr2   <= clr1;
+                c_reg2 <= c_reg1;
 
-            for (int i = 0; i < N; i++) begin
-                unique case (mode1_op)
-                    2'd0: prod_reg[i] <= $signed(a_reg[i]) * $signed(b_reg[i]);
-                    2'd1: prod_reg[i] <= $signed(a_reg[i]) * $signed({1'b0, b_reg[i]});
-                    default: prod_reg[i] <= $signed({1'b0, a_reg[i]}) * $signed({1'b0, b_reg[i]});
-                endcase
+                for (int i = 0; i < N; i++) begin
+                    unique case (mode1_op)
+                        2'd0: prod_reg[i] <= $signed(a_reg[i]) * $signed(b_reg[i]);
+                        2'd1: prod_reg[i] <= $signed(a_reg[i]) * $signed({1'b0, b_reg[i]});
+                        default: prod_reg[i] <= $signed({1'b0, a_reg[i]}) * $signed({1'b0, b_reg[i]});
+                    endcase
+                end
             end
         end
     end
@@ -126,9 +131,11 @@ module mac_array_engine #(
             vec_sum_reg <= '0;
         end else if (advance) begin
             v3          <= v2;
-            clr3        <= clr2;
-            c_reg3      <= c_reg2;
-            vec_sum_reg <= vec_sum_comb;
+            if (v2) begin
+                clr3        <= clr2;
+                c_reg3      <= c_reg2;
+                vec_sum_reg <= vec_sum_comb;
+            end
         end
     end
 

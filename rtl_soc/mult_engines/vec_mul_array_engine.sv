@@ -59,10 +59,13 @@ module vec_mul_array_engine #(
             mode1_op <= 2'd0;
         end else if (advance) begin
             v1       <= in_valid;
-            mode1_op <= op_mode;
-            for (int i = 0; i < N; i++) begin
-                a_reg[i] <= a[i];
-                b_reg[i] <= b[i];
+            // the data registers load only for a valid beat (their clock is gated otherwise)
+            if (in_valid) begin
+                mode1_op <= op_mode;
+                for (int i = 0; i < N; i++) begin
+                    a_reg[i] <= a[i];
+                    b_reg[i] <= b[i];
+                end
             end
         end
     end
@@ -78,12 +81,14 @@ module vec_mul_array_engine #(
             v2 <= 1'b0;
         end else if (advance) begin
             v2 <= v1;
-            for (int i = 0; i < N; i++) begin
-                unique case (mode1_op)
-                    2'd0: prod_reg[i] <= $signed(a_reg[i]) * $signed(b_reg[i]);
-                    2'd1: prod_reg[i] <= $signed(a_reg[i]) * $signed({1'b0, b_reg[i]});
-                    default: prod_reg[i] <= $signed({1'b0, a_reg[i]}) * $signed({1'b0, b_reg[i]});
-                endcase
+            if (v1) begin
+                for (int i = 0; i < N; i++) begin
+                    unique case (mode1_op)
+                        2'd0: prod_reg[i] <= $signed(a_reg[i]) * $signed(b_reg[i]);
+                        2'd1: prod_reg[i] <= $signed(a_reg[i]) * $signed({1'b0, b_reg[i]});
+                        default: prod_reg[i] <= $signed({1'b0, a_reg[i]}) * $signed({1'b0, b_reg[i]});
+                    endcase
+                end
             end
         end
     end

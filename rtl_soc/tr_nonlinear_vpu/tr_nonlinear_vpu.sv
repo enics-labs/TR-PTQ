@@ -226,10 +226,15 @@ module tr_nonlinear_vpu #(
     // =========================================================
     // MUX 6: VPU Final Output
     // =========================================================
+    // The output register loads when the selected source delivers a result: the vec-mul or backbone valid, or always for the scalar subtractor
+    // (which has no valid); its clock is gated otherwise.
+    logic out_load;
+    assign out_load = int_vecmul_valid || int_bb_valid || (mux_vpu_out_sel == 3'b011);
+
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             for(int i=0; i<N; i++) vpu_data_out[i] <= '0;
-        end else begin
+        end else if (out_load) begin
             for(int i=0; i<N; i++) begin
                 case (mux_vpu_out_sel)
                     3'b000: vpu_data_out[i] <= vecmul_out_trunc[i];
