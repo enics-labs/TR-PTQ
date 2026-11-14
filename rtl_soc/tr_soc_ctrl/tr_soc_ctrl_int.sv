@@ -43,7 +43,7 @@
  *           mk = round(S >> (FRAC_W+log2N-2)), feeds it to the shared ln lane, and latches the unsigned wide inv_rms
  *           (INV_W bits, FRAC_W+4 fractional bits) in reg_inv_rms, read from the reciprocal-sqrt unit (rsq_unit) in the VPU
  *           from the ln lane's leading-one position and mantissa (no ln / exp arithmetic). The apply (command 0xA) is
- *           round(x * inv_rms >> 5), a 12-bit Q5.7 code. Software spec: tools/models/vpu_ops.py (HW2, rsq_inv_mk).
+ *           round(x * inv_rms >> 5), a 12-bit Q5.7 code. Software spec: tools/models/vpu_ops.py (HW, rsq_inv_mk).
  *
  * @param    N      Vector dimension (lanes) of the driven VPU/datapath.
  * @param    W      Data word width (ctrl_scalar_sub_val, vpu_data_out).

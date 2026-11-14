@@ -50,8 +50,9 @@ static bool run_eval_mode(const std::string& mode, const std::string& in_path,
             fout << inv;
             for (int i = 0; i < n; i++) fout << " " << (v2 ? (int)y2[i] : (int)y[i]);
             fout << "\n";
-        } else if (mode == "swiglu" || mode == "swiglu2") {
-            const bool v2 = mode == "swiglu2";
+        } else if (mode == "swiglu" || mode == "swiglu2" || mode == "ibert_swiglu") {
+            const bool vi = mode == "ibert_swiglu";
+            const bool v2 = mode == "swiglu2" || vi;
             // line: "n g0..g(n-1) u0..u(n-1)" -> "e y0..y(n-1)"  (two-pass SwiGLU row, see sw_* in tr_math_model.hpp)
             int n; iss >> n;
             std::vector<int8_t> g(n), u(n);
@@ -59,9 +60,9 @@ static bool run_eval_mode(const std::string& mode, const std::string& in_path,
             for (int i = 0; i < n; i++) { int v; iss >> v; g[i] = (int8_t)v; }
             for (int i = 0; i < n; i++) { int v; iss >> v; u[i] = (int8_t)v; }
             int32_t mx = 0;
-            for (int i = 0; i < n; i++) { int32_t a = sw_abs_prod(v2 ? sw2_silu(g[i]) : sw_silu(g[i]), u[i]); if (a > mx) mx = a; }
+            for (int i = 0; i < n; i++) { int32_t a = sw_abs_prod(v2 ? (vi ? ibert_silu(g[i]) : sw2_silu(g[i])) : sw_silu(g[i]), u[i]); if (a > mx) mx = a; }
             int e = v2 ? sw2_gain(mx) : sw_gain(mx);
-            for (int i = 0; i < n; i++) y[i] = v2 ? sw2_apply(sw2_silu(g[i]), u[i], e) : (int16_t)sw_apply(sw_silu(g[i]), u[i], e);
+            for (int i = 0; i < n; i++) y[i] = v2 ? sw2_apply((vi ? ibert_silu(g[i]) : sw2_silu(g[i])), u[i], e) : (int16_t)sw_apply(sw_silu(g[i]), u[i], e);
             fout << e;
             for (int i = 0; i < n; i++) fout << " " << (int)y[i];
             fout << "\n";
@@ -289,8 +290,9 @@ int main(int argc, char* argv[]) {
         }
         std::cout << "[C++ MODEL] Generated SOFTMAX (production tr_soc_top_int path, probs + z) vectors." << std::endl;
     }
-    else if (mode == "swiglu" || mode == "swiglu2") {
-        const bool v2 = mode == "swiglu2";
+    else if (mode == "swiglu" || mode == "swiglu2" || mode == "ibert_swiglu") {
+        const bool vi = mode == "ibert_swiglu";
+        const bool v2 = mode == "swiglu2" || vi;
         // PRODUCTION two-pass SwiGLU (cmds 5/6/0xB/0xC, host-sequenced in 8-lane groups). One row per line:
         // input "n g0..g(n-1) u0..u(n-1)" (gate / up int8 codes), expected "e y0..y(n-1)" with e the row gain
         // read back from the controller. Row mix: heavy-tailed gate/up (what the FFN produces), gate outliers
@@ -329,9 +331,9 @@ int main(int argc, char* argv[]) {
             for (int i = 0; i < n; i++) vec_file << " " << (int)u[i];
             vec_file << "\n";
             int32_t mx = 0;
-            for (int i = 0; i < n; i++) { int32_t a = sw_abs_prod(v2 ? sw2_silu(g[i]) : sw_silu(g[i]), u[i]); if (a > mx) mx = a; }
+            for (int i = 0; i < n; i++) { int32_t a = sw_abs_prod(v2 ? (vi ? ibert_silu(g[i]) : sw2_silu(g[i])) : sw_silu(g[i]), u[i]); if (a > mx) mx = a; }
             int e = v2 ? sw2_gain(mx) : sw_gain(mx);
-            for (int i = 0; i < n; i++) y[i] = v2 ? sw2_apply(sw2_silu(g[i]), u[i], e) : (int16_t)sw_apply(sw_silu(g[i]), u[i], e);
+            for (int i = 0; i < n; i++) y[i] = v2 ? sw2_apply((vi ? ibert_silu(g[i]) : sw2_silu(g[i])), u[i], e) : (int16_t)sw_apply(sw_silu(g[i]), u[i], e);
             exp_file << e;
             for (int i = 0; i < n; i++) exp_file << " " << (int)y[i];
             exp_file << "\n";

@@ -33,7 +33,7 @@ This does 4 things: (1) compiles `cpu_math_model.cpp`, (2) runs it in the given 
 | `softmax` | Production SM_P1..SM_P4 via `tr_soc_top_int` (CMD=0x01); checks the 8 probabilities **and** the tile `z` (`ADDR_SM_Z`) on random, attention-like (masked lanes), fully masked, equal and z-clamping tiles | `softmax_hw_model_ex` (log-sum-exp) |
 | `rmsnorm` | Production **tiled** RMSNorm via `tr_soc_top_int` (cmds 0x07/0x08 per tile, 0x09, 0x0A per tile; rows of 8..2048 elements; compares `inv_rms` and the outputs) | `rms_acc_tile` / `rms_scale` / `rms_apply_tile` |
 | `swiglu` | Production **two-pass** SwiGLU via `tr_soc_top_int` (cmds 0x05/0x06 per group, 0x0B, 0x05/0x0C per group; rows of 8..8192 elements; compares the row gain and the outputs) | `sw_silu` / `sw_abs_prod` / `sw_gain` / `sw_apply` |
-| `rmsnorm2`, `swiglu2` | Golden only (no RTL yet): the HW2 variants of the two flows (reciprocal-sqrt unit with 12-bit Q5.7 output; symmetric 64-entry sigma with 12-bit output). Same line formats, outputs are 12-bit signed. Bit-exact to `vpu_ops.HW2` on the generated rows | `rms2_scale` / `rms2_apply_tile`, `sw2_silu` / `sw2_gain` / `sw2_apply` |
+| `rmsnorm2`, `swiglu2` | The golden models of the production RMSNorm and SwiGLU flows (reciprocal-sqrt unit with 12-bit Q5.7 output; symmetric 64-entry sigma with 12-bit output), used by the `rmsnorm` and `swiglu` regressions. Same line formats, outputs are 12-bit signed. Bit-exact to `vpu_ops.HW` on the generated rows | `rms2_scale` / `rms2_apply_tile`, `sw2_silu` / `sw2_gain` / `sw2_apply` |
 | `quant` | `requantize_engine_int` in isolation | `quant_model` |
 | `matmul` | `dot_product_engine` + `requantize_engine_int` | `matmul_model` |
 

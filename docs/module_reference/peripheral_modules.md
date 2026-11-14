@@ -67,7 +67,7 @@ Combinationally subtracts a single scalar value (`sub_val`) from every element o
 
 ### Operation
 
-SwiGLU sigmoid lookup: `sigma(x/16)` in Q.6 for every int8 gate code `x` (combinational, one lookup per lane). `silu(x) = x · sigma(x)` needs sigma only at the 256 int8 gate codes. `sigma(-x) = 1 - sigma(x)` and neighbouring codes share an entry, so the table has 64 entries of 7 bits (values reach 64 = 1.0) indexed by `|x| >> 1` (`|x| = 128` reads the last entry); negative codes read `64 - entry`. The entries are `sigma((2b + 1/2)/16)` rounded to 6 fractional bits. **Generated** by `tools/scripts/llama32_1b/gen_rom_sv.py` from `tools/models/vpu_ops.py::_sigma_table_sym` (HW2); the `swiglu` regression checks it against the C++ golden `sw2_silu`. The earlier 256 × 6 b table of the alpha → exp → ln chain gives the same perplexity within noise (`docs/llama/accuracy-study.md`).
+SwiGLU sigmoid lookup: `sigma(x/16)` in Q.6 for every int8 gate code `x` (combinational, one lookup per lane). `silu(x) = x · sigma(x)` needs sigma only at the 256 int8 gate codes. `sigma(-x) = 1 - sigma(x)` and neighbouring codes share an entry, so the table has 64 entries of 7 bits (values reach 64 = 1.0) indexed by `|x| >> 1` (`|x| = 128` reads the last entry); negative codes read `64 - entry`. The entries are `sigma((2b + 1/2)/16)` rounded to 6 fractional bits. **Generated** by `tools/scripts/llama32_1b/gen_rom_sv.py` from `tools/models/vpu_ops.py::_sigma_table_sym`; the `swiglu` regression checks it against the C++ golden `sw2_silu`. The earlier 256 × 6 b table of the alpha → exp → ln chain gives the same perplexity within noise (`docs/llama/accuracy-study.md`).
 
 ### Parameters
 

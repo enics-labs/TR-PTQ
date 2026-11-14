@@ -60,3 +60,55 @@ The cycle definition (command issue and completion included) differs from the sh
 ### Synthesis
 
 Top module = module name, clock 3.3 ns. File lists: `tr_rmsnorm`: `rtl_baseline/rmsnorm_sumsq.sv`, `rtl_soc/tr_nonlinear_vpu/peripheral_modules/rsq_unit.sv`, `rtl_baseline/tr_baseline/tr_rmsnorm.sv`. `ibert_rmsnorm`: `rtl_baseline/rmsnorm_sumsq.sv`, `rtl_baseline/ibert_baseline/ibert_divider.sv`, `rtl_baseline/ibert_baseline/ibert_rmsnorm.sv` (the `.f` files in the testbench directories list the same).
+
+---
+
+## SwiGLU: `tr_swiglu`, `ibert_swiglu`
+
+Both share the back end [swiglu_core.sv](../../rtl_baseline/swiglu_core.sv) (silu register, 8 products `silu · up`, running max of `|silu · up|`, row gain, apply), so they differ only in how the 12-bit silu of a gate group is produced.
+
+### Command interface
+
+Host-sequenced in 8-lane groups, like the controller of the production flow (pass 1 = SILU + MAX per group, GAIN once, pass 2 = SILU + APPLY per group):
+
+| `cmd` | Name | Action |
+|---|---|---|
+| 0 | SILU | gate group `x_in` → silu register: `silu = sat12((x · σ(x) + 2) >> 2)`, σ in Q.6 |
+| 1 | MAX | up group `x_in`: running max of `|silu · up|` |
+| 2 | GAIN | row gain `e` = largest k in [-8, 10] with `(max << 2) << k <= 2047 << 10`; clears the max |
+| 3 | APPLY | up group `x_in`: `y = sat12(round_shift((silu · up) << 2, 10 - e))`, 12-bit signed |
+
+`out_valid` pulses when a command has completed; `scale_o` is the row gain `e` (signed); `y_out` is valid after APPLY.
+
+### `tr_swiglu`
+
+[rtl_baseline/tr_baseline/tr_swiglu.sv](../../rtl_baseline/tr_baseline/tr_swiglu.sv). σ from the 64-entry symmetric table ([sigma_rom](peripheral_modules.md): index `|x| >> 1`, negative codes read `64 - entry`); three pipeline stages (register, table lookup, multiply–round–saturate). Golden: `sw2_silu`, `sw_abs_prod`, `sw2_gain`, `sw2_apply` (C++ mode `swiglu2`).
+
+### `ibert_swiglu`
+
+[rtl_baseline/ibert_baseline/ibert_swiglu.sv](../../rtl_baseline/ibert_baseline/ibert_swiglu.sv), with the restoring divider [ibert_divider.sv](../../rtl_baseline/ibert_baseline/ibert_divider.sv). σ from the I-BERT integer exponential (Algorithm 3) and one division per lane: with `a = 2|x|` (one extra input fractional bit, scale 1/32), `z = floor(a / 22)`, `p = 22 z − a`, `e = ((p + 43)² + 983) >> z`, `σ = N / D` with `D = 2859 + e` and `N = 2859` for `x ≥ 0` or `N = e` for `x < 0`, computed as `(64 N + D/2) / D`. The division by the constant 22 and the polynomial are combinational; the 18-bit sigma division is iterative and shared by the 8 lanes (sequential). Golden: `ibert_sigma6`, `ibert_silu` (then `sw2_gain`, `sw2_apply`; C++ mode `ibert_swiglu`).
+
+Accuracy of σ against exact `64 / (1 + e^-x)` over all 256 gate codes: mean error 0.217 LSB of Q.6 and maximum 0.685 for `ibert_swiglu`; 0.256 and 1.000 for the table. With the plain Q4.4 input scale the polynomial gives 0.329 / 1.163, which is why one extra fractional bit is used. The divider variant is therefore at least as accurate as the table.
+
+### Verification
+
+```
+cd workspace
+python ../verification/verify_block.py tr_swiglu       # bit-exact against swiglu2
+python ../verification/verify_block.py ibert_swiglu    # bit-exact against ibert_swiglu
+```
+
+The 40 rows (n = 8 … 8192; heavy-tailed gate / up, gate outliers at the int8 limits, an all-zero up row at the gain cap, tiny and saturating products) are those of the production SwiGLU regression. Run the long ones through the cluster wrapper (`qrun`).
+
+### Energy pilots
+
+`<module>_energy_tb.sv`: one representative 8-lane group (gate vector of the other pilots, up vector of the shared-VPU SwiGLU pilot), the five commands of the two-pass flow back to back (SILU, MAX, GAIN, SILU, APPLY), the cycle count from the first command to the last result, and a VCD of that window (`<module>_power_activity.vcd` in `workspace/`).
+
+| Pilot, one 8-lane group, two passes | Cycles |
+|---|---|
+| `tr_swiglu` | 30 (command issue and completion included) |
+| `ibert_swiglu` | 410 (8 sequential sigma divisions of 18 cycles in each of the two SILU commands) |
+
+### Synthesis
+
+Top module = module name, clock 3.3 ns. File lists: `tr_swiglu`: `rtl_baseline/swiglu_core.sv`, `rtl_soc/tr_nonlinear_vpu/peripheral_modules/sigma_rom.sv`, `rtl_baseline/tr_baseline/tr_swiglu.sv`. `ibert_swiglu`: `rtl_baseline/swiglu_core.sv`, `rtl_baseline/ibert_baseline/ibert_divider.sv`, `rtl_baseline/ibert_baseline/ibert_swiglu.sv`. Since `genus.tcl` reads every `.sv` under `rtl_soc/` and `rtl_baseline/`, only the top module name is needed.

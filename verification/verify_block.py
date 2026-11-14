@@ -11,15 +11,17 @@ def get_config(block_name):
         # (softmax tile cmd 0x01; tiled RMSNorm cmds 0x07..0x0A; two-pass SwiGLU cmds 0x05/0x06/0x0B/0x0C).
         # Golden models: tr_math_model.hpp, bit-exact to tools/models/vpu_ops.py.
         "softmax": {"f_file": "../tb_soc/tr_softmax_int/tr_softmax_int.f", "max_error": 0},
-        # "model": the cpu_math_model.cpp mode that generates the vectors (default: the block name). rmsnorm / swiglu run the HW2 flows
-        # (reciprocal-sqrt unit, symmetric sigma table, 12-bit output codes); the previous flows stay available as the C++ modes rmsnorm / swiglu.
+        # "model": the cpu_math_model.cpp mode that generates the vectors (default: the block name). rmsnorm / swiglu run the production flows
+        # (reciprocal-sqrt unit, symmetric sigma table, 12-bit output codes).
         "rmsnorm": {"f_file": "../tb_soc/tr_rmsnorm_int/tr_rmsnorm_int.f", "max_error": 0, "model": "rmsnorm2"},
         "swiglu":  {"f_file": "../tb_soc/tr_swiglu_int/tr_swiglu_int.f", "max_error": 0, "model": "swiglu2"},
-        # reciprocal-sqrt unit of RMSNorm (HW2): tr_ln_alu taps + rsq_unit over every mean the ln lane can receive
+        # reciprocal-sqrt unit of RMSNorm: tr_ln_alu taps + rsq_unit over every mean the ln lane can receive
         "rsq":     {"f_file": "../tb_soc/tr_rsq_unit/tr_rsq_unit.f", "max_error": 0},
         # standalone RMSNorm modules (rtl_baseline/): the Taylor-Region reciprocal-sqrt flow as a dedicated block, and the divider-based version (Newton sqrt + divisions)
         "tr_rmsnorm":    {"f_file": "../tb_baseline/tr_baseline/tr_rmsnorm/tr_rmsnorm.f", "max_error": 0, "model": "rmsnorm2"},
         "ibert_rmsnorm": {"f_file": "../tb_baseline/ibert_baseline/ibert_rmsnorm/ibert_rmsnorm.f", "max_error": 0, "model": "ibert_rmsnorm"},
+        "tr_swiglu":    {"f_file": "../tb_baseline/tr_baseline/tr_swiglu/tr_swiglu.f", "max_error": 0, "model": "swiglu2"},
+        "ibert_swiglu": {"f_file": "../tb_baseline/ibert_baseline/ibert_swiglu/ibert_swiglu.f", "max_error": 0, "model": "ibert_swiglu"},
         "quant":   {"f_file": "../tb_soc/requantize_engine/requantize_engine_int.f", "max_error": 0},
         "matmul":  {"f_file": "../tb_soc/tr_matmul/tr_matmul.f",     "max_error": 0},
     }
@@ -158,7 +160,7 @@ def run_verification():
         if row_has_error and failed_rows_logged < 10:
             print(f"  [MISMATCH] Row {idx+1} (Max Error in row: {row_max_delta})")
             print(f"    Input   : {in_line.strip()}")
-            if args.block in ["softmax", "swiglu", "quant", "matmul", "rmsnorm", "tr_rmsnorm", "ibert_rmsnorm"]:
+            if args.block in ["softmax", "swiglu", "quant", "matmul", "rmsnorm", "tr_rmsnorm", "ibert_rmsnorm", "tr_swiglu", "ibert_swiglu"]:
                 print(f"    Expected: {exp_line.strip()}")
                 print(f"    HDL Got : {hdl_line.strip()}\n")
             else:

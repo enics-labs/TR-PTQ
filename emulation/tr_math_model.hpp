@@ -454,7 +454,7 @@ inline void rms_apply_tile(const int8_t x[8], uint32_t inv, int8_t out[8]) {
 }
 
 // ----------------------------------------------------------------------------
-// HW2 variants (software spec: tools/models/vpu_ops.py, HW2 preset; docs/llama/accuracy-study.md): the same SwiGLU / RMSNorm flows with
+// Production RMSNorm / SwiGLU flows (software spec: tools/models/vpu_ops.py, HW preset; docs/llama/accuracy-study.md):
 //   - RMSNorm: reciprocal-sqrt unit instead of mean -> ln -> exp (rsq_inv_mk), fed by the ln lane's rounded mean: leading-one finder, 2 x 32-entry table of
 //     12-bit entries (index = parity of k, top 5 mantissa bits of mk), one shift with one half-up rounding, cap 4095; apply shift
 //     FRAC_W+INV_BITS+4-7 = 5 and a signed 12-bit output (Q5.7)
@@ -533,6 +533,34 @@ inline int16_t ibert_rmsnorm_apply_one(int8_t x, uint32_t R) {
 }
 
 inline void ibert_rmsnorm_apply_tile(const int8_t x[8], uint32_t R, int16_t out[8]) { for (int i = 0; i < 8; i++) out[i] = ibert_rmsnorm_apply_one(x[i], R); }
+
+// ----------------------------------------------------------------------------
+// Divider-based SwiGLU (rtl_baseline/ibert_baseline/ibert_swiglu.sv): the sigmoid of the gate code from the I-BERT integer exponential
+// (Algorithm 3: z = floor(-x / ln2), second-order polynomial a (p + b)^2 + c on the remainder, shift by z) and one integer division,
+//   sigma(x) = 1 / (1 + e^-x)  for x >= 0,   e^x / (1 + e^x)  for x < 0,   both as  N / (1 + e)  with e = e^-|x|,
+// at the input scale 2^-(4 + IBERT_SW_T) (one extra fractional bit over the Q4.4 gate code). The remaining stages (silu rounding, running
+// max, row gain, apply) are those of the production flow (sw2_gain, sw2_apply).
+// ----------------------------------------------------------------------------
+static const int IBERT_SW_XLN2 = 22;      // floor(ln 2 * 32)
+static const int IBERT_SW_QB   = 43;      // floor(b * 32),  b = 1.353
+static const int IBERT_SW_QC   = 983;     // floor(c / (a * 32^-2)),  a = 0.35815147, c = 0.344
+static const int IBERT_SW_ONE  = 2859;    // floor(1 / (a * 32^-2)): the value 1.0 at the exponential's output scale
+
+inline int ibert_sigma6(int8_t x) {
+    const int a = (x < 0 ? -(int)x : (int)x) << 1;          // |x| at the finer scale
+    const int z = a / IBERT_SW_XLN2;
+    const int p = -a + IBERT_SW_XLN2 * z;                   // in (-ln 2, 0]
+    const int e = ((p + IBERT_SW_QB) * (p + IBERT_SW_QB) + IBERT_SW_QC) >> z;
+    const int n = x >= 0 ? IBERT_SW_ONE : e;
+    const int d = IBERT_SW_ONE + e;
+    return (n * (1 << SW_FRAC_W) + (d >> 1)) / d;
+}
+
+inline int32_t ibert_silu(int8_t x) {
+    const int32_t w = (int32_t)x * ibert_sigma6(x);
+    const int32_t s = (w + (1 << (SW_DROP - 1))) >> SW_DROP;
+    return s > 2047 ? 2047 : (s < -2048 ? -2048 : s);
+}
 
 static const uint8_t SW2_SIGMA[64] = {          // sigma((2b + 1/2) / 16) in Q.6, b = |x| >> 1 (b = 63 also for |x| = 128)
     32, 34, 36, 38, 40, 42, 44, 46, 47, 49, 50, 51, 53, 54, 55, 56,
