@@ -16,7 +16,7 @@ module tr_nonlinear_vpu_swiglu_energy_tb();
 
     logic clk = 0;
     logic rst_n = 0;
-    always #5 clk = ~clk;
+    always #1.65 clk = ~clk;                     // 3.3 ns: the synthesis clock, so power x cycles x 3.3 ns is the energy of the VCD window
 
     logic signed [W_VEC-1:0] sram_data_a [N];
     logic signed [W_VEC-1:0] sram_data_b [N];

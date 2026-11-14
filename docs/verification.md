@@ -47,6 +47,8 @@ Separate from correctness verification. Each of these instruments a **new, dedic
 tb_soc/tr_nonlinear_vpu/tr_nonlinear_vpu_{softmax,rmsnorm,swiglu}_energy.f
 ```
 
+The pilot testbenches clock the design at the synthesis period (3.3 ns, `always #1.65`), so the average power that Genus reports over the VCD window is the power at the synthesis clock and the formula below is exact (a testbench clock of a different period would scale the dynamic part).
+
 The VCD feeds Genus (65 nm synthesis, branch `tr-vpu_synthesis`) via `read_vcd -vcd_scope <tb>/<dut> <file>.vcd` against the already-synthesized netlist, then `report_power`. `Energy = Total_Power(µW) × N_cycles × T_clock(ns)`. The paper-era numbers (including the baselines) are in the tag `tr-vpu_synthesis-ISCAS-20261013` of the synthesis branch.
 
 `tr_nonlinear_vpu`'s own energy pilots are the trickiest of the three: it has no single valid_in/valid_out handshake (a crossbar with 4 separate valid outputs), so each pilot replicates the controller's exact multi-pass sequence directly against the VPU, including two testbench pitfalls worth knowing about if you're writing a new one:

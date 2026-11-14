@@ -20,7 +20,7 @@ module tr_rmsnorm_energy_tb();
     tr_rmsnorm #(.N(N), .W(W), .OUT_W(OUT_W)) dut (.*);
     localparam string TAG = "TR_RMSNORM";
 
-    always #5 clk = ~clk;
+    always #1.65 clk = ~clk;                     // 3.3 ns: the synthesis clock, so power x cycles x 3.3 ns is the energy of the VCD window
 
     // watchdog: a command that never completes ends the run with a message instead of hanging
     initial begin #100000; $display("[TB WATCHDOG] timeout"); $finish; end
