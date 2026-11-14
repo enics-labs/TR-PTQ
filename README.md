@@ -110,3 +110,19 @@ Defaults are 10 / 2 / 1 ns. Results: `reports/<module>/sweep/clock_sweep_results
 
 - `scripts/settings.tcl` and `scripts/simulation.tcl` (OCV settings, gate-level VCD probing) are not used by the flow.
 - There is no place-and-route, back-annotated gate-level simulation or power-rail analysis in this branch.
+
+### Comparison runs (unattended)
+
+`scripts/run_comparison.sh` runs the whole operator comparison without supervision: for each configuration (`gated_io10`: clock gating on and 10% I/O delay;
+`nogate_io10`: gating off; `gated_io30`: the VPU at the original 30% I/O delay) it synthesizes `tr_rmsnorm`, `ibert_rmsnorm`, `tr_swiglu`, `ibert_swiglu`,
+`tr_softmax`, `ibert_softmax` and `tr_nonlinear_vpu`, runs the activity-based power report with the matching pilot VCD (the VPU with its three), and finally
+writes `reports_cmp/summary.md`, commits and pushes. Each configuration runs in its own directory `../TR-PTQ_runs/<tag>/`; finished steps are skipped, so it can be
+resubmitted after an interruption. Submit it detached (the wrapper `genus` only queues interactive sessions, the script calls the real binary):
+
+```tcsh
+source /tools/ocs/default/common/settings.sh
+/tools/common/wrappers/qrun -n 1 -m 12G bash scripts/run_comparison.sh
+```
+
+Progress: `../TR-PTQ_runs/driver.log`. Hooks used by the flow: `IO_DELAY_FRAC` (inputs/dut.defines, default 0.3) and `CLOCK_GATING` (scripts/genus.tcl, default true).
+The VCDs come from the pilot testbenches of the RTL repository (`tb_*/**/*_energy_tb.sv`, clocked at 3.3 ns); the driver reads them from the integration tree (`PNX` in the script).

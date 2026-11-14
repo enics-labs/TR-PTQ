@@ -43,8 +43,15 @@ if {$design(FULLCHIP_OR_MACRO) == "FULLCHIP" } {
 #       SDC Settings
 #############################################
 # IO Constraints
-set design(INPUT_DELAY) [expr $design(CLK_PERIOD) * 0.3]
-set design(OUTPUT_DELAY) [expr $design(CLK_PERIOD) * 0.3]
+# I/O delay as a fraction of the clock period (default 0.3). IO_DELAY_FRAC in the environment overrides it, e.g. 0.1 for block-level runs of units that sit
+# behind registers in the system, so the unconstrained boundary does not drive their area.
+if {[info exists env(IO_DELAY_FRAC)] && $env(IO_DELAY_FRAC) ne ""} {
+    set design(IO_DELAY_FRAC) $env(IO_DELAY_FRAC)
+} else {
+    set design(IO_DELAY_FRAC) 0.3
+}
+set design(INPUT_DELAY) [expr $design(CLK_PERIOD) * $design(IO_DELAY_FRAC)]
+set design(OUTPUT_DELAY) [expr $design(CLK_PERIOD) * $design(IO_DELAY_FRAC)]
 set design(INPUT_TRANSITION) [expr $design(CLK_PERIOD)/10.0]
 
 # Clock Constraints 

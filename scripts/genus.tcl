@@ -94,7 +94,12 @@ read_hdl -language sv $rtl_files
 enics_start_stage "elaborate"
 
 set_db hdl_track_filename_row_col true -quiet; # helps with debug
-set_db lp_insert_clock_gating true 
+# CLOCK_GATING=false in the environment disables the clock-gating insertion (default: on)
+if {[info exists env(CLOCK_GATING)] && $env(CLOCK_GATING) ne ""} {
+    set_db lp_insert_clock_gating $env(CLOCK_GATING)
+} else {
+    set_db lp_insert_clock_gating true
+}
 
 elaborate $design(TOPLEVEL) ;#-update
 
