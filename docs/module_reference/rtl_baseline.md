@@ -112,3 +112,42 @@ The 40 rows (n = 8 … 8192; heavy-tailed gate / up, gate outliers at the int8 l
 ### Synthesis
 
 Top module = module name, clock 3.3 ns. File lists: `tr_swiglu`: `rtl_baseline/swiglu_core.sv`, `rtl_soc/tr_nonlinear_vpu/peripheral_modules/sigma_rom.sv`, `rtl_baseline/tr_baseline/tr_swiglu.sv`. `ibert_swiglu`: `rtl_baseline/swiglu_core.sv`, `rtl_baseline/ibert_baseline/ibert_divider.sv`, `rtl_baseline/ibert_baseline/ibert_swiglu.sv`. Since `genus.tcl` reads every `.sv` under `rtl_soc/` and `rtl_baseline/`, only the top module name is needed.
+
+---
+
+## Softmax: `tr_softmax`, `ibert_softmax`
+
+One command per 8-lane tile: `in_valid` with `x_in` (int8, Q4.4 scores); `out_valid` pulses when `p_out` (8 bytes, Q0.8 unsigned, saturating at 255) is valid. The tile is the unit the production flow works on; the firmware combines tiles of a longer row with the tile log-partition value `z` (`tr_softmax` produces it, `ibert_softmax` has none: a tile is normalized by its own sum).
+
+### `tr_softmax`
+
+[rtl_baseline/tr_baseline/tr_softmax.sv](../../rtl_baseline/tr_baseline/tr_softmax.sv). The four passes of the production flow on one set of 8 exponential lanes (`tr_exp_alu`, `shared_lut_rom`, one product per lane; `is_zero` selects 256 as the anchor): max, `S = Σ exp(sat8(x − max))`, `ln(S)` from `S[23:8]` through `tr_ln_alu` in the shared format (BITS = 6, input ×4, rounded back to Q4.4, saturated), `z = sat8(max + ln S)`, then `p = min(255, exp(sat8(x − z)) >> 4)`. No divider. Output also `z_o`. Golden: `softmax_hw_model_ex` (C++ mode `softmax`, the vectors of the production regression).
+
+### `ibert_softmax`
+
+[rtl_baseline/ibert_baseline/ibert_softmax.sv](../../rtl_baseline/ibert_baseline/ibert_softmax.sv), with the restoring divider [ibert_divider.sv](../../rtl_baseline/ibert_baseline/ibert_divider.sv). I-BERT integer exponential (Algorithm 3) of `d = sat8(x − max)` at the scale 1/32 (the constants of `ibert_swiglu`: `z = floor(2|d| / 22)`, `e = ((22 z − 2|d| + 43)² + 983) >> z`), `S = Σ e`, and `p = min(255, (256 e + S/2) / S)`: eight sequential 20-bit divisions through one divider. Golden: `ibert_softmax_model` (C++ mode `ibert_softmax`, probabilities only).
+
+Accuracy against exact softmax of the Q4.4 scores, in LSBs of the Q0.8 output, over 20,000 random attention-like tiles (scores within ±60 and ±30): `ibert_softmax` mean error 0.30, maximum 1.6; `tr_softmax` mean 0.92, maximum 16.7 (rare tiles). Tiles with scores near the int8 limit are not comparable: `tr_softmax` clamps `z` at 127 there, as the production flow does.
+
+### Verification
+
+```
+cd workspace
+python ../verification/verify_block.py tr_softmax       # 3,456 / 3,456 exact (probabilities and z)
+python ../verification/verify_block.py ibert_softmax    # 3,072 / 3,072 exact
+```
+
+The 384 tiles are those of the production softmax regression (full-range random, attention-like with masked lanes, fully masked, equal-max, near-saturating max, causal-prefix tiles).
+
+### Energy pilots
+
+`<module>_energy_tb.sv`: the representative 8-element vector of the other pilots, one tile, the cycle count from the command to the result and a VCD of that window (`<module>_power_activity.vcd` in `workspace/`).
+
+| Pilot, one 8-element tile | Cycles |
+|---|---|
+| `tr_softmax` | 12 (command issue and completion included) |
+| `ibert_softmax` | 208 (eight sequential 20-cycle divisions) |
+
+### Synthesis
+
+Top module = module name, clock 3.3 ns. File lists: `tr_softmax`: `rtl_soc/tr_nonlinear_vpu/tr_backbone/{tr_ln_alu,tr_exp_alu,round,quadratic_divider}.sv`, `rtl_soc/tr_nonlinear_vpu/peripheral_modules/shared_lut_rom.sv`, `rtl_baseline/tr_baseline/tr_softmax.sv`. `ibert_softmax`: `rtl_baseline/ibert_baseline/ibert_divider.sv`, `rtl_baseline/ibert_baseline/ibert_softmax.sv`.

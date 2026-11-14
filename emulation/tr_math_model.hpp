@@ -761,6 +761,30 @@ inline void softmax_hw_model_ex(const int8_t x[8], uint8_t out[8], int8_t* z_out
     }
 }
 
+// ----------------------------------------------------------------------------
+// Divider-based softmax tile (rtl_baseline/ibert_baseline/ibert_softmax.sv): I-BERT integer exponential (Algorithm 3, the polynomial of
+// ibert_sigma6 at the scale 1/32: z = floor(2|d| / 22), p = 22 z - 2|d|, e = ((p + 43)^2 + 983) >> z) of d = x - max (saturating int8
+// subtraction, as in the shared flow) and one integer division per lane, out = min(255, round(256 e / S)) with S = sum e, Q0.8 unsigned.
+// No log-partition value: a tile is normalized by its own sum.
+// ----------------------------------------------------------------------------
+inline int ibert_exp_neg(int8_t d) {                    // exp(d / 16) for d <= 0, in units of 1 / IBERT_SW_ONE
+    const int a = (d < 0 ? -(int)d : (int)d) << 1;
+    const int z = a / IBERT_SW_XLN2;
+    const int p = -a + IBERT_SW_XLN2 * z;
+    return ((p + IBERT_SW_QB) * (p + IBERT_SW_QB) + IBERT_SW_QC) >> z;
+}
+
+inline void ibert_softmax_model(const int8_t x[8], uint8_t out[8]) {
+    int8_t max_x = x[0];
+    for (int i = 1; i < 8; i++) if (x[i] > max_x) max_x = x[i];
+    int e[8]; int32_t S = 0;
+    for (int i = 0; i < 8; i++) { e[i] = ibert_exp_neg(softmax_sat8_sub(x[i], max_x)); S += e[i]; }
+    for (int i = 0; i < 8; i++) {
+        const int q = (int)(((int64_t)e[i] * 256 + (S >> 1)) / S);
+        out[i] = (uint8_t)(q > 255 ? 255 : q);
+    }
+}
+
 inline void softmax_hw_model(const int8_t x[8], uint8_t out[8]) {
     softmax_hw_model_ex(x, out, nullptr);
 }

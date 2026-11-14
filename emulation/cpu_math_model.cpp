@@ -257,7 +257,8 @@ int main(int argc, char* argv[]) {
         std::cout << "[C++ MODEL] Generated LN test vectors (W=" << W << " B=" << B << " SEG=" << S
                   << " C=" << C << " OUT=" << O << ")." << std::endl;
     } 
-    else if (mode == "softmax") {
+    else if (mode == "softmax" || mode == "ibert_softmax") {
+        const bool vi = mode == "ibert_softmax";
         // PRODUCTION path: tr_soc_top_int CMD=0x01 (SM_P1..SM_P4), bit-exact via softmax_hw_model_ex. Output is
         // Q0.8 UNSIGNED (0..255, saturating); expected line = 8 probabilities + the tile's z = sat8(max + ln(S))
         // (read back via ADDR_SM_Z), which the CPU needs to combine tiles (logsumexp over z).
@@ -284,9 +285,15 @@ int main(int argc, char* argv[]) {
             }
             vec_file << "\n";
 
-            softmax_hw_model_ex(x, y, &z);
-            for (int j = 0; j < 8; j++) exp_file << (int)y[j] << " ";
-            exp_file << (int)z << "\n";
+            if (vi) {                                                                       // divider-based tile: probabilities only
+                ibert_softmax_model(x, y);
+                for (int j = 0; j < 8; j++) exp_file << (int)y[j] << (j == 7 ? "" : " ");
+                exp_file << "\n";
+            } else {
+                softmax_hw_model_ex(x, y, &z);
+                for (int j = 0; j < 8; j++) exp_file << (int)y[j] << " ";
+                exp_file << (int)z << "\n";
+            }
         }
         std::cout << "[C++ MODEL] Generated SOFTMAX (production tr_soc_top_int path, probs + z) vectors." << std::endl;
     }

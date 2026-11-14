@@ -22,6 +22,8 @@ def get_config(block_name):
         "ibert_rmsnorm": {"f_file": "../tb_baseline/ibert_baseline/ibert_rmsnorm/ibert_rmsnorm.f", "max_error": 0, "model": "ibert_rmsnorm"},
         "tr_swiglu":    {"f_file": "../tb_baseline/tr_baseline/tr_swiglu/tr_swiglu.f", "max_error": 0, "model": "swiglu2"},
         "ibert_swiglu": {"f_file": "../tb_baseline/ibert_baseline/ibert_swiglu/ibert_swiglu.f", "max_error": 0, "model": "ibert_swiglu"},
+        "tr_softmax":    {"f_file": "../tb_baseline/tr_baseline/tr_softmax/tr_softmax.f", "max_error": 0, "model": "softmax"},
+        "ibert_softmax": {"f_file": "../tb_baseline/ibert_baseline/ibert_softmax/ibert_softmax.f", "max_error": 0, "model": "ibert_softmax"},
         "quant":   {"f_file": "../tb_soc/requantize_engine/requantize_engine_int.f", "max_error": 0},
         "matmul":  {"f_file": "../tb_soc/tr_matmul/tr_matmul.f",     "max_error": 0},
     }
@@ -160,7 +162,7 @@ def run_verification():
         if row_has_error and failed_rows_logged < 10:
             print(f"  [MISMATCH] Row {idx+1} (Max Error in row: {row_max_delta})")
             print(f"    Input   : {in_line.strip()}")
-            if args.block in ["softmax", "swiglu", "quant", "matmul", "rmsnorm", "tr_rmsnorm", "ibert_rmsnorm", "tr_swiglu", "ibert_swiglu"]:
+            if args.block in ["softmax", "swiglu", "quant", "matmul", "rmsnorm", "tr_rmsnorm", "ibert_rmsnorm", "tr_swiglu", "ibert_swiglu", "tr_softmax", "ibert_softmax"]:
                 print(f"    Expected: {exp_line.strip()}")
                 print(f"    HDL Got : {hdl_line.strip()}\n")
             else:
