@@ -81,12 +81,15 @@ module tr_ln_alu #(
         endcase
     endfunction
 
+    // Elaboration-time parameter checks ($error in a generate block): checks kept for simulation only; hidden from the synthesis tools because Quartus 21.1 Lite rejects $error here
+    // synopsys translate_off
     generate
         if (coef_l(COEF_BITS) == 0 || coef_a(SEGMENTS, COEF_BITS, 0) == 0)
             $error("tr_ln_alu: no PWL constants for SEGMENTS=%0d COEF_BITS=%0d", SEGMENTS, COEF_BITS);
         if (BITS < LG_SEG)
             $error("tr_ln_alu: BITS must be >= log2(SEGMENTS)");
     endgenerate
+    // synopsys translate_on
 
     // ========================================================================
     // MSB finder: balanced binary-search tree (NUM_LEVELS = MSB_W levels),
