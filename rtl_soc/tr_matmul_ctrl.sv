@@ -7,9 +7,8 @@
  *           to compute OUT[r] = requant( SUM_c A[r][c]*B[c] ) over an
  *           (num_row_tiles*M) x (num_ctiles*N) matmul.
  *
- *           No datapath is instantiated here — this FSM only sequences it, so
- *           the SAME module is reused by tr_soc_top_int and tr_soc_top_mx (each
- *           wires it to its own int/mx dot+requant).
+ *           No datapath is instantiated here — this FSM only sequences it;
+ *           tr_soc_top_int wires it to its dot-product and requantize engines.
  *
  *           Per output-row-tile: stream num_ctiles tiles (clear_acc=1 on the
  *           first, =0 to accumulate), then capture the result on the

@@ -65,32 +65,13 @@ The ln / exp arithmetic is not used by RMSNorm any more (it needed a sign guard 
 
 ---
 
-## `tr_soc_ctrl_mx`
-
-**File:** [rtl_soc/tr_soc_ctrl/tr_soc_ctrl_mx.sv](../../rtl_soc/tr_soc_ctrl/tr_soc_ctrl_mx.sv)
-
-### Operation
-
-**Not yet updated** for the commands, ports and registers added to `tr_soc_ctrl_int` for the Llama work (tiled RMSNorm, two-pass SwiGLU, `ADDR_SM_Z`, wide buses); it still follows the earlier command set. The MX counterpart of `tr_soc_ctrl_int` — same command dispatch and the same `GL_*`/`SM_*`/`RM_*` pass sequencing over `tr_nonlinear_vpu`'s crossbar, with two differences specific to the MX datapath:
-
-1. **Double-buffered outputs.** Every FSM output goes through an explicit `nxt_*` "control pipeline register" stage instead of being driven straight from the combinational case block, adding one cycle of latency per state for MX's tighter timing closure.
-2. **Exponent-based rescaling.** Drives `ctrl_enable_linear_shift` (the MX dynamic shifter's enable) instead of the INT variant's explicit `req_mult_out`/`req_shift_out` requantizer registers, since MX rescaling is exponent-based rather than an explicit multiply-shift. Softmax's SM_P1 max-reduction also waits a fixed 3-cycle latency instead of polling a `vpu_max_valid` handshake, since that signal isn't wired into this variant.
-
-The RMSNorm sign-guard fix is the same as `tr_soc_ctrl_int`, applied here to the pipelined `nxt_*` outputs.
-
-### Parameters
-
-Same as `tr_soc_ctrl_int` (`N`, `W`, `ACC_W`).
-
----
-
 ## `tr_matmul_ctrl`
 
 **File:** [rtl_soc/tr_matmul_ctrl.sv](../../rtl_soc/tr_matmul_ctrl.sv)
 
 ### Operation
 
-Format-agnostic streaming-matmul sequencer (control only — no datapath instantiated here). Drives a shared linear datapath (`dot_product_engine` + requantizer) to compute `OUT[r] = requant(Σ_c A[r][c]·B[c])` over an `(num_row_tiles·M) × (num_ctiles·N)` matmul. Since this FSM only sequences the datapath rather than owning it, the same module is reused by both `tr_soc_top_int` and `tr_soc_top_mx` (each wires it to its own int/mx dot+requant pair).
+Format-agnostic streaming-matmul sequencer (control only — no datapath instantiated here). Drives a shared linear datapath (`dot_product_engine` + requantizer) to compute `OUT[r] = requant(Σ_c A[r][c]·B[c])` over an `(num_row_tiles·M) × (num_ctiles·N)` matmul. It only sequences the datapath, which `tr_soc_top_int` wires to its dot-product and requantize engines.
 
 Per output-row-tile: streams `num_ctiles` tiles (`clear_acc=1` on the first, `=0` to accumulate), then captures the result on the `num_ctiles`-th requantizer valid — the final accumulated dot. Using the valid *count* (not a fixed drain latency) keeps this independent of the datapath's pipeline depth.
 

@@ -20,7 +20,7 @@ Start with [docs/architecture.md](docs/architecture.md).
 
 | Path | Content |
 |---|---|
-| `rtl_soc/` | production RTL: `tr_nonlinear_vpu` (the crossbar), `tr_soc_ctrl` (command FSMs), `tr_soc_top_int` / `tr_soc_top_mx` (integration), and the shared engines |
+| `rtl_soc/` | production RTL: `tr_nonlinear_vpu` (the crossbar), `tr_soc_ctrl` (command FSMs), `tr_soc_top_int` (integration), and the shared engines |
 | `tb_soc/` | testbenches, mirroring the RTL tree |
 | `verification/` | `verify_block.py`, the golden-vector regression flow |
 | `emulation/` | C++ golden models (`tr_math_model.hpp`, `cpu_math_model.cpp`) and the ctypes wrapper source |
@@ -42,8 +42,7 @@ python3 ../verification/verify_block.py <block>          # RTL against the C++ g
 
 | Page | Content |
 |---|---|
-| [docs/architecture.md](docs/architecture.md) | shared crossbar, command set, timing structure, INT and MX variants |
+| [docs/architecture.md](docs/architecture.md) | shared crossbar, command set, timing structure |
 | [docs/verification.md](docs/verification.md) | regression flows, golden models, energy pilots |
 | [docs/module_reference/](docs/module_reference/) | ports and parameters, one file per `rtl_soc/` subfolder |
-| [docs/mx_format_operation.md](docs/mx_format_operation.md) | the MX (shared-exponent) datapath |
 | `docs/*.drawio` | block diagram sources |

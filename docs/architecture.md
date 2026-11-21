@@ -56,16 +56,7 @@ and the post-ln mode; `tr_exp_alu` combinational to the outputs (three cycles fr
 after the ln closes the 3.3 ns clock. Rounding in the wide shifters is written shifter-first
 (`((2x >>> s) + 1) >>> 1`), which removes a subtract and an adder from the path and gives identical results.
 
-## INT and MX variants
-
-| | `tr_soc_top_int` | `tr_soc_top_mx` |
-|---|---|---|
-| Controller | `tr_soc_ctrl_int` | `tr_soc_ctrl_mx` |
-| Rescaling | `requantize_engine_int`: explicit `acc * M >>> S` | `requantize_engine_mx` + `dynamic_shifter_mx` + `formatter_mx`: shared exponent |
-| VPU width | narrow (`W_VEC`) with a wider internal backbone | one wide `VPU_W` throughout |
-
-Both use the same `tr_nonlinear_vpu` and `dot_product_engine`. The MX variant has not been brought up to the command
-set above. See [mx_format_operation.md](mx_format_operation.md).
+The MX (shared-exponent) variant of the paper era (`tr_soc_top_mx`) is not part of this branch; it is kept at the tag `tr-vpu_rtl-ISCAS-20261013`.
 
 ## Linear side
 
