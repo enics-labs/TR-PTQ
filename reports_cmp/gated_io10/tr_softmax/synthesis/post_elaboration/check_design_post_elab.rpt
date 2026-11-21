@@ -22,24 +22,24 @@ No unloaded port in 'tr_softmax'
  Unloaded Combinational Pin(s)
  -------------------------------
 design 'tr_softmax' has the following unloaded combinational elements
-pin:tr_softmax/u_ln/add_159_26/g4/z
-pin:tr_softmax/u_ln/add_159_26/g374/z
-pin:tr_softmax/u_ln/add_159_26/g376/z
-pin:tr_softmax/u_ln/add_159_26/g379/z
-pin:tr_softmax/u_ln/add_159_26/g381/z
-pin:tr_softmax/u_ln/add_159_26/g384/z
-pin:tr_softmax/u_ln/add_159_26/g386/z
-pin:tr_softmax/u_ln/add_159_26/g389/z
-pin:tr_softmax/u_ln/mux_fk_150_16/g1/z
-pin:tr_softmax/u_ln/mux_fk_150_16/g2/z
-pin:tr_softmax/u_ln/mux_fk_150_16/g3/z
-pin:tr_softmax/u_ln/mux_fk_150_16/g4/z
-pin:tr_softmax/u_ln/mux_fk_150_16/g5/z
-pin:tr_softmax/u_ln/mux_fk_150_16/g6/z
-pin:tr_softmax/u_ln/mux_msb_150_16/g1/z
-pin:tr_softmax/u_ln/mux_msb_150_16/g2/z
-pin:tr_softmax/u_ln/mux_msb_150_16/g3/z
-pin:tr_softmax/u_ln/mux_msb_150_16/g4/z
+pin:tr_softmax/u_ln/add_162_26/g4/z
+pin:tr_softmax/u_ln/add_162_26/g374/z
+pin:tr_softmax/u_ln/add_162_26/g376/z
+pin:tr_softmax/u_ln/add_162_26/g379/z
+pin:tr_softmax/u_ln/add_162_26/g381/z
+pin:tr_softmax/u_ln/add_162_26/g384/z
+pin:tr_softmax/u_ln/add_162_26/g386/z
+pin:tr_softmax/u_ln/add_162_26/g389/z
+pin:tr_softmax/u_ln/mux_fk_153_16/g1/z
+pin:tr_softmax/u_ln/mux_fk_153_16/g2/z
+pin:tr_softmax/u_ln/mux_fk_153_16/g3/z
+pin:tr_softmax/u_ln/mux_fk_153_16/g4/z
+pin:tr_softmax/u_ln/mux_fk_153_16/g5/z
+pin:tr_softmax/u_ln/mux_fk_153_16/g6/z
+pin:tr_softmax/u_ln/mux_msb_153_16/g1/z
+pin:tr_softmax/u_ln/mux_msb_153_16/g2/z
+pin:tr_softmax/u_ln/mux_msb_153_16/g3/z
+pin:tr_softmax/u_ln/mux_msb_153_16/g4/z
 pin:tr_softmax/mul_81_47_I8/g720/z
 pin:tr_softmax/mul_81_47_I7/g720/z
 pin:tr_softmax/mul_81_47_I6/g720/z
@@ -58,12 +58,12 @@ pin:tr_softmax/add_92_69_I3_I1/g175/z
 pin:tr_softmax/add_92_69_I3_I1/g178/z
 pin:tr_softmax/add_117_40/g4/z
 pin:tr_softmax/add_117_40/g78/z
-pin:tr_softmax/u_ln/sll_153_31/g102/z
-pin:tr_softmax/u_ln/sll_153_31/g103/z
-pin:tr_softmax/u_ln/sll_153_31/g104/z
-pin:tr_softmax/u_ln/sll_153_31/g105/z
-pin:tr_softmax/u_ln/sll_153_31/g106/z
-pin:tr_softmax/u_ln/sll_153_31/g107/z
+pin:tr_softmax/u_ln/sll_156_31/g102/z
+pin:tr_softmax/u_ln/sll_156_31/g103/z
+pin:tr_softmax/u_ln/sll_156_31/g104/z
+pin:tr_softmax/u_ln/sll_156_31/g105/z
+pin:tr_softmax/u_ln/sll_156_31/g106/z
+pin:tr_softmax/u_ln/sll_156_31/g107/z
 Total number of unloaded combinational elements in design 'tr_softmax' : 42
 
  Assigns
@@ -81,34 +81,34 @@ Encountered an assign statement at hport 'hport:tr_softmax/u_lut/e_a[3][7]' in m
 Encountered an assign statement at hport 'hport:tr_softmax/u_lut/e_a[2][7]' in module shared_lut_rom_N8_LUT_IDX_W3
 Encountered an assign statement at hport 'hport:tr_softmax/u_lut/e_a[1][7]' in module shared_lut_rom_N8_LUT_IDX_W3
 Encountered an assign statement at hport 'hport:tr_softmax/u_lut/e_a[0][7]' in module shared_lut_rom_N8_LUT_IDX_W3
-Encountered an assign statement at hport 'hport:tr_softmax/u_ln/sub_153_45/Z[31]' in module sub_unsigned
-Encountered an assign statement at hport 'hport:tr_softmax/u_ln/sub_153_45/Z[30]' in module sub_unsigned
-Encountered an assign statement at hport 'hport:tr_softmax/u_ln/sub_153_45/Z[29]' in module sub_unsigned
-Encountered an assign statement at hport 'hport:tr_softmax/u_ln/sub_153_45/Z[28]' in module sub_unsigned
-Encountered an assign statement at hport 'hport:tr_softmax/u_ln/sub_153_45/Z[27]' in module sub_unsigned
-Encountered an assign statement at hport 'hport:tr_softmax/u_ln/sub_153_45/Z[26]' in module sub_unsigned
-Encountered an assign statement at hport 'hport:tr_softmax/u_ln/sub_153_45/Z[25]' in module sub_unsigned
-Encountered an assign statement at hport 'hport:tr_softmax/u_ln/sub_153_45/Z[24]' in module sub_unsigned
-Encountered an assign statement at hport 'hport:tr_softmax/u_ln/sub_153_45/Z[23]' in module sub_unsigned
-Encountered an assign statement at hport 'hport:tr_softmax/u_ln/sub_153_45/Z[22]' in module sub_unsigned
-Encountered an assign statement at hport 'hport:tr_softmax/u_ln/sub_153_45/Z[21]' in module sub_unsigned
-Encountered an assign statement at hport 'hport:tr_softmax/u_ln/sub_153_45/Z[20]' in module sub_unsigned
-Encountered an assign statement at hport 'hport:tr_softmax/u_ln/sub_153_45/Z[19]' in module sub_unsigned
-Encountered an assign statement at hport 'hport:tr_softmax/u_ln/sub_153_45/Z[18]' in module sub_unsigned
-Encountered an assign statement at hport 'hport:tr_softmax/u_ln/sub_153_45/Z[17]' in module sub_unsigned
-Encountered an assign statement at hport 'hport:tr_softmax/u_ln/sub_153_45/Z[16]' in module sub_unsigned
-Encountered an assign statement at hport 'hport:tr_softmax/u_ln/sub_153_45/Z[15]' in module sub_unsigned
-Encountered an assign statement at hport 'hport:tr_softmax/u_ln/sub_153_45/Z[14]' in module sub_unsigned
-Encountered an assign statement at hport 'hport:tr_softmax/u_ln/sub_153_45/Z[13]' in module sub_unsigned
-Encountered an assign statement at hport 'hport:tr_softmax/u_ln/sub_153_45/Z[12]' in module sub_unsigned
-Encountered an assign statement at hport 'hport:tr_softmax/u_ln/sub_153_45/Z[11]' in module sub_unsigned
-Encountered an assign statement at hport 'hport:tr_softmax/u_ln/sub_153_45/Z[10]' in module sub_unsigned
-Encountered an assign statement at hport 'hport:tr_softmax/u_ln/sub_153_45/Z[9]' in module sub_unsigned
-Encountered an assign statement at hport 'hport:tr_softmax/u_ln/sub_153_45/Z[8]' in module sub_unsigned
-Encountered an assign statement at hport 'hport:tr_softmax/u_ln/sub_153_45/Z[7]' in module sub_unsigned
-Encountered an assign statement at hport 'hport:tr_softmax/u_ln/sub_153_45/Z[6]' in module sub_unsigned
-Encountered an assign statement at hport 'hport:tr_softmax/u_ln/sub_153_45/Z[5]' in module sub_unsigned
-Encountered an assign statement at hport 'hport:tr_softmax/u_ln/sub_153_45/Z[4]' in module sub_unsigned
+Encountered an assign statement at hport 'hport:tr_softmax/u_ln/sub_156_45/Z[31]' in module sub_unsigned
+Encountered an assign statement at hport 'hport:tr_softmax/u_ln/sub_156_45/Z[30]' in module sub_unsigned
+Encountered an assign statement at hport 'hport:tr_softmax/u_ln/sub_156_45/Z[29]' in module sub_unsigned
+Encountered an assign statement at hport 'hport:tr_softmax/u_ln/sub_156_45/Z[28]' in module sub_unsigned
+Encountered an assign statement at hport 'hport:tr_softmax/u_ln/sub_156_45/Z[27]' in module sub_unsigned
+Encountered an assign statement at hport 'hport:tr_softmax/u_ln/sub_156_45/Z[26]' in module sub_unsigned
+Encountered an assign statement at hport 'hport:tr_softmax/u_ln/sub_156_45/Z[25]' in module sub_unsigned
+Encountered an assign statement at hport 'hport:tr_softmax/u_ln/sub_156_45/Z[24]' in module sub_unsigned
+Encountered an assign statement at hport 'hport:tr_softmax/u_ln/sub_156_45/Z[23]' in module sub_unsigned
+Encountered an assign statement at hport 'hport:tr_softmax/u_ln/sub_156_45/Z[22]' in module sub_unsigned
+Encountered an assign statement at hport 'hport:tr_softmax/u_ln/sub_156_45/Z[21]' in module sub_unsigned
+Encountered an assign statement at hport 'hport:tr_softmax/u_ln/sub_156_45/Z[20]' in module sub_unsigned
+Encountered an assign statement at hport 'hport:tr_softmax/u_ln/sub_156_45/Z[19]' in module sub_unsigned
+Encountered an assign statement at hport 'hport:tr_softmax/u_ln/sub_156_45/Z[18]' in module sub_unsigned
+Encountered an assign statement at hport 'hport:tr_softmax/u_ln/sub_156_45/Z[17]' in module sub_unsigned
+Encountered an assign statement at hport 'hport:tr_softmax/u_ln/sub_156_45/Z[16]' in module sub_unsigned
+Encountered an assign statement at hport 'hport:tr_softmax/u_ln/sub_156_45/Z[15]' in module sub_unsigned
+Encountered an assign statement at hport 'hport:tr_softmax/u_ln/sub_156_45/Z[14]' in module sub_unsigned
+Encountered an assign statement at hport 'hport:tr_softmax/u_ln/sub_156_45/Z[13]' in module sub_unsigned
+Encountered an assign statement at hport 'hport:tr_softmax/u_ln/sub_156_45/Z[12]' in module sub_unsigned
+Encountered an assign statement at hport 'hport:tr_softmax/u_ln/sub_156_45/Z[11]' in module sub_unsigned
+Encountered an assign statement at hport 'hport:tr_softmax/u_ln/sub_156_45/Z[10]' in module sub_unsigned
+Encountered an assign statement at hport 'hport:tr_softmax/u_ln/sub_156_45/Z[9]' in module sub_unsigned
+Encountered an assign statement at hport 'hport:tr_softmax/u_ln/sub_156_45/Z[8]' in module sub_unsigned
+Encountered an assign statement at hport 'hport:tr_softmax/u_ln/sub_156_45/Z[7]' in module sub_unsigned
+Encountered an assign statement at hport 'hport:tr_softmax/u_ln/sub_156_45/Z[6]' in module sub_unsigned
+Encountered an assign statement at hport 'hport:tr_softmax/u_ln/sub_156_45/Z[5]' in module sub_unsigned
+Encountered an assign statement at hport 'hport:tr_softmax/u_ln/sub_156_45/Z[4]' in module sub_unsigned
 Total number of assign statements in design 'tr_softmax' : 41
 
  Undriven Port(s)/Pin(s)
@@ -137,21 +137,21 @@ No multidriven unloaded nets in 'tr_softmax'
   Constant Pin(s)
   ----------------
 design 'tr_softmax' has the following constant input combinational pin(s)
-pin:tr_softmax/u_ln/sll_153_31/g68/data1
-pin:tr_softmax/u_ln/sll_153_31/g80/data1
-pin:tr_softmax/u_ln/sll_153_31/g81/data1
-pin:tr_softmax/u_ln/sll_153_31/g91/data1
-pin:tr_softmax/u_ln/sll_153_31/g92/data1
-pin:tr_softmax/u_ln/sll_153_31/g93/data1
-pin:tr_softmax/u_ln/sll_153_31/g94/data1
-pin:tr_softmax/u_ln/sll_153_31/g100/data1
-pin:tr_softmax/u_ln/sll_153_31/g101/data1
-pin:tr_softmax/u_ln/sll_153_31/g102/data1
-pin:tr_softmax/u_ln/sll_153_31/g103/data1
-pin:tr_softmax/u_ln/sll_153_31/g104/data1
-pin:tr_softmax/u_ln/sll_153_31/g105/data1
-pin:tr_softmax/u_ln/sll_153_31/g106/data1
-pin:tr_softmax/u_ln/sll_153_31/g107/data1
+pin:tr_softmax/u_ln/sll_156_31/g68/data1
+pin:tr_softmax/u_ln/sll_156_31/g80/data1
+pin:tr_softmax/u_ln/sll_156_31/g81/data1
+pin:tr_softmax/u_ln/sll_156_31/g91/data1
+pin:tr_softmax/u_ln/sll_156_31/g92/data1
+pin:tr_softmax/u_ln/sll_156_31/g93/data1
+pin:tr_softmax/u_ln/sll_156_31/g94/data1
+pin:tr_softmax/u_ln/sll_156_31/g100/data1
+pin:tr_softmax/u_ln/sll_156_31/g101/data1
+pin:tr_softmax/u_ln/sll_156_31/g102/data1
+pin:tr_softmax/u_ln/sll_156_31/g103/data1
+pin:tr_softmax/u_ln/sll_156_31/g104/data1
+pin:tr_softmax/u_ln/sll_156_31/g105/data1
+pin:tr_softmax/u_ln/sll_156_31/g106/data1
+pin:tr_softmax/u_ln/sll_156_31/g107/data1
 Total number of constant combinational pins in design 'tr_softmax' : 15
 
 No constant sequential pin(s) in design 'tr_softmax'
@@ -1255,263 +1255,263 @@ hpin:tr_softmax/u_lut/mux_exp_lut[a_idx[7]]_38_22/in_7[3] 	 (fanout : 1)
 hpin:tr_softmax/u_lut/mux_exp_lut[a_idx[7]]_38_22/in_7[2] 	 (fanout : 1)
 hpin:tr_softmax/u_lut/mux_exp_lut[a_idx[7]]_38_22/in_7[1] 	 (fanout : 1)
 hpin:tr_softmax/u_lut/mux_exp_lut[a_idx[7]]_38_22/in_7[0] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/gt_168_21/B[9] 	 (fanout : 45)
-hpin:tr_softmax/u_ln/gt_168_21/B[8] 	 (fanout : 2)
-hpin:tr_softmax/u_ln/gt_168_21/B[7] 	 (fanout : 2)
-hpin:tr_softmax/u_ln/gt_168_21/B[6] 	 (fanout : 2)
-hpin:tr_softmax/u_ln/gt_168_21/B[5] 	 (fanout : 2)
-hpin:tr_softmax/u_ln/gt_168_21/B[4] 	 (fanout : 2)
-hpin:tr_softmax/u_ln/gt_168_21/B[3] 	 (fanout : 2)
-hpin:tr_softmax/u_ln/gt_168_21/B[2] 	 (fanout : 2)
-hpin:tr_softmax/u_ln/gt_168_21/B[1] 	 (fanout : 2)
-hpin:tr_softmax/u_ln/gt_168_21/B[0] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/lt_170_26/B[9] 	 (fanout : 3)
-hpin:tr_softmax/u_ln/lt_170_26/B[8] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/lt_170_26/B[7] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/lt_170_26/B[6] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/lt_170_26/B[5] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/lt_170_26/B[4] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/lt_170_26/B[3] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/lt_170_26/B[2] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/lt_170_26/B[1] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/lt_170_26/B[0] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/neq_150_16/B 	 (fanout : 1)
-hpin:tr_softmax/u_ln/add_157_26/A[5] 	 (fanout : 2)
-hpin:tr_softmax/u_ln/add_157_26/A[4] 	 (fanout : 2)
-hpin:tr_softmax/u_ln/add_157_26/A[3] 	 (fanout : 2)
-hpin:tr_softmax/u_ln/add_157_26/A[2] 	 (fanout : 2)
-hpin:tr_softmax/u_ln/add_157_26/A[1] 	 (fanout : 2)
-hpin:tr_softmax/u_ln/add_157_26/A[0] 	 (fanout : 2)
-hpin:tr_softmax/u_ln/add_158_26/B[31] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/add_158_26/B[30] 	 (fanout : 2)
-hpin:tr_softmax/u_ln/add_158_26/B[29] 	 (fanout : 2)
-hpin:tr_softmax/u_ln/add_158_26/B[28] 	 (fanout : 2)
-hpin:tr_softmax/u_ln/add_158_26/B[27] 	 (fanout : 2)
-hpin:tr_softmax/u_ln/add_158_26/B[26] 	 (fanout : 2)
-hpin:tr_softmax/u_ln/add_158_26/B[25] 	 (fanout : 2)
-hpin:tr_softmax/u_ln/add_158_26/B[24] 	 (fanout : 2)
-hpin:tr_softmax/u_ln/add_158_26/B[23] 	 (fanout : 2)
-hpin:tr_softmax/u_ln/add_158_26/B[22] 	 (fanout : 2)
-hpin:tr_softmax/u_ln/add_158_26/B[21] 	 (fanout : 2)
-hpin:tr_softmax/u_ln/add_158_26/B[20] 	 (fanout : 2)
-hpin:tr_softmax/u_ln/add_158_26/B[19] 	 (fanout : 2)
-hpin:tr_softmax/u_ln/add_158_26/B[18] 	 (fanout : 2)
-hpin:tr_softmax/u_ln/add_158_26/B[17] 	 (fanout : 2)
-hpin:tr_softmax/u_ln/add_158_26/B[16] 	 (fanout : 2)
-hpin:tr_softmax/u_ln/add_158_26/B[15] 	 (fanout : 2)
-hpin:tr_softmax/u_ln/add_158_26/B[14] 	 (fanout : 2)
-hpin:tr_softmax/u_ln/add_158_26/B[13] 	 (fanout : 2)
-hpin:tr_softmax/u_ln/add_158_26/B[12] 	 (fanout : 2)
-hpin:tr_softmax/u_ln/add_158_26/B[10] 	 (fanout : 2)
-hpin:tr_softmax/u_ln/add_158_26/B[9] 	 (fanout : 2)
-hpin:tr_softmax/u_ln/add_158_26/B[7] 	 (fanout : 2)
-hpin:tr_softmax/u_ln/add_158_26/B[6] 	 (fanout : 2)
-hpin:tr_softmax/u_ln/add_158_26/B[5] 	 (fanout : 2)
-hpin:tr_softmax/u_ln/add_158_26/B[4] 	 (fanout : 2)
-hpin:tr_softmax/u_ln/add_158_26/B[3] 	 (fanout : 2)
-hpin:tr_softmax/u_ln/add_158_26/B[2] 	 (fanout : 2)
-hpin:tr_softmax/u_ln/add_158_26/B[1] 	 (fanout : 2)
-hpin:tr_softmax/u_ln/add_158_26/B[0] 	 (fanout : 2)
-hpin:tr_softmax/u_ln/add_159_26/B[8] 	 (fanout : 47)
-hpin:tr_softmax/u_ln/add_159_26/B[7] 	 (fanout : 2)
-hpin:tr_softmax/u_ln/add_159_26/B[6] 	 (fanout : 2)
-hpin:tr_softmax/u_ln/add_159_26/B[5] 	 (fanout : 2)
-hpin:tr_softmax/u_ln/add_159_26/B[4] 	 (fanout : 2)
-hpin:tr_softmax/u_ln/add_159_26/B[3] 	 (fanout : 2)
-hpin:tr_softmax/u_ln/add_159_26/B[2] 	 (fanout : 2)
-hpin:tr_softmax/u_ln/add_159_26/B[1] 	 (fanout : 2)
-hpin:tr_softmax/u_ln/add_159_26/B[0] 	 (fanout : 2)
-hpin:tr_softmax/u_ln/mul_157_69/A[31] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mul_157_69/A[30] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mul_157_69/A[29] 	 (fanout : 2)
-hpin:tr_softmax/u_ln/mul_157_69/A[28] 	 (fanout : 2)
-hpin:tr_softmax/u_ln/mul_157_69/A[27] 	 (fanout : 3)
-hpin:tr_softmax/u_ln/mul_157_69/A[26] 	 (fanout : 3)
-hpin:tr_softmax/u_ln/mul_157_69/A[25] 	 (fanout : 4)
-hpin:tr_softmax/u_ln/mul_157_69/A[24] 	 (fanout : 4)
-hpin:tr_softmax/u_ln/mul_157_69/A[23] 	 (fanout : 4)
-hpin:tr_softmax/u_ln/mul_157_69/A[22] 	 (fanout : 4)
-hpin:tr_softmax/u_ln/mul_157_69/A[21] 	 (fanout : 4)
-hpin:tr_softmax/u_ln/mul_157_69/A[20] 	 (fanout : 4)
-hpin:tr_softmax/u_ln/mul_157_69/A[19] 	 (fanout : 4)
-hpin:tr_softmax/u_ln/mul_157_69/A[18] 	 (fanout : 4)
-hpin:tr_softmax/u_ln/mul_157_69/A[17] 	 (fanout : 4)
-hpin:tr_softmax/u_ln/mul_157_69/A[16] 	 (fanout : 4)
-hpin:tr_softmax/u_ln/mul_157_69/A[15] 	 (fanout : 4)
-hpin:tr_softmax/u_ln/mul_157_69/A[14] 	 (fanout : 4)
-hpin:tr_softmax/u_ln/mul_157_69/A[13] 	 (fanout : 4)
-hpin:tr_softmax/u_ln/mul_157_69/A[12] 	 (fanout : 4)
-hpin:tr_softmax/u_ln/mul_157_69/A[11] 	 (fanout : 4)
-hpin:tr_softmax/u_ln/mul_157_69/A[10] 	 (fanout : 4)
-hpin:tr_softmax/u_ln/mul_157_69/A[9] 	 (fanout : 4)
-hpin:tr_softmax/u_ln/mul_157_69/A[8] 	 (fanout : 4)
-hpin:tr_softmax/u_ln/mul_157_69/A[7] 	 (fanout : 4)
-hpin:tr_softmax/u_ln/mul_157_69/A[5] 	 (fanout : 4)
-hpin:tr_softmax/u_ln/mul_157_69/A[1] 	 (fanout : 4)
-hpin:tr_softmax/u_ln/mul_157_69/B[6] 	 (fanout : 29)
-hpin:tr_softmax/u_ln/sub_153_45/A[3] 	 (fanout : 2)
-hpin:tr_softmax/u_ln/sub_153_45/A[2] 	 (fanout : 2)
-hpin:tr_softmax/u_ln/sub_153_45/A[1] 	 (fanout : 2)
-hpin:tr_softmax/u_ln/sub_153_45/A[0] 	 (fanout : 2)
-hpin:tr_softmax/u_ln/sub_152_49/B[2] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/sub_152_49/B[1] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/sub_152_49/B[0] 	 (fanout : 2)
-hpin:tr_softmax/u_ln/mul_156_44/B[8] 	 (fanout : 5)
-hpin:tr_softmax/u_ln/mul_156_44/B[7] 	 (fanout : 5)
-hpin:tr_softmax/u_ln/mul_156_44/B[6] 	 (fanout : 5)
-hpin:tr_softmax/u_ln/mul_156_44/B[5] 	 (fanout : 5)
-hpin:tr_softmax/u_ln/mul_156_44/B[4] 	 (fanout : 5)
-hpin:tr_softmax/u_ln/mul_156_44/B[3] 	 (fanout : 5)
-hpin:tr_softmax/u_ln/mul_156_44/B[2] 	 (fanout : 5)
-hpin:tr_softmax/u_ln/mul_156_44/B[1] 	 (fanout : 5)
-hpin:tr_softmax/u_ln/mul_156_44/B[0] 	 (fanout : 5)
-hpin:tr_softmax/u_ln/mux_124_38/in_0 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_124_38/in_1 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_124_22/in_0 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_124_22/in_1 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_124_23/in_0[1] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_124_23/in_1[1] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_124_24/in_0[2] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_124_24/in_1[2] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_124_24/in_1[1] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_124_24/in_1[0] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_124_27/in_0 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_124_27/in_1 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_124_29/in_0 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_124_29/in_1 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_124_30/in_0[1] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_124_30/in_1[1] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_124_32/in_0 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_124_32/in_1 	 (fanout : 1)
-hpin:tr_softmax/u_ln/ctl_nz[3][1]_124_38/in_0 	 (fanout : 4)
-hpin:tr_softmax/u_ln/mux_124_33/in_0[3] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_124_33/in_1[3] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_124_33/in_1[2] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_124_33/in_2[3] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_124_33/in_2[2] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_124_33/in_2[1] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_124_33/in_3[3] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_124_33/in_3[2] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_124_33/in_3[1] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_124_33/in_3[0] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_124_33/in_4[3] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_124_33/in_4[2] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_124_33/in_4[1] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_124_33/in_4[0] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_fk_150_16/in_0[5] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_fk_150_16/in_0[4] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_fk_150_16/in_0[3] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_fk_150_16/in_0[2] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_fk_150_16/in_0[1] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_fk_150_16/in_0[0] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_msb_150_16/in_0[3] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_msb_150_16/in_0[2] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_msb_150_16/in_0[1] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_msb_150_16/in_0[0] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_yq_full_150_16/in_0[31] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_yq_full_150_16/in_0[30] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_yq_full_150_16/in_0[29] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_yq_full_150_16/in_0[28] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_yq_full_150_16/in_0[27] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_yq_full_150_16/in_0[26] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_yq_full_150_16/in_0[25] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_yq_full_150_16/in_0[24] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_yq_full_150_16/in_0[23] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_yq_full_150_16/in_0[22] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_yq_full_150_16/in_0[21] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_yq_full_150_16/in_0[20] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_yq_full_150_16/in_0[19] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_yq_full_150_16/in_0[18] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_yq_full_150_16/in_0[17] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_yq_full_150_16/in_0[16] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_yq_full_150_16/in_0[15] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_yq_full_150_16/in_0[14] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_yq_full_150_16/in_0[13] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_yq_full_150_16/in_0[12] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_yq_full_150_16/in_0[11] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_yq_full_150_16/in_0[10] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_yq_full_150_16/in_0[9] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_yq_full_150_16/in_0[8] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_yq_full_150_16/in_0[7] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_yq_full_150_16/in_0[6] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_yq_full_150_16/in_0[5] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_yq_full_150_16/in_0[4] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_yq_full_150_16/in_0[3] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_yq_full_150_16/in_0[2] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_yq_full_150_16/in_0[1] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_yq_full_150_16/in_0[0] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_yq_170_26/in_1[9] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_yq_170_26/in_1[8] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_yq_170_26/in_1[7] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_yq_170_26/in_1[6] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_yq_170_26/in_1[5] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_yq_170_26/in_1[4] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_yq_170_26/in_1[3] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_yq_170_26/in_1[2] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_yq_170_26/in_1[1] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_yq_170_26/in_1[0] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_yq_168_21/in_1[9] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_yq_168_21/in_1[8] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_yq_168_21/in_1[7] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_yq_168_21/in_1[6] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_yq_168_21/in_1[5] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_yq_168_21/in_1[4] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_yq_168_21/in_1[3] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_yq_168_21/in_1[2] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_yq_168_21/in_1[1] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_yq_168_21/in_1[0] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/coef_a_157_30:eq_54_36/A[31] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/coef_a_157_30:eq_54_36/A[30] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/coef_a_157_30:eq_54_36/A[29] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/coef_a_157_30:eq_54_36/A[28] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/coef_a_157_30:eq_54_36/A[27] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/coef_a_157_30:eq_54_36/A[26] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/coef_a_157_30:eq_54_36/A[25] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/coef_a_157_30:eq_54_36/A[24] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/coef_a_157_30:eq_54_36/A[23] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/coef_a_157_30:eq_54_36/A[22] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/coef_a_157_30:eq_54_36/A[21] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/coef_a_157_30:eq_54_36/A[20] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/coef_a_157_30:eq_54_36/A[19] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/coef_a_157_30:eq_54_36/A[18] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/coef_a_157_30:eq_54_36/A[17] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/coef_a_157_30:eq_54_36/A[16] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/coef_a_157_30:eq_54_36/A[15] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/coef_a_157_30:eq_54_36/A[14] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/coef_a_157_30:eq_54_36/A[13] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/coef_a_157_30:eq_54_36/A[12] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/coef_a_157_30:eq_54_36/A[11] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/coef_a_157_30:eq_54_36/A[10] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/coef_a_157_30:eq_54_36/A[9] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/coef_a_157_30:eq_54_36/A[8] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/coef_a_157_30:eq_54_36/A[7] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/coef_a_157_30:eq_54_36/A[6] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/coef_a_157_30:eq_54_36/A[5] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/coef_a_157_30:eq_54_36/A[4] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/coef_a_157_30:eq_54_36/A[3] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/coef_a_157_30:eq_54_36/A[2] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/coef_a_157_30:eq_54_36/A[1] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/coef_a_157_30:eq_54_36/B 	 (fanout : 1)
-hpin:tr_softmax/u_ln/coef_a_157_30:mux_54_36/in_0[4] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/coef_a_157_30:mux_54_36/in_0[3] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/coef_a_157_30:mux_54_36/in_0[2] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/coef_a_157_30:mux_54_36/in_0[1] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/coef_a_157_30:mux_54_36/in_0[0] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/coef_a_157_30:mux_54_36/in_1[4] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/coef_a_157_30:mux_54_36/in_1[3] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/coef_a_157_30:mux_54_36/in_1[2] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/coef_a_157_30:mux_54_36/in_1[1] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/coef_a_157_30:mux_54_36/in_1[0] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/coef_b_158_30:mux_66_36/in_0[1] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/coef_b_158_30:mux_66_36/in_0[0] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/coef_b_158_30:mux_66_36/in_1[1] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/coef_b_158_30:mux_66_36/in_1[0] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_153_31/in_1[5] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_153_31/in_1[4] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_153_31/in_1[3] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_153_31/in_1[2] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_153_31/in_1[1] 	 (fanout : 1)
-hpin:tr_softmax/u_ln/mux_153_31/in_1[0] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/gt_171_21/B[9] 	 (fanout : 45)
+hpin:tr_softmax/u_ln/gt_171_21/B[8] 	 (fanout : 2)
+hpin:tr_softmax/u_ln/gt_171_21/B[7] 	 (fanout : 2)
+hpin:tr_softmax/u_ln/gt_171_21/B[6] 	 (fanout : 2)
+hpin:tr_softmax/u_ln/gt_171_21/B[5] 	 (fanout : 2)
+hpin:tr_softmax/u_ln/gt_171_21/B[4] 	 (fanout : 2)
+hpin:tr_softmax/u_ln/gt_171_21/B[3] 	 (fanout : 2)
+hpin:tr_softmax/u_ln/gt_171_21/B[2] 	 (fanout : 2)
+hpin:tr_softmax/u_ln/gt_171_21/B[1] 	 (fanout : 2)
+hpin:tr_softmax/u_ln/gt_171_21/B[0] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/lt_173_26/B[9] 	 (fanout : 3)
+hpin:tr_softmax/u_ln/lt_173_26/B[8] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/lt_173_26/B[7] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/lt_173_26/B[6] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/lt_173_26/B[5] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/lt_173_26/B[4] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/lt_173_26/B[3] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/lt_173_26/B[2] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/lt_173_26/B[1] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/lt_173_26/B[0] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/neq_153_16/B 	 (fanout : 1)
+hpin:tr_softmax/u_ln/add_160_26/A[5] 	 (fanout : 2)
+hpin:tr_softmax/u_ln/add_160_26/A[4] 	 (fanout : 2)
+hpin:tr_softmax/u_ln/add_160_26/A[3] 	 (fanout : 2)
+hpin:tr_softmax/u_ln/add_160_26/A[2] 	 (fanout : 2)
+hpin:tr_softmax/u_ln/add_160_26/A[1] 	 (fanout : 2)
+hpin:tr_softmax/u_ln/add_160_26/A[0] 	 (fanout : 2)
+hpin:tr_softmax/u_ln/add_161_26/B[31] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/add_161_26/B[30] 	 (fanout : 2)
+hpin:tr_softmax/u_ln/add_161_26/B[29] 	 (fanout : 2)
+hpin:tr_softmax/u_ln/add_161_26/B[28] 	 (fanout : 2)
+hpin:tr_softmax/u_ln/add_161_26/B[27] 	 (fanout : 2)
+hpin:tr_softmax/u_ln/add_161_26/B[26] 	 (fanout : 2)
+hpin:tr_softmax/u_ln/add_161_26/B[25] 	 (fanout : 2)
+hpin:tr_softmax/u_ln/add_161_26/B[24] 	 (fanout : 2)
+hpin:tr_softmax/u_ln/add_161_26/B[23] 	 (fanout : 2)
+hpin:tr_softmax/u_ln/add_161_26/B[22] 	 (fanout : 2)
+hpin:tr_softmax/u_ln/add_161_26/B[21] 	 (fanout : 2)
+hpin:tr_softmax/u_ln/add_161_26/B[20] 	 (fanout : 2)
+hpin:tr_softmax/u_ln/add_161_26/B[19] 	 (fanout : 2)
+hpin:tr_softmax/u_ln/add_161_26/B[18] 	 (fanout : 2)
+hpin:tr_softmax/u_ln/add_161_26/B[17] 	 (fanout : 2)
+hpin:tr_softmax/u_ln/add_161_26/B[16] 	 (fanout : 2)
+hpin:tr_softmax/u_ln/add_161_26/B[15] 	 (fanout : 2)
+hpin:tr_softmax/u_ln/add_161_26/B[14] 	 (fanout : 2)
+hpin:tr_softmax/u_ln/add_161_26/B[13] 	 (fanout : 2)
+hpin:tr_softmax/u_ln/add_161_26/B[12] 	 (fanout : 2)
+hpin:tr_softmax/u_ln/add_161_26/B[10] 	 (fanout : 2)
+hpin:tr_softmax/u_ln/add_161_26/B[9] 	 (fanout : 2)
+hpin:tr_softmax/u_ln/add_161_26/B[7] 	 (fanout : 2)
+hpin:tr_softmax/u_ln/add_161_26/B[6] 	 (fanout : 2)
+hpin:tr_softmax/u_ln/add_161_26/B[5] 	 (fanout : 2)
+hpin:tr_softmax/u_ln/add_161_26/B[4] 	 (fanout : 2)
+hpin:tr_softmax/u_ln/add_161_26/B[3] 	 (fanout : 2)
+hpin:tr_softmax/u_ln/add_161_26/B[2] 	 (fanout : 2)
+hpin:tr_softmax/u_ln/add_161_26/B[1] 	 (fanout : 2)
+hpin:tr_softmax/u_ln/add_161_26/B[0] 	 (fanout : 2)
+hpin:tr_softmax/u_ln/add_162_26/B[8] 	 (fanout : 47)
+hpin:tr_softmax/u_ln/add_162_26/B[7] 	 (fanout : 2)
+hpin:tr_softmax/u_ln/add_162_26/B[6] 	 (fanout : 2)
+hpin:tr_softmax/u_ln/add_162_26/B[5] 	 (fanout : 2)
+hpin:tr_softmax/u_ln/add_162_26/B[4] 	 (fanout : 2)
+hpin:tr_softmax/u_ln/add_162_26/B[3] 	 (fanout : 2)
+hpin:tr_softmax/u_ln/add_162_26/B[2] 	 (fanout : 2)
+hpin:tr_softmax/u_ln/add_162_26/B[1] 	 (fanout : 2)
+hpin:tr_softmax/u_ln/add_162_26/B[0] 	 (fanout : 2)
+hpin:tr_softmax/u_ln/mul_160_69/A[31] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mul_160_69/A[30] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mul_160_69/A[29] 	 (fanout : 2)
+hpin:tr_softmax/u_ln/mul_160_69/A[28] 	 (fanout : 2)
+hpin:tr_softmax/u_ln/mul_160_69/A[27] 	 (fanout : 3)
+hpin:tr_softmax/u_ln/mul_160_69/A[26] 	 (fanout : 3)
+hpin:tr_softmax/u_ln/mul_160_69/A[25] 	 (fanout : 4)
+hpin:tr_softmax/u_ln/mul_160_69/A[24] 	 (fanout : 4)
+hpin:tr_softmax/u_ln/mul_160_69/A[23] 	 (fanout : 4)
+hpin:tr_softmax/u_ln/mul_160_69/A[22] 	 (fanout : 4)
+hpin:tr_softmax/u_ln/mul_160_69/A[21] 	 (fanout : 4)
+hpin:tr_softmax/u_ln/mul_160_69/A[20] 	 (fanout : 4)
+hpin:tr_softmax/u_ln/mul_160_69/A[19] 	 (fanout : 4)
+hpin:tr_softmax/u_ln/mul_160_69/A[18] 	 (fanout : 4)
+hpin:tr_softmax/u_ln/mul_160_69/A[17] 	 (fanout : 4)
+hpin:tr_softmax/u_ln/mul_160_69/A[16] 	 (fanout : 4)
+hpin:tr_softmax/u_ln/mul_160_69/A[15] 	 (fanout : 4)
+hpin:tr_softmax/u_ln/mul_160_69/A[14] 	 (fanout : 4)
+hpin:tr_softmax/u_ln/mul_160_69/A[13] 	 (fanout : 4)
+hpin:tr_softmax/u_ln/mul_160_69/A[12] 	 (fanout : 4)
+hpin:tr_softmax/u_ln/mul_160_69/A[11] 	 (fanout : 4)
+hpin:tr_softmax/u_ln/mul_160_69/A[10] 	 (fanout : 4)
+hpin:tr_softmax/u_ln/mul_160_69/A[9] 	 (fanout : 4)
+hpin:tr_softmax/u_ln/mul_160_69/A[8] 	 (fanout : 4)
+hpin:tr_softmax/u_ln/mul_160_69/A[7] 	 (fanout : 4)
+hpin:tr_softmax/u_ln/mul_160_69/A[5] 	 (fanout : 4)
+hpin:tr_softmax/u_ln/mul_160_69/A[1] 	 (fanout : 4)
+hpin:tr_softmax/u_ln/mul_160_69/B[6] 	 (fanout : 29)
+hpin:tr_softmax/u_ln/sub_156_45/A[3] 	 (fanout : 2)
+hpin:tr_softmax/u_ln/sub_156_45/A[2] 	 (fanout : 2)
+hpin:tr_softmax/u_ln/sub_156_45/A[1] 	 (fanout : 2)
+hpin:tr_softmax/u_ln/sub_156_45/A[0] 	 (fanout : 2)
+hpin:tr_softmax/u_ln/sub_155_49/B[2] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/sub_155_49/B[1] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/sub_155_49/B[0] 	 (fanout : 2)
+hpin:tr_softmax/u_ln/mul_159_44/B[8] 	 (fanout : 5)
+hpin:tr_softmax/u_ln/mul_159_44/B[7] 	 (fanout : 5)
+hpin:tr_softmax/u_ln/mul_159_44/B[6] 	 (fanout : 5)
+hpin:tr_softmax/u_ln/mul_159_44/B[5] 	 (fanout : 5)
+hpin:tr_softmax/u_ln/mul_159_44/B[4] 	 (fanout : 5)
+hpin:tr_softmax/u_ln/mul_159_44/B[3] 	 (fanout : 5)
+hpin:tr_softmax/u_ln/mul_159_44/B[2] 	 (fanout : 5)
+hpin:tr_softmax/u_ln/mul_159_44/B[1] 	 (fanout : 5)
+hpin:tr_softmax/u_ln/mul_159_44/B[0] 	 (fanout : 5)
+hpin:tr_softmax/u_ln/mux_127_38/in_0 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_127_38/in_1 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_127_22/in_0 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_127_22/in_1 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_127_23/in_0[1] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_127_23/in_1[1] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_127_24/in_0[2] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_127_24/in_1[2] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_127_24/in_1[1] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_127_24/in_1[0] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_127_27/in_0 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_127_27/in_1 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_127_29/in_0 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_127_29/in_1 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_127_30/in_0[1] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_127_30/in_1[1] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_127_32/in_0 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_127_32/in_1 	 (fanout : 1)
+hpin:tr_softmax/u_ln/ctl_nz[3][1]_127_38/in_0 	 (fanout : 4)
+hpin:tr_softmax/u_ln/mux_127_33/in_0[3] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_127_33/in_1[3] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_127_33/in_1[2] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_127_33/in_2[3] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_127_33/in_2[2] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_127_33/in_2[1] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_127_33/in_3[3] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_127_33/in_3[2] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_127_33/in_3[1] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_127_33/in_3[0] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_127_33/in_4[3] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_127_33/in_4[2] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_127_33/in_4[1] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_127_33/in_4[0] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_fk_153_16/in_0[5] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_fk_153_16/in_0[4] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_fk_153_16/in_0[3] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_fk_153_16/in_0[2] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_fk_153_16/in_0[1] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_fk_153_16/in_0[0] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_msb_153_16/in_0[3] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_msb_153_16/in_0[2] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_msb_153_16/in_0[1] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_msb_153_16/in_0[0] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_yq_full_153_16/in_0[31] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_yq_full_153_16/in_0[30] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_yq_full_153_16/in_0[29] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_yq_full_153_16/in_0[28] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_yq_full_153_16/in_0[27] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_yq_full_153_16/in_0[26] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_yq_full_153_16/in_0[25] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_yq_full_153_16/in_0[24] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_yq_full_153_16/in_0[23] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_yq_full_153_16/in_0[22] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_yq_full_153_16/in_0[21] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_yq_full_153_16/in_0[20] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_yq_full_153_16/in_0[19] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_yq_full_153_16/in_0[18] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_yq_full_153_16/in_0[17] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_yq_full_153_16/in_0[16] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_yq_full_153_16/in_0[15] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_yq_full_153_16/in_0[14] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_yq_full_153_16/in_0[13] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_yq_full_153_16/in_0[12] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_yq_full_153_16/in_0[11] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_yq_full_153_16/in_0[10] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_yq_full_153_16/in_0[9] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_yq_full_153_16/in_0[8] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_yq_full_153_16/in_0[7] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_yq_full_153_16/in_0[6] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_yq_full_153_16/in_0[5] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_yq_full_153_16/in_0[4] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_yq_full_153_16/in_0[3] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_yq_full_153_16/in_0[2] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_yq_full_153_16/in_0[1] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_yq_full_153_16/in_0[0] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_yq_173_26/in_1[9] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_yq_173_26/in_1[8] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_yq_173_26/in_1[7] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_yq_173_26/in_1[6] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_yq_173_26/in_1[5] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_yq_173_26/in_1[4] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_yq_173_26/in_1[3] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_yq_173_26/in_1[2] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_yq_173_26/in_1[1] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_yq_173_26/in_1[0] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_yq_171_21/in_1[9] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_yq_171_21/in_1[8] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_yq_171_21/in_1[7] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_yq_171_21/in_1[6] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_yq_171_21/in_1[5] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_yq_171_21/in_1[4] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_yq_171_21/in_1[3] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_yq_171_21/in_1[2] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_yq_171_21/in_1[1] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_yq_171_21/in_1[0] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/coef_a_160_30:eq_54_36/A[31] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/coef_a_160_30:eq_54_36/A[30] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/coef_a_160_30:eq_54_36/A[29] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/coef_a_160_30:eq_54_36/A[28] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/coef_a_160_30:eq_54_36/A[27] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/coef_a_160_30:eq_54_36/A[26] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/coef_a_160_30:eq_54_36/A[25] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/coef_a_160_30:eq_54_36/A[24] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/coef_a_160_30:eq_54_36/A[23] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/coef_a_160_30:eq_54_36/A[22] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/coef_a_160_30:eq_54_36/A[21] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/coef_a_160_30:eq_54_36/A[20] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/coef_a_160_30:eq_54_36/A[19] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/coef_a_160_30:eq_54_36/A[18] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/coef_a_160_30:eq_54_36/A[17] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/coef_a_160_30:eq_54_36/A[16] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/coef_a_160_30:eq_54_36/A[15] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/coef_a_160_30:eq_54_36/A[14] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/coef_a_160_30:eq_54_36/A[13] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/coef_a_160_30:eq_54_36/A[12] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/coef_a_160_30:eq_54_36/A[11] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/coef_a_160_30:eq_54_36/A[10] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/coef_a_160_30:eq_54_36/A[9] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/coef_a_160_30:eq_54_36/A[8] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/coef_a_160_30:eq_54_36/A[7] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/coef_a_160_30:eq_54_36/A[6] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/coef_a_160_30:eq_54_36/A[5] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/coef_a_160_30:eq_54_36/A[4] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/coef_a_160_30:eq_54_36/A[3] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/coef_a_160_30:eq_54_36/A[2] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/coef_a_160_30:eq_54_36/A[1] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/coef_a_160_30:eq_54_36/B 	 (fanout : 1)
+hpin:tr_softmax/u_ln/coef_a_160_30:mux_54_36/in_0[4] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/coef_a_160_30:mux_54_36/in_0[3] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/coef_a_160_30:mux_54_36/in_0[2] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/coef_a_160_30:mux_54_36/in_0[1] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/coef_a_160_30:mux_54_36/in_0[0] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/coef_a_160_30:mux_54_36/in_1[4] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/coef_a_160_30:mux_54_36/in_1[3] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/coef_a_160_30:mux_54_36/in_1[2] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/coef_a_160_30:mux_54_36/in_1[1] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/coef_a_160_30:mux_54_36/in_1[0] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/coef_b_161_30:mux_66_36/in_0[1] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/coef_b_161_30:mux_66_36/in_0[0] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/coef_b_161_30:mux_66_36/in_1[1] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/coef_b_161_30:mux_66_36/in_1[0] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_156_31/in_1[5] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_156_31/in_1[4] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_156_31/in_1[3] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_156_31/in_1[2] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_156_31/in_1[1] 	 (fanout : 1)
+hpin:tr_softmax/u_ln/mux_156_31/in_1[0] 	 (fanout : 1)
 hpin:tr_softmax/gen_exp[1].u_exp/u_round/eq_54_44/B 	 (fanout : 1)
 hpin:tr_softmax/gen_exp[1].u_exp/u_round/add_51_61/B 	 (fanout : 2)
 hpin:tr_softmax/gen_exp[2].u_exp/u_round/eq_54_44/B 	 (fanout : 1)

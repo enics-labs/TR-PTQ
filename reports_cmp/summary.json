@@ -1,44 +1,44 @@
 {
  "gated_io10": {
   "tr_rmsnorm": {
-   "area": 17440.56,
-   "cells": 4718,
-   "flops": 567,
+   "area": 17099.64,
+   "cells": 4564,
+   "flops": 559,
    "slack": {
-    "reg2reg": "0.1",
-    "in2reg": "0.6",
-    "reg2out": "2046.8"
+    "reg2reg": "0.4",
+    "in2reg": "0.8",
+    "reg2out": "2081.9"
    },
    "violating": 0,
    "gating": {
-    "gated": 542,
+    "gated": 534,
     "ungated": 15,
-    "frac": 0.9730700179533214
+    "frac": 0.9726775956284153
    },
-   "vectorless_total": 0.0019842,
+   "vectorless_total": 0.00196082,
    "act": {
     "": {
-     "total": 0.000306393,
-     "leak": 1.40391e-05,
-     "internal": 0.000165355,
-     "switching": 0.000126999,
-     "reg_internal": 9.64718e-05,
+     "total": 0.000304476,
+     "leak": 1.36525e-05,
+     "internal": 0.000164289,
+     "switching": 0.000126535,
+     "reg_internal": 9.44951e-05,
      "cycles": 20,
-     "energy_pj": 20.221938,
+     "energy_pj": 20.095415999999997,
      "window_ns": 72.6,
-     "energy_window_pj": 22.2441318,
-     "flop_annot": 99.64
+     "energy_window_pj": 22.104957599999995,
+     "flop_annot": 99.81
     }
    }
   },
   "ibert_rmsnorm": {
-   "area": 11317.68,
-   "cells": 2605,
+   "area": 11307.96,
+   "cells": 2594,
    "flops": 691,
    "slack": {
-    "reg2reg": "1.5",
+    "reg2reg": "0.0",
     "in2reg": "0.1",
-    "reg2out": "2446.3"
+    "reg2out": "2438.4"
    },
    "violating": 0,
    "gating": {
@@ -46,18 +46,18 @@
     "ungated": 19,
     "frac": 0.9716840536512668
    },
-   "vectorless_total": 0.00137919,
+   "vectorless_total": 0.00136897,
    "act": {
     "": {
-     "total": 0.000283718,
-     "leak": 8.17948e-06,
-     "internal": 0.000201837,
-     "switching": 7.37018e-05,
-     "reg_internal": 0.000167667,
+     "total": 0.000281142,
+     "leak": 8.19498e-06,
+     "internal": 0.000200769,
+     "switching": 7.21778e-05,
+     "reg_internal": 0.00016732,
      "cycles": 369,
-     "energy_pj": 345.4834086,
+     "energy_pj": 342.3466134,
      "window_ns": 1224.3,
-     "energy_window_pj": 347.35594740000005,
+     "energy_window_pj": 344.2021506,
      "flop_annot": 99.85
     }
    }
@@ -187,13 +187,13 @@
    }
   },
   "tr_nonlinear_vpu": {
-   "area": 48920.04,
-   "cells": 13342,
+   "area": 48052.8,
+   "cells": 13103,
    "flops": 1347,
    "slack": {
     "reg2reg": "0.0",
     "in2reg": "0.0",
-    "reg2out": "0.4"
+    "reg2out": "0.7"
    },
    "violating": 0,
    "gating": {
@@ -201,87 +201,87 @@
     "ungated": 23,
     "frac": 0.9827456864216054
    },
-   "vectorless_total": 0.0123138,
+   "vectorless_total": 0.0120536,
    "act": {
     "rmsnorm": {
-     "total": 0.00109855,
-     "leak": 4.22435e-05,
-     "internal": 0.000568759,
-     "switching": 0.000487548,
-     "reg_internal": 0.000258252,
+     "total": 0.001096,
+     "leak": 4.14171e-05,
+     "internal": 0.000568174,
+     "switching": 0.00048641,
+     "reg_internal": 0.000257703,
      "cycles": 15,
-     "energy_pj": 54.378225,
+     "energy_pj": 54.252,
      "window_ns": 60.4,
-     "energy_window_pj": 66.35242,
-     "flop_annot": 98.94
+     "energy_window_pj": 66.19839999999999,
+     "flop_annot": 99.02
     },
     "swiglu": {
-     "total": 0.00173076,
-     "leak": 4.34584e-05,
-     "internal": 0.00085875,
-     "switching": 0.000828555,
-     "reg_internal": 0.000346352,
+     "total": 0.00170431,
+     "leak": 4.23521e-05,
+     "internal": 0.000847603,
+     "switching": 0.000814355,
+     "reg_internal": 0.000344825,
      "cycles": 21,
-     "energy_pj": 119.941668,
+     "energy_pj": 118.10868299999998,
      "window_ns": 86.8,
-     "energy_window_pj": 150.22996799999999,
-     "flop_annot": 98.94
+     "energy_window_pj": 147.93410799999998,
+     "flop_annot": 99.02
     },
     "softmax": {
-     "total": 0.000886336,
-     "leak": 4.18148e-05,
-     "internal": 0.00045803,
-     "switching": 0.000386491,
-     "reg_internal": 0.000228203,
+     "total": 0.000883242,
+     "leak": 4.09535e-05,
+     "internal": 0.000456502,
+     "switching": 0.000385787,
+     "reg_internal": 0.000227133,
      "cycles": 25,
-     "energy_pj": 73.12272,
+     "energy_pj": 72.86746500000001,
      "window_ns": 103.3,
-     "energy_window_pj": 91.55850880000001,
-     "flop_annot": 98.94
+     "energy_window_pj": 91.2388986,
+     "flop_annot": 99.02
     }
    }
   }
  },
  "nogate_io10": {
   "tr_rmsnorm": {
-   "area": 18912.6,
-   "cells": 4798,
-   "flops": 557,
+   "area": 18924.12,
+   "cells": 4878,
+   "flops": 549,
    "slack": {
-    "reg2reg": "0.0",
-    "in2reg": "0.7",
-    "reg2out": "2094.6"
+    "reg2reg": "0.3",
+    "in2reg": "0.8",
+    "reg2out": "2086.8"
    },
    "violating": 0,
    "gating": {
     "gated": 0,
-    "ungated": 557,
+    "ungated": 549,
     "frac": 0.0
    },
-   "vectorless_total": 0.00477891,
+   "vectorless_total": 0.00469345,
    "act": {
     "": {
-     "total": 0.00132764,
-     "leak": 1.47433e-05,
-     "internal": 0.0010513,
-     "switching": 0.000261602,
-     "reg_internal": 0.000981492,
+     "total": 0.00132437,
+     "leak": 1.50696e-05,
+     "internal": 0.00104412,
+     "switching": 0.000265185,
+     "reg_internal": 0.000967254,
      "cycles": 20,
-     "energy_pj": 87.62424,
+     "energy_pj": 87.40842,
      "window_ns": 72.6,
-     "energy_window_pj": 96.386664,
-     "flop_annot": 99.82
+     "energy_window_pj": 96.149262,
+     "flop_annot": 99.81
     }
    }
   },
   "ibert_rmsnorm": {
-   "area": 12674.16,
-   "cells": 2824,
+   "area": 12623.04,
+   "cells": 2800,
    "flops": 671,
    "slack": {
-    "reg2reg": "1.1",
-    "in2reg": "1.4",
-    "reg2out": "2421.2"
+    "reg2reg": "0.1",
+    "in2reg": "1.7",
+    "reg2out": "2414.0"
    },
    "violating": 0,
    "gating": {
@@ -289,18 +289,18 @@
     "ungated": 671,
     "frac": 0.0
    },
-   "vectorless_total": 0.00289459,
+   "vectorless_total": 0.00291951,
    "act": {
     "": {
-     "total": 0.00138203,
-     "leak": 8.88757e-06,
-     "internal": 0.00118967,
-     "switching": 0.000183469,
-     "reg_internal": 0.00117011,
+     "total": 0.00138165,
+     "leak": 8.8713e-06,
+     "internal": 0.00118988,
+     "switching": 0.000182897,
+     "reg_internal": 0.00117066,
      "cycles": 369,
-     "energy_pj": 1682.897931,
+     "energy_pj": 1682.435205,
      "window_ns": 1224.3,
-     "energy_window_pj": 1692.0193290000002,
+     "energy_window_pj": 1691.554095,
      "flop_annot": 100.0
     }
    }
@@ -430,13 +430,13 @@
    }
   },
   "tr_nonlinear_vpu": {
-   "area": 52151.4,
-   "cells": 13894,
+   "area": 51938.28,
+   "cells": 13873,
    "flops": 1333,
    "slack": {
     "reg2reg": "0.0",
-    "in2reg": "0.0",
-    "reg2out": "0.1"
+    "in2reg": "0.1",
+    "reg2out": "2.8"
    },
    "violating": 0,
    "gating": {
@@ -444,56 +444,56 @@
     "ungated": 1333,
     "frac": 0.0
    },
-   "vectorless_total": 0.0129948,
+   "vectorless_total": 0.0130161,
    "act": {
     "rmsnorm": {
-     "total": 0.00319285,
-     "leak": 4.36583e-05,
-     "internal": 0.00262741,
-     "switching": 0.000521785,
-     "reg_internal": 0.00232902,
+     "total": 0.00320156,
+     "leak": 4.35518e-05,
+     "internal": 0.00263301,
+     "switching": 0.000524995,
+     "reg_internal": 0.0023272,
      "cycles": 15,
-     "energy_pj": 158.04607500000003,
+     "energy_pj": 158.47722000000002,
      "window_ns": 60.4,
-     "energy_window_pj": 192.84814000000003,
-     "flop_annot": 99.84
+     "energy_window_pj": 193.37422399999997,
+     "flop_annot": 99.92
     },
     "swiglu": {
-     "total": 0.0039091,
-     "leak": 4.46853e-05,
-     "internal": 0.00292822,
-     "switching": 0.000936189,
-     "reg_internal": 0.0023755,
+     "total": 0.00389739,
+     "leak": 4.45733e-05,
+     "internal": 0.00291848,
+     "switching": 0.000934328,
+     "reg_internal": 0.00237239,
      "cycles": 21,
-     "energy_pj": 270.9006300000001,
+     "energy_pj": 270.089127,
      "window_ns": 86.8,
-     "energy_window_pj": 339.30988,
-     "flop_annot": 99.84
+     "energy_window_pj": 338.293452,
+     "flop_annot": 99.92
     },
     "softmax": {
-     "total": 0.00308122,
-     "leak": 4.3369e-05,
-     "internal": 0.00258601,
-     "switching": 0.000451832,
-     "reg_internal": 0.00235009,
+     "total": 0.00308297,
+     "leak": 4.3201e-05,
+     "internal": 0.00258654,
+     "switching": 0.000453229,
+     "reg_internal": 0.00234772,
      "cycles": 25,
-     "energy_pj": 254.20065000000002,
+     "energy_pj": 254.34502500000002,
      "window_ns": 103.3,
-     "energy_window_pj": 318.29002600000007,
-     "flop_annot": 99.84
+     "energy_window_pj": 318.470801,
+     "flop_annot": 99.92
     }
    }
   }
  },
  "gated_io30": {
   "tr_nonlinear_vpu": {
-   "area": 55326.24,
-   "cells": 13940,
+   "area": 53967.96,
+   "cells": 13777,
    "flops": 1347,
    "slack": {
     "reg2reg": "0.0",
     "in2reg": "0.0",
-    "reg2out": "0.0"
+    "reg2out": "0.1"
    },
    "violating": 0,
    "gating": {
@@ -501,43 +501,43 @@
     "ungated": 23,
     "frac": 0.9827456864216054
    },
-   "vectorless_total": 0.0136514,
+   "vectorless_total": 0.0132442,
    "act": {
     "rmsnorm": {
-     "total": 0.00109705,
-     "leak": 5.4516e-05,
-     "internal": 0.000566284,
-     "switching": 0.000476246,
-     "reg_internal": 0.000263195,
+     "total": 0.00110043,
+     "leak": 5.19568e-05,
+     "internal": 0.000567516,
+     "switching": 0.000480953,
+     "reg_internal": 0.000261993,
      "cycles": 15,
-     "energy_pj": 54.30397500000001,
+     "energy_pj": 54.471285,
      "window_ns": 60.4,
-     "energy_window_pj": 66.26182,
-     "flop_annot": 98.94
+     "energy_window_pj": 66.46597200000001,
+     "flop_annot": 99.02
     },
     "swiglu": {
-     "total": 0.00192069,
-     "leak": 5.5661e-05,
-     "internal": 0.000953652,
-     "switching": 0.000911378,
-     "reg_internal": 0.000354602,
+     "total": 0.00186922,
+     "leak": 5.30176e-05,
+     "internal": 0.000935055,
+     "switching": 0.000881152,
+     "reg_internal": 0.000357648,
      "cycles": 21,
-     "energy_pj": 133.10381700000002,
+     "energy_pj": 129.536946,
      "window_ns": 86.8,
-     "energy_window_pj": 166.71589200000003,
-     "flop_annot": 98.94
+     "energy_window_pj": 162.248296,
+     "flop_annot": 99.02
     },
     "softmax": {
-     "total": 0.000914339,
-     "leak": 5.40871e-05,
-     "internal": 0.000468018,
-     "switching": 0.000392233,
-     "reg_internal": 0.000236339,
+     "total": 0.000911187,
+     "leak": 5.14734e-05,
+     "internal": 0.000467497,
+     "switching": 0.000392217,
+     "reg_internal": 0.000235013,
      "cycles": 25,
-     "energy_pj": 75.4329675,
+     "energy_pj": 75.17292750000001,
      "window_ns": 103.3,
-     "energy_window_pj": 94.45121870000001,
-     "flop_annot": 98.94
+     "energy_window_pj": 94.12561710000001,
+     "flop_annot": 99.02
     }
    }
   }

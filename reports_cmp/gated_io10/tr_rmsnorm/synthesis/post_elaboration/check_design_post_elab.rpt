@@ -39,42 +39,50 @@ pin:tr_rmsnorm/add_89_26_I8/g198/z
 pin:tr_rmsnorm/add_89_26_I8/g200/z
 pin:tr_rmsnorm/add_89_26_I8/g203/z
 pin:tr_rmsnorm/add_89_26_I8/g205/z
+pin:tr_rmsnorm/add_89_26_I8/g208/z
 pin:tr_rmsnorm/add_89_26_I7/g4/z
 pin:tr_rmsnorm/add_89_26_I7/g198/z
 pin:tr_rmsnorm/add_89_26_I7/g200/z
 pin:tr_rmsnorm/add_89_26_I7/g203/z
 pin:tr_rmsnorm/add_89_26_I7/g205/z
+pin:tr_rmsnorm/add_89_26_I7/g208/z
 pin:tr_rmsnorm/add_89_26_I6/g4/z
 pin:tr_rmsnorm/add_89_26_I6/g198/z
 pin:tr_rmsnorm/add_89_26_I6/g200/z
 pin:tr_rmsnorm/add_89_26_I6/g203/z
 pin:tr_rmsnorm/add_89_26_I6/g205/z
+pin:tr_rmsnorm/add_89_26_I6/g208/z
 pin:tr_rmsnorm/add_89_26_I5/g4/z
 pin:tr_rmsnorm/add_89_26_I5/g198/z
 pin:tr_rmsnorm/add_89_26_I5/g200/z
 pin:tr_rmsnorm/add_89_26_I5/g203/z
 pin:tr_rmsnorm/add_89_26_I5/g205/z
+pin:tr_rmsnorm/add_89_26_I5/g208/z
 pin:tr_rmsnorm/add_89_26_I4/g4/z
 pin:tr_rmsnorm/add_89_26_I4/g198/z
 pin:tr_rmsnorm/add_89_26_I4/g200/z
 pin:tr_rmsnorm/add_89_26_I4/g203/z
 pin:tr_rmsnorm/add_89_26_I4/g205/z
+pin:tr_rmsnorm/add_89_26_I4/g208/z
 pin:tr_rmsnorm/add_89_26_I3/g4/z
 pin:tr_rmsnorm/add_89_26_I3/g198/z
 pin:tr_rmsnorm/add_89_26_I3/g200/z
 pin:tr_rmsnorm/add_89_26_I3/g203/z
 pin:tr_rmsnorm/add_89_26_I3/g205/z
+pin:tr_rmsnorm/add_89_26_I3/g208/z
 pin:tr_rmsnorm/add_89_26_I2/g4/z
 pin:tr_rmsnorm/add_89_26_I2/g198/z
 pin:tr_rmsnorm/add_89_26_I2/g200/z
 pin:tr_rmsnorm/add_89_26_I2/g203/z
 pin:tr_rmsnorm/add_89_26_I2/g205/z
+pin:tr_rmsnorm/add_89_26_I2/g208/z
 pin:tr_rmsnorm/add_89_26_I1/g4/z
 pin:tr_rmsnorm/add_89_26_I1/g198/z
 pin:tr_rmsnorm/add_89_26_I1/g200/z
 pin:tr_rmsnorm/add_89_26_I1/g203/z
 pin:tr_rmsnorm/add_89_26_I1/g205/z
-Total number of unloaded combinational elements in design 'tr_rmsnorm' : 50
+pin:tr_rmsnorm/add_89_26_I1/g208/z
+Total number of unloaded combinational elements in design 'tr_rmsnorm' : 58
 
  Assigns
  ------- 
@@ -167,7 +175,8 @@ hpin:tr_rmsnorm/lt_90_53_I8/B[3] 	 (fanout : 1)
 hpin:tr_rmsnorm/lt_90_53_I8/B[2] 	 (fanout : 1)
 hpin:tr_rmsnorm/lt_90_53_I8/B[1] 	 (fanout : 1)
 hpin:tr_rmsnorm/lt_90_53_I8/B[0] 	 (fanout : 1)
-hpin:tr_rmsnorm/add_89_26_I8/B[5] 	 (fanout : 31)
+hpin:tr_rmsnorm/add_89_26_I8/B[6] 	 (fanout : 29)
+hpin:tr_rmsnorm/add_89_26_I8/B[5] 	 (fanout : 2)
 hpin:tr_rmsnorm/add_89_26_I8/B[4] 	 (fanout : 2)
 hpin:tr_rmsnorm/add_89_26_I8/B[3] 	 (fanout : 2)
 hpin:tr_rmsnorm/add_89_26_I8/B[2] 	 (fanout : 2)
@@ -197,7 +206,8 @@ hpin:tr_rmsnorm/lt_90_53_I7/B[3] 	 (fanout : 1)
 hpin:tr_rmsnorm/lt_90_53_I7/B[2] 	 (fanout : 1)
 hpin:tr_rmsnorm/lt_90_53_I7/B[1] 	 (fanout : 1)
 hpin:tr_rmsnorm/lt_90_53_I7/B[0] 	 (fanout : 1)
-hpin:tr_rmsnorm/add_89_26_I7/B[5] 	 (fanout : 31)
+hpin:tr_rmsnorm/add_89_26_I7/B[6] 	 (fanout : 29)
+hpin:tr_rmsnorm/add_89_26_I7/B[5] 	 (fanout : 2)
 hpin:tr_rmsnorm/add_89_26_I7/B[4] 	 (fanout : 2)
 hpin:tr_rmsnorm/add_89_26_I7/B[3] 	 (fanout : 2)
 hpin:tr_rmsnorm/add_89_26_I7/B[2] 	 (fanout : 2)
@@ -227,7 +237,8 @@ hpin:tr_rmsnorm/lt_90_53_I6/B[3] 	 (fanout : 1)
 hpin:tr_rmsnorm/lt_90_53_I6/B[2] 	 (fanout : 1)
 hpin:tr_rmsnorm/lt_90_53_I6/B[1] 	 (fanout : 1)
 hpin:tr_rmsnorm/lt_90_53_I6/B[0] 	 (fanout : 1)
-hpin:tr_rmsnorm/add_89_26_I6/B[5] 	 (fanout : 31)
+hpin:tr_rmsnorm/add_89_26_I6/B[6] 	 (fanout : 29)
+hpin:tr_rmsnorm/add_89_26_I6/B[5] 	 (fanout : 2)
 hpin:tr_rmsnorm/add_89_26_I6/B[4] 	 (fanout : 2)
 hpin:tr_rmsnorm/add_89_26_I6/B[3] 	 (fanout : 2)
 hpin:tr_rmsnorm/add_89_26_I6/B[2] 	 (fanout : 2)
@@ -257,7 +268,8 @@ hpin:tr_rmsnorm/lt_90_53_I5/B[3] 	 (fanout : 1)
 hpin:tr_rmsnorm/lt_90_53_I5/B[2] 	 (fanout : 1)
 hpin:tr_rmsnorm/lt_90_53_I5/B[1] 	 (fanout : 1)
 hpin:tr_rmsnorm/lt_90_53_I5/B[0] 	 (fanout : 1)
-hpin:tr_rmsnorm/add_89_26_I5/B[5] 	 (fanout : 31)
+hpin:tr_rmsnorm/add_89_26_I5/B[6] 	 (fanout : 29)
+hpin:tr_rmsnorm/add_89_26_I5/B[5] 	 (fanout : 2)
 hpin:tr_rmsnorm/add_89_26_I5/B[4] 	 (fanout : 2)
 hpin:tr_rmsnorm/add_89_26_I5/B[3] 	 (fanout : 2)
 hpin:tr_rmsnorm/add_89_26_I5/B[2] 	 (fanout : 2)
@@ -287,7 +299,8 @@ hpin:tr_rmsnorm/lt_90_53_I4/B[3] 	 (fanout : 1)
 hpin:tr_rmsnorm/lt_90_53_I4/B[2] 	 (fanout : 1)
 hpin:tr_rmsnorm/lt_90_53_I4/B[1] 	 (fanout : 1)
 hpin:tr_rmsnorm/lt_90_53_I4/B[0] 	 (fanout : 1)
-hpin:tr_rmsnorm/add_89_26_I4/B[5] 	 (fanout : 31)
+hpin:tr_rmsnorm/add_89_26_I4/B[6] 	 (fanout : 29)
+hpin:tr_rmsnorm/add_89_26_I4/B[5] 	 (fanout : 2)
 hpin:tr_rmsnorm/add_89_26_I4/B[4] 	 (fanout : 2)
 hpin:tr_rmsnorm/add_89_26_I4/B[3] 	 (fanout : 2)
 hpin:tr_rmsnorm/add_89_26_I4/B[2] 	 (fanout : 2)
@@ -317,7 +330,8 @@ hpin:tr_rmsnorm/lt_90_53_I3/B[3] 	 (fanout : 1)
 hpin:tr_rmsnorm/lt_90_53_I3/B[2] 	 (fanout : 1)
 hpin:tr_rmsnorm/lt_90_53_I3/B[1] 	 (fanout : 1)
 hpin:tr_rmsnorm/lt_90_53_I3/B[0] 	 (fanout : 1)
-hpin:tr_rmsnorm/add_89_26_I3/B[5] 	 (fanout : 31)
+hpin:tr_rmsnorm/add_89_26_I3/B[6] 	 (fanout : 29)
+hpin:tr_rmsnorm/add_89_26_I3/B[5] 	 (fanout : 2)
 hpin:tr_rmsnorm/add_89_26_I3/B[4] 	 (fanout : 2)
 hpin:tr_rmsnorm/add_89_26_I3/B[3] 	 (fanout : 2)
 hpin:tr_rmsnorm/add_89_26_I3/B[2] 	 (fanout : 2)
@@ -347,7 +361,8 @@ hpin:tr_rmsnorm/lt_90_53_I2/B[3] 	 (fanout : 1)
 hpin:tr_rmsnorm/lt_90_53_I2/B[2] 	 (fanout : 1)
 hpin:tr_rmsnorm/lt_90_53_I2/B[1] 	 (fanout : 1)
 hpin:tr_rmsnorm/lt_90_53_I2/B[0] 	 (fanout : 1)
-hpin:tr_rmsnorm/add_89_26_I2/B[5] 	 (fanout : 31)
+hpin:tr_rmsnorm/add_89_26_I2/B[6] 	 (fanout : 29)
+hpin:tr_rmsnorm/add_89_26_I2/B[5] 	 (fanout : 2)
 hpin:tr_rmsnorm/add_89_26_I2/B[4] 	 (fanout : 2)
 hpin:tr_rmsnorm/add_89_26_I2/B[3] 	 (fanout : 2)
 hpin:tr_rmsnorm/add_89_26_I2/B[2] 	 (fanout : 2)
@@ -377,7 +392,8 @@ hpin:tr_rmsnorm/lt_90_53_I1/B[3] 	 (fanout : 1)
 hpin:tr_rmsnorm/lt_90_53_I1/B[2] 	 (fanout : 1)
 hpin:tr_rmsnorm/lt_90_53_I1/B[1] 	 (fanout : 1)
 hpin:tr_rmsnorm/lt_90_53_I1/B[0] 	 (fanout : 1)
-hpin:tr_rmsnorm/add_89_26_I1/B[5] 	 (fanout : 31)
+hpin:tr_rmsnorm/add_89_26_I1/B[6] 	 (fanout : 29)
+hpin:tr_rmsnorm/add_89_26_I1/B[5] 	 (fanout : 2)
 hpin:tr_rmsnorm/add_89_26_I1/B[4] 	 (fanout : 2)
 hpin:tr_rmsnorm/add_89_26_I1/B[3] 	 (fanout : 2)
 hpin:tr_rmsnorm/add_89_26_I1/B[2] 	 (fanout : 2)
@@ -1515,7 +1531,7 @@ hpin:tr_rmsnorm/u_rsq/lookup_109_16:mux_lookup_31_15/in_63[3] 	 (fanout : 1)
 hpin:tr_rmsnorm/u_rsq/lookup_109_16:mux_lookup_31_15/in_63[2] 	 (fanout : 1)
 hpin:tr_rmsnorm/u_rsq/lookup_109_16:mux_lookup_31_15/in_63[1] 	 (fanout : 1)
 hpin:tr_rmsnorm/u_rsq/lookup_109_16:mux_lookup_31_15/in_63[0] 	 (fanout : 1)
-Total number of constant hierarchical pins in design 'tr_rmsnorm' : 1373
+Total number of constant hierarchical pins in design 'tr_rmsnorm' : 1381
 
 design 'tr_rmsnorm' has the following constant port(s)
 port:tr_rmsnorm/scale_o[15]
@@ -1556,7 +1572,7 @@ Unresolved References                        0
 Empty Modules                                0
 Unloaded Port(s)                             0
 Unloaded Sequential Pin(s)                   1
-Unloaded Combinational Pin(s)               50
+Unloaded Combinational Pin(s)               58
 Assigns                                     32
 Undriven Port(s)                             0
 Undriven Leaf Pin(s)                         0
@@ -1567,7 +1583,7 @@ Multidriven hierarchical Pin(s)              0
 Multidriven unloaded net(s)                  0
 Constant Port(s)                             4
 Constant Leaf Pin(s)                         0
-Constant hierarchical Pin(s)              1373
+Constant hierarchical Pin(s)              1381
 Preserved leaf instance(s)                   0
 Preserved hierarchical instance(s)           0
 Feedthrough Modules(s)                       0
