@@ -457,13 +457,14 @@ inline void rms_apply_tile(const int8_t x[8], uint32_t inv, int8_t out[8]) {
 // Production RMSNorm / SwiGLU flows (software spec: tools/models/vpu_ops.py, HW preset; docs/llama/accuracy-study.md):
 //   - RMSNorm: reciprocal-sqrt unit instead of mean -> ln -> exp (rsq_inv_mk), fed by the ln lane's rounded mean: leading-one finder, 2 x 32-entry table of
 //     12-bit entries (index = parity of k, top 5 mantissa bits of mk), one shift with one half-up rounding, cap 4095; apply shift
-//     FRAC_W+INV_BITS+4-7 = 5 and a signed 12-bit output (Q5.7)
+//     FRAC_W+INV_BITS+4-6 = 6 and a signed 12-bit output (Q6.6)
 //   - SwiGLU: 64-entry symmetric sigma table on |x| >> 1 (negative codes: 64 - entry; entries 0..64, 7 bits), gain chosen for the
 //     12-bit range (largest |prod| <= 2047), signed 12-bit output
 // ----------------------------------------------------------------------------
 static const int RSQ_T = 5;                    // mantissa index bits
 static const int RSQ_W = 12;                   // entry width: one integer bit, RSQ_W-1 fractional bits
-static const int RMS2_OUT_FRAC = 7;
+static const int RMS2_OUT_FRAC = 6;            // production RMSNorm output code: Q6.6 (range +-32 x rms)
+static const int IBERT_RMSNORM_OUT_FRAC = 6;   // divider-based baseline (rtl_baseline/ibert_baseline): Q6.6, the same code as the production RMSNorm
 static const uint16_t RSQ_TAB[2][1 << RSQ_T] = {   // [k & 1][i] = round(2^(RSQ_W-1) * c / sqrt(1 + (i + 1/2) / 2^RSQ_T)), c = 1 | sqrt(2)
     {2032, 2002, 1972, 1944, 1918, 1892, 1867, 1843, 1820, 1798, 1777, 1757, 1737, 1718, 1699, 1681, 1664, 1647, 1630, 1614, 1599, 1584, 1569, 1555, 1541, 1528, 1515, 1502, 1489, 1477, 1465, 1454},
     {2874, 2831, 2789, 2750, 2712, 2675, 2641, 2607, 2574, 2543, 2513, 2484, 2456, 2429, 2403, 2377, 2353, 2329, 2306, 2283, 2261, 2240, 2219, 2199, 2180, 2161, 2142, 2124, 2106, 2089, 2072, 2056},
@@ -500,10 +501,10 @@ inline void rms2_apply_tile(const int8_t x[8], uint32_t inv, int16_t out[8]) {
 
 // ----------------------------------------------------------------------------
 // Divider-based RMSNorm (rtl_baseline/ibert_baseline/ibert_rmsnorm.sv): I-BERT Newton integer square root of the mean of squares and one integer
-// division per element, with a 12-bit Q5.7 output. Same phases as the standalone tr_rmsnorm (accumulate / scale / apply).
+// division per element, with a 12-bit Q6.6 output. Same phases as the standalone tr_rmsnorm (accumulate / scale / apply).
 //   msq = round(S * 4^F / N)                       mean of squares with 2F extra fractional bits (<= 2^24 for F = 5)
 //   R   = isqrt(msq)                               Newton: x0 = 2^ceil(bits/2), x <- (x + msq / x) >> 1 until it stops falling = rms code * 2^F
-//   y   = sign(x) * min(round_half_up(|x| * 2^(7+F) / R), 2047 | 2048)
+//   y   = sign(x) * min(round_half_up(|x| * 2^(6+F) / R), 2047 | 2048)
 // ----------------------------------------------------------------------------
 static const int IBERT_RMSNORM_F = 5;
 
@@ -526,7 +527,7 @@ inline uint32_t ibert_rmsnorm_scale(int32_t S, int log2n) {
 inline int16_t ibert_rmsnorm_apply_one(int8_t x, uint32_t R) {
     const uint32_t a = x < 0 ? (uint32_t)(-(int)x) : (uint32_t)x;
     const uint32_t d = R ? R : 1;
-    uint32_t q = ((a << (RMS2_OUT_FRAC + IBERT_RMSNORM_F)) + (R >> 1)) / d;
+    uint32_t q = ((a << (IBERT_RMSNORM_OUT_FRAC + IBERT_RMSNORM_F)) + (R >> 1)) / d;
     if (x < 0) { if (q > 2048) q = 2048; return (int16_t)(-(int)q); }
     if (q > 2047) q = 2047;
     return (int16_t)q;

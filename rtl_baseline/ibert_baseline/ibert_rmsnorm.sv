@@ -3,13 +3,13 @@
 /*
  * @module   ibert_rmsnorm
  * @brief    Standalone divider-based RMSNorm: I-BERT Newton integer square root plus one integer division per element, at the output
- *           precision of tr_rmsnorm (12-bit Q5.7 codes). Area / energy reference for the reciprocal-sqrt unit.
+ *           precision of tr_rmsnorm (12-bit Q6.6 codes). Area / energy reference for the reciprocal-sqrt unit.
  * @details  Same command interface and sum-of-squares front end as tr_rmsnorm (rmsnorm_sumsq), so the two differ only in how 1/rms is formed
  *           and applied. Golden: tr_math_model.hpp ibert_rmsnorm_scale / ibert_rmsnorm_apply_tile.
  *             cmd 0/1  ACC_FIRST / ACC   S (+)= sum x^2 of the tile
  *             cmd 2    SCALE             msq = round(S * 4^F / N);  R = isqrt(msq) by Newton iteration (I-BERT Algorithm 4),
  *                                        each x <- (x + msq / x) >> 1 through the shared divider, until x stops decreasing
- *             cmd 3    APPLY             per lane (sequential, one divider): y = sign * min(round(|x| * 2^(7+F) / R), 2047 | 2048)
+ *             cmd 3    APPLY             per lane (sequential, one divider): y = sign * min(round(|x| * 2^(6+F) / R), 2047 | 2048)
  *           R = rms code * 2^F (F = 5), reported on scale_o. The divider is the conventional restoring divider of the ISCAS I-BERT
  *           baselines (ibert_divider.sv), WIDTH cycles per division; the structure is one iterative divider with sequential lanes. All-zero input gives R = 0 and zero output.
  */
@@ -19,7 +19,7 @@ module ibert_rmsnorm #(
     parameter int OUT_W = 12,
     parameter int ACC_W = 32,
     parameter int F     = 5,
-    parameter int OUT_FRAC = 7
+    parameter int OUT_FRAC = 6
 )(
     input  logic                  clk,
     input  logic                  rst_n,

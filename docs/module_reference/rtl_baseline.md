@@ -24,7 +24,7 @@ Host-sequenced like the controller of the production flow:
 | 0 | ACC_FIRST | S = sum of x² over the 8-lane tile |
 | 1 | ACC | S += sum of x² over the tile |
 | 2 | SCALE | scale register from S (`log2n` selects N, stable from ACC to SCALE) |
-| 3 | APPLY | y = round(x · scale) per lane, 12-bit signed Q5.7 |
+| 3 | APPLY | y = round(x · scale) per lane, 12-bit signed Q6.6 |
 
 `out_valid` pulses when a command has completed; `scale_o` is the scale register (`inv` for `tr_rmsnorm`, `R` for `ibert_rmsnorm`); `y_out` is valid after APPLY.
 
@@ -34,7 +34,7 @@ Host-sequenced like the controller of the production flow:
 
 ### `ibert_rmsnorm`
 
-[rtl_baseline/ibert_baseline/ibert_rmsnorm.sv](../../rtl_baseline/ibert_baseline/ibert_rmsnorm.sv), with the restoring divider [ibert_divider.sv](../../rtl_baseline/ibert_baseline/ibert_divider.sv) (WIDTH cycles per division). SCALE: `msq = round(S · 4^F / N)` with F = 5, `R = isqrt(msq)` by Newton iteration (I-BERT Algorithm 4, `x ← (x + msq / x) >> 1` through the divider until x stops decreasing); R is the rms code × 2^F. APPLY: one division per lane through the same divider, `y = sign · min(round(|x| · 2^(7+F) / R), 2047 | 2048)`, lanes sequential. All-zero input gives R = 0 and zero output. Golden: `ibert_rmsnorm_scale`, `ibert_rmsnorm_apply_tile` (C++ mode `ibert_rmsnorm`). Accuracy against exact RMSNorm on Llama-like rows: mean error 0.10 LSB of the Q5.7 output (0.59 LSB for `tr_rmsnorm`).
+[rtl_baseline/ibert_baseline/ibert_rmsnorm.sv](../../rtl_baseline/ibert_baseline/ibert_rmsnorm.sv), with the restoring divider [ibert_divider.sv](../../rtl_baseline/ibert_baseline/ibert_divider.sv) (WIDTH cycles per division). SCALE: `msq = round(S · 4^F / N)` with F = 5, `R = isqrt(msq)` by Newton iteration (I-BERT Algorithm 4, `x ← (x + msq / x) >> 1` through the divider until x stops decreasing); R is the rms code × 2^F. APPLY: one division per lane through the same divider, `y = sign · min(round(|x| · 2^(6+F) / R), 2047 | 2048)`, lanes sequential. All-zero input gives R = 0 and zero output. Golden: `ibert_rmsnorm_scale`, `ibert_rmsnorm_apply_tile` (C++ mode `ibert_rmsnorm`). Accuracy against exact RMSNorm on Llama-like rows: mean error 0.10 LSB of the Q5.7 output at the time of measurement (the codes are now Q6.6) (0.59 LSB for `tr_rmsnorm`).
 
 ### Verification
 

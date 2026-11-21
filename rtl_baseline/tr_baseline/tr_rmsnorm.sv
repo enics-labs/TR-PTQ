@@ -2,7 +2,7 @@
 
 /*
  * @module   tr_rmsnorm
- * @brief    Standalone RMSNorm with the Taylor-Region reciprocal-sqrt unit (12-bit Q5.7 output), without the shared VPU backbone.
+ * @brief    Standalone RMSNorm with the Taylor-Region reciprocal-sqrt unit (12-bit Q6.6 output), without the shared VPU backbone.
  * @details  The same arithmetic as the production flow of tr_soc_ctrl_int / tr_nonlinear_vpu (golden: tr_math_model.hpp rms_acc_tile,
  *           rms2_scale, rms2_apply_tile), built as a dedicated block so that its area can be compared with the standalone divider
  *           divider-based ibert_rmsnorm and with the share of the VPU that RMSNorm uses. Three host-sequenced commands, like the controller:
@@ -10,7 +10,7 @@
  *             cmd 1  ACC         S += sum x^2 of the tile
  *             cmd 2  SCALE       mk = round(S >> (log2n + 2)) saturated to 16 bits; leading-one finder and normalizer (msb, fk);
  *                                rsq_unit table + shift -> inv register   (4 cycles to done)
- *             cmd 3  APPLY       y = sat12((x * inv + 16) >> 5) per lane   (3 cycles to done)
+ *             cmd 3  APPLY       y = sat12((x * inv + 32) >> 6) per lane   (3 cycles to done)
  *           out_valid pulses when the command has completed. scale_o is the inv register. log2n must be stable from ACC to SCALE.
  *           The leading-one finder and normalizer here are the ones tr_ln_alu provides to rsq_unit in the VPU (msb = k, fk = the BITS
  *           mantissa bits below the leading one, truncated).
@@ -86,7 +86,7 @@ module tr_rmsnorm #(
     always_comb
         for (int i = 0; i < N; i++) begin
             logic signed [P_W-1:0] t;
-            t = (prod[i] + P_W'(16)) >>> 5;                           // round half up, FRAC_W + INV_BITS + 4 - 7 = 5
+            t = (prod[i] + P_W'(32)) >>> 6;                           // round half up, FRAC_W + INV_BITS + 4 - 6 = 6
             y_c[i] = (t > YMAX) ? OUT_W'(YMAX) : (t < YMIN) ? OUT_W'(YMIN) : OUT_W'(t);
         end
 
