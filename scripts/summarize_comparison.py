@@ -13,8 +13,21 @@ OPS = [('RMSNorm', 'rmsnorm', 'tr_rmsnorm', 'ibert_rmsnorm'), ('SwiGLU', 'swiglu
        ('Softmax', 'softmax', 'tr_softmax', 'ibert_softmax')]
 DEDICATED = ['tr_rmsnorm', 'ibert_rmsnorm', 'tr_swiglu', 'ibert_swiglu', 'tr_softmax', 'ibert_softmax']
 VPU = 'tr_nonlinear_vpu'
-CTRL_AREA = 4335.12            # u_ctrl of the tr_soc_top_int synthesis of d92ec11 (not re-synthesized here)
-U_VPU_SOC = 46125.72           # u_vpu of the same run (in-SoC reference)
+def _soc_area(inst, default):
+    """Cell area of a top-level instance of tr_soc_top_int from this clone's last top-level run (reports/, written by run_soc_top.sh)."""
+    rpt = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'reports', 'tr_soc_top_int', 'synthesis', 'post_opt', 'report_area.rpt')
+    try:
+        for line in open(rpt):
+            f = line.split()
+            if len(f) >= 4 and f[0] == inst:
+                return float(f[3])
+    except OSError:
+        pass
+    return default
+
+
+CTRL_AREA = _soc_area('u_ctrl', 4335.12)    # u_ctrl of the last tr_soc_top_int run (fallback: d92ec11)
+U_VPU_SOC = _soc_area('u_vpu', 46125.72)    # u_vpu of the same run (in-SoC reference)
 TAGS_ORDER = ['gated_io10', 'nogate_io10', 'gated_io30']
 TAG_TEXT = {'gated_io10': 'clock gating on, boundary delay 10% of the period (main configuration)',
             'nogate_io10': 'clock gating off, boundary delay 10% (diagnostic: sharing effect without gating)',

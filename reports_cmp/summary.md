@@ -32,12 +32,12 @@ Per operator (ratios of the table above):
 | SwiGLU | 0.95x | 13.7x | 7.9x | | 1.8x | 0.22x |
 | Softmax | 1.36x | 17.3x | 10.4x | | 3.7x | 0.36x |
 
-Sharing in area (the dedicated blocks carry their own sequencing, so the controller `u_ctrl` of the SoC run, 4,335, is added to the VPU):
+Sharing in area (the dedicated blocks carry their own sequencing, so the controller `u_ctrl` of the SoC run, 4,327, is added to the VPU):
 
-| | Cell area | VPU alone | VPU + controller | In-SoC `u_vpu` + controller (50,461) |
+| | Cell area | VPU alone | VPU + controller | In-SoC `u_vpu` + controller (51,006) |
 |---|---|---|---|---|
-| Sum of the three `tr_*` blocks | 62,044 | -22.6% | -15.6% | -18.7% |
-| Sum of the three `ibert_*` blocks | 58,300 | -17.6% | -10.1% | -13.4% |
+| Sum of the three `tr_*` blocks | 62,044 | -22.6% | -15.6% | -17.8% |
+| Sum of the three `ibert_*` blocks | 58,300 | -17.6% | -10.2% | -12.5% |
 
 Shared VPU (`tr_nonlinear_vpu`): 48,053.
 
@@ -63,12 +63,12 @@ Per operator (ratios of the table above):
 | SwiGLU | 0.90x | 13.7x | 11.9x | | 1.4x | 0.12x |
 | Softmax | 1.28x | 17.3x | 16.8x | | 5.8x | 0.35x |
 
-Sharing in area (the dedicated blocks carry their own sequencing, so the controller `u_ctrl` of the SoC run, 4,335, is added to the VPU):
+Sharing in area (the dedicated blocks carry their own sequencing, so the controller `u_ctrl` of the SoC run, 4,327, is added to the VPU):
 
-| | Cell area | VPU alone | VPU + controller | In-SoC `u_vpu` + controller (50,461) |
+| | Cell area | VPU alone | VPU + controller | In-SoC `u_vpu` + controller (51,006) |
 |---|---|---|---|---|
-| Sum of the three `tr_*` blocks | 67,161 | -22.7% | -16.2% | -24.9% |
-| Sum of the three `ibert_*` blocks | 60,088 | -13.6% | -6.3% | -16.0% |
+| Sum of the three `tr_*` blocks | 67,161 | -22.7% | -16.2% | -24.1% |
+| Sum of the three `ibert_*` blocks | 60,088 | -13.6% | -6.4% | -15.1% |
 
 Shared VPU (`tr_nonlinear_vpu`): 51,938.
 
@@ -115,4 +115,4 @@ Cell area only: the activity reports of those runs used pilot VCDs with a 10 ns 
 
 Missing synthesis results: none.
 
-Generated 2026-11-21 16:12.
+Generated 2026-11-21 16:43.
