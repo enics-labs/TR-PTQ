@@ -6,4 +6,6 @@ Genus scripts. Usage and conventions: see ../README.md.
   report_power_activity.tcl   VCD-driven power on an already-synthesized design
   procedures.tcl              shared helper procs (enics_*)
 
-  settings.tcl, simulation.tcl   not used by the flow (OCV settings, gate-level VCD probing)
+  run_soc_top.sh              top-level run of tr_soc_top_int (qrun job)
+  run_comparison.sh           operator comparison: synthesis + activity power of the operator modules and the VPU (qrun job)
+  summarize_comparison.py     tables of the comparison -> reports/operator_comparison.md

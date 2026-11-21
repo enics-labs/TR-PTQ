@@ -9,15 +9,17 @@ in this branch; they are preserved at the tag `tr-vpu_synthesis-ISCAS-20261013`.
 
 ## Current results
 
-Clock 3.3 ns, `ss_typical_max_0p90v_125c`. Cell area in library units.
+Frozen design of the Llama work, RTL `tr-vpu_rtl` at `353d5e4` (RMSNorm output code Q6.6). Clock 3.3 ns, `ss_typical_max_0p90v_125c`, Genus 25.12,
+cell area in library units.
 
-| Top level | RTL commit | Timing | Cell area | Notes |
+| Top level | Configuration | Timing | Cell area | Notes |
 |---|---|---|---|---|
-| `tr_soc_top_int` | `56c819e` | met, 0 violating paths | 178,000 | `u_vpu` 46,706; power 33.3 mW (vectorless) |
-| `tr_nonlinear_vpu` (standalone) | `e65eb37` | in2reg -10 ps | 56,721 | the violating path is an input-delay artifact of standalone runs |
-| `tr_backbone_wrapper` (standalone) | `2c7ce3a` | met | 26,760 | before the removal of the ln units on lanes 1 to 7; includes all 8 ln lanes |
+| `tr_soc_top_int` | clock gating inferred, 30% boundary delay (`scripts/run_soc_top.sh`) | met, 0 violating paths | 180,303 | `u_vpu` 46,679, `u_ctrl` 4,327; 34.06 mW (vectorless) |
+| `tr_nonlinear_vpu` (standalone) | clock gating on, 10% boundary delay | met, 0 violating paths | 48,053 | energy per tile 54.3 / 118.1 / 72.9 pJ (RMSNorm / SwiGLU / softmax pilots) |
+| `tr_*`, `ibert_*` operator modules | same | met, 0 violating paths | see `reports/operator_comparison.md` | dedicated Taylor-Region and divider-based versions of the three operators |
 
-Raw reports: `reports/<top level>/synthesis/`. Analysis and history: `docs/llama/synthesis-results.md`
+Raw reports: `reports/<top level>/synthesis/` (operator comparison without clock gating: `reports/no_clock_gating/<module>/`); the operator
+comparison tables: `reports/operator_comparison.md`. Analysis and history: `docs/llama/synthesis-results.md` and `docs/llama/standalone-comparison.md`
 in the [integration repository](https://github.com/YoniP31/tr-ptq-ddp23).
 
 ## Layout
@@ -27,8 +29,8 @@ in the [integration repository](https://github.com/YoniP31/tr-ptq-ddp23).
 | `tr-vpu_rtl/` | submodule: the RTL (`rtl_soc/` and `rtl_baseline/` are read) |
 | `inputs/dut.defines`, `inputs/dut.sdc` | technology, clock period (3.3 ns), I/O delays, DRV limits, path layout, RTL roots |
 | `libraries/` | TSMC65LP / ARM65LP standard-cell, SRAM and IO library configuration |
-| `scripts/` | `genus.tcl` (main flow), `report_power.tcl`, `report_power_activity.tcl`, `run_sweep.tcl`, `procedures.tcl` |
-| `reports/<top>/synthesis/` | timing, area, power, QoR reports of the last run |
+| `scripts/` | `genus.tcl` (main flow), `report_power.tcl`, `report_power_activity.tcl`, `run_sweep.tcl`, `procedures.tcl`; drivers `run_soc_top.sh` (top level) and `run_comparison.sh` + `summarize_comparison.py` (operator comparison) |
+| `reports/<top>/synthesis/` | timing, area, power, QoR reports of the frozen runs; `reports/no_clock_gating/` and `reports/operator_comparison.{md,json}` from the operator comparison |
 | `export/<top>/` | exported netlist, db, sdf, sdc (git-ignored) |
 | `workspace/` | run everything from here (tracked empty; all generated files are untracked) |
 
@@ -108,15 +110,15 @@ Defaults are 10 / 2 / 1 ns. Results: `reports/<module>/sweep/clock_sweep_results
 
 ## Limitations
 
-- `scripts/settings.tcl` and `scripts/simulation.tcl` (OCV settings, gate-level VCD probing) are not used by the flow.
 - There is no place-and-route, back-annotated gate-level simulation or power-rail analysis in this branch.
 
 ### Comparison runs (unattended)
 
 `scripts/run_comparison.sh` runs the whole operator comparison without supervision: for each configuration (`gated_io10`: clock gating on and 10% I/O delay;
-`nogate_io10`: gating off; `gated_io30`: the VPU at the original 30% I/O delay) it synthesizes `tr_rmsnorm`, `ibert_rmsnorm`, `tr_swiglu`, `ibert_swiglu`,
+`nogate_io10`: gating off) it synthesizes `tr_rmsnorm`, `ibert_rmsnorm`, `tr_swiglu`, `ibert_swiglu`,
 `tr_softmax`, `ibert_softmax` and `tr_nonlinear_vpu`, runs the activity-based power report with the matching pilot VCD (the VPU with its three), and finally
-writes `reports_cmp/summary.md`, commits and pushes. Each configuration runs in its own directory `../TR-PTQ_runs/<tag>/`; finished steps are skipped, so it can be
+copies the reports into `reports/` (`reports/no_clock_gating/` for the second configuration) and writes `reports/operator_comparison.md`;
+it commits and pushes unless `NO_PUBLISH=1` is set. Each configuration runs in its own directory `../TR-PTQ_runs/<tag>/`; finished steps are skipped, so it can be
 resubmitted after an interruption. Submit it detached (the wrapper `genus` only queues interactive sessions, the script calls the real binary):
 
 ```tcsh
