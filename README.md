@@ -1,7 +1,7 @@
 # TR-PTQ VPU: RTL
 
 RTL for a Taylor-Region (TR) vector processing unit: one shared, software-defined log/exp crossbar
-(`tr_nonlinear_vpu`) that implements the nonlinear operators of INT8 Llama-3.2-1B inference, sequenced by an MMIO
+(`tr_nonlinear_vpu`) that implements the nonlinear operators of INT8 inference of the Llama family (Llama-3.2-1B, Llama-3.2-3B, Llama-3.1-8B), sequenced by an MMIO
 command FSM and fed by an INT8 matmul engine.
 
 | Operator | Used by | Where it runs |
