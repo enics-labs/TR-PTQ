@@ -7,20 +7,17 @@ The RTL lives on the `tr-vpu_rtl` branch and is pulled in here as the `tr-vpu_rt
 Reports of the paper-era designs (I-BERT and standalone TR baselines, MX top, GELU build, bit-width sweeps) are not kept
 in this branch; they are preserved at the tag `tr-vpu_synthesis-ISCAS-20261013`.
 
-## Current results
+## What is here
 
-Frozen design of the Llama work, RTL `tr-vpu_rtl` at `353d5e4` (RMSNorm output code Q6.6). Clock 3.3 ns, `ss_typical_max_0p90v_125c`, Genus 25.12,
-cell area in library units.
+The synthesis flow, constraints and library configuration for the frozen design of the Llama work (RTL `tr-vpu_rtl` at the tag `tr-vpu_rtl-LLAMA-20261121`), and the raw reports of its runs:
 
-| Top level | Configuration | Timing | Cell area | Notes |
-|---|---|---|---|---|
-| `tr_soc_top_int` | clock gating inferred, 30% boundary delay (`scripts/run_soc_top.sh`) | met, 0 violating paths | 180,303 | `u_vpu` 46,679, `u_ctrl` 4,327; 34.06 mW (vectorless) |
-| `tr_nonlinear_vpu` (standalone) | clock gating on, 10% boundary delay | met, 0 violating paths | 48,053 | energy per tile 54.3 / 118.1 / 72.9 pJ (RMSNorm / SwiGLU / softmax pilots) |
-| `tr_*`, `ibert_*` operator modules | same | met, 0 violating paths | see `reports/operator_comparison.md` | dedicated Taylor-Region and divider-based versions of the three operators |
+| Top level | Configuration | Script |
+|---|---|---|
+| `tr_soc_top_int` | clock gating inferred, 30% boundary delay | `scripts/run_soc_top.sh` |
+| `tr_nonlinear_vpu` (standalone) and the operator modules `tr_*`, `ibert_*` | clock gating on, 10% boundary delay (and gating off, for the comparison) | `scripts/run_comparison.sh` |
 
-Raw reports: `reports/<top level>/synthesis/` (operator comparison without clock gating: `reports/no_clock_gating/<module>/`); the operator
-comparison tables: `reports/operator_comparison.md`. Analysis and history: `docs/llama/synthesis-results.md` and `docs/llama/standalone-comparison.md`
-in the [integration repository](https://github.com/YoniP31/tr-ptq-ddp23).
+Raw reports: `reports/<top level>/synthesis/`; operator comparison without clock gating: `reports/no_clock_gating/<module>/`; the generated comparison tables: `reports/operator_comparison.md`.
+The results and their analysis are in `docs/llama/synthesis-results.md` and `docs/llama/standalone-comparison.md` of the [integration repository](https://github.com/YoniP31/tr-ptq-ddp23).
 
 ## Layout
 
